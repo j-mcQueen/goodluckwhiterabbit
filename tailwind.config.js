@@ -11,6 +11,9 @@ export default {
       alabaster: "#E4E4DD",
       onyx: "#313638",
     },
+    fontFamily: {
+      times: ["Times New Roman", "serif"],
+    },
     extend: {},
   },
   plugins: [],
