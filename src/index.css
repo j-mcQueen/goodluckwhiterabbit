@@ -4,7 +4,8 @@
 
 @font-face {
   font-family: "Times New Roman";
-  src: local("Times New Roman"),
+  src:
+    local("Times New Roman"),
     url("/src/assets/fonts/TNR/TimesNewRomanMTStd.woff") format("woff"),
     url("/src/assets/fonts/TNR/TimesNewRomanMTStd-Bold.woff") format("woff"),
     url("/src/assets/fonts/TNR/TimesNewRomanMTStd-BoldIt.woff") format("woff"),
