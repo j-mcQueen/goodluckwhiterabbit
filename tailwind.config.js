@@ -14,7 +14,12 @@ export default {
     fontFamily: {
       times: ["Times New Roman", "serif"],
     },
-    extend: {},
+    extend: {
+      backgroundImage: {
+        life: "url('/src/assets/media/LIFE.webp')",
+        still: "url('/src/assets/media/STILL.webp')",
+      },
+    },
   },
   plugins: [],
 };
