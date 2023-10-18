@@ -1,0 +1,64 @@
+@keyframes extend {
+  from {
+    width: 50%;
+  }
+
+  to {
+    width: 75%;
+  }
+}
+
+@keyframes shrink {
+  from {
+    width: 75%;
+  }
+
+  to {
+    width: 50%;
+  }
+}
+
+@media screen and (min-width: 1081px) {
+  /* LARGE */
+  main {
+    display: flex;
+    width: 100dvw;
+    height: 100dvh;
+
+    & section {
+      width: 50%;
+      height: 100%;
+      overflow: hidden;
+      animation-duration: 750ms;
+      animation-name: shrink;
+    }
+
+    & .life-active,
+    .still-active {
+      /* width: 70%; */
+      animation-duration: 750ms;
+      animation-name: extend;
+      animation-fill-mode: forwards;
+    }
+
+    & .life-shrunk,
+    .still-shrunk {
+      /* width: 30%; */
+      animation-duration: 750ms;
+      animation-name: shrink;
+      animation-fill-mode: forwards;
+    }
+
+    & img {
+      height: 100dvh;
+    }
+  }
+}
+
+@media screen and (min-width: 768px) and (max-width: 1080px) {
+  /* MEDIUM */
+}
+
+@media screen and (max-width: 767px) {
+  /* SMALL */
+}
