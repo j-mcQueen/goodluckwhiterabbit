@@ -6,41 +6,68 @@ import life from "../../assets/media/LIFE.webp";
 export default function Landing() {
   const [activePanel, setActivePanel] = useState("");
 
-  // when we hover a panel, it's width extends to 3/4, and it's counterpart's width shrinks to 1/4
-
   return (
-    <main onMouseLeave={() => setActivePanel("")}>
-      <section
-        onMouseEnter={() => setActivePanel("still")}
-        className={
-          activePanel === "still"
-            ? "still-active"
-            : activePanel === "life"
-            ? "still-shrunk"
-            : "still"
-        }
-      >
-        <picture>
-          <source />
-          <img src={butterfly} alt="" />
-        </picture>
-      </section>
+    <>
+      <header>
+        <div className="title-container">
+          <h1>KAILEY MONET</h1>
+          <h2>FINE ART PHOTOGRAPHY</h2>
+        </div>
+      </header>
 
-      <section
-        onMouseEnter={() => setActivePanel("life")}
-        className={
-          activePanel === "life"
-            ? "life-active"
-            : activePanel === "still"
-            ? "life-shrunk"
-            : "life"
-        }
-      >
-        <picture>
-          <source />
-          <img src={life} alt="" />
-        </picture>
-      </section>
-    </main>
+      <main onMouseLeave={() => setActivePanel("")}>
+        <section
+          onMouseEnter={() => setActivePanel("still")}
+          className={
+            activePanel === "still"
+              ? "still-active"
+              : activePanel === "life"
+              ? "still-shrunk"
+              : "still"
+          }
+        >
+          <a href="">
+            <h3 className="still-sub">STILL</h3>
+            <picture>
+              <source srcSet="" media="" type="image/webp" />
+              <img
+                className="still-img"
+                src={butterfly}
+                alt="A photograph of Damien Hirst's red / gold butterfly painting, taken by Kailey Monet"
+              />
+            </picture>
+          </a>
+        </section>
+
+        <section
+          onMouseEnter={() => setActivePanel("life")}
+          className={
+            activePanel === "life"
+              ? "life-active"
+              : activePanel === "still"
+              ? "life-shrunk"
+              : "life"
+          }
+        >
+          <a href="">
+            <picture>
+              <source srcSet="" media="" type="image/webp" />
+              <img
+                className="life-img"
+                src={life}
+                alt="A red cardinal flying amongst the woods, taken by Kailey Monet"
+              />
+            </picture>
+            <h3 className="life-sub">LIFE</h3>
+          </a>
+        </section>
+      </main>
+
+      <footer>
+        <a className="bio-container" href="">
+          BIOGRAPHY
+        </a>
+      </footer>
+    </>
   );
 }

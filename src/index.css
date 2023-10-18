@@ -10,13 +10,14 @@
 }
 
 :root {
-  --black: "#000000";
-  --white: "#FFFFFF";
-  --tangerine: "#E99D86";
-  --rufous: "#A42208";
-  --smoke: "#F6F6F3";
-  --alabaster: "#E4E4DD";
-  --onyx: "#313638";
+  --black: #000000;
+  --white: #ffffff;
+  --tangerine: #e99d86;
+  --rufous: #a42208;
+  --smoke: #f6f6f3;
+  --alabaster: #e4e4dd;
+  --onyx: #313638;
+  background-color: var(--black);
 }
 
 /* http://meyerweb.com/eric/tools/css/reset/ 
@@ -92,8 +93,6 @@ details,
 embed,
 figure,
 figcaption,
-footer,
-header,
 hgroup,
 menu,
 nav,
@@ -118,8 +117,6 @@ aside,
 details,
 figcaption,
 figure,
-footer,
-header,
 hgroup,
 menu,
 nav,
