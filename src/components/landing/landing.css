@@ -18,57 +18,52 @@
   }
 }
 
+header {
+  position: absolute;
+  /*  */
+  width: 100%;
+  /*  */
+  font-family: "Times New Roman", Times, serif;
+  text-align: center;
+  color: var(--alabaster);
+  /*  */
+  z-index: 2;
+
+  & h1 {
+    font-weight: bold;
+  }
+
+  & h2 {
+    font-style: italic;
+  }
+}
+
+main {
+  font-family: "Times New Roman", Times, serif;
+}
+
 @media screen and (min-width: 1081px) {
   /* LARGE */
   header {
-    position: absolute;
-    height: auto;
-    width: 100%;
-    /*  */
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    /*  */
-    z-index: 1;
-    /*  */
-    color: var(--alabaster);
+    padding: 2% 0;
 
-    & .title-container {
-      font-family: "Times New Roman", Times, serif;
-      /*  */
-      padding: 10px;
-      margin: 10px;
-      /*  */
-      border-radius: 5px;
+    & h1 {
+      font-size: 52px;
+      letter-spacing: -2px;
+    }
 
-      & h1 {
-        font-size: 32px;
-        font-family: "Times New Roman", Times, serif;
-        text-align: center;
-        letter-spacing: -2px;
-      }
-
-      & h2 {
-        font-size: 20px;
-        font-style: italic;
-        font-family: "Times New Roman", Times, serif;
-        text-align: center;
-        letter-spacing: 10px;
-      }
+    & h2 {
+      font-size: 20px;
+      letter-spacing: -0.5px;
     }
   }
 
   main {
     display: flex;
-    /*  */
-    width: 100dvw;
-    height: 100dvh;
-    overflow: hidden;
 
     & section {
-      width: 50%;
-      height: 100%;
+      width: 50dvw;
+      height: 100dvh;
       /*  */
       overflow: hidden;
       /*  */
@@ -79,40 +74,39 @@
         display: flex;
         flex-direction: column;
         justify-content: center;
-        position: relative;
         /*  */
-        text-decoration: none;
+        height: 100dvh;
 
         & h3 {
-          font-family: "Times New Roman", Times, serif;
-          font-size: 24px;
-          letter-spacing: -2px;
-          z-index: 1;
-          /*  */
-          color: var(--alabaster);
-          /*  */
           display: flex;
           align-items: center;
           align-self: center;
           position: absolute;
           /*  */
-          height: 100dvh;
+          font-size: 24px;
+          letter-spacing: -2px;
+          color: var(--alabaster);
+          z-index: 1;
         }
       }
     }
 
+    & .still-active,
+    .life-active,
+    .still-shrunk,
+    .life-shrunk {
+      animation-duration: 750ms;
+      animation-fill-mode: forwards;
+    }
+
     & .life-active,
     .still-active {
-      animation-duration: 750ms;
       animation-name: extend;
-      animation-fill-mode: forwards;
     }
 
     & .life-shrunk,
     .still-shrunk {
-      animation-duration: 750ms;
       animation-name: shrink;
-      animation-fill-mode: forwards;
     }
 
     & img {
@@ -150,7 +144,6 @@
       text-decoration: none;
       /*  */
       color: var(--alabaster);
-      /* background-color: var(--black); */
       /*  */
       border-radius: 5px;
       /*  */
@@ -166,4 +159,70 @@
 
 @media screen and (max-width: 767px) {
   /* SMALL */
+  header {
+    padding: 5% 0;
+
+    & h1 {
+      font-size: 40px;
+      letter-spacing: -2px;
+    }
+
+    & h2 {
+      letter-spacing: -1px;
+    }
+  }
+
+  main {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    /*  */
+    overflow: hidden;
+
+    & section {
+      width: 50dvw;
+      height: 100dvh;
+
+      & a {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        /*  */
+        height: 100dvh;
+
+        & h3 {
+          position: absolute;
+          align-self: center;
+          /*  */
+          font-size: 24px;
+          letter-spacing: -2px;
+          color: var(--alabaster);
+          z-index: 1;
+        }
+
+        & .still-img {
+          float: right;
+          /*  */
+          transform: scaleX(-1);
+        }
+      }
+    }
+  }
+
+  footer {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    /*  */
+    font-family: "Times New Roman", Times, serif;
+    text-align: center;
+    /*  */
+    padding: 2% 0;
+
+    & .bio-container {
+      font-size: 20px;
+      letter-spacing: -2px;
+      color: var(--alabaster);
+      text-decoration: none;
+    }
+  }
 }

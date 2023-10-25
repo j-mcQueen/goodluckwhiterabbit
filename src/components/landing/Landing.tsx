@@ -50,6 +50,7 @@ export default function Landing() {
           }
         >
           <a href="">
+            <h3 className="life-sub">LIFE</h3>
             <picture>
               <source srcSet="" media="" type="image/webp" />
               <img
@@ -58,7 +59,6 @@ export default function Landing() {
                 alt="A red cardinal flying amongst the woods, taken by Kailey Monet"
               />
             </picture>
-            <h3 className="life-sub">LIFE</h3>
           </a>
         </section>
       </main>
