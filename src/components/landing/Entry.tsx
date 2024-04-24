@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import rabbit from "../../assets/media/glwr-lenticular.gif";
+import rabbit from "../../assets/media/gifs/glwr-lenticular.gif";
 
 export default function Entry() {
   return (
