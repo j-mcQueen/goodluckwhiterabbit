@@ -1,11 +1,9 @@
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
-import Entry from "./components/landing/Entry";
-import Photo from "./components/photo/Photo";
+import UnderConstruction from "./components/landing/UnderConstruction";
 
 function App() {
   const router = createBrowserRouter([
-    { path: "/", element: <Entry />, errorElement: "" },
-    { path: "/photo", element: <Photo />, errorElement: "" },
+    { path: "/", element: <UnderConstruction />, errorElement: "" },
   ]);
 
   return <RouterProvider router={router} />;

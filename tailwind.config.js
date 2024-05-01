@@ -5,6 +5,7 @@ export default {
     extend: {
       fontFamily: {
         tnr: ["Times New Roman", "serif"],
+        inter: ["Inter", "sans-serif"],
       },
       colors: {
         blu: "#0075FF",

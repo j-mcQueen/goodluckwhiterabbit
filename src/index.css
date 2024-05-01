@@ -9,6 +9,13 @@
     url("./src/assets/fonts/TimesNewRomanMTStd.woff2") format("woff2");
 }
 
+@font-face {
+  font-family: "Inter";
+  src:
+    local("Inter"),
+    url("./src/assets/fonts/inter/Inter-Regular.woff2") format("woff2");
+}
+
 :root {
   font-family: "Times New Roman", Times, serif;
   min-width: 300px;
