@@ -6,14 +6,14 @@
   font-family: "Times New Roman";
   src:
     local("Times New Roman"),
-    url("./src/assets/fonts/TimesNewRomanMTStd.woff2") format("woff2");
+    url("/fonts/TimesNewRomanMTStd.woff2") format("woff2");
 }
 
 @font-face {
   font-family: "Inter";
   src:
     local("Inter"),
-    url("./src/assets/fonts/inter/Inter-Regular.woff2") format("woff2");
+    url("/fonts/inter/Inter-Regular.woff2") format("woff2");
 }
 
 :root {

@@ -11,7 +11,7 @@ export default function UnderConstruction() {
         />
 
         <hgroup className="flex flex-col items-center justify-center">
-          <h1 className="text-white py-6 xl:py-10 text-3xl xl:text-5xl tracking-widest italic text-center px-6 xl:px-0">
+          <h1 className="text-white py-6 xl:py-10 text-3xl xl:text-5xl tracking-widest italic text-center px-6 xl:px-0 z-10">
             WELCOME TO MY WORLD
           </h1>
 
