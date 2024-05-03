@@ -10,6 +10,7 @@ export default {
       colors: {
         blu: "#0075FF",
         ylw: "#FFF500",
+        gray: "#818181",
       },
     },
   },
