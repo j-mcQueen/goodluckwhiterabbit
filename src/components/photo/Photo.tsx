@@ -47,7 +47,7 @@ export default function Photo() {
         <Header page={activePage} />
       )}
 
-      <main className="flex xl:flex-row flex-col overflow-y-scroll p-5">
+      <main className="flex xl:flex-row flex-col xl:overflow-y-scroll p-5">
         {mobile === true ? (
           <>
             <Title
