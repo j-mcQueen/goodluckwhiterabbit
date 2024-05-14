@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -19,6 +19,12 @@ export default function MobileHeader({ page }: { page: number }) {
     active: `${page === 1 ? "bg-blu text-white" : page === 2 ? "bg-ylw" : page === 3 ? "bg-red-600" : null}`,
     std: "",
   };
+
+  useEffect(() => {
+    // prevent body scrolling when nav modal is open
+    document.body.style.overflowY = active ? "hidden" : "unset";
+    document.documentElement.style.overflowY = active ? "hidden" : "unset";
+  }, [active]);
 
   return (
     <header
@@ -54,13 +60,13 @@ export default function MobileHeader({ page }: { page: number }) {
             animate={{ x: 0, opacity: 1, visibility: "visible" }}
             exit={{ x: -100, opacity: 0 }}
             transition={{ type: "spring", bounce: 0, duration: 0.4 }}
-            className="absolute bg-white w-[calc(100dvw-1.5rem-2px)] h-[calc(100dvh-1.5rem-52px)] translate-y-[51px] flex items-center"
+            className="absolute bg-white w-[calc(100dvw-1.5rem-2px)] h-[calc(100dvh-1.5rem-52px)] translate-y-[51px] flex flex-col items-center"
           >
-            <ul className="w-full">
+            <ul className="w-full h-full flex flex-col  justify-evenly">
               {listData.map((item, index: number) => {
                 return (
                   <li
-                    className={`${page === index + 1 ? listItemVariants.active : listItemVariants.std} ${index === listData.length - 1 ? "border-b-[1px]" : ""} border-t-[1px] border-solid border-black flex h-[75px]`}
+                    className={`${page === index + 1 ? listItemVariants.active : listItemVariants.std} ${index === listData.length - 1 ? "border-b-[1px]" : ""} border-t-[1px] border-solid border-black flex h-full`}
                     key={uuidv4()}
                   >
                     <Link
@@ -74,19 +80,19 @@ export default function MobileHeader({ page }: { page: number }) {
               })}
             </ul>
 
-            <div className="absolute bottom-0 flex justify-between w-full h-[75px] border-t-[1px] border-solid border-black">
-              <a
-                href=""
-                className="flex items-center justify-center italic w-full"
-              >
-                CONTACT
-              </a>
-
-              <div className="w-[75px] h-full flex items-center justify-center border-l-[1px] border-solid border-black">
-                <a href="">
+            <div className="flex justify-between w-full min-h-[50px]">
+              <div className="min-w-[50px] flex items-center justify-center border-r-[1px] border-solid border-black">
+                <a href="https://www.instagram.com/goodluckwhiterabbit/">
                   <Instagram mobile={true} />
                 </a>
               </div>
+
+              <a
+                href=""
+                className="flex items-center justify-center italic w-full h-[50px]"
+              >
+                CONTACT
+              </a>
             </div>
           </motion.nav>
         )}

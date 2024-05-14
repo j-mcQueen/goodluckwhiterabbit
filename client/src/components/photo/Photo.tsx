@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { projects } from "../photo/data/projects";
+import { projects } from "./data/projects";
 
 import Header from "../global/header/Header";
 import MobileHeader from "../global/header/mobile/Header";

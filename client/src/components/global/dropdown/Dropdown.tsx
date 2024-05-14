@@ -1,6 +1,7 @@
 import { Fragment, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { motion } from "framer-motion";
+import Up from "../../../assets/media/icons/Up";
 
 export default function Dropdown({ ...props }) {
   const { categoryData, activeProject, setActiveProject } = props;
@@ -23,14 +24,15 @@ export default function Dropdown({ ...props }) {
       <button
         type="button"
         onClick={() => setOpen(!open)}
-        className="bg-black text-white border border-solid border-blu p-3"
+        className="bg-black text-white border border-solid border-blu p-3 flex justify-center gap-2"
       >
         PROJECTS
+        <Up active={open} />
       </button>
 
       <div className="relative">
         <ul
-          className={`${open ? "block" : "hidden"} absolute top-0 w-full border border-solid border-blu border-t-0 bg-black max-h-[500px] overflow-y-scroll`}
+          className={`${open ? "block" : "hidden"} absolute top-0 w-full border border-solid border-blu border-t-0 bg-black max-h-[500px] overflow-y-scroll overflow-x-hidden`}
         >
           {categoryData.map(
             (category: { title: string; links: [] }, index: number) => {
@@ -47,6 +49,7 @@ export default function Dropdown({ ...props }) {
                     className="p-5 text-lg leading-none"
                   >
                     {category.title}
+
                     <ul>
                       {category.links.map(
                         (
