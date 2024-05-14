@@ -48,11 +48,10 @@ export default function Header({ page }: { page: number }) {
         </ul>
 
         <a
-          href=""
+          href="https://www.instagram.com/goodluckwhiterabbit/"
           className={`${page === 4 ? "border-l-[1px]" : ""} w-[50px] flex items-center justify-center border-b-[1px] border-solid`}
         >
           <Instagram mobile={false} />
-          {/* TODO add href */}
         </a>
       </nav>
     </header>
