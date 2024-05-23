@@ -1,5 +1,24 @@
+import { FormEvent } from "react";
 import glwr from "../../../assets/media/gifs/glwr-lenticular.gif";
+
 export default function Login() {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    const formData = new FormData(e.currentTarget);
+    e.preventDefault();
+
+    try {
+      const response = await fetch("http://localhost:3000/", {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await response.json();
+      console.log(data); // success!
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   return (
     <main className="w-[calc(100dvw-1.5rem-2px)] h-[calc(100dvh-1.5rem-2px)] flex items-center justify-center">
       <section className="text-white border border-solid border-white xl:w-[25dvw] xl:h-[35dvw] mx-3 xl:mx-0 py-5 xl:py-0 flex flex-col justify-center">
@@ -21,12 +40,19 @@ export default function Login() {
           </p> */}
         </hgroup>
 
-        <form action="" className="flex flex-col gap-5 py-5 px-3 xl:px-0">
+        <form
+          action=""
+          method="post"
+          encType="multipart/form-data"
+          onSubmit={(e) => handleSubmit(e)}
+          className="flex flex-col gap-5 py-5 px-3 xl:px-0"
+        >
           <label className="italic flex flex-col xl:px-5">
             USERNAME
             <input
               type="text"
               name="username"
+              minLength={4}
               required
               className="bg-black border border-solid border-white font-inter text-gray h-10 pl-2 mt-2 outline-none focus:border-blu"
             />
@@ -39,7 +65,7 @@ export default function Login() {
             PASSWORD
             <input
               type="password"
-              name="pwd"
+              name="password"
               minLength={8}
               required
               className="bg-black border border-solid border-white font-inter text-gray h-10 pl-2 mt-2 outline-none focus:border-blu"

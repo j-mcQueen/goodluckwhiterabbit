@@ -1,8 +1,11 @@
-var express = require("express");
-var router = express.Router();
+const { adminLogin } = require("../controllers/admin");
+const express = require("express");
+const multer = require("multer");
+const router = express.Router();
+const upload = multer();
 
 router.get("/", (req, res, next) => {});
-router.post("/", (req, res, next) => {});
+router.post("/", upload.none(), adminLogin);
 router.put("/", (req, res, next) => {});
 router.delete("/", (req, res, next) => {});
 
