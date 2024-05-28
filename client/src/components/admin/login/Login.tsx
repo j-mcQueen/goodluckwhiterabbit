@@ -1,7 +1,9 @@
-import { FormEvent } from "react";
+import { FormEvent, useState } from "react";
 import glwr from "../../../assets/media/gifs/glwr-lenticular.gif";
 
 export default function Login() {
+  const [authError, setAuthError] = useState(false);
+
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     const formData = new FormData(e.currentTarget);
     e.preventDefault();
@@ -13,9 +15,16 @@ export default function Login() {
       });
 
       const data = await response.json();
-      console.log(data); // success!
+
+      if (data.errors) {
+        return setAuthError(true);
+      } else {
+        // success!
+        setAuthError(false);
+      }
     } catch (err) {
       console.log(err);
+      setAuthError(true);
     }
   };
 
@@ -53,12 +62,12 @@ export default function Login() {
               type="text"
               name="username"
               minLength={4}
+              onChange={() => {
+                if (authError) setAuthError(false);
+              }}
               required
-              className="bg-black border border-solid border-white font-inter text-gray h-10 pl-2 mt-2 outline-none focus:border-blu"
+              className="bg-black border border-solid border-white font-inter text-ylw h-10 pl-2 mt-2 outline-none focus:border-blu"
             />
-            {/* <div className="font-inter not-italic text-sm text-red-500 pt-2">
-              Username not found.
-            </div> */}
           </label>
 
           <label className="italic flex flex-col xl:px-5">
@@ -67,23 +76,29 @@ export default function Login() {
               type="password"
               name="password"
               minLength={8}
+              onChange={() => {
+                if (authError) setAuthError(false);
+              }}
               required
-              className="bg-black border border-solid border-white font-inter text-gray h-10 pl-2 mt-2 outline-none focus:border-blu"
+              className="bg-black border border-solid border-white font-inter text-ylw h-10 pl-2 mt-2 outline-none focus:border-blu"
             />
-            {/* <div className="font-inter not-italic text-sm text-red-500 pt-2">
-              Invalid password. You shall not pass!
-            </div> */}
           </label>
 
           <div className="flex justify-center pt-5">
             <button
               type="submit"
-              className="font-inter bg-white text-black border border-solid border-white outline-none focus:bg-black focus:text-white focus:border-blu xl:hover:border-blu xl:hover:bg-black xl:hover:text-white  py-3 px-5 italic font-bold xl:transition-colors"
+              className="font-tnr bg-white text-black border border-solid border-white outline-none focus:bg-black focus:text-white focus:border-blu xl:hover:border-blu xl:hover:bg-black xl:hover:text-white italic py-3 px-5 tracking-wider font-bold xl:transition-colors"
             >
               LOGIN
             </button>
           </div>
         </form>
+
+        {authError ? (
+          <div className="font-tnr not-italic text-center text-sm text-red-500 pt-2">
+            Invalid username or password. You shall not pass!
+          </div>
+        ) : null}
       </section>
     </main>
   );
