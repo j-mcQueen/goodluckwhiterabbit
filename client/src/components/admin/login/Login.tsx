@@ -1,7 +1,9 @@
 import { FormEvent, useState } from "react";
 import glwr from "../../../assets/media/gifs/glwr-lenticular.gif";
+import { useNavigate } from "react-router-dom";
 
 export default function Login() {
+  const navigate = useNavigate();
   const [authError, setAuthError] = useState(false);
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
@@ -17,14 +19,17 @@ export default function Login() {
       const data = await response.json();
 
       if (data.errors) {
+        // validation errors have been returned from servers. Likely a special character is in the username field
         return setAuthError(true);
       } else {
         // success!
         setAuthError(false);
+        return navigate("/admin/dashboard");
       }
     } catch (err) {
       console.log(err);
       setAuthError(true);
+      return;
     }
   };
 
