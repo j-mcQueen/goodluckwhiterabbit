@@ -1,9 +1,11 @@
 import Actions from "./Actions";
 
-export default function AllClients() {
+export default function AllClients({ ...props }) {
+  const { setActivePane } = props;
+
   return (
     <div className="text-white">
-      <Actions />
+      <Actions setActivePane={setActivePane} />
     </div>
   );
 }

@@ -2,11 +2,13 @@ import Add from "../../../assets/media/icons/Add";
 import Search from "../../../assets/media/icons/Search";
 import Sort from "../../../assets/media/icons/Sort";
 
-export default function Actions() {
+export default function Actions({ ...props }) {
+  const { setActivePane } = props;
+
   return (
     <div className="flex items-center gap-5">
-      <div className="flex">
-        <label>
+      <div className="flex flex-grow">
+        <label className="flex flex-grow">
           <span className="h-[1px] w-[1px] m-[-1px] absolute overflow-hidden">
             SEARCH CLIENTS
           </span>
@@ -16,7 +18,7 @@ export default function Actions() {
             name="search"
             id=""
             placeholder="SEARCH CLIENTS"
-            className="bg-black font-inter border border-solid border-gray p-[10px] xl:min-w-[400px] text-ylw xl:focus:border-blu xl:focus:outline-none max-h-[40px]"
+            className="bg-black font-inter border border-solid border-gray p-[10px] xl:min-w-[400px] text-ylw xl:focus:border-blu xl:focus:outline-none max-h-[40px] flex-grow"
           />
         </label>
 
@@ -36,6 +38,7 @@ export default function Actions() {
       </button>
 
       <button
+        onClick={() => setActivePane("ADD")}
         type="button"
         className="w-10 h-10 border border-solid border-green-600 flex justify-center items-center xl:focus:bg-green-600 xl:transition-colors xl:hover:bg-green-600 xl:focus:outline-none"
       >
