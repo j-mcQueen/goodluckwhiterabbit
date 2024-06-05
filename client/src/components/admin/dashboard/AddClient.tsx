@@ -1,21 +1,17 @@
-// import { FormEvent } from "react";
+import { FormEvent } from "react";
 import { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import PaneHeader from "./PaneHeader";
 
 export default function AddClient({ ...props }) {
   // TODO configure this component to allow for client editing (since the form is largely the same)
-  const { setActivePane } = props;
   const [selectedFiles, setSelectedFiles] = useState({
     sneaks: 0,
     full: 0,
     socials: 0,
   });
 
-  // const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {};
-
-  // TODO create state which holds an object that contains how many files have been selected for sneak peeks, full gallery, socials
-  // TODO create an array of objects which holds data for each browse component
+  const { clients, setActivePane, setClients } = props;
 
   const photoCategoryData = [
     {
@@ -44,7 +40,6 @@ export default function AddClient({ ...props }) {
   const Browse = ({ ...props }) => {
     const { title, fileCount, labelFor, inputName, inputId } = props;
 
-    // TODO 2nd p tag text should either be 0 files selected, x files selected, or 1 file selected, each object contains how many files have been selected
     return (
       <div className="flex items-center justify-between">
         <div className="flex gap-3 items-center font-inter">
@@ -67,7 +62,6 @@ export default function AddClient({ ...props }) {
               type="file"
               name={inputName}
               id={inputId}
-              multiple
               onChange={(e) =>
                 setSelectedFiles({
                   ...selectedFiles,
@@ -75,6 +69,8 @@ export default function AddClient({ ...props }) {
                 })
               }
               className="opacity-0 w-[1px]"
+              accept="image/*"
+              multiple
             />
             BROWSE
           </label>
@@ -83,12 +79,40 @@ export default function AddClient({ ...props }) {
     );
   };
 
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+
+    try {
+      const response = await fetch("http://localhost:3000/admin/add", {
+        method: "POST",
+        body: formData,
+        credentials: "include",
+      });
+
+      const data = await response.json();
+
+      // TODO handle server form validation errors
+
+      if (response.status === 200 && data) {
+        // A client has been added
+        // update state on admin dashboard component to include the addition of a new client
+        // TODO set activePane back to "ALL"
+        setClients({ ...clients, [data.name]: data });
+        setActivePane("ALL");
+      }
+    } catch (err) {
+      console.log(err);
+      return;
+    }
+  };
+
   return (
     <div>
       <PaneHeader setActivePane={setActivePane} paneTitle={"ADD NEW CLIENT"} />
 
       <form
-        // onSubmit={(e) => handleSubmit(e)}
+        onSubmit={(e) => handleSubmit(e)}
         action=""
         method="post"
         className="flex flex-col gap-5"
@@ -98,8 +122,10 @@ export default function AddClient({ ...props }) {
           CLIENT NAME
           <input
             type="text"
+            name="clientname"
             placeholder="e.g. Good and Luck"
             className="w-full bg-black border border-solid border-white p-3 text-ylw font-inter xl:focus:outline-none xl:focus:border-blu"
+            required
           />
         </label>
 
@@ -107,9 +133,10 @@ export default function AddClient({ ...props }) {
           CLIENT EMAIL
           <input
             type="email"
-            name=""
+            name="clientemail"
             placeholder="e.g. goodluck@gmail.com"
             className="w-full bg-black border border-solid border-white p-3 text-ylw font-inter xl:focus:outline-none xl:focus:border-blu"
+            required
           />
         </label>
 

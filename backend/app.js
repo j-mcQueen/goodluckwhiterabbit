@@ -26,15 +26,16 @@ const main = async () => {
 };
 main();
 
+app.use(cookieParser());
 app.use(
   cors({
+    credentials: true,
     origin: ["http://localhost:5173", "http://localhost:4173"],
   })
 );
 app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 
 // admin login
