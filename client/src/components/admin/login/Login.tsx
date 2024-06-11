@@ -11,9 +11,10 @@ export default function Login() {
     e.preventDefault();
 
     try {
-      const response = await fetch("http://localhost:3000/", {
+      const response = await fetch("http://localhost:3000/admin/login", {
         method: "POST",
         body: formData,
+        credentials: "include",
       });
 
       const data = await response.json();

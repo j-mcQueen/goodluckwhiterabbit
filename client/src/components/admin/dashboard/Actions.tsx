@@ -32,7 +32,7 @@ export default function Actions({ ...props }) {
 
       <button
         type="button"
-        className="w-10 h-10 border border-solid border-gray flex justify-center items-center xl:focus:border-ylw xl:hover:border-ylw xl:focus:outline-none"
+        className="w-10 h-10 border border-solid border-gray flex justify-center items-center xl:focus:border-ylw xl:hover:border-ylw xl:focus:outline-none xl:transition-colors"
       >
         <Sort className={"w-[18px] h-[18px]"} />
       </button>

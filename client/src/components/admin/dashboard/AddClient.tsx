@@ -11,6 +11,8 @@ export default function AddClient({ ...props }) {
     socials: 0,
   });
 
+  const [takenEmail, setTakenEmail] = useState(false);
+
   const { clients, setActivePane, setClients } = props;
 
   const photoCategoryData = [
@@ -96,12 +98,14 @@ export default function AddClient({ ...props }) {
 
       if (response.status === 200 && data) {
         // A client has been added
-        // update state on admin dashboard component to include the addition of a new client
-        // TODO set activePane back to "ALL"
-        setClients({ ...clients, [data.name]: data });
+        setClients([...clients, data]);
         setActivePane("ALL");
+      } else if (response.status === 409) {
+        // Client email already in use
+        setTakenEmail(true);
       }
     } catch (err) {
+      // TODO handle edge cases like network errors
       console.log(err);
       return;
     }
@@ -124,6 +128,7 @@ export default function AddClient({ ...props }) {
             type="text"
             name="clientname"
             placeholder="e.g. Good and Luck"
+            minLength={4}
             className="w-full bg-black border border-solid border-white p-3 text-ylw font-inter xl:focus:outline-none xl:focus:border-blu"
             required
           />
@@ -135,9 +140,17 @@ export default function AddClient({ ...props }) {
             type="email"
             name="clientemail"
             placeholder="e.g. goodluck@gmail.com"
+            onChange={() => {
+              if (takenEmail) setTakenEmail(false);
+            }}
             className="w-full bg-black border border-solid border-white p-3 text-ylw font-inter xl:focus:outline-none xl:focus:border-blu"
             required
           />
+          {takenEmail ? (
+            <p className="text-red-600 font-inter pt-3">
+              Email address already in use.
+            </p>
+          ) : null}
         </label>
 
         {photoCategoryData.map((category) => {

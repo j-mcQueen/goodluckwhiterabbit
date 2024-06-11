@@ -70,7 +70,7 @@ exports.adminLogin = [
     ); // create access token
 
     // TODO in options, ensure httpOnly is true, consider sameSite and secure attributes (latter in production only)
-    // TODO delete refresh cookie on logout
+    // TODO delete refresh and access cookies on logout
 
     return res
       .cookie("refreshToken", refreshToken, {
@@ -87,8 +87,62 @@ exports.adminLogin = [
   },
 ];
 
+const returnClients = async () => {
+  const allUsers = await User.find(
+    {},
+    {
+      // exclude this information from the query
+      email: 0,
+      role: 0,
+      __v: 0,
+    }
+  ).exec();
+
+  return allUsers;
+};
+
+exports.adminGetClients = async (req, res, next) => {
+  // TODO go through authorization process and handle outcomes as previously. On successful authorization, get all users
+  try {
+    const decodedAccess = jwt.verify(
+      req.cookies.accessToken,
+      process.env.JWT_SECRET
+    );
+
+    if (decodedAccess.exp > 0) {
+      // we're in!
+      const clients = await returnClients();
+      return res.status(200).json(clients);
+    } else {
+      if (decodedRefresh.exp > 0) {
+        // create new access token
+        const newAccess = jwt.sign(
+          { _id: decodedRefresh._id },
+          process.env.JWT_SECRET,
+          { expiresIn: "1h" }
+        );
+
+        const clients = await returnClients();
+
+        return res
+          .cookie("accessToken", newAccess, {
+            httpOnly: true,
+            sameSite: "Strict",
+            maxAge: 3600000,
+          })
+          .status(200)
+          .json(clients);
+      }
+    }
+  } catch (err) {
+    console.log(err);
+    return res.sendStatus(401); // TODO indicate to user they will be logged out
+  }
+};
+
 const createCode = () => {
   // create a user login code that contains 2 specials, 2 numbers, 2 lowercase letters, 2 uppercase letters, and a hyphen at index 4
+  // TODO while this function works great, it might be too verbose for the user. Perhaps consider an alphanumeric code in all caps for ease of use?
   let code = "";
   const characterCounts = {
     0: 0,
@@ -124,18 +178,20 @@ const createCode = () => {
 };
 
 exports.adminAddClient = [
-  body("clientname").trim().notEmpty().isLength({ min: 4 }).isAlphanumeric(),
+  body("clientname").trim().notEmpty().isLength({ min: 4 }),
   body("clientemail").trim().notEmpty().isEmail(),
-  asyncHandler((req, res, next) => {
+  asyncHandler(async (req, res, next) => {
     // validate form
     const errors = validationResult(req);
-
-    // TODO ensure the same client hasn't already been created!
+    const existingEmail = await User.findOne({ email: req.body.clientemail });
 
     if (!errors.isEmpty()) {
       // there are backend validation errors
       return res.status(401).json({ errors: errors.array() });
+    } else if (existingEmail) {
+      return res.status(409).json({ errors: 409 });
     }
+
     next();
   }),
   async (req, res, next) => {
@@ -152,28 +208,20 @@ exports.adminAddClient = [
 
         const loginCode = createCode();
 
-        bcrypt.hash(loginCode, 10, async (err, hash) => {
-          if (err) {
-            // TODO implement hashing error workflow
-            console.log(err);
-            return next(err);
-          }
+        const user = new User({
+          name: req.body.clientname,
+          email: req.body.clientemail,
+          code: loginCode,
+          role: "user",
+          added: new Date(Date.now()).toLocaleString("en-US").split(",")[0], // mm/dd/yyyy format
+        });
 
-          const user = new User({
-            name: req.body.clientname,
-            email: req.body.clientemail,
-            code: hash,
-            role: "user",
-            added: new Date(Date.now()).toLocaleString("en-US").split(",")[0],
-          });
+        const savedUser = await user.save();
 
-          const savedUser = await user.save();
-
-          return res.status(200).json({
-            name: savedUser.name,
-            code: loginCode,
-            added: savedUser.added,
-          });
+        return res.status(200).json({
+          name: savedUser.name,
+          code: loginCode,
+          added: savedUser.added,
         });
       } else {
         // access token expired
@@ -202,8 +250,6 @@ exports.adminAddClient = [
             .json(req.user._id);
         }
       }
-
-      return console.log(decodedAccess, "2");
     } catch (err) {
       // TODO handle error -> either the refresh or access token is invalid - indicate to user they will be logged out
       console.log(err);
