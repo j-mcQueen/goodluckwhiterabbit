@@ -70,7 +70,6 @@ exports.adminLogin = [
     ); // create access token
 
     // TODO in options, ensure httpOnly is true, consider sameSite and secure attributes (latter in production only)
-    // TODO delete refresh and access cookies on logout
 
     return res
       .cookie("refreshToken", refreshToken, {
@@ -80,12 +79,19 @@ exports.adminLogin = [
       .cookie("accessToken", accessToken, {
         httpOnly: true,
         sameSite: "Strict",
-        maxAge: 3600000,
       })
       .status(200)
       .json(req.user._id);
   },
 ];
+
+exports.adminLogout = async (req, res, next) => {
+  // revoke refresh and access tokens
+  return res
+    .clearCookie("accessToken", { httpOnly: true, sameSite: "Strict" })
+    .clearCookie("refreshToken", { httpOnly: true, sameSite: "Strict" })
+    .end();
+};
 
 const returnClients = async () => {
   const allUsers = await User.find(
@@ -128,7 +134,6 @@ exports.adminGetClients = async (req, res, next) => {
           .cookie("accessToken", newAccess, {
             httpOnly: true,
             sameSite: "Strict",
-            maxAge: 3600000,
           })
           .status(200)
           .json(clients);
@@ -244,7 +249,6 @@ exports.adminAddClient = [
             .cookie("accessToken", newAccess, {
               httpOnly: true,
               sameSite: "Strict",
-              maxAge: 3600000,
             })
             .status(200)
             .json(req.user._id);
