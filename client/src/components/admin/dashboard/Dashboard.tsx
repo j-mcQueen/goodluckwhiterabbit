@@ -9,8 +9,6 @@ export default function AdminDashboard() {
 
   // TODO how can we organise the pane data here? conditional rendering? we could organise all pane values into an array, then render the pane which matches state -> best option, since this will declutter the return statement
 
-  // TODO fetch all clients on load of component
-
   useEffect(() => {
     const getAllClients = async () => {
       try {
@@ -27,8 +25,7 @@ export default function AdminDashboard() {
           return;
         }
       } catch (err) {
-        //
-        console.log(err);
+        // TODO inform user that something went wrong and for security reasons, they are being logged out
       }
     };
 
