@@ -3,6 +3,7 @@ const {
   adminLogin,
   adminAddClient,
   adminLogout,
+  adminDeleteUser,
 } = require("../controllers/admin");
 const express = require("express");
 const multer = require("multer");
@@ -13,10 +14,10 @@ const upload = multer(); // enable form data to be unpacked
 
 // admin dashboard routes
 router.get("/admin/users", adminGetClients);
-router.post("/admin/login", upload.none(), adminLogin); // text only data coming from login
+router.post("/admin/login", upload.none(), adminLogin);
 router.post("/admin/add", upload.any(), adminAddClient); // using .any() here to accommodate edge cases where admin has filled out the form but has added no files yet
 router.post("/admin/logout", adminLogout);
 router.put("/", (req, res, next) => {});
-router.delete("/", (req, res, next) => {});
+router.delete("/admin/deleteUser/:id", adminDeleteUser);
 
 module.exports = router;

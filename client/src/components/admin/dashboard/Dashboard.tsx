@@ -2,10 +2,16 @@ import { useEffect, useState } from "react";
 import AllClients from "./AllClients";
 import Header from "./Header";
 import AddClient from "./AddClient";
+import DeleteModal from "./DeleteModal";
 
 export default function AdminDashboard() {
   const [activePane, setActivePane] = useState("ALL");
   const [clients, setClients] = useState([]);
+  const [deleteModalToggle, setDeleteModalToggle] = useState({
+    active: false,
+    target: "",
+    name: "",
+  });
 
   // TODO how can we organise the pane data here? conditional rendering? we could organise all pane values into an array, then render the pane which matches state -> best option, since this will declutter the return statement
 
@@ -39,7 +45,11 @@ export default function AdminDashboard() {
       <section className="flex justify-center items-center text-white">
         <div className="border border-solid border-white p-3 w-[40dvw]">
           {activePane === "ALL" ? (
-            <AllClients clients={clients} setActivePane={setActivePane} />
+            <AllClients
+              clients={clients}
+              setActivePane={setActivePane}
+              setDeleteModalToggle={setDeleteModalToggle}
+            />
           ) : activePane === "ADD" ? (
             <AddClient
               clients={clients}
@@ -55,6 +65,15 @@ export default function AdminDashboard() {
           ) : null}
         </div>
       </section>
+
+      {deleteModalToggle.active === true ? (
+        <DeleteModal
+          clients={clients}
+          setClients={setClients}
+          deleteModalToggle={deleteModalToggle}
+          setDeleteModalToggle={setDeleteModalToggle}
+        />
+      ) : null}
     </main>
   );
 }

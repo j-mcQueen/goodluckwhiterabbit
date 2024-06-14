@@ -6,7 +6,7 @@ import Edit from "../../../assets/media/icons/Edit";
 import Delete from "../../../assets/media/icons/Delete";
 
 export default function AllClients({ ...props }) {
-  const { setActivePane, clients } = props;
+  const { setActivePane, setDeleteModalToggle, clients } = props;
 
   const handleCopy = async (code: string) => {
     try {
@@ -39,7 +39,12 @@ export default function AllClients({ ...props }) {
 
         <tbody>
           {clients.map(
-            (client: { name: string; added: string; code: string }) => {
+            (client: {
+              name: string;
+              added: string;
+              code: string;
+              _id: string;
+            }) => {
               return (
                 <tr key={uuidv4()} className="font-inter text-white">
                   <td>{client.name}</td>
@@ -75,6 +80,13 @@ export default function AllClients({ ...props }) {
 
                   <td>
                     <button
+                      onClick={() =>
+                        setDeleteModalToggle({
+                          active: true,
+                          target: client._id,
+                          name: client.name,
+                        })
+                      }
                       type="button"
                       className="border border-solid border-red-600 xl:hover:bg-red-600 xl:transition-colors xl:focus:bg-red-600 xl:focus:outline-none p-2"
                     >

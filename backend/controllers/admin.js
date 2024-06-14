@@ -69,16 +69,18 @@ exports.adminLogin = [
       { expiresIn: "1h" }
     ); // create access token
 
-    // TODO in options, ensure httpOnly is true, consider sameSite and secure attributes (latter in production only)
+    // TODO in options, ensure httpOnly is true, consider secure attribute (in production only)
 
     return res
       .cookie("refreshToken", refreshToken, {
         httpOnly: true,
         sameSite: "Strict",
+        secure: true,
       })
       .cookie("accessToken", accessToken, {
         httpOnly: true,
         sameSite: "Strict",
+        secure: true,
       })
       .status(200)
       .json(req.user._id);
@@ -88,8 +90,16 @@ exports.adminLogin = [
 exports.adminLogout = async (req, res, next) => {
   // revoke refresh and access tokens
   return res
-    .clearCookie("accessToken", { httpOnly: true, sameSite: "Strict" })
-    .clearCookie("refreshToken", { httpOnly: true, sameSite: "Strict" })
+    .clearCookie("accessToken", {
+      httpOnly: true,
+      sameSite: "Strict",
+      secure: true,
+    })
+    .clearCookie("refreshToken", {
+      httpOnly: true,
+      sameSite: "Strict",
+      secure: true,
+    })
     .end();
 };
 
@@ -108,7 +118,6 @@ const returnClients = async () => {
 };
 
 exports.adminGetClients = async (req, res, next) => {
-  // TODO go through authorization process and handle outcomes as previously. On successful authorization, get all users
   try {
     const decodedAccess = jwt.verify(
       req.cookies.accessToken,
@@ -120,10 +129,16 @@ exports.adminGetClients = async (req, res, next) => {
       const clients = await returnClients();
       return res.status(200).json(clients);
     } else {
+      // access token expired
+      const decodedRefresh = jwt.verify(
+        req.cookies.refreshToken,
+        process.env.JWT_SECRET
+      ); // check refresh token is still valid
+
       if (decodedRefresh.exp > 0) {
         // create new access token
         const newAccess = jwt.sign(
-          { _id: decodedRefresh._id },
+          { _id: req.user._id },
           process.env.JWT_SECRET,
           { expiresIn: "1h" }
         );
@@ -134,6 +149,7 @@ exports.adminGetClients = async (req, res, next) => {
           .cookie("accessToken", newAccess, {
             httpOnly: true,
             sameSite: "Strict",
+            secure: true,
           })
           .status(200)
           .json(clients);
@@ -211,6 +227,21 @@ exports.adminAddClient = [
 
         // TODO add data to S3, make sure it syncs with the db
 
+        // 1. Install aws-s3 sdk
+        // 2. Install multer s3
+        // 3. Require both aws-s3 sdk in admin controller and multer-s3 in index route
+        // 3. Create a secret access id
+        // 3i. Likely requires some other steps
+
+        // when the files come in, they will be separated into 3 categories
+        // the files within each category should have their own folder within an s3 object
+        // s3.putObject(params, (err, data) => {...})
+        // inside params, we can specify folder and subfolder
+
+        // for all incoming files, we need to loop through and upload each file individually to s3
+        // this may require 3 separate loops for each imageset to do the same thing
+        // instead of an imageset, client should have the url to their bucket stored in the db. The alternative would require potentially hundreds of POST requests to the db for each image uploaded to s3
+
         const loginCode = createCode();
 
         const user = new User({
@@ -238,7 +269,7 @@ exports.adminAddClient = [
         if (decodedRefresh.exp > 0) {
           // create new access token
           const newAccess = jwt.sign(
-            { _id: decodedRefresh._id },
+            { _id: req.user._id },
             process.env.JWT_SECRET,
             { expiresIn: "1h" }
           );
@@ -249,6 +280,7 @@ exports.adminAddClient = [
             .cookie("accessToken", newAccess, {
               httpOnly: true,
               sameSite: "Strict",
+              secure: true,
             })
             .status(200)
             .json(req.user._id);
@@ -261,3 +293,39 @@ exports.adminAddClient = [
     }
   },
 ];
+
+exports.adminDeleteUser = async (req, res, next) => {
+  try {
+    const decodedAccess = jwt.verify(
+      req.cookies.accessToken,
+      process.env.JWT_SECRET
+    );
+
+    if (decodedAccess.exp > 0) {
+      // we're in!
+      const deleted = await User.findByIdAndDelete(req.params.id).exec();
+      if (deleted._id !== undefined) return res.status(200).json(deleted._id);
+    } else {
+      // access token expired
+      const decodedRefresh = jwt.verify(
+        req.cookies.refreshToken,
+        process.env.JWT_SECRET
+      ); // check refresh token is still valid
+
+      if (decodedRefresh.exp > 0) {
+        // create new access token
+        const newAccess = jwt.sign(
+          { _id: req.user._id },
+          process.env.JWT_SECRET,
+          { expiresIn: "1h" }
+        );
+
+        const deleted = await User.findByIdAndDelete(req.params.id).exec();
+        if (deleted._id !== undefined) return res.status(200).json(deleted._id);
+      }
+    }
+  } catch (err) {
+    console.log(err);
+    return res.sendStatus(401); // TODO indicate to user they will be logged out
+  }
+};
