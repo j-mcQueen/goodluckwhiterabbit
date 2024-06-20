@@ -5,6 +5,14 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const User = require("../models/user");
 const { body, validationResult } = require("express-validator");
+const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
+const client = new S3Client({
+  region: "us-east-1",
+  credentials: {
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+  },
+});
 
 exports.adminLogin = [
   // sanitize received input with body from express validator
@@ -227,12 +235,6 @@ exports.adminAddClient = [
 
         // TODO add data to S3, make sure it syncs with the db
 
-        // 1. Install aws-s3 sdk
-        // 2. Install multer s3
-        // 3. Require both aws-s3 sdk in admin controller and multer-s3 in index route
-        // 3. Create a secret access id
-        // 3i. Likely requires some other steps
-
         // when the files come in, they will be separated into 3 categories
         // the files within each category should have their own folder within an s3 object
         // s3.putObject(params, (err, data) => {...})
@@ -254,9 +256,26 @@ exports.adminAddClient = [
 
         const savedUser = await user.save();
 
+        // upload images to s3 if req.files has been populated
+        if (req.files.length > 0) {
+          for (let i = 0; i < req.files.length; i++) {
+            const s3Params = {
+              Bucket: "glwr-client-files",
+              Key: `${savedUser._id}/${req.files[i].fieldname}/${req.files[i].originalname}`, // ensures files are associated to a user
+              Body: req.files[i].buffer,
+              ContentType: req.files[i].mimetype,
+            };
+
+            await client.send(new PutObjectCommand(s3Params));
+          }
+
+          console.log("passed - check s3!");
+        }
+
         return res.status(200).json({
           name: savedUser.name,
           code: loginCode,
+          _id: savedUser._id,
           added: savedUser.added,
         });
       } else {
