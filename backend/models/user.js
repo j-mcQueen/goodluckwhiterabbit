@@ -5,7 +5,7 @@ const UserSchema = new Schema({
   name: String,
   email: String,
   code: String,
-  imageset: [{ type: Schema.Types.ObjectId, ref: "Imageset" }],
+  url: String,
   role: String,
   added: String,
 });

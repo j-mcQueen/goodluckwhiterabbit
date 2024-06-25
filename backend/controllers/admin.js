@@ -5,7 +5,13 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const User = require("../models/user");
 const { body, validationResult } = require("express-validator");
-const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
+
+const { getSignedUrl } = require("@aws-sdk/s3-request-presigner");
+const {
+  S3Client,
+  PutObjectCommand,
+  GetObjectCommand,
+} = require("@aws-sdk/client-s3");
 const client = new S3Client({
   region: "us-east-1",
   credentials: {
@@ -132,6 +138,7 @@ exports.adminGetClients = async (req, res, next) => {
       process.env.JWT_SECRET
     );
 
+    // TODO if the access file has expired, it won't reach here - it will instead go straight to catch
     if (decodedAccess.exp > 0) {
       // we're in!
       const clients = await returnClients();
@@ -225,6 +232,7 @@ exports.adminAddClient = [
   }),
   async (req, res, next) => {
     try {
+      // TODO Restructure this workflow so try-catch blocks are ONLY associated within await statements
       const decodedAccess = jwt.verify(
         req.cookies.accessToken,
         process.env.JWT_SECRET
@@ -233,16 +241,9 @@ exports.adminAddClient = [
       if (decodedAccess.exp > 0) {
         // access token is valid so authorize
 
-        // TODO add data to S3, make sure it syncs with the db
-
-        // when the files come in, they will be separated into 3 categories
-        // the files within each category should have their own folder within an s3 object
-        // s3.putObject(params, (err, data) => {...})
-        // inside params, we can specify folder and subfolder
-
-        // for all incoming files, we need to loop through and upload each file individually to s3
-        // this may require 3 separate loops for each imageset to do the same thing
-        // instead of an imageset, client should have the url to their bucket stored in the db. The alternative would require potentially hundreds of POST requests to the db for each image uploaded to s3
+        // TODO make sure s3 upload syncs with the db
+        // max expiry of presigned URL is one week, so for when the user wants to retrieve their files, if theirs has expired...
+        // TODO determine workflow for expired presigned URLs
 
         const loginCode = createCode();
 
@@ -251,17 +252,16 @@ exports.adminAddClient = [
           email: req.body.clientemail,
           code: loginCode,
           role: "user",
+          url: "",
           added: new Date(Date.now()).toLocaleString("en-US").split(",")[0], // mm/dd/yyyy format
         });
-
-        const savedUser = await user.save();
 
         // upload images to s3 if req.files has been populated
         if (req.files.length > 0) {
           for (let i = 0; i < req.files.length; i++) {
             const s3Params = {
               Bucket: "glwr-client-files",
-              Key: `${savedUser._id}/${req.files[i].fieldname}/${req.files[i].originalname}`, // ensures files are associated to a user
+              Key: `${user._id}/${req.files[i].fieldname}/${req.files[i].originalname}`, // ensures files are associated to a user
               Body: req.files[i].buffer,
               ContentType: req.files[i].mimetype,
             };
@@ -269,8 +269,22 @@ exports.adminAddClient = [
             await client.send(new PutObjectCommand(s3Params));
           }
 
-          console.log("passed - check s3!");
+          // create a presigned URL
+          const command = new GetObjectCommand({
+            Bucket: "glwr-client-files",
+            Key: `${user._id}`,
+          });
+
+          const url = await getSignedUrl(client, command, {
+            expiresIn: 604800, // expires in 7 days
+          });
+
+          user.url = url;
+          // if no url has been created, then the admin has not attached files to the client yet.
+          // TODO ensure that the user is updated with the presigned URL when this happens
         }
+
+        const savedUser = await user.save();
 
         return res.status(200).json({
           name: savedUser.name,
