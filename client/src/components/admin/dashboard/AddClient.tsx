@@ -1,85 +1,24 @@
 import { FormEvent } from "react";
 import { useState } from "react";
-import { v4 as uuidv4 } from "uuid";
 import PaneHeader from "./PaneHeader";
+import Order from "../../../assets/media/icons/Order";
 
 export default function AddClient({ ...props }) {
   // TODO configure this component to allow for client editing (since the form is largely the same)
-  const [selectedFiles, setSelectedFiles] = useState({
-    sneaks: 0,
-    full: 0,
-    socials: 0,
+
+  const [selectedFiles, setSelectedFiles] = useState<{
+    sneaks: { count: number; files: FileList | null };
+    full: { count: number; files: FileList | null };
+    socials: { count: number; files: FileList | null };
+  }>({
+    sneaks: { count: 0, files: null },
+    full: { count: 0, files: null },
+    socials: { count: 0, files: null },
   });
 
   const [takenEmail, setTakenEmail] = useState(false);
 
   const { clients, setActivePane, setClients } = props;
-
-  const photoCategoryData = [
-    {
-      title: "UPLOAD SNEAK PEEKS",
-      fileCount: selectedFiles.sneaks,
-      labelFor: "sneaks",
-      inputName: "sneaks",
-      inputId: "sneaks",
-    },
-    {
-      title: "UPLOAD FULL GALLERY",
-      fileCount: selectedFiles.full,
-      labelFor: "full",
-      inputName: "full",
-      inputId: "full",
-    },
-    {
-      title: "UPLOAD SOCIAL MEDIA CROPS",
-      fileCount: selectedFiles.socials,
-      labelFor: "socials",
-      inputName: "socials",
-      inputId: "socials",
-    },
-  ];
-
-  const Browse = ({ ...props }) => {
-    const { title, fileCount, labelFor, inputName, inputId } = props;
-
-    return (
-      <div className="flex items-center justify-between">
-        <div className="flex gap-3 items-center font-inter">
-          <p className="text-gray">{title}:</p>
-          <p className={`${fileCount > 0 ? "text-red-600" : "text-white"}`}>
-            {fileCount === 0
-              ? "No files selected."
-              : fileCount === 1
-                ? "1 file selected."
-                : `${fileCount} files selected.`}
-          </p>
-        </div>
-
-        <div>
-          <label
-            htmlFor={labelFor}
-            className="cursor-pointer bg-white text-black py-2 px-3 font-inter italic font-bold focus-within:bg-blu focus-within:text-white xl:hover:bg-blu xl:hover:text-white transition-colors"
-          >
-            <input
-              type="file"
-              name={inputName}
-              id={inputId}
-              onChange={(e) =>
-                setSelectedFiles({
-                  ...selectedFiles,
-                  [inputName]: e.target.files?.length || 0,
-                })
-              }
-              className="opacity-0 w-[1px]"
-              accept="image/*"
-              multiple
-            />
-            BROWSE
-          </label>
-        </div>
-      </div>
-    );
-  };
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -111,13 +50,20 @@ export default function AddClient({ ...props }) {
     }
   };
 
+  const displayFileCount = (count: number) => {
+    return count === 0
+      ? "No files selected."
+      : count === 1
+        ? "1 file selected."
+        : `${count} files selected.`;
+  };
+
   return (
     <div>
       <PaneHeader setActivePane={setActivePane} paneTitle={"ADD NEW CLIENT"} />
 
       <form
         onSubmit={(e) => handleSubmit(e)}
-        action=""
         method="post"
         className="flex flex-col gap-5"
         encType="multipart/form-data"
@@ -153,18 +99,131 @@ export default function AddClient({ ...props }) {
           ) : null}
         </label>
 
-        {photoCategoryData.map((category) => {
-          return (
-            <Browse
-              key={uuidv4()}
-              title={category.title}
-              fileCount={category.fileCount}
-              labelFor={category.labelFor}
-              inputName={category.inputName}
-              inputId={category.inputId}
-            />
-          );
-        })}
+        <div className="flex items-center justify-between">
+          <div className="flex gap-3 items-center font-inter">
+            <p className="text-gray">UPLOAD SNEAK PEEKS:</p>
+            <p
+              className={`${selectedFiles.sneaks.count > 0 ? "text-red-600" : "text-white"}`}
+            >
+              {displayFileCount(selectedFiles.sneaks.count)}
+            </p>
+          </div>
+
+          <div className="flex gap-2">
+            <label className="cursor-pointer bg-white text-black py-2 px-3 font-inter italic font-bold focus-within:bg-blu focus-within:text-white xl:hover:bg-blu xl:hover:text-white transition-colors">
+              <input
+                type="file"
+                name={"sneaks"}
+                onChange={(e) => {
+                  setSelectedFiles({
+                    ...selectedFiles,
+                    sneaks: {
+                      count: e.target.files?.length || 0,
+                      files: e.target.files,
+                    },
+                  });
+                }}
+                className="opacity-0 w-[1px]"
+                accept="image/*"
+                multiple
+              />
+              BROWSE
+            </label>
+
+            {selectedFiles.sneaks.files !== null ? (
+              <button
+                type="button"
+                className="border border-solid border-blu px-2 xl:hover:bg-blu focus:bg-blu focus:outline-none xl:transition-colors"
+              >
+                <Order className="w-[20px] h-[20px]" />
+              </button>
+            ) : null}
+          </div>
+        </div>
+
+        <div className="flex items-center justify-between">
+          <div className="flex gap-3 items-center font-inter">
+            <p className="text-gray">UPLOAD FULL GALLERY:</p>
+            <p
+              className={`${selectedFiles.full.count > 0 ? "text-red-600" : "text-white"}`}
+            >
+              {displayFileCount(selectedFiles.full.count)}
+            </p>
+          </div>
+
+          <div className="flex gap-2">
+            <label className="cursor-pointer bg-white text-black py-2 px-3 font-inter italic font-bold focus-within:bg-blu focus-within:text-white xl:hover:bg-blu xl:hover:text-white transition-colors">
+              <input
+                type="file"
+                name={"sneaks"}
+                onChange={(e) => {
+                  setSelectedFiles({
+                    ...selectedFiles,
+                    full: {
+                      count: e.target.files?.length || 0,
+                      files: e.target.files,
+                    },
+                  });
+                }}
+                className="opacity-0 w-[1px]"
+                accept="image/*"
+                multiple
+              />
+              BROWSE
+            </label>
+
+            {selectedFiles.full.files !== null ? (
+              <button
+                type="button"
+                className="border border-solid border-blu px-2 xl:hover:bg-blu focus:bg-blu focus:outline-none xl:transition-colors"
+              >
+                <Order className="w-[20px] h-[20px]" />
+              </button>
+            ) : null}
+          </div>
+        </div>
+
+        <div className="flex items-center justify-between">
+          <div className="flex gap-3 items-center font-inter">
+            <p className="text-gray">UPLOAD SOCIAL MEDIA CROPS:</p>
+            <p
+              className={`${selectedFiles.socials.count > 0 ? "text-red-600" : "text-white"}`}
+            >
+              {displayFileCount(selectedFiles.socials.count)}
+            </p>
+          </div>
+
+          <div className="flex gap-2">
+            <label className="cursor-pointer bg-white text-black py-2 px-3 font-inter italic font-bold focus-within:bg-blu focus-within:text-white xl:hover:bg-blu xl:hover:text-white transition-colors">
+              <input
+                type="file"
+                name={"sneaks"}
+                onChange={(e) => {
+                  setSelectedFiles({
+                    ...selectedFiles,
+                    socials: {
+                      count: e.target.files?.length || 0,
+                      files: e.target.files,
+                    },
+                  });
+                }}
+                className="opacity-0 w-[1px]"
+                accept="image/*"
+                multiple
+              />
+              BROWSE
+            </label>
+
+            {selectedFiles.socials.files !== null ? (
+              <button
+                type="button"
+                className="border border-solid border-blu px-2 xl:hover:bg-blu focus:bg-blu focus:outline-none xl:transition-colors"
+              >
+                <Order className="w-[20px] h-[20px]" />
+              </button>
+            ) : null}
+          </div>
+        </div>
 
         <div className="text-center">
           <button
