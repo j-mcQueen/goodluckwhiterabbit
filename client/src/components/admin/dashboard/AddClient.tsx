@@ -1,28 +1,39 @@
 import { FormEvent } from "react";
 import { useState } from "react";
 import PaneHeader from "./PaneHeader";
-import Order from "../../../assets/media/icons/Order";
 
 export default function AddClient({ ...props }) {
   // TODO configure this component to allow for client editing (since the form is largely the same)
-
-  const [selectedFiles, setSelectedFiles] = useState<{
+  interface filesType {
     sneaks: { count: number; files: FileList | null };
     full: { count: number; files: FileList | null };
     socials: { count: number; files: FileList | null };
-  }>({
+  }
+
+  const [selectedFiles, setSelectedFiles] = useState<filesType>({
     sneaks: { count: 0, files: null },
     full: { count: 0, files: null },
     socials: { count: 0, files: null },
   });
-
   const [takenEmail, setTakenEmail] = useState(false);
 
-  const { clients, setActivePane, setClients } = props;
+  const { clients, setClients, setActivePane } = props;
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
+    formData.append(
+      "sneaksAttached",
+      selectedFiles.sneaks.files !== null ? "true" : "false"
+    );
+    formData.append(
+      "fullAttached",
+      selectedFiles.full.files !== null ? "true" : "false"
+    );
+    formData.append(
+      "socialsAttached",
+      selectedFiles.socials.files !== null ? "true" : "false"
+    );
 
     try {
       const response = await fetch("http://localhost:3000/admin/add", {
@@ -38,7 +49,7 @@ export default function AddClient({ ...props }) {
       if (response.status === 200 && data) {
         // A client has been added
         setClients([...clients, data]);
-        setActivePane("ALL");
+        setActivePane({ pane: "ALL", edit: null });
       } else if (response.status === 409) {
         // Client email already in use
         setTakenEmail(true);
@@ -50,16 +61,8 @@ export default function AddClient({ ...props }) {
     }
   };
 
-  const displayFileCount = (count: number) => {
-    return count === 0
-      ? "No files selected."
-      : count === 1
-        ? "1 file selected."
-        : `${count} files selected.`;
-  };
-
   return (
-    <div>
+    <div className="text-white border border-solid border-white p-3 w-[40dvw]">
       <PaneHeader setActivePane={setActivePane} paneTitle={"ADD NEW CLIENT"} />
 
       <form
@@ -105,7 +108,7 @@ export default function AddClient({ ...props }) {
             <p
               className={`${selectedFiles.sneaks.count > 0 ? "text-red-600" : "text-white"}`}
             >
-              {displayFileCount(selectedFiles.sneaks.count)}
+              {selectedFiles.sneaks.count}
             </p>
           </div>
 
@@ -129,15 +132,6 @@ export default function AddClient({ ...props }) {
               />
               BROWSE
             </label>
-
-            {selectedFiles.sneaks.files !== null ? (
-              <button
-                type="button"
-                className="border border-solid border-blu px-2 xl:hover:bg-blu focus:bg-blu focus:outline-none xl:transition-colors"
-              >
-                <Order className="w-[20px] h-[20px]" />
-              </button>
-            ) : null}
           </div>
         </div>
 
@@ -147,7 +141,7 @@ export default function AddClient({ ...props }) {
             <p
               className={`${selectedFiles.full.count > 0 ? "text-red-600" : "text-white"}`}
             >
-              {displayFileCount(selectedFiles.full.count)}
+              {selectedFiles.full.count}
             </p>
           </div>
 
@@ -155,7 +149,7 @@ export default function AddClient({ ...props }) {
             <label className="cursor-pointer bg-white text-black py-2 px-3 font-inter italic font-bold focus-within:bg-blu focus-within:text-white xl:hover:bg-blu xl:hover:text-white transition-colors">
               <input
                 type="file"
-                name={"sneaks"}
+                name={"full"}
                 onChange={(e) => {
                   setSelectedFiles({
                     ...selectedFiles,
@@ -171,15 +165,6 @@ export default function AddClient({ ...props }) {
               />
               BROWSE
             </label>
-
-            {selectedFiles.full.files !== null ? (
-              <button
-                type="button"
-                className="border border-solid border-blu px-2 xl:hover:bg-blu focus:bg-blu focus:outline-none xl:transition-colors"
-              >
-                <Order className="w-[20px] h-[20px]" />
-              </button>
-            ) : null}
           </div>
         </div>
 
@@ -189,7 +174,7 @@ export default function AddClient({ ...props }) {
             <p
               className={`${selectedFiles.socials.count > 0 ? "text-red-600" : "text-white"}`}
             >
-              {displayFileCount(selectedFiles.socials.count)}
+              {selectedFiles.socials.count}
             </p>
           </div>
 
@@ -197,7 +182,7 @@ export default function AddClient({ ...props }) {
             <label className="cursor-pointer bg-white text-black py-2 px-3 font-inter italic font-bold focus-within:bg-blu focus-within:text-white xl:hover:bg-blu xl:hover:text-white transition-colors">
               <input
                 type="file"
-                name={"sneaks"}
+                name={"socials"}
                 onChange={(e) => {
                   setSelectedFiles({
                     ...selectedFiles,
@@ -213,15 +198,6 @@ export default function AddClient({ ...props }) {
               />
               BROWSE
             </label>
-
-            {selectedFiles.socials.files !== null ? (
-              <button
-                type="button"
-                className="border border-solid border-blu px-2 xl:hover:bg-blu focus:bg-blu focus:outline-none xl:transition-colors"
-              >
-                <Order className="w-[20px] h-[20px]" />
-              </button>
-            ) : null}
           </div>
         </div>
 
