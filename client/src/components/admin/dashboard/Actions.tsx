@@ -1,6 +1,7 @@
 import Add from "../../../assets/media/icons/Add";
 import Search from "../../../assets/media/icons/Search";
 import Sort from "../../../assets/media/icons/Sort";
+import clicky from "../../../assets/media/sounds/CLICKY_.wav";
 
 export default function Actions({ ...props }) {
   const { setActivePane } = props;
@@ -17,14 +18,13 @@ export default function Actions({ ...props }) {
             type="search"
             name="search"
             id=""
-            placeholder="SEARCH CLIENTS"
-            className="bg-black font-inter border border-solid border-gray p-[10px] xl:min-w-[400px] text-ylw xl:focus:border-blu xl:focus:outline-none max-h-[40px] flex-grow"
+            className="bg-black font-inter border border-solid border-white p-[10px] xl:min-w-[400px] text-ylw xl:focus:border-ylw xl:hover:border-ylw xl:focus:outline-none max-h-[40px] xl:transition-colors flex-grow"
           />
         </label>
 
         <button
           type="button"
-          className="w-10 h-10 border border-l-0 border-solid border-gray flex justify-center p-[10px] xl:focus:bg-blu xl:focus:border-blu xl:hover:border-blu xl:transition-colors xl:hover:bg-blu xl:focus:outline-none"
+          className="w-10 h-10 border border-l-0 border-solid border-white flex justify-center p-[10px] xl:focus:border-ylw xl:hover:border-ylw xl:transition-colors xl:focus:outline-none"
         >
           <Search className={"w-[18px] h-[18px]"} />
         </button>
@@ -32,15 +32,18 @@ export default function Actions({ ...props }) {
 
       <button
         type="button"
-        className="w-10 h-10 border border-solid border-gray flex justify-center items-center xl:focus:border-ylw xl:hover:border-ylw xl:focus:outline-none xl:transition-colors"
+        className="w-10 h-10 xl:hover:drop-shadow-ylw border border-solid flex justify-center items-center xl:focus:border-ylw xl:hover:border-ylw xl:focus:outline-none xl:transition-all"
       >
         <Sort className={"w-[18px] h-[18px]"} />
       </button>
 
       <button
-        onClick={() => setActivePane("ADD")}
+        onClick={() => {
+          setActivePane("ADD");
+          new Audio(clicky).play();
+        }}
         type="button"
-        className="w-10 h-10 border border-solid border-green-600 flex justify-center items-center xl:focus:bg-green-600 xl:transition-colors xl:hover:bg-green-600 xl:focus:outline-none"
+        className="w-10 h-10 xl:hover:drop-shadow-grn border border-solid flex justify-center items-center xl:focus:border-grn xl:transition-all xl:hover:border-grn xl:focus:outline-none"
       >
         <Add className={"w-[18px] h-[18px]"} />
       </button>

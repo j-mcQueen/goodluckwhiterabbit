@@ -1,12 +1,12 @@
 import { v4 as uuidv4 } from "uuid";
-import Upload from "../../../assets/media/icons/Upload";
 import Copy from "../../../assets/media/icons/Copy";
 import Edit from "../../../assets/media/icons/Edit";
 import Delete from "../../../assets/media/icons/Delete";
-import Order from "../../../assets/media/icons/Order";
+import Close from "../../../assets/media/icons/Close";
 
 export default function AllClients({ ...props }) {
-  const { clients, setDeleteModalToggle } = props;
+  const { clients, setActivePane, setTargetClient, setDeleteModalToggle } =
+    props;
 
   const handleCopy = async (code: string) => {
     try {
@@ -25,6 +25,11 @@ export default function AllClients({ ...props }) {
 
   // TODO clicking order button should display the "ImageOrder" component for that particular imageset
   // TODO clicking upload button should display an "UploadImages" component for that particular imageset, and perform a put request to the user
+  // TODO add email button so Kailey can copy their email quickly
+  // TODO CHANGE "ADDED" TAB TO "EMAIL" and display email in the list. Display date added in the edit client page
+  // TODO implement capability to search by dates too
+  // TODO create button that takes Kailey to a page which allows her to "preview" what the client sees
+  // TODO change trashcan icon to a X
 
   return (
     <table className="w-full mt-5">
@@ -33,9 +38,6 @@ export default function AllClients({ ...props }) {
           <th>NAME</th>
           <th>ADDED</th>
           <th>CODE</th>
-          <th>SNEAKS</th>
-          <th>FULL</th>
-          <th>SOCIALS</th>
         </tr>
       </thead>
 
@@ -59,70 +61,20 @@ export default function AllClients({ ...props }) {
                   <button
                     onClick={() => handleCopy(client.code)}
                     type="button"
-                    className="border border-solid border-gray xl:hover:border-white xl:transition-colors xl:focus:border-white xl:focus:outline-none p-2 ml-3"
+                    className="border border-solid xl:hover:drop-shadow-ylw xl:hover:border-ylw xl:transition-all xl:focus:border-white xl:focus:outline-none p-2 ml-3"
                   >
                     <Copy className="w-[20px] h-[20px]" />
                   </button>
                 </td>
 
                 <td>
-                  {client.files.sneaks ? (
-                    <button
-                      type="button"
-                      className="border border-solid border-green-600 xl:hover:border-ylw xl:transition-colors xl:focus:border-ylw xl:focus:outline-none p-2"
-                    >
-                      <Order className="w-[20px] h-[20px]" />
-                    </button>
-                  ) : (
-                    <button
-                      type="button"
-                      className="border border-solid border-gray xl:hover:border-ylw xl:transition-colors xl:focus:border-ylw xl:focus:outline-none p-2"
-                    >
-                      <Upload className="w-[20px] h-[20px]" />
-                    </button>
-                  )}
-                </td>
-
-                <td>
-                  {client.files.full ? (
-                    <button
-                      type="button"
-                      className="border border-solid border-green-600 xl:hover:border-ylw xl:transition-colors xl:focus:border-ylw xl:focus:outline-none p-2"
-                    >
-                      <Order className="w-[20px] h-[20px]" />
-                    </button>
-                  ) : (
-                    <button
-                      type="button"
-                      className="border border-solid border-gray xl:hover:border-ylw xl:transition-colors xl:focus:border-ylW xl:focus:outline-none p-2"
-                    >
-                      <Upload className="w-[20px] h-[20px]" />
-                    </button>
-                  )}
-                </td>
-
-                <td>
-                  {client.files.socials ? (
-                    <button
-                      type="button"
-                      className="border border-solid border-green-600 xl:hover:border-ylw xl:transition-colors xl:focus:border-ylw xl:focus:outline-none p-2"
-                    >
-                      <Order className="w-[20px] h-[20px]" />
-                    </button>
-                  ) : (
-                    <button
-                      type="button"
-                      className="border border-solid border-gray xl:hover:border-ylw xl:transition-colors xl:focus:border-ylw xl:focus:outline-none p-2"
-                    >
-                      <Upload className="w-[20px] h-[20px]" />
-                    </button>
-                  )}
-                </td>
-
-                <td>
                   <button
                     type="button"
-                    className="border border-solid border-blu xl:hover:bg-blu xl:transition-colors xl:focus:bg-blu xl:focus:outline-none p-2"
+                    className="border border-solid border-cyn drop-shadow-cyn xl:hover:border-blu xl:transition-all xl:focus:border-blu xl:focus:outline-none p-2 xl:hover:drop-shadow-blu"
+                    onClick={() => {
+                      setTargetClient(client);
+                      setActivePane("EDIT");
+                    }}
                   >
                     <Edit className="w-[20px] h-[20px]" />
                   </button>
@@ -138,9 +90,9 @@ export default function AllClients({ ...props }) {
                       })
                     }
                     type="button"
-                    className="border border-solid border-red-600 xl:hover:bg-red-600 xl:transition-colors xl:focus:bg-red-600 xl:focus:outline-none p-2"
+                    className="border border-solid border-mag drop-shadow-mag xl:hover:drop-shadow-red xl:hover:border-red-600 xl:transition-all xl:focus:border-red-600 xl:focus:outline-none p-2"
                   >
-                    <Delete className="w-[20px] h-[20px]" />
+                    <Close customColor="#FFF" className="w-[20px] h-[20px]" />
                   </button>
                 </td>
               </tr>
