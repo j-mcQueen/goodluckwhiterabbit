@@ -1,4 +1,5 @@
 import Close from "../../../assets/media/icons/Close";
+import clicky from "../../../assets/media/sounds/CLICKY_.wav";
 
 export default function PaneHeader({ ...props }) {
   const { paneTitle, setActivePane } = props;
@@ -9,8 +10,11 @@ export default function PaneHeader({ ...props }) {
 
       <button
         type="button"
-        className="bg-white  w-10 h-10 flex items-center justify-center xl:hover:bg-red-600 xl:focus:bg-red-600 outline-none transition-colors"
-        onClick={() => setActivePane("ALL")}
+        className="bg-white w-10 h-10 flex items-center justify-center xl:hover:bg-red-600 xl:focus:bg-red-600 outline-none transition-colors"
+        onClick={() => {
+          setActivePane("ALL");
+          new Audio(clicky).play();
+        }}
       >
         <Close className={"w-[18px] h-[18px]"} />
       </button>
