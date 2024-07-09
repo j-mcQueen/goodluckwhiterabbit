@@ -4,11 +4,12 @@ import Header from "./Header";
 import AddClient from "./AddClient";
 import DeleteModal from "./DeleteModal";
 import Actions from "./Actions";
-import ImageOrder from "./ImageOrder";
+import EditClient from "./EditClient";
 
 export default function AdminDashboard() {
-  const [activePane, setActivePane] = useState({ pane: "ALL", edit: null });
+  const [activePane, setActivePane] = useState("ALL");
   const [clients, setClients] = useState([]);
+  const [targetClient, setTargetClient] = useState({});
   const [clientFilterResult, setClientFilterResult] = useState([]);
   const [deleteModalToggle, setDeleteModalToggle] = useState({
     active: false,
@@ -38,8 +39,8 @@ export default function AdminDashboard() {
       }
     };
 
-    if (activePane.pane === "ALL") getAllClients();
-  }, [activePane.pane]);
+    if (activePane === "ALL") getAllClients(); // TODO perhaps extend this to check if clients hasn't changed in length?
+  }, [activePane]);
 
   return (
     <main className="w-[calc(100dvw-1.5rem-2px)] h-[calc(100dvh-1.5rem-2px)]">
@@ -47,8 +48,7 @@ export default function AdminDashboard() {
 
       <section className="flex justify-center items-center text-white">
         <>
-          <ImageOrder activePane={activePane} setActivePane={setActivePane} />
-          {/* {activePane.pane === "ALL" ? (
+          {activePane === "ALL" ? (
             <div className="text-white border border-solid border-white p-3 w-[40dvw]">
               <Actions
                 setClientFilterResult={setClientFilterResult}
@@ -60,18 +60,23 @@ export default function AdminDashboard() {
                   clientFilterResult.length > 0 ? clientFilterResult : clients
                 }
                 setActivePane={setActivePane}
+                setTargetClient={setTargetClient}
                 setDeleteModalToggle={setDeleteModalToggle}
               />
             </div>
-          ) : activePane.pane === "ADD" ? (
+          ) : activePane === "ADD" ? (
             <AddClient
               clients={clients}
               setClients={setClients}
               setActivePane={setActivePane}
             />
-          ) : activePane.pane === "UPLOAD" ? (
-            <></>
-          ) : null} */}
+          ) : activePane === "EDIT" ? (
+            <EditClient
+              targetClient={targetClient}
+              setTargetClient={setTargetClient}
+              setActivePane={setActivePane}
+            />
+          ) : null}
         </>
       </section>
 

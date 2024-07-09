@@ -4,6 +4,7 @@ const passport = require("passport");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const User = require("../models/user");
+const consumers = require("node:stream/consumers");
 const { body, validationResult } = require("express-validator");
 
 const { getSignedUrl } = require("@aws-sdk/s3-request-presigner");
@@ -11,6 +12,7 @@ const {
   S3Client,
   PutObjectCommand,
   GetObjectCommand,
+  ListObjectsV2Command,
 } = require("@aws-sdk/client-s3");
 const client = new S3Client({
   region: "us-east-1",
@@ -55,19 +57,6 @@ exports.adminLogin = [
   },
   (req, res, next) => {
     // handle login success
-    // TODO handle what data to send in success response
-    // TODO check if user already has a refresh token active -> can be found in cookies part of the request
-    // if they do, TWO PATHWAYS:
-    // 1. User is logging in: new refresh token needed, so create one and add a refresh token cookie to the response along with the data that is needed on the frontend (for login, we only need 200 status response/ successful auth)
-    // 2. If user is logged in (refresh token active), they are making a separate request, so check if there is also an access token (shorter lived) in the request's cookies
-    // 2a. If there's an access token, check if it's valid and not expired.
-    // 2ai. If all checks pass, then send requested data with a 200 response.
-    // 2aii. If it's expired, then create a new access token
-    // 2aiii. If it's invalid, send 401 unauthorized
-    // 2b. If there is no access token, add one to the cookie that gets sent in the response
-
-    // TODO decide what info is necessary to attach to the refresh token
-    // TODO admin passwords are unhashed given their manual addition to the db - consider adding a hashed version of their password into the DB, then bcrypt.compare() them on login
 
     const refreshToken = jwt.sign(
       { _id: req.user._id },
@@ -82,8 +71,6 @@ exports.adminLogin = [
       process.env.JWT_SECRET,
       { expiresIn: "1h" }
     ); // create access token
-
-    // TODO in options, ensure httpOnly is true, consider secure attribute (in production only)
 
     return res
       .cookie("refreshToken", refreshToken, {
@@ -138,7 +125,6 @@ exports.adminGetClients = async (req, res, next) => {
       process.env.JWT_SECRET
     );
 
-    // TODO if the access file has expired, it won't reach here - it will instead go straight to catch
     if (decodedAccess.exp > 0) {
       // we're in!
       const clients = await returnClients();
@@ -172,13 +158,57 @@ exports.adminGetClients = async (req, res, next) => {
     }
   } catch (err) {
     console.log(err);
-    return res.sendStatus(401); // TODO indicate to user they will be logged out
+    return res.sendStatus(401);
+  }
+};
+
+exports.adminGetUserImages = async (req, res, next) => {
+  try {
+    // TODO try block should only envelop the below variable. Catch block should be for the response to a verification error
+    // this will allow following try catch blocks specific to the async operations to come. Enables targeted error handling
+    const decodedAccess = jwt.verify(
+      req.cookies.accessToken,
+      process.env.JWT_SECRET
+    );
+
+    if (decodedAccess.exp > 0) {
+      const images = [];
+      const objects = await client.send(
+        new ListObjectsV2Command({ Bucket: "glwr-client-files" })
+      );
+
+      for (let i = 0; i < objects.Contents.length; i++) {
+        if (
+          objects.Contents[i].Key.includes(req.params.imageset) &&
+          objects.Contents[i].Key.includes(req.params.id)
+        ) {
+          // if the requested imageset and matching user id are present in the key of the object, this is a target file
+          const file = await client.send(
+            new GetObjectCommand({
+              Bucket: "glwr-client-files",
+              Key: objects.Contents[i].Key,
+            })
+          );
+
+          const imgBuffer = (await consumers.buffer(file.Body)).toString(
+            "base64"
+          );
+          const image = `data:${file.ContentType};base64, ${imgBuffer}`;
+          images.push(image);
+        } else continue;
+      }
+
+      res.status(200).send(images);
+    }
+  } catch (err) {
+    //
+    console.log(err);
   }
 };
 
 const createCode = () => {
   // create a user login code that contains 2 specials, 2 numbers, 2 lowercase letters, 2 uppercase letters, and a hyphen at index 4
-  // TODO while this function works great, it might be too verbose for the user. Perhaps consider an alphanumeric code in all caps for ease of use?
+
   let code = "";
   const characterCounts = {
     0: 0,
@@ -232,7 +262,6 @@ exports.adminAddClient = [
   }),
   async (req, res, next) => {
     try {
-      // TODO Restructure this workflow so try-catch blocks are ONLY associated within await statements
       const decodedAccess = jwt.verify(
         req.cookies.accessToken,
         process.env.JWT_SECRET
@@ -240,25 +269,32 @@ exports.adminAddClient = [
 
       if (decodedAccess.exp > 0) {
         // access token is valid so authorize
-
-        // TODO make sure s3 upload syncs with the db
-        // max expiry of presigned URL is one week, so for when the user wants to retrieve their files, if theirs has expired...
-        // TODO determine workflow for expired presigned URLs
-
         const loginCode = createCode();
 
         const user = new User({
           name: req.body.clientname,
           email: req.body.clientemail,
           code: loginCode,
-          role: "user",
           url: "",
+          files: {
+            sneaks: req.body.sneaksAttached === "true" ? true : false,
+            full: req.body.fullAttached === "true" ? true : false,
+            socials: req.body.socialsAttached === "true" ? true : false,
+          },
+          role: "user",
           added: new Date(Date.now()).toLocaleString("en-US").split(",")[0], // mm/dd/yyyy format
         });
 
         // upload images to s3 if req.files has been populated
         if (req.files.length > 0) {
+          // TODO this could be causing a performance bottleneck
           for (let i = 0; i < req.files.length; i++) {
+            // TODO include a try catch block here
+            // if there is an issue with an upload, add the file to an array
+            // if this array has been populated, add it to the array within the catch block (execution will continue despite catch)
+            // at the end of the loop, if the array has been populated, carry on as normal
+            // but when the response is sent, send with a message to indicate which files were not added and why
+
             const s3Params = {
               Bucket: "glwr-client-files",
               Key: `${user._id}/${req.files[i].fieldname}/${req.files[i].originalname}`, // ensures files are associated to a user
@@ -290,6 +326,7 @@ exports.adminAddClient = [
           name: savedUser.name,
           code: loginCode,
           _id: savedUser._id,
+          files: savedUser.files,
           added: savedUser.added,
         });
       } else {
@@ -338,27 +375,45 @@ exports.adminDeleteUser = async (req, res, next) => {
       // we're in!
       const deleted = await User.findByIdAndDelete(req.params.id).exec();
       if (deleted._id !== undefined) return res.status(200).json(deleted._id);
-    } else {
-      // access token expired
-      const decodedRefresh = jwt.verify(
-        req.cookies.refreshToken,
-        process.env.JWT_SECRET
-      ); // check refresh token is still valid
-
-      if (decodedRefresh.exp > 0) {
-        // create new access token
-        const newAccess = jwt.sign(
-          { _id: req.user._id },
-          process.env.JWT_SECRET,
-          { expiresIn: "1h" }
-        );
-
-        const deleted = await User.findByIdAndDelete(req.params.id).exec();
-        if (deleted._id !== undefined) return res.status(200).json(deleted._id);
-      }
     }
   } catch (err) {
-    console.log(err);
-    return res.sendStatus(401); // TODO indicate to user they will be logged out
+    if (err.name === "TokenExpiredError") {
+      try {
+        // access token expired
+        const decodedRefresh = jwt.verify(
+          req.cookies.refreshToken,
+          process.env.JWT_SECRET
+        ); // check refresh token is still valid
+
+        if (decodedRefresh.exp > 0) {
+          // create new access token
+          const newAccess = jwt.sign(
+            { _id: decodedRefresh._id },
+            process.env.JWT_SECRET,
+            { expiresIn: "1h" }
+          );
+
+          const deleted = await User.findByIdAndDelete(req.params.id).exec();
+          if (deleted._id !== undefined)
+            return res
+              .status(200)
+              .cookie("accessToken", newAccess, {
+                httpOnly: true,
+                sameSite: "Strict",
+                secure: true,
+              })
+              .json(deleted._id);
+        }
+      } catch (err) {
+        if (err.name !== "TokenExpiredError") {
+          return res.status(500).send("DeletionError"); // TODO indicate to user client-side that there was a deletion issue
+        }
+        // refresh token has also expired -> indicate to user they will be logged out
+        return res.sendStatus(401);
+      }
+    }
+
+    // if there is any other error, block access
+    return res.sendStatus(401);
   }
 };

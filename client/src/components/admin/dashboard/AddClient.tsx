@@ -49,7 +49,7 @@ export default function AddClient({ ...props }) {
       if (response.status === 200 && data) {
         // A client has been added
         setClients([...clients, data]);
-        setActivePane({ pane: "ALL", edit: null });
+        setActivePane("ALL");
       } else if (response.status === 409) {
         // Client email already in use
         setTakenEmail(true);

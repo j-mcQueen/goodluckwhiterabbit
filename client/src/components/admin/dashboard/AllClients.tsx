@@ -1,7 +1,6 @@
 import { v4 as uuidv4 } from "uuid";
 import Copy from "../../../assets/media/icons/Copy";
 import Edit from "../../../assets/media/icons/Edit";
-import Delete from "../../../assets/media/icons/Delete";
 import Close from "../../../assets/media/icons/Close";
 
 export default function AllClients({ ...props }) {
@@ -29,7 +28,6 @@ export default function AllClients({ ...props }) {
   // TODO CHANGE "ADDED" TAB TO "EMAIL" and display email in the list. Display date added in the edit client page
   // TODO implement capability to search by dates too
   // TODO create button that takes Kailey to a page which allows her to "preview" what the client sees
-  // TODO change trashcan icon to a X
 
   return (
     <table className="w-full mt-5">
