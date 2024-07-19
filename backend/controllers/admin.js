@@ -110,6 +110,7 @@ const returnClients = async () => {
     {
       // exclude this information from the query
       email: 0,
+      url: 0, // this string includes sensitive S3 creds, so don't include it
       role: 0,
       __v: 0,
     }
@@ -172,6 +173,7 @@ exports.adminGetUserImages = async (req, res, next) => {
     );
 
     if (decodedAccess.exp > 0) {
+      // TODO if nothing has changed since the last request, we don't need to tap S3. Determine if nothing has changed
       const images = [];
       const objects = await client.send(
         new ListObjectsV2Command({ Bucket: "glwr-client-files" })
@@ -190,15 +192,26 @@ exports.adminGetUserImages = async (req, res, next) => {
             })
           );
 
+          // create a data URL and isolate filename to present to the client
+          // this ensures we can render the image + handle editing of image order correctly on the frontend
+          const imageData = {};
           const imgBuffer = (await consumers.buffer(file.Body)).toString(
             "base64"
           );
-          const image = `data:${file.ContentType};base64, ${imgBuffer}`;
-          images.push(image);
+
+          // pass the data the frontend needs for state management
+          imageData.url = `data:${file.ContentType};base64, ${imgBuffer}`;
+          imageData.filename = objects.Contents[i].Key.split(
+            `/${req.params.imageset}/`
+          )[1];
+          imageData.mime = file.ContentType;
+          imageData.queued = true;
+
+          images.push(imageData);
         } else continue;
       }
 
-      res.status(200).send(images);
+      return res.status(200).send(images);
     }
   } catch (err) {
     //

@@ -44,7 +44,7 @@ export default function EditClient({ ...props }) {
           >
             PREVIEW
             <label className="opacity-0 w-0">
-              <input type="file" name="" className="w-0 opacity-0" />
+              <input type="file" name="sneaks" className="w-0 opacity-0" />
               {/* when we change the image order, we are updating the files object of these inputs */}
             </label>
           </button>
@@ -56,7 +56,7 @@ export default function EditClient({ ...props }) {
           >
             GALLERY
             <label className="opacity-0 w-0">
-              <input type="file" name="" className="w-0 opacity-0" />
+              <input type="file" name="full" className="w-0 opacity-0" />
             </label>
           </button>
 
@@ -67,7 +67,7 @@ export default function EditClient({ ...props }) {
           >
             SOCIAL
             <label className="opacity-0 w-0">
-              <input type="file" name="" className="w-0 opacity-0" />
+              <input type="file" name="socials" className="w-0 opacity-0" />
             </label>
           </button>
         </div>

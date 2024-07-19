@@ -7,6 +7,9 @@ export default {
         tnr: ["Times New Roman", "serif"],
         inter: ["Inter", "sans-serif"],
       },
+      gridTemplateColumns: {
+        imageQueue: "repeat(auto-fit, minmax(100px, 200px))",
+      },
       dropShadow: {
         cyn: "2px 2px 2px #08FF09",
         blu: "2px 2px 2px #0075FF",
