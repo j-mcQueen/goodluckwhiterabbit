@@ -6,6 +6,8 @@ const bcrypt = require("bcryptjs");
 const User = require("../models/user");
 const consumers = require("node:stream/consumers");
 const { body, validationResult } = require("express-validator");
+const { returnClients } = require("./utils/returnClients");
+const { createCode } = require("./utils/createCode");
 
 const { getSignedUrl } = require("@aws-sdk/s3-request-presigner");
 const {
@@ -104,21 +106,6 @@ exports.adminLogout = async (req, res, next) => {
     .end();
 };
 
-const returnClients = async () => {
-  const allUsers = await User.find(
-    {},
-    {
-      // exclude this information from the query
-      email: 0,
-      url: 0, // this string includes sensitive S3 creds, so don't include it
-      role: 0,
-      __v: 0,
-    }
-  ).exec();
-
-  return allUsers;
-};
-
 exports.adminGetClients = async (req, res, next) => {
   try {
     const decodedAccess = jwt.verify(
@@ -128,7 +115,7 @@ exports.adminGetClients = async (req, res, next) => {
 
     if (decodedAccess.exp > 0) {
       // we're in!
-      const clients = await returnClients();
+      const clients = await returnClients(User);
       return res.status(200).json(clients);
     } else {
       // access token expired
@@ -145,7 +132,7 @@ exports.adminGetClients = async (req, res, next) => {
           { expiresIn: "1h" }
         );
 
-        const clients = await returnClients();
+        const clients = await returnClients(User);
 
         return res
           .cookie("accessToken", newAccess, {
@@ -217,43 +204,6 @@ exports.adminGetUserImages = async (req, res, next) => {
     //
     console.log(err);
   }
-};
-
-const createCode = () => {
-  // create a user login code that contains 2 specials, 2 numbers, 2 lowercase letters, 2 uppercase letters, and a hyphen at index 4
-
-  let code = "";
-  const characterCounts = {
-    0: 0,
-    1: 0,
-    2: 0,
-    3: 0,
-  };
-  const characters = [
-    "@#$%&!",
-    "0123456789",
-    "abcdefghijklmnopqrstuvwxyz",
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
-  ];
-
-  const generateIndex = (arr) => {
-    return Math.floor(Math.random() * arr.length);
-  };
-
-  while (code.length < 9) {
-    // while the code is still being created
-    if (code.length === 4) code += "-";
-
-    const randomIndex = generateIndex(characters); // select a character set at random
-    if (characterCounts[randomIndex] < 2) {
-      // if we have not yet reached the character set threshold
-      const randomSubIndex = generateIndex(characters[randomIndex]); // select a character within the chosen character set at random
-      characterCounts[randomIndex]++;
-      code += characters[randomIndex][randomSubIndex];
-    }
-  }
-
-  return code;
 };
 
 exports.adminAddClient = [
