@@ -1,14 +1,10 @@
-import { v4 as uuidv4 } from "uuid";
-import Check from "../../../assets/media/icons/Check";
 import { useEffect, useState } from "react";
+import { v4 as uuidv4 } from "uuid";
+import { convertToFile } from "./utils/convertToFile";
+import Check from "../../../assets/media/icons/Check";
 
 export default function ImageOrder({ ...props }) {
-  const {
-    targetClient,
-    targetImageset,
-    allOrderedImagesets,
-    // setAllOrderedImagesets,
-  } = props;
+  const { targetClient, targetImageset, allOrderedImagesets, innerRef } = props;
   // https://stackoverflow.com/questions/52078853/is-it-possible-to-update-filelist
   // TODO can create hidden file inputs to attach the ordered imagesets to
 
@@ -25,16 +21,28 @@ export default function ImageOrder({ ...props }) {
   }
 
   const [queuedImages, setQueuedImages] = useState<
-    { filename: string; url: string; queued: boolean; mime: string }[]
+    {
+      filename: string;
+      url: string;
+      position: number;
+      queued: boolean;
+      mime: string;
+    }[]
   >([]);
   const [orderedImageset, setOrderedImageset] = useState<
-    { filename: string; url: string; mime: string; file: File | null }[]
+    {
+      filename: string;
+      url: string;
+      mime: string;
+      position: number;
+      file: File;
+      queueIndex: number;
+    }[]
   >([]);
   const [draggedIndex, setDraggedIndex] = useState(0);
 
   useEffect(() => {
-    // TODO if imageQueue is empty for image set, run getImages() to send a request to the server to fetch them
-
+    // retrieve images if there have been no images set in order yet
     const getImages = async () => {
       try {
         const response = await fetch(
@@ -48,6 +56,8 @@ export default function ImageOrder({ ...props }) {
             filename: "",
             url: "",
             mime: "",
+            position: 0,
+            queueIndex: 0,
           });
           setQueuedImages(data);
           setOrderedImageset(dummy);
@@ -60,23 +70,20 @@ export default function ImageOrder({ ...props }) {
     if (allOrderedImagesets[targetImageset].length === 0) getImages();
   }, [allOrderedImagesets, targetImageset, targetClient]);
 
-  const convertToFile = (url: string, filename: string, mime: string) => {
-    // https://medium.com/@impulsejs/convert-dataurl-to-a-file-in-javascript-1921b8c3f4b
-    const parts = url.split(",");
-    const b64 = atob(parts[parts.length - 1]); // get the base 64 string
-    let n = b64.length;
-    const u8 = new Uint8Array(length); // initialize the best performing and most file compatible data type for new File object creation
-
-    while (n--) {
-      u8[n] = b64.charCodeAt(n); // replace character with integer
+  const handleConfirmOrder = async () => {
+    // create a FileList object + attach to file input
+    const list = new DataTransfer();
+    for (let i = 0; i < orderedImageset.length; i++) {
+      if (!orderedImageset[i].file) continue;
+      list.items.add(orderedImageset[i].file);
     }
-
-    return new File([u8], filename, { type: mime });
+    return (innerRef.current.files = list.files);
   };
 
-  // TODO render image order - initially from files contained within selectedFiles.inputname.files
   // allOrderedImagesets is only updated when the confirmation button is clicked. Clicking away with unsaved progress will open a dialog box which says "you have unsaved changes. Press proceed to continue anyway, or lock-in your changes" or something like that
   // the app will determine if the dialog box needs to show based on whether or not orderedImageset is complete (i.e. contains "empty" values) AND the confirmation button has been clicked - will need more state variables for this
+
+  // TODO include a feature that allows GLWR to remove an image from the imageset completely? i.e. performs a delete request and sends to s3
 
   return (
     <div className="flex items-start">
@@ -90,8 +97,9 @@ export default function ImageOrder({ ...props }) {
 
           <div className="flex gap-5">
             <button
-              type="button"
+              type="submit"
               className="border border-solid border-green-600 w-10 h-10 flex items-center justify-center"
+              onClick={() => handleConfirmOrder()}
             >
               <Check className="w-[20px] h-[20px]" />
             </button>
@@ -107,6 +115,7 @@ export default function ImageOrder({ ...props }) {
                   const url = e.dataTransfer.getData("text/uri-list");
                   const filename = e.dataTransfer.getData("text/plain");
                   const mime = e.dataTransfer.getData("text/image-type");
+                  const queueIndex = e.dataTransfer.getData("text/index");
 
                   // create a new file object from the retrieved image data
                   const newFile = convertToFile(url, filename, mime);
@@ -115,6 +124,14 @@ export default function ImageOrder({ ...props }) {
                   e.currentTarget.src = url;
                   e.currentTarget.alt = filename;
 
+                  // trigger visual "removal" from image queue
+                  const newQueuedImages = [...queuedImages];
+                  newQueuedImages[draggedIndex].queued = false;
+                  if (image.url !== "")
+                    // if an image exists in the slot being dropped on, reinstate draggability of previous image
+                    newQueuedImages[image.queueIndex].queued = true;
+                  setQueuedImages(newQueuedImages);
+
                   // update image order
                   const newOrderedImages = [...orderedImageset];
                   newOrderedImages[index] = {
@@ -122,13 +139,10 @@ export default function ImageOrder({ ...props }) {
                     url,
                     mime,
                     file: newFile,
+                    position: index,
+                    queueIndex: Number(queueIndex),
                   };
                   setOrderedImageset(newOrderedImages);
-
-                  // trigger visual "removal" from image queue
-                  const newQueuedImages = [...queuedImages];
-                  newQueuedImages[draggedIndex].queued = false;
-                  setQueuedImages(newQueuedImages);
                 }}
                 onDragOver={(e) => e.preventDefault()}
                 className="border border-solid w-[200px] h-[300px]"
@@ -145,8 +159,14 @@ export default function ImageOrder({ ...props }) {
         <div className="grid grid-cols-imageQueue gap-5 h-[75dvh] overflow-scroll">
           {queuedImages.map(
             (
-              image: { filename: string; url: string; mime: string } | null,
-              index
+              image: {
+                filename: string;
+                url: string;
+                mime: string;
+                position: number;
+                queued: boolean;
+              } | null,
+              index: number
             ) => {
               return (
                 <img
@@ -155,13 +175,17 @@ export default function ImageOrder({ ...props }) {
                       e.dataTransfer.setData("text/uri-list", image.url);
                       e.dataTransfer.setData("text/plain", image.filename);
                       e.dataTransfer.setData("text/image-type", image.mime);
+                      e.dataTransfer.setData("text/index", index.toString());
                       setDraggedIndex(index);
                     }
                   }}
+                  draggable={image?.queued === true ? "true" : "false"}
                   key={uuidv4()}
                   src={image ? image.url : ""}
                   alt={image ? image.filename : ""}
-                  className="border border-solid"
+                  className={
+                    image?.queued === true ? "opacity-100" : "opacity-25"
+                  }
                 />
               );
             }
