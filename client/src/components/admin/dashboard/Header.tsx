@@ -22,7 +22,7 @@ export default function Header() {
       <button
         onClick={() => handleLogout()}
         type="button"
-        className="font-inter italic font-bold bg-black text-white border-white xl:hover:border-red-600 xl:focus:bg-red-600 xl:focus:text-white xl:focus:outline-none xl:hover:text-white  xl:transition-colors border border-solid w-10 h-10 flex items-center justify-center"
+        className="font-inter italic font-bold xl:hover:drop-shadow-red border-mag drop-shadow-mag xl:hover:border-red xl:focus:border-red xl:focus:drop-shadow-red xl:focus:outline-none xl:transition-all border border-solid w-10 h-10 flex items-center justify-center"
       >
         <Eject className="w-[18px] h-[18px]" />
       </button>

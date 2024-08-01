@@ -113,7 +113,7 @@ export default function AddClient({ ...props }) {
           </div>
 
           <div className="flex gap-2">
-            <label className="cursor-pointer bg-white text-black py-2 px-3 font-inter italic font-bold focus-within:bg-blu focus-within:text-white xl:hover:bg-blu xl:hover:text-white transition-colors">
+            <label className="border border-solid border-cyn drop-shadow-cyn xl:hover:border-blu xl:hover:drop-shadow-blu xl:focus:border-blu xl:focus:drop-shadow-blu cursor-pointer text-white py-2 px-3 font-inter italic font-bold transition-all">
               <input
                 type="file"
                 name={"sneaks"}
@@ -146,7 +146,7 @@ export default function AddClient({ ...props }) {
           </div>
 
           <div className="flex gap-2">
-            <label className="cursor-pointer bg-white text-black py-2 px-3 font-inter italic font-bold focus-within:bg-blu focus-within:text-white xl:hover:bg-blu xl:hover:text-white transition-colors">
+            <label className="border border-solid border-cyn drop-shadow-cyn xl:hover:border-blu xl:hover:drop-shadow-blu xl:focus:border-blu xl:focus:drop-shadow-blu cursor-pointer text-white py-2 px-3 font-inter italic font-bold transition-all">
               <input
                 type="file"
                 name={"full"}
@@ -179,7 +179,7 @@ export default function AddClient({ ...props }) {
           </div>
 
           <div className="flex gap-2">
-            <label className="cursor-pointer bg-white text-black py-2 px-3 font-inter italic font-bold focus-within:bg-blu focus-within:text-white xl:hover:bg-blu xl:hover:text-white transition-colors">
+            <label className="border border-solid border-cyn drop-shadow-cyn xl:hover:border-blu xl:hover:drop-shadow-blu xl:focus:border-blu xl:focus:drop-shadow-blu cursor-pointer text-white py-2 px-3 font-inter italic font-bold transition-all">
               <input
                 type="file"
                 name={"socials"}
@@ -204,7 +204,7 @@ export default function AddClient({ ...props }) {
         <div className="text-center">
           <button
             type="submit"
-            className="border border-solid border-green-600 py-3 px-5 font-inter italic bold xl:hover:bg-green-600 transition-colors"
+            className="border border-solid border-ylw drop-shadow-ylw xl:hover:border-grn xl:hover:drop-shadow-grn xl:focus:border-grn xl:focus:drop-shadow-grn py-3 px-5 font-inter italic bold transition-all"
           >
             ADD CLIENT
           </button>

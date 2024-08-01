@@ -26,6 +26,9 @@ export default {
         cyn: "#00FFFF",
         grn: "#08FF09",
       },
+      backgroundColor: {
+        red: "#DC2626",
+      },
       borderColor: {
         red: "#DC2626",
       },

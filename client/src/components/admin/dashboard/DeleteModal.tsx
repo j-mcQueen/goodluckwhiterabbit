@@ -44,9 +44,9 @@ export default function DeleteModal({ ...props }) {
               setDeleteModalToggle({ active: false, target: "", name: "" })
             }
             type="button"
-            className="bg-white w-8 h-8 flex items-center justify-center xl:hover:bg-red-600 xl:focus:bg-red-600 outline-none transition-colors"
+            className="border border-solid border-mag drop-shadow-mag xl:hover:border-red xl:hover:drop-shadow-red xl:focus:border-red xl:focus:drop-shadow-red w-10 h-10 flex items-center justify-center outline-none transition-all"
           >
-            <Close className="w-[20px] h-[20px]" fill="#fff" />
+            <Close className="w-[20px] h-[20px]" customColor={"#FFF"} />
           </button>
         </div>
 
@@ -58,7 +58,7 @@ export default function DeleteModal({ ...props }) {
           <button
             onClick={() => handleDelete()}
             type="button"
-            className="bg-red-600 w-full py-3 font-inter xl:hover:bg-red-700 xl:transition-colors xl:focus:transition-colors"
+            className="border border-solid border-red drop-shadow-red xl:hover:bg-red xl:hover:drop-shadow-none xl:focus:bg-red xl:focus:drop-shadow-none w-full py-3 font-inter transition-all"
           >
             DELETE
           </button>

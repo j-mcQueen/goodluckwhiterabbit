@@ -88,7 +88,7 @@ export default function AllClients({ ...props }) {
                       })
                     }
                     type="button"
-                    className="border border-solid border-mag drop-shadow-mag xl:hover:drop-shadow-red xl:hover:border-red-600 xl:transition-all xl:focus:border-red-600 xl:focus:outline-none p-2"
+                    className="border border-solid border-mag drop-shadow-mag xl:hover:drop-shadow-red xl:hover:border-red xl:transition-all xl:focus:border-red-600 xl:focus:outline-none p-2"
                   >
                     <Close customColor="#FFF" className="w-[20px] h-[20px]" />
                   </button>
