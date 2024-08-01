@@ -3,10 +3,31 @@
 @tailwind utilities;
 
 @font-face {
+  font-family: "Times New Roman Bold";
+  src:
+    local("Times New Roman Bold"),
+    url("/fonts/times/TimesNewRomanMTStd-Bold.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Times New Roman Italic";
+  src:
+    local("Times New Roman Italic"),
+    url("/fonts/times/TimesNewRomanMTStd-Italic.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Times New Roman Bold-Italic";
+  src:
+    local("Times New Roman Bold-Italic"),
+    url("/fonts/times/TimesNewRomanMTStd-BoldIt.woff2") format("woff2");
+}
+
+@font-face {
   font-family: "Times New Roman";
   src:
     local("Times New Roman"),
-    url("/fonts/TimesNewRomanMTStd.woff2") format("woff2");
+    url("/fonts/times/TimesNewRomanMTStd.woff2") format("woff2");
 }
 
 @font-face {
@@ -14,6 +35,20 @@
   src:
     local("Inter"),
     url("/fonts/inter/Inter-Regular.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Inter Bold";
+  src:
+    local("Inter Bold"),
+    url("/fonts/inter/Inter-Bold.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Inter Light";
+  src:
+    local("Inter Light"),
+    url("/fonts/inter/Inter-Light.woff2") format("woff2");
 }
 
 :root {

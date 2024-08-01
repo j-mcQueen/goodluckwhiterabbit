@@ -5,7 +5,12 @@ export default {
     extend: {
       fontFamily: {
         tnr: ["Times New Roman", "serif"],
+        tnrB: ["Times New Roman Bold", "serif"],
+        tnrI: ["Times New Roman Italic", "serif"],
+        tnrBI: ["Times New Roman Bold-Italic", "serif"],
         inter: ["Inter", "sans-serif"],
+        interB: ["Inter Bold", "sans-serif"],
+        interL: ["Inter Light", "sans-serif"],
       },
       gridTemplateColumns: {
         imageQueue: "repeat(auto-fit, minmax(100px, 200px))",
