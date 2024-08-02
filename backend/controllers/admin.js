@@ -341,7 +341,6 @@ exports.adminPutImageOrder = async (req, res, next) => {
 
   if (decodedAccess.exp > 0) {
     // retrieve all images in the bucket
-    let ordered = [];
     let objects;
     try {
       objects = await client.send(
@@ -353,6 +352,7 @@ exports.adminPutImageOrder = async (req, res, next) => {
 
     let j = 0; // counter to accurately track index of provided FileList
     for (let i = 0; i < objects.Contents.length; i++) {
+      // find target files
       if (
         objects.Contents[i].Key.includes(req.params.imageset) &&
         objects.Contents[i].Key.includes(req.params.id)
@@ -378,7 +378,6 @@ exports.adminPutImageOrder = async (req, res, next) => {
               })
             ),
           ]);
-          // TODO now we need to populate the ordered array above to send to the client and render the updated order for visual confirmation
         } catch (err) {
           // TODO handle delete -> add error
           // TODO what if this happens mid loop?
@@ -392,9 +391,8 @@ exports.adminPutImageOrder = async (req, res, next) => {
 
     // IT WORKS!!
 
-    console.log(ordered);
     // we have successfully edited the image order
-    return res.status(200).send("success!!");
+    return res.sendStatus(200);
   }
 };
 
