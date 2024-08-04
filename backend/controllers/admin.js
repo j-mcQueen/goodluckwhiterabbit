@@ -18,7 +18,7 @@ const {
   DeleteObjectCommand,
 } = require("@aws-sdk/client-s3");
 const client = new S3Client({
-  region: "us-east-1",
+  region: "us-east-1", // TODO move this to .env
   credentials: {
     accessKeyId: process.env.AWS_ACCESS_KEY_ID,
     secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
@@ -53,7 +53,7 @@ exports.adminLogin = [
     next();
   }),
   // authenticate with passport local
-  passport.authenticate("local", { failWithError: true, session: false }),
+  passport.authenticate("admin-local", { failWithError: true, session: false }),
   (err, req, res, next) => {
     // handle unauthorized
     return res.sendStatus(401);

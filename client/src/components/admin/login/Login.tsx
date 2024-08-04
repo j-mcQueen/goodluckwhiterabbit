@@ -1,6 +1,6 @@
 import { FormEvent, useState } from "react";
-import glwr from "../../../assets/media/gifs/glwr-lenticular.gif";
 import { useNavigate } from "react-router-dom";
+import Rabbit from "../../global/forms/Rabbit";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -28,22 +28,14 @@ export default function Login() {
         return navigate("/admin/dashboard");
       }
     } catch (err) {
-      console.log(err);
-      setAuthError(true);
-      return;
+      return setAuthError(true);
     }
   };
 
   return (
     <main className="w-[calc(100dvw-1.5rem-2px)] h-[calc(100dvh-1.5rem-2px)] flex items-center justify-center">
       <section className="text-white border border-solid border-white xl:w-[25dvw] xl:h-[35dvw] mx-3 xl:mx-0 py-5 xl:py-0 flex flex-col justify-center">
-        <div className="flex justify-center">
-          <img
-            src={glwr}
-            alt="Image goes here"
-            className="max-h-[25dvw] xl:max-h-[5dvw]"
-          />
-        </div>
+        <Rabbit />
 
         <hgroup className="pt-10 pb-5">
           <h1 className="font-tnr text-2xl xl:text-3xl text-center italic">
@@ -56,8 +48,7 @@ export default function Login() {
         </hgroup>
 
         <form
-          action=""
-          method="post"
+          method="POST"
           encType="multipart/form-data"
           onSubmit={(e) => handleSubmit(e)}
           className="flex flex-col gap-5 py-5 px-3 xl:px-0"
@@ -102,7 +93,7 @@ export default function Login() {
 
         {authError ? (
           <div className="font-tnr not-italic text-center text-sm text-red-500 pt-2">
-            Invalid username or password. You shall not pass!
+            <p>Your code isn't quite right...</p>
           </div>
         ) : null}
       </section>
