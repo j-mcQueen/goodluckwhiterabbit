@@ -1,9 +1,10 @@
 import { FormEvent } from "react";
 import { useState } from "react";
 import PaneHeader from "./PaneHeader";
+import Add from "../../../assets/media/icons/Add";
+import Spinner from "../../../assets/media/icons/Spinner";
 
 export default function AddClient({ ...props }) {
-  // TODO configure this component to allow for client editing (since the form is largely the same)
   interface filesType {
     sneaks: { count: number; files: FileList | null };
     full: { count: number; files: FileList | null };
@@ -16,11 +17,14 @@ export default function AddClient({ ...props }) {
     socials: { count: 0, files: null },
   });
   const [takenEmail, setTakenEmail] = useState(false);
+  const [spinner, setSpinner] = useState(false);
 
   const { clients, setClients, setActivePane } = props;
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setSpinner(true);
+
     const formData = new FormData(e.currentTarget);
     formData.append(
       "sneaksAttached",
@@ -48,6 +52,7 @@ export default function AddClient({ ...props }) {
 
       if (response.status === 200 && data) {
         // A client has been added
+        setSpinner(false);
         setClients([...clients, data]);
         setActivePane("ALL");
       } else if (response.status === 409) {
@@ -113,7 +118,7 @@ export default function AddClient({ ...props }) {
           </div>
 
           <div className="flex gap-2">
-            <label className="border border-solid border-cyn drop-shadow-cyn xl:hover:border-blu xl:hover:drop-shadow-blu xl:focus:border-blu xl:focus:drop-shadow-blu cursor-pointer text-white py-2 px-3 font-inter italic font-bold transition-all">
+            <label className="flex items-center justify-center border border-solid border-cyn drop-shadow-cyn xl:hover:border-blu xl:hover:drop-shadow-blu xl:focus:border-blu xl:focus:drop-shadow-blu cursor-pointer w-10 h-10 transition-all">
               <input
                 type="file"
                 name={"sneaks"}
@@ -130,7 +135,7 @@ export default function AddClient({ ...props }) {
                 accept="image/*"
                 multiple
               />
-              BROWSE
+              <Add className={"w-[18px] h-[18px]"} />
             </label>
           </div>
         </div>
@@ -146,7 +151,7 @@ export default function AddClient({ ...props }) {
           </div>
 
           <div className="flex gap-2">
-            <label className="border border-solid border-cyn drop-shadow-cyn xl:hover:border-blu xl:hover:drop-shadow-blu xl:focus:border-blu xl:focus:drop-shadow-blu cursor-pointer text-white py-2 px-3 font-inter italic font-bold transition-all">
+            <label className="flex items-center justify-center border border-solid border-cyn drop-shadow-cyn xl:hover:border-blu xl:hover:drop-shadow-blu xl:focus:border-blu xl:focus:drop-shadow-blu cursor-pointer w-10 h-10 transition-all">
               <input
                 type="file"
                 name={"full"}
@@ -163,7 +168,7 @@ export default function AddClient({ ...props }) {
                 accept="image/*"
                 multiple
               />
-              BROWSE
+              <Add className={"w-[18px] h-[18px]"} />
             </label>
           </div>
         </div>
@@ -179,7 +184,7 @@ export default function AddClient({ ...props }) {
           </div>
 
           <div className="flex gap-2">
-            <label className="border border-solid border-cyn drop-shadow-cyn xl:hover:border-blu xl:hover:drop-shadow-blu xl:focus:border-blu xl:focus:drop-shadow-blu cursor-pointer text-white py-2 px-3 font-inter italic font-bold transition-all">
+            <label className="flex items-center justify-center border border-solid border-cyn drop-shadow-cyn xl:hover:border-blu xl:hover:drop-shadow-blu xl:focus:border-blu xl:focus:drop-shadow-blu cursor-pointer w-10 h-10 transition-all">
               <input
                 type="file"
                 name={"socials"}
@@ -196,7 +201,7 @@ export default function AddClient({ ...props }) {
                 accept="image/*"
                 multiple
               />
-              BROWSE
+              <Add className={"w-[18px] h-[18px]"} />
             </label>
           </div>
         </div>
@@ -206,7 +211,7 @@ export default function AddClient({ ...props }) {
             type="submit"
             className="border border-solid border-ylw drop-shadow-ylw xl:hover:border-grn xl:hover:drop-shadow-grn xl:focus:border-grn xl:focus:drop-shadow-grn py-3 px-5 font-inter italic bold transition-all"
           >
-            ADD CLIENT
+            {spinner ? <Spinner className="w-[18px] h-[18px]" /> : "ADD CLIENT"}
           </button>
         </div>
       </form>
