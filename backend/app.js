@@ -66,22 +66,8 @@ passport.use(
   })
 );
 
-passport.use(
-  "user-local",
-  new LocalStrategy(async (code, done) => {
-    try {
-      const user = await User.findOne({ code, role: "user" }).exec();
-      if (user.code !== code) return done(null, false);
-
-      return done(null, user);
-    } catch (err) {
-      return done(err);
-    }
-  })
-);
-
 passport.initialize();
-app.use("/", indexRouter);
+app.use("/admin", indexRouter);
 app.use("/user", userRouter);
 
 // catch 404 and forward to error handler

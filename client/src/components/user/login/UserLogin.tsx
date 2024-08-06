@@ -1,10 +1,13 @@
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Rabbit from "../../global/forms/Rabbit";
 
 export default function UserLogin() {
+  useEffect(() => {
+    document.title = "LOGIN — GOOD LUCK WHITE RABBIT";
+  }, []);
   const navigate = useNavigate();
-  const [authError, setAuthError] = useState(false);
+  const [authError, setAuthError] = useState({ active: false, message: "" });
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -18,13 +21,29 @@ export default function UserLogin() {
       });
       const data = await response.json();
 
-      if (data.errors) return setAuthError(true);
-      else {
-        setAuthError(false);
-        return navigate(`user/${data._id}/dashboard`);
+      switch (data.status) {
+        case 404:
+          // user not found
+          throw new TypeError(
+            "User not found. Please check your code and try again."
+          );
+
+        case 500:
+          // something else went wrong
+          throw new TypeError(
+            "Something went wrong. Please reach out for assistance."
+          );
+
+        default:
+          // we have a winner!
+          setAuthError({ active: false, message: "" });
+          return navigate(`user/${data._id}/dashboard`);
       }
     } catch (err) {
-      return setAuthError(true);
+      return setAuthError({
+        active: true,
+        message: (err as TypeError).message,
+      });
     }
   };
 
@@ -55,6 +74,9 @@ export default function UserLogin() {
               type="text"
               name="code"
               minLength={8}
+              onChange={() => {
+                if (authError) setAuthError({ active: false, message: "" });
+              }}
               className="bg-black border border-solid border-white xl:hover:border-cyn xl:focus:border-cyn transition-all font-inter text-ylw h-10 pl-2 mt-2 outline-none"
               required
             />
@@ -70,9 +92,9 @@ export default function UserLogin() {
           </div>
         </form>
 
-        {authError ? (
+        {authError.active ? (
           <div className="font-tnr not-italic text-center text-sm text-red-500 pt-2">
-            Invalid username or password. You shall not pass!
+            User not found. Please check your code and try again.
           </div>
         ) : null}
       </section>

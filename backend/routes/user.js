@@ -5,6 +5,6 @@ const router = express.Router();
 const upload = multer();
 
 // POST
-router.post("/user", upload.none(), login);
+router.post("/login", upload.none(), login);
 
 module.exports = router;

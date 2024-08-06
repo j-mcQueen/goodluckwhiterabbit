@@ -13,19 +13,19 @@ const router = express.Router();
 const upload = multer(); // enable form data to be unpacked
 
 // GET
-router.get("/admin/users", adminGetClients);
-router.get("/admin/users/:id/getImages/:imageset", adminGetUserImages);
+router.get("/users", adminGetClients);
+router.get("/users/:id/getImages/:imageset", adminGetUserImages);
 // POST
-router.post("/admin/login", upload.none(), adminLogin);
-router.post("/admin/add", upload.any(), adminAddClient); // using .any() here to accommodate edge cases where admin has filled out the form but has added no files yet
-router.post("/admin/logout", adminLogout);
+router.post("/login", upload.none(), adminLogin);
+router.post("/add", upload.any(), adminAddClient); // using .any() here to accommodate edge cases where admin has filled out the form but has added no files yet
+router.post("/logout", adminLogout);
 // PUT
 router.put(
-  "/admin/users/:id/editImageOrder/:imageset",
+  "/users/:id/editImageOrder/:imageset",
   upload.any(),
   adminPutImageOrder
 );
 // DELETE
-router.delete("/admin/deleteUser/:id", adminDeleteUser);
+router.delete("/deleteUser/:id", adminDeleteUser);
 
 module.exports = router;

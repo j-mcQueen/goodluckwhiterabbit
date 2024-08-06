@@ -22,12 +22,8 @@ exports.login = [
     minNumbers: 2,
     minSymbols: 2,
   }),
-  asyncHandler((req, res, next) => {
+  (req, res, next) => {
     // validate form
-  }),
-  passport.authenticate("user-local", { failWithError: true, session: false }), // authenticate
-  // handle auth errors
-  (err, res, next) => {
     const errors = validationResult(req);
 
     if (!errors.isEmpty()) {
@@ -35,6 +31,26 @@ exports.login = [
       return res.status(401).json({ errors: errors.array() });
     }
     next();
+  },
+  async (req, res, next) => {
+    try {
+      const user = await User.findOne({
+        code: req.body.code,
+        role: "user",
+      }).exec();
+
+      if (user) {
+        req.user = user;
+        next();
+      } else {
+        // user does not exist
+        throw new TypeError("User not found.");
+      }
+    } catch (err) {
+      return err.message === "User not found."
+        ? res.status(404).json({ status: 404 })
+        : res.status(500).json({ status: 500 });
+    }
   },
   // handle success
   (req, res, next) => {
