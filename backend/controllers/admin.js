@@ -42,17 +42,16 @@ exports.adminLogin = [
     minNumbers: 1,
     minSymbols: 1,
   }),
-  asyncHandler((req, res, next) => {
+  (req, res, next) => {
     // validate form
     const errors = validationResult(req);
 
-    if (!errors.isEmpty()) {
-      // there are backend validation errors
+    if (!errors.isEmpty())
+      // there are validation errors
       return res.status(401).json({ errors: errors.array() });
-    }
-    next();
-  }),
-  // authenticate with passport local
+    else next();
+  },
+  // authenticate
   passport.authenticate("admin-local", { failWithError: true, session: false }),
   (err, req, res, next) => {
     // handle unauthorized
@@ -94,20 +93,26 @@ exports.adminLogin = [
 exports.adminAddClient = [
   body("clientname").trim().notEmpty().isLength({ min: 4 }),
   body("clientemail").trim().notEmpty().isEmail(),
-  asyncHandler(async (req, res, next) => {
+  (req, res, next) => {
     // validate form
     const errors = validationResult(req);
-    const existingEmail = await User.findOne({ email: req.body.clientemail });
-
-    if (!errors.isEmpty()) {
-      // there are backend validation errors
+    if (!errors.isEmpty())
+      // there are validation errors
       return res.status(401).json({ errors: errors.array() });
-    } else if (existingEmail) {
-      return res.status(409).json({ errors: 409 });
+    else next();
+  },
+  async (req, res, next) => {
+    // check for existing email
+    try {
+      const existingEmail = await User.findOne({ email: req.body.clientemail });
+      if (existingEmail) throw new TypeError("Email already in use.");
+      else next();
+    } catch (err) {
+      return err.message === "Email already in use."
+        ? res.status(409).json({ status: 409 })
+        : res.status(500).json({ status: 500 });
     }
-
-    next();
-  }),
+  },
   async (req, res, next) => {
     try {
       const decodedAccess = jwt.verify(
@@ -411,8 +416,8 @@ exports.adminDeleteUser = async (req, res, next) => {
     }
   } catch (err) {
     if (err.name === "TokenExpiredError") {
+      // access token expired
       try {
-        // access token expired
         const decodedRefresh = jwt.verify(
           req.cookies.refreshToken,
           process.env.JWT_SECRET
