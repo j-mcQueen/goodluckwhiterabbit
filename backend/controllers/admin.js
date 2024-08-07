@@ -16,6 +16,7 @@ const {
   GetObjectCommand,
   ListObjectsV2Command,
   DeleteObjectCommand,
+  DeleteObjectsCommand,
 } = require("@aws-sdk/client-s3");
 const client = new S3Client({
   region: "us-east-1", // TODO move this to .env
@@ -402,56 +403,116 @@ exports.adminPutImageOrder = async (req, res, next) => {
 };
 
 exports.adminDeleteUser = async (req, res, next) => {
+  let decodedAccess;
   try {
-    const decodedAccess = jwt.verify(
-      req.cookies.accessToken,
-      process.env.JWT_SECRET
-    );
-
-    if (decodedAccess.exp > 0) {
-      // we're in!
-      // TODO delete all objects from S3 which contain the deleted user._id in the object key!
-      const deleted = await User.findByIdAndDelete(req.params.id).exec();
-      if (deleted._id !== undefined) return res.status(200).json(deleted._id);
-    }
+    decodedAccess = jwt.verify(req.cookies.accessToken, process.env.JWT_SECRET);
   } catch (err) {
-    if (err.name === "TokenExpiredError") {
-      // access token expired
-      try {
-        const decodedRefresh = jwt.verify(
-          req.cookies.refreshToken,
-          process.env.JWT_SECRET
-        ); // check refresh token is still valid
-
-        if (decodedRefresh.exp > 0) {
-          // create new access token
-          const newAccess = jwt.sign(
-            { _id: decodedRefresh._id },
-            process.env.JWT_SECRET,
-            { expiresIn: "1h" }
-          );
-
-          const deleted = await User.findByIdAndDelete(req.params.id).exec();
-          if (deleted._id !== undefined)
-            return res
-              .status(200)
-              .cookie("accessToken", newAccess, {
-                httpOnly: true,
-                sameSite: "Strict",
-                secure: true,
-              })
-              .json(deleted._id);
-        }
-      } catch (err) {
-        if (err.name !== "TokenExpiredError") {
-          return res.status(500).send("DeletionError"); // TODO indicate to user client-side that there was a deletion issue
-        }
-        // refresh token has also expired -> indicate to user they will be logged out
-        return res.sendStatus(401);
-      }
+    // access token expired
+    let decodedRefresh;
+    try {
+      // check if refresh token is also expired
+      decodedRefresh = jwt.verify(
+        req.cookies.refreshToken,
+        process.env.JWT_SECRET
+      );
+    } catch (err) {
+      // refresh token has also expired -> indicate to user they will be logged out
+      return res
+        .status(401)
+        .json({ status: 401, message: "Refresh token expired." });
     }
 
-    // if there is any other error, block access
-    return res.sendStatus(401);
+    if (decodedRefresh.exp > 0) {
+      // create new access token
+      decodedAccess = jwt.sign(
+        { _id: decodedRefresh._id },
+        process.env.JWT_SECRET,
+        { expiresIn: "1h" }
+      );
+
+      // attach new access token to response cookie
+      res.cookie("accessToken", decodedAccess, {
+        httpOnly: true,
+        sameSite: "Strict",
+        secure: true,
+      });
+    }
+  }
+
+  if (decodedAccess.exp > 0) {
+    // we're in!
+
+    // remove user from database
+    let deleted;
+    try {
+      deleted = await User.findByIdAndDelete(req.params.id).exec();
+      if (!deleted) throw new TypeError("User deletion error.");
+    } catch (err) {
+      return res.status(500).json({
+        status: 500,
+        message:
+          "There was an error deleting the user from the database. Please refresh the page and try again.",
+      });
+    }
+
+    // prevent unnecessary S3 requests
+    if (
+      deleted.files.sneaks === true ||
+      deleted.files.socials === true ||
+      deleted.files.full === true
+    ) {
+      // we have images to remove, so grab all files from S3
+      let objects;
+      try {
+        objects = await client.send(
+          new ListObjectsV2Command({ Bucket: "glwr-client-files" })
+        );
+        if (!objects || objects.Contents.length === 0)
+          throw new TypeError("No files found.");
+      } catch (err) {
+        return res.status(500).json({
+          status: 500,
+          message:
+            "The user has been deleted from the database, but there was an error retrieving the files from storage. Please contact Jack!",
+        });
+      }
+
+      // populate an array with delete target files in preparation for removal
+      const populate = (arr, object, deleted, imageset) => {
+        if (
+          deleted.files[imageset] === true &&
+          object.Key.includes(deleted._id) &&
+          object.Key.includes(imageset)
+        ) {
+          return arr.push({ Key: object.Key });
+        }
+      };
+
+      const deleteTargets = [];
+      for (let i = 0; i < objects.Contents.length; i++) {
+        populate(deleteTargets, objects.Contents[i], deleted, "sneaks");
+        populate(deleteTargets, objects.Contents[i], deleted, "full");
+        populate(deleteTargets, objects.Contents[i], deleted, "socials");
+      }
+
+      // delete target files in one step using populated array
+      try {
+        const deletedFiles = await client.send(
+          new DeleteObjectsCommand({
+            Bucket: "glwr-client-files",
+            Delete: { Objects: deleteTargets },
+          })
+        );
+
+        if (!deletedFiles.Deleted) throw new TypeError("Error deleting files.");
+        else return res.status(200).json(deleted._id); // return success response
+      } catch (err) {
+        return res.status(500).json({
+          status: 500,
+          message:
+            "The user has been deleted from the database, but there was an error removing the associated files from storage. Please contact Jack!",
+        });
+      }
+    } else return res.status(200).json(deleted._id); // no images to remove from S3, so return success response
   }
 };

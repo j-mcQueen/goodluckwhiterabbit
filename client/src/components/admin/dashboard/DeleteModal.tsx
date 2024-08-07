@@ -1,12 +1,19 @@
+import { useState } from "react";
 import Close from "../../../assets/media/icons/Close";
+import { useNavigate } from "react-router-dom";
 
 export default function DeleteModal({ ...props }) {
   const { clients, setClients, deleteModalToggle, setDeleteModalToggle } =
     props;
+  const navigate = useNavigate();
+
+  const [serverError, setServerError] = useState({
+    status: false,
+    message: "",
+  });
 
   const handleDelete = async () => {
     try {
-      //
       const response = await fetch(
         `http://localhost:3000/admin/deleteUser/${deleteModalToggle.target}`,
         {
@@ -16,15 +23,44 @@ export default function DeleteModal({ ...props }) {
       );
       const data = await response.json();
 
-      if (response.status === 200 && data) {
+      if ((response.status === 200 || response.status === 304) && data) {
         const updatedClients = clients.filter(
           (client: { _id: string }) => client._id !== data
         );
         setClients(updatedClients);
         setDeleteModalToggle({ active: false, target: "", name: "" });
+      } else {
+        switch (response.status) {
+          case 401:
+            // unauthorized -> indicate logout
+            setServerError({
+              status: true,
+              message:
+                "Your session has expired, so we're logging you out to keep things secure. Please login again to continue.",
+            });
+
+            return setTimeout(() => {
+              // expired tokens will still be attached to browser, but logging in again will generate new ones so no logout request to server necessary
+              navigate("/admin");
+            }, 10000);
+
+          case 500:
+            return setServerError({ status: true, message: data.message });
+
+          default:
+            throw new TypeError("Other error.");
+        }
       }
     } catch (err) {
-      //
+      setServerError({
+        status: true,
+        message:
+          "There was an unexpected error. We are logging you out to keep things secure. Please log back in and try again. If the problem persists, contact Jack.",
+      });
+
+      return setTimeout(() => {
+        navigate("/admin");
+      }, 10000);
     }
   };
 
@@ -40,9 +76,11 @@ export default function DeleteModal({ ...props }) {
           </h3>
 
           <button
-            onClick={() =>
-              setDeleteModalToggle({ active: false, target: "", name: "" })
-            }
+            onClick={() => {
+              if (serverError.status === true)
+                setServerError({ status: false, message: "" });
+              setDeleteModalToggle({ active: false, target: "", name: "" });
+            }}
             type="button"
             className="border border-solid border-mag drop-shadow-mag xl:hover:border-red xl:hover:drop-shadow-red xl:focus:border-red xl:focus:drop-shadow-red w-10 h-10 flex items-center justify-center outline-none transition-all"
           >
@@ -64,6 +102,12 @@ export default function DeleteModal({ ...props }) {
           </button>
         </div>
       </div>
+
+      {serverError.status === true ? (
+        <div className="text-red-500 max-w-[350px] pb-3">
+          <p>{serverError.message}</p>
+        </div>
+      ) : null}
     </dialog>
   );
 }
