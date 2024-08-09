@@ -16,10 +16,15 @@ export default function AddClient({ ...props }) {
     full: { count: 0, files: null },
     socials: { count: 0, files: null },
   });
+  const [errors, setErrors] = useState({
+    takenEmail: false,
+    formValidation: false,
+    other: false,
+  });
   const [takenEmail, setTakenEmail] = useState(false);
   const [spinner, setSpinner] = useState(false);
 
-  const { clients, setClients, setActivePane } = props;
+  const { clients, setClients, setActivePane, setRejectedFiles } = props;
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -48,21 +53,50 @@ export default function AddClient({ ...props }) {
 
       const data = await response.json();
 
-      // TODO handle server form validation errors
-
-      if (response.status === 200 && data) {
-        // A client has been added
+      if (data) {
         setSpinner(false);
-        setClients([...clients, data]);
-        setActivePane("ALL");
-      } else if (response.status === 409) {
-        // Client email already in use
-        setTakenEmail(true);
+        switch (response.status) {
+          case 200:
+            // A client has been added
+            setErrors({
+              takenEmail: false,
+              formValidation: false, // this should always be false
+              other: false,
+            });
+            if (data.rejected) {
+              setRejectedFiles(data.rejected);
+              setClients([
+                ...clients,
+                {
+                  name: data.name,
+                  code: data.code,
+                  _id: data._id,
+                  files: data.files,
+                  added: data.added,
+                },
+              ]);
+            } else {
+              setClients([...clients, data]);
+            }
+            setActivePane("ALL");
+            break;
+
+          case 401:
+            // form validation errors
+            setErrors({ ...errors, formValidation: true });
+            break;
+
+          case 409:
+            // Client email already in use
+            setErrors({ ...errors, takenEmail: true });
+            break;
+
+          default:
+            throw new TypeError("Error with 500 status code.");
+        }
       }
     } catch (err) {
-      // TODO handle edge cases like network errors
-      console.log(err);
-      return;
+      return setErrors({ ...errors, other: true });
     }
   };
 
@@ -100,7 +134,7 @@ export default function AddClient({ ...props }) {
             className="w-full bg-black border border-solid border-white p-3 text-ylw font-inter xl:focus:outline-none xl:focus:border-blu"
             required
           />
-          {takenEmail ? (
+          {errors.takenEmail ? (
             <p className="text-red-600 font-inter pt-3">
               Email address already in use.
             </p>
@@ -214,6 +248,14 @@ export default function AddClient({ ...props }) {
             {spinner ? <Spinner className="w-[18px] h-[18px]" /> : "ADD CLIENT"}
           </button>
         </div>
+
+        {errors.formValidation || errors.other ? (
+          <p>
+            {errors.formValidation
+              ? "There was an error in the name or email you typed in. Refresh the page and try again, then notify Jack!"
+              : "Something else went wrong. Please notify Jack!"}
+          </p>
+        ) : null}
       </form>
     </div>
   );

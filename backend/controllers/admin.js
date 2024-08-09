@@ -71,7 +71,7 @@ exports.adminLogin = [
     const accessToken = jwt.sign(
       { _id: req.user._id },
       process.env.JWT_SECRET,
-      { expiresIn: 10 }
+      { expiresIn: "1h" }
     );
 
     return res
@@ -120,7 +120,7 @@ exports.adminAddClient = [
     if (verified) {
       const loginCode = createCode();
       // initialize array to hold any files not uploaded to S3 for notification purposes
-      const unuploaded = [];
+      const rejected = [];
 
       const user = new User({
         name: req.body.clientname,
@@ -152,7 +152,7 @@ exports.adminAddClient = [
             if (!added) throw new TypeError("File not added.");
             else continue;
           } catch (err) {
-            unuploaded.push(req.files[i].originalname);
+            rejected.push(req.files[i].originalname);
             continue;
           }
         }
@@ -166,7 +166,7 @@ exports.adminAddClient = [
         files: savedUser.files,
         added: savedUser.added,
       };
-      if (unuploaded.length > 0) data.unuploaded = unuploaded;
+      if (rejected.length > 0) data.rejected = rejected;
       return res.status(200).json(data);
     }
   },
