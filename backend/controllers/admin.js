@@ -8,8 +8,8 @@ const consumers = require("node:stream/consumers");
 const { body, validationResult } = require("express-validator");
 const { returnClients } = require("./utils/returnClients");
 const { createCode } = require("./utils/createCode");
+const { verifyTokens } = require("./utils/verifyTokens");
 
-const { getSignedUrl } = require("@aws-sdk/s3-request-presigner");
 const {
   S3Client,
   PutObjectCommand,
@@ -59,21 +59,20 @@ exports.adminLogin = [
     return res.sendStatus(401);
   },
   (req, res, next) => {
-    // handle login success
-
+    // handle login success -> generate access and refresh tokens + attach to response
     const refreshToken = jwt.sign(
       { _id: req.user._id },
       process.env.JWT_SECRET,
       {
         expiresIn: "24h",
       }
-    ); // create refresh token
+    );
 
     const accessToken = jwt.sign(
       { _id: req.user._id },
       process.env.JWT_SECRET,
-      { expiresIn: "1h" }
-    ); // create access token
+      { expiresIn: 10 }
+    );
 
     return res
       .cookie("refreshToken", refreshToken, {
@@ -115,106 +114,60 @@ exports.adminAddClient = [
     }
   },
   async (req, res, next) => {
-    try {
-      const decodedAccess = jwt.verify(
-        req.cookies.accessToken,
-        process.env.JWT_SECRET
-      );
+    const verified = await verifyTokens(req, res);
 
-      if (decodedAccess.exp > 0) {
-        // access token is valid so authorize
-        const loginCode = createCode();
+    // the below condition will always be true if verifyTokens() doesn't end the request cycle early. Just being explicit that the token is valid at this step
+    if (verified) {
+      const loginCode = createCode();
+      // initialize array to hold any files not uploaded to S3 for notification purposes
+      const unuploaded = [];
 
-        const user = new User({
-          name: req.body.clientname,
-          email: req.body.clientemail,
-          code: loginCode,
-          url: "",
-          files: {
-            sneaks: req.body.sneaksAttached === "true" ? true : false,
-            full: req.body.fullAttached === "true" ? true : false,
-            socials: req.body.socialsAttached === "true" ? true : false,
-          },
-          role: "user",
-          added: new Date(Date.now()).toLocaleString("en-US").split(",")[0], // mm/dd/yyyy format
-        });
+      const user = new User({
+        name: req.body.clientname,
+        email: req.body.clientemail,
+        code: loginCode,
+        url: "",
+        files: {
+          sneaks: req.body.sneaksAttached === "true" ? true : false,
+          full: req.body.fullAttached === "true" ? true : false,
+          socials: req.body.socialsAttached === "true" ? true : false,
+        },
+        role: "user",
+        added: new Date(Date.now()).toLocaleString("en-US").split(",")[0], // mm/dd/yyyy format
+      });
 
-        // upload images to s3 if req.files has been populated
-        if (req.files.length > 0) {
-          // TODO this could be causing a performance bottleneck
-          for (let i = 0; i < req.files.length; i++) {
-            // TODO include a try catch block here
-            // if there is an issue with an upload, add the file to an array
-            // if this array has been populated, add it to the array within the catch block (execution will continue despite catch)
-            // at the end of the loop, if the array has been populated, carry on as normal
-            // but when the response is sent, send with a message to indicate which files were not added and why
-
-            const s3Params = {
-              Bucket: "glwr-client-files",
-              Key: `${user._id}/${req.files[i].fieldname}/${i}/${req.files[i].originalname}`, // ensures files are associated to a user and that each file has a key containing a reference to it's position
-              Body: req.files[i].buffer,
-              ContentType: req.files[i].mimetype,
-            };
-
-            await client.send(new PutObjectCommand(s3Params));
-          }
-
-          // create a presigned URL
-          const command = new GetObjectCommand({
+      // upload images to s3 if req.files has been populated
+      if (req.files.length > 0) {
+        for (let i = 0; i < req.files.length; i++) {
+          const s3Params = {
             Bucket: "glwr-client-files",
-            Key: `${user._id}`,
-          });
+            Key: `${user._id}/${req.files[i].fieldname}/${i}/${req.files[i].originalname}`, // ensures files are associated to a user and that each file has a key containing a reference to it's position
+            Body: req.files[i].buffer,
+            ContentType: req.files[i].mimetype,
+          };
 
-          // TODO not sure I need this anymore
-          const url = await getSignedUrl(client, command, {
-            expiresIn: 604800, // expires in 7 days
-          });
-
-          user.url = url;
-          // if no url has been created, then the admin has not attached files to the client yet.
-          // TODO ensure that the user is updated with the presigned URL when this happens
-        }
-
-        const savedUser = await user.save();
-
-        return res.status(200).json({
-          name: savedUser.name,
-          code: loginCode,
-          _id: savedUser._id,
-          files: savedUser.files,
-          added: savedUser.added,
-        });
-      } else {
-        // access token expired
-        const decodedRefresh = jwt.verify(
-          req.cookies.refreshToken,
-          process.env.JWT_SECRET
-        ); // check refresh token is still valid
-
-        if (decodedRefresh.exp > 0) {
-          // create new access token
-          const newAccess = jwt.sign(
-            { _id: req.user._id },
-            process.env.JWT_SECRET,
-            { expiresIn: "1h" }
-          );
-
-          // TODO create new user following same steps as above (maybe move into a HOC)
-
-          return res
-            .cookie("accessToken", newAccess, {
-              httpOnly: true,
-              sameSite: "Strict",
-              secure: true,
-            })
-            .status(200)
-            .json(req.user._id);
+          // fish for upload errors and handle them
+          try {
+            const added = await client.send(new PutObjectCommand(s3Params));
+            if (!added) throw new TypeError("File not added.");
+            else continue;
+          } catch (err) {
+            unuploaded.push(req.files[i].originalname);
+            continue;
+          }
         }
       }
-    } catch (err) {
-      // TODO handle error -> either the refresh or access token is invalid - indicate to user they will be logged out
-      console.log(err);
-      return res.sendStatus(401);
+
+      const savedUser = await user.save();
+      const data = {
+        name: savedUser.name,
+        code: loginCode,
+        _id: savedUser._id,
+        files: savedUser.files,
+        added: savedUser.added,
+      };
+      if (unuploaded.length > 0) data.unuploaded = unuploaded;
+      return res.status(200).json(data);
     }
   },
 ];
