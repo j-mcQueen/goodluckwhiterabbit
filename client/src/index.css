@@ -3,56 +3,33 @@
 @tailwind utilities;
 
 @font-face {
-  font-family: "Times New Roman Bold";
-  src:
-    local("Times New Roman Bold"),
-    url("/fonts/times/TimesNewRomanMTStd-Bold.woff2") format("woff2");
+  font-family: "VT323";
+  src: local("VT323"), url("/fonts/vt323/VT323-Regular.woff2");
 }
 
 @font-face {
-  font-family: "Times New Roman Italic";
+  font-family: "Liquid Crystal";
   src:
-    local("Times New Roman Italic"),
-    url("/fonts/times/TimesNewRomanMTStd-Italic.woff2") format("woff2");
+    local("Liquid Crystal"),
+    url("/fonts/lc/LiquidCrystal-Normal.woff2") format("woff2");
 }
 
 @font-face {
-  font-family: "Times New Roman Bold-Italic";
+  font-family: "Liquid Crystal Bold";
   src:
-    local("Times New Roman Bold-Italic"),
-    url("/fonts/times/TimesNewRomanMTStd-BoldIt.woff2") format("woff2");
+    local("Liquid Crystal Bold"),
+    url("/fonts/lc/LiquidCrystal-Bold.woff2") format("woff2");
 }
 
 @font-face {
-  font-family: "Times New Roman";
+  font-family: "Liquid Crystal Light";
   src:
-    local("Times New Roman"),
-    url("/fonts/times/TimesNewRomanMTStd.woff2") format("woff2");
-}
-
-@font-face {
-  font-family: "Inter";
-  src:
-    local("Inter"),
-    url("/fonts/inter/Inter-Regular.woff2") format("woff2");
-}
-
-@font-face {
-  font-family: "Inter Bold";
-  src:
-    local("Inter Bold"),
-    url("/fonts/inter/Inter-Bold.woff2") format("woff2");
-}
-
-@font-face {
-  font-family: "Inter Light";
-  src:
-    local("Inter Light"),
-    url("/fonts/inter/Inter-Light.woff2") format("woff2");
+    local("Liquid Crystal Light"),
+    url("/fonts/lc/LiquidCrystal-Light.woff2") format("woff2");
 }
 
 :root {
-  font-family: "Times New Roman", Times, serif;
+  font-family: "VT323", serif;
   min-width: 300px;
   overflow-x: hidden;
 }
