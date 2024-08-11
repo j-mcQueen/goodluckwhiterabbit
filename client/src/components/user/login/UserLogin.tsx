@@ -49,26 +49,24 @@ export default function UserLogin() {
 
   return (
     <main className="w-[calc(100dvw-1.5rem-2px)] h-[calc(100dvh-1.5rem-2px)] flex items-center justify-center">
-      <section className="text-white border border-solid border-white p-5">
+      <section className="text-white xl:border xl:border-solid xl:border-white w-[90dvw] h-dvh xl:w-[25dvw] xl:h-[35dvw] pb-6 xl:mx-0 xl:py-0 flex flex-col justify-end">
         <Rabbit />
 
-        <hgroup>
-          <h1 className="text-2xl xl:text-3xl text-center italic pt-10">
-            MAGIC AWAITS
+        <hgroup className="pt-10 xl:pb-5 xl:pl-10 pl-3">
+          <h1 className="font-liquid text-2xl xl:text-3xl tracking-widest opacity-80 drop-shadow-glo pt-10">
+            magic awaits
           </h1>
 
-          <p className="font-inter py-10">
-            Enter your login code to access your photos
-          </p>
+          <p className="text-lg">ENTER LOGIN CODE TO ACCESS PORTAL</p>
         </hgroup>
 
         <form
           method="POST"
           encType="multipart/form-data"
           onSubmit={(e) => handleSubmit(e)}
-          className="flex flex-col"
+          className="flex flex-col gap-5 xl:pb-10 py-3"
         >
-          <label className="flex flex-col">
+          <label className="flex flex-col text-lg xl:px-10">
             CODE
             <input
               type="text"
@@ -77,26 +75,32 @@ export default function UserLogin() {
               onChange={() => {
                 if (authError) setAuthError({ active: false, message: "" });
               }}
-              className="bg-black border border-solid border-white xl:hover:border-cyn xl:focus:border-cyn transition-all font-inter text-ylw h-10 pl-2 mt-2 outline-none"
+              className="bg-black border border-solid border-white xl:focus:border-red transition-all font-liquid text-rd h-10 pl-2 mt-2 outline-none"
               required
             />
           </label>
 
-          <div className="text-center">
+          {authError.active ? (
+            <div className="font-vt text-md text-rd xl:pl-10">
+              <p>INVALID CODE. TRY AGAIN!</p>
+            </div>
+          ) : (
+            <div className="font-vt text-md xl:pl-10 opacity-0">
+              <p>WELL FOUND! THIS IS AN EASTER EGG.</p>
+            </div>
+          )}
+
+          <div className="text-end xl:pt-6">
             <button
               type="submit"
-              className="border border-solid border-ylw xl:hover:border-grn xl:focus:border-grn transition-all mt-10 px-5 py-2"
+              className="text-white border border-solid border-white xl:hover:text-rd xl:hover:border-red focus:border-red focus:text-rd drop-shadow-glo focus:drop-shadow-red xl:hover:drop-shadow-red outline-none pl-6 pr-5 pt-3 pb-2 xl:transition-all xl:mr-10"
             >
-              BEGIN
+              <span className="font-liquid text-[20px] tracking-widest opacity-80">
+                begin
+              </span>
             </button>
           </div>
         </form>
-
-        {authError.active ? (
-          <div className="font-tnr not-italic text-center text-sm text-red-500 pt-2">
-            User not found. Please check your code and try again.
-          </div>
-        ) : null}
       </section>
     </main>
   );
