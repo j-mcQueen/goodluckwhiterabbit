@@ -6,13 +6,13 @@ import Spinner from "../../../assets/media/icons/Spinner";
 
 export default function AddClient({ ...props }) {
   interface filesType {
-    sneaks: { count: number; files: FileList | null };
+    previews: { count: number; files: FileList | null };
     full: { count: number; files: FileList | null };
     socials: { count: number; files: FileList | null };
   }
 
   const [selectedFiles, setSelectedFiles] = useState<filesType>({
-    sneaks: { count: 0, files: null },
+    previews: { count: 0, files: null },
     full: { count: 0, files: null },
     socials: { count: 0, files: null },
   });
@@ -32,8 +32,8 @@ export default function AddClient({ ...props }) {
 
     const formData = new FormData(e.currentTarget);
     formData.append(
-      "sneaksAttached",
-      selectedFiles.sneaks.files !== null ? "true" : "false"
+      "previewsAttached",
+      selectedFiles.previews.files !== null ? "true" : "false"
     );
     formData.append(
       "fullAttached",
@@ -143,11 +143,11 @@ export default function AddClient({ ...props }) {
 
         <div className="flex items-center justify-between">
           <div className="flex gap-3 items-center font-inter">
-            <p className="text-gray">UPLOAD SNEAK PEEKS:</p>
+            <p className="text-gray">UPLOAD PREVIEWS:</p>
             <p
-              className={`${selectedFiles.sneaks.count > 0 ? "text-red-600" : "text-white"}`}
+              className={`${selectedFiles.previews.count > 0 ? "text-red-600" : "text-white"}`}
             >
-              {selectedFiles.sneaks.count}
+              {selectedFiles.previews.count}
             </p>
           </div>
 
@@ -155,11 +155,11 @@ export default function AddClient({ ...props }) {
             <label className="flex items-center justify-center border border-solid border-cyn drop-shadow-cyn xl:hover:border-blu xl:hover:drop-shadow-blu xl:focus:border-blu xl:focus:drop-shadow-blu cursor-pointer w-10 h-10 transition-all">
               <input
                 type="file"
-                name={"sneaks"}
+                name={"previews"}
                 onChange={(e) => {
                   setSelectedFiles({
                     ...selectedFiles,
-                    sneaks: {
+                    previews: {
                       count: e.target.files?.length || 0,
                       files: e.target.files,
                     },

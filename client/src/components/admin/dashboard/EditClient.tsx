@@ -4,14 +4,14 @@ import ImageOrder from "./ImageOrder";
 
 export default function EditClient({ ...props }) {
   const { targetClient, setTargetClient, setActivePane } = props;
-  const sneaksRef = useRef<HTMLInputElement>(null);
+  const previewsRef = useRef<HTMLInputElement>(null);
   const socialsRef = useRef<HTMLInputElement>(null);
   const galleryRef = useRef<HTMLInputElement>(null);
 
   const chooseRef = (imageset: string) => {
     switch (imageset) {
-      case "sneaks":
-        return sneaksRef;
+      case "previews":
+        return previewsRef;
 
       case "socials":
         return socialsRef;
@@ -22,7 +22,7 @@ export default function EditClient({ ...props }) {
   };
 
   const [allOrderedImagesets, setAllOrderedImagesets] = useState({
-    sneaks: [],
+    previews: [],
     full: [],
     socials: [],
   });
@@ -49,7 +49,7 @@ export default function EditClient({ ...props }) {
     }[]
   >([]);
 
-  const [targetImageset, setTargetImageset] = useState("sneaks"); // this value is passed to ImageOrder component
+  const [targetImageset, setTargetImageset] = useState("previews"); // this value is passed to ImageOrder component
   const [spinner, setSpinner] = useState(false);
 
   useEffect(() => {
@@ -136,16 +136,16 @@ export default function EditClient({ ...props }) {
         <div>
           <button
             type="button"
-            className={`${targetImageset === "sneaks" ? "bg-red border border-solid border-white" : "border border-solid border-white"} font-inter font-bold border-b-0 text-center py-2 px-3`}
-            onClick={() => setTargetImageset("sneaks")}
+            className={`${targetImageset === "previews" ? "bg-red border border-solid border-white" : "border border-solid border-white"} font-inter font-bold border-b-0 text-center py-2 px-3`}
+            onClick={() => setTargetImageset("previews")}
           >
             PREVIEW
             <label className="opacity-0 w-0">
               <input
                 type="file"
-                name="sneaks"
+                name="previews"
                 className="w-0 opacity-0"
-                ref={sneaksRef}
+                ref={previewsRef}
               />
               {/* when we change the image order, we are updating the files object of these inputs */}
             </label>

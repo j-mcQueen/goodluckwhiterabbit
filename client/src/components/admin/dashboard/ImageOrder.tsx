@@ -18,13 +18,13 @@ export default function ImageOrder({ ...props }) {
   // TODO can create hidden file inputs to attach the ordered imagesets to
 
   const headingText: headingTextType = {
-    sneaks: "PREVIEW",
+    previews: "PREVIEWS",
     full: "GALLERY",
     socials: "SOCIAL",
   };
 
   interface headingTextType {
-    sneaks: string;
+    previews: string;
     full: string;
     socials: string;
   }

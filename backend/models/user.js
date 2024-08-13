@@ -6,7 +6,7 @@ const UserSchema = new Schema({
   email: String,
   code: String,
   url: String,
-  files: { sneaks: Boolean, full: Boolean, socials: Boolean },
+  files: { previews: Boolean, full: Boolean, socials: Boolean },
   role: String,
   added: String,
 });
