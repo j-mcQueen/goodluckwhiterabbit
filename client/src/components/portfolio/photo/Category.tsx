@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from "uuid";
 import { AnimatePresence, motion } from "framer-motion";
 
-import Up from "../../assets/media/icons/Up";
+import Up from "../../../assets/media/icons/Up";
 
 export default function Category({ ...props }) {
   const {

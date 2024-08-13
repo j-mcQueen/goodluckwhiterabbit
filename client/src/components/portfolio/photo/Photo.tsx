@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { projects } from "./data/projects";
 
-import Header from "../global/header/Header";
-import MobileHeader from "../global/header/mobile/Header";
-import Sidebar from "../global/sidebar/Sidebar";
+import Header from "../../global/header/Header";
+import MobileHeader from "../../global/header/mobile/Header";
+import Sidebar from "../../global/sidebar/Sidebar";
 import Content from "./Content";
-import Title from "../global/title/Title";
-import Dropdown from "../global/dropdown/Dropdown";
+import Title from "../../global/title/Title";
+import Dropdown from "../../global/dropdown/Dropdown";
 
 export default function Photo() {
   const mobile = window.matchMedia("(max-width: 1080px)").matches;

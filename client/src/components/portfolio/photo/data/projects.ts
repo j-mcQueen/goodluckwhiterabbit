@@ -1,5 +1,5 @@
 // TODO each item in each data set should have an images property that refers to an import of all that project's images (e.g. tag.images)
-import { commercialImages } from "../../../assets/media/images/commercial/commercial";
+import { commercialImages } from "../../../../assets/media/images/commercial/commercial";
 
 const commercial = [
   {

@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from "uuid";
 import { useState } from "react";
 
-import Category from "../../photo/Category";
+import Category from "../../portfolio/photo/Category";
 import Title from "../title/Title";
 
 export default function Sidebar({ ...props }) {
