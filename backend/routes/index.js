@@ -18,7 +18,6 @@ router.get("/users/:id/getImages/:imageset", adminGetUserImages);
 // POST
 router.post("/login", upload.none(), adminLogin);
 router.post("/add", upload.any(), adminAddClient); // using .any() here to accommodate edge cases where admin has filled out the form but has added no files yet
-router.post("/logout", adminLogout);
 // PUT
 router.put(
   "/users/:id/editImageOrder/:imageset",

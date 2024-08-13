@@ -15,6 +15,7 @@ const Admin = require("./models/admin");
 const User = require("./models/user");
 
 // routes
+const globalRouter = require("./routes/global");
 const indexRouter = require("./routes/index");
 const userRouter = require("./routes/user");
 
@@ -67,6 +68,7 @@ passport.use(
 );
 
 passport.initialize();
+app.use("/", globalRouter);
 app.use("/admin", indexRouter);
 app.use("/user", userRouter);
 
