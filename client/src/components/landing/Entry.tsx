@@ -11,13 +11,13 @@ export default function Entry() {
           alt="A white rabbit against a black background shimmering from left to right"
         />
 
-        <h1 className="text-white py-6 xl:py-10 text-xl xl:text-3xl italic">
-          WELCOME TO MY WORLD
+        <h1 className="font-liquid text-white py-6 xl:py-10 text-xl xl:text-4xl">
+          welcome to my world
         </h1>
 
         <Link
           to={"/photo"}
-          className="border border-solid border-red-600 text-lg text-white py-3 px-5 xl:hover:bg-red-600 xl:hover:text-black xl:transition-colors italic leading-none"
+          className="border border-solid border-white xl:hover:border-red xl:hover:drop-shadow-red focus:drop-shadow-red text-lg text-white py-1 px-5 xl:hover:bg-red-600 xl:transition-colors"
         >
           ENTER
         </Link>
