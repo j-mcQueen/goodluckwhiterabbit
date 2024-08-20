@@ -2,7 +2,13 @@ require("dotenv").config();
 const jwt = require("jsonwebtoken");
 const User = require("../../models/user");
 const { body, validationResult } = require("express-validator");
-const { S3Client } = require("@aws-sdk/client-s3");
+const { verifyTokens } = require("../utils/verifyTokens");
+const consumers = require("node:stream/consumers");
+const {
+  S3Client,
+  ListObjectsV2Command,
+  GetObjectCommand,
+} = require("@aws-sdk/client-s3");
 const client = new S3Client({
   region: "us-east-1", // TODO move this to .env
   credentials: {
@@ -81,3 +87,66 @@ exports.login = [
       .json(req.user._id);
   },
 ];
+
+exports.getImages = async (req, res, next) => {
+  const verified = await verifyTokens(req, res);
+
+  if (verified) {
+    let user;
+    try {
+      user = await User.findById(req.params.id).exec();
+      if (!user)
+        throw TypeError(
+          "The server produced an unexpected error. Please refresh the page and try again."
+        );
+    } catch (err) {
+      return res.status(404).json({
+        status: 404,
+        message: err.message,
+      });
+    }
+
+    const imagesets = { previews: [], full: [], socials: [] };
+    let objects;
+    try {
+      objects = await client.send(
+        new ListObjectsV2Command({ Bucket: "glwr-client-files" })
+      );
+      if (!objects)
+        throw new TypeError("Failed to retrieve all images from storage.");
+    } catch (err) {
+      return res.status(404).json({ status: 404, message: err.message });
+    }
+
+    for (let i = 0; i < objects.Contents.length; i++) {
+      if (objects.Contents[i].Key.includes(req.params.id)) {
+        // if the matching user id is present in the key of the object, this is a target file
+        const file = await client.send(
+          new GetObjectCommand({
+            Bucket: "glwr-client-files",
+            Key: objects.Contents[i].Key,
+          })
+        );
+
+        // create a data URL and isolate filename to present to the client
+        // this ensures we can render the image + handle editing of image order correctly on the frontend
+        const imageData = {};
+        const imgBuffer = (await consumers.buffer(file.Body)).toString(
+          "base64"
+        );
+
+        // pass the data the frontend needs for state management
+        const keyStrings = objects.Contents[i].Key.split("/");
+        imageData.url = `data:${file.ContentType};base64, ${imgBuffer}`;
+        imageData.position = keyStrings[2];
+        imageData.filename = keyStrings[3];
+        imageData.mime = file.ContentType;
+        imageData.queued = true;
+
+        imagesets[keyStrings[1]].push(imageData); // adds imageData into the property with the corresponding imageset name
+      } else continue;
+    }
+
+    return res.status(200).json({ files: imagesets, name: user.name });
+  }
+};

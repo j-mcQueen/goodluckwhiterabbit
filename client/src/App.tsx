@@ -14,8 +14,7 @@ function App() {
     { path: "/admin/dashboard", element: <AdminDashboard />, errorElement: "" },
     { path: "/portal", element: <UserLogin />, errorElement: "" },
     {
-      // path: "/user/:id/dashboard",
-      path: "/user/dashboard",
+      path: "/user/:id/dashboard/",
       element: <UserDashboard />,
       errorElement: "",
     },

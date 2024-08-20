@@ -37,7 +37,7 @@ export default function UserLogin() {
         default:
           // we have a winner!
           setAuthError({ active: false, message: "" });
-          return navigate(`user/${data._id}/dashboard`);
+          return navigate(`/user/${data}/dashboard`);
       }
     } catch (err) {
       return setAuthError({
