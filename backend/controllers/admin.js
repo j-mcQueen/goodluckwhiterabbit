@@ -126,9 +126,8 @@ exports.adminAddClient = [
         name: req.body.clientname,
         email: req.body.clientemail,
         code: loginCode,
-        url: "",
         files: {
-          sneaks: req.body.sneaksAttached === "true" ? true : false,
+          previews: req.body.previewsAttached === "true" ? true : false,
           full: req.body.fullAttached === "true" ? true : false,
           socials: req.body.socialsAttached === "true" ? true : false,
         },
@@ -172,63 +171,22 @@ exports.adminAddClient = [
   },
 ];
 
-exports.adminLogout = async (req, res, next) => {
-  // revoke refresh and access tokens
-  return res
-    .clearCookie("accessToken", {
-      httpOnly: true,
-      sameSite: "Strict",
-      secure: true,
-    })
-    .clearCookie("refreshToken", {
-      httpOnly: true,
-      sameSite: "Strict",
-      secure: true,
-    })
-    .end();
-};
-
 exports.adminGetClients = async (req, res, next) => {
-  try {
-    const decodedAccess = jwt.verify(
-      req.cookies.accessToken,
-      process.env.JWT_SECRET
-    );
+  const verified = await verifyTokens(req, res);
 
-    if (decodedAccess.exp > 0) {
-      // we're in!
-      const clients = await returnClients(User);
-      return res.status(200).json(clients);
-    } else {
-      // access token expired
-      const decodedRefresh = jwt.verify(
-        req.cookies.refreshToken,
-        process.env.JWT_SECRET
-      ); // check refresh token is still valid
-
-      if (decodedRefresh.exp > 0) {
-        // create new access token
-        const newAccess = jwt.sign(
-          { _id: req.user._id },
-          process.env.JWT_SECRET,
-          { expiresIn: "1h" }
-        );
-
-        const clients = await returnClients(User);
-
-        return res
-          .cookie("accessToken", newAccess, {
-            httpOnly: true,
-            sameSite: "Strict",
-            secure: true,
-          })
-          .status(200)
-          .json(clients);
-      }
+  if (verified) {
+    let clients;
+    try {
+      clients = await returnClients(User);
+    } catch (err) {
+      return res.status(500).json({
+        status: 500,
+        message:
+          "There was an error retrieving your clients. Please refresh and try again.",
+      });
     }
-  } catch (err) {
-    console.log(err);
-    return res.sendStatus(401);
+
+    return res.status(200).json(clients);
   }
 };
 
@@ -280,7 +238,6 @@ exports.adminGetUserImages = async (req, res, next) => {
         } else continue;
       }
 
-      // TODO sort images based on position i.e. images.sort((a,b) => a.position - b.position)
       const sorted = images.sort((a, b) => a.position - b.position);
       return res.status(200).send(sorted);
     }
@@ -410,7 +367,7 @@ exports.adminDeleteUser = async (req, res, next) => {
 
     // prevent unnecessary S3 requests
     if (
-      deleted.files.sneaks === true ||
+      deleted.files.previews === true ||
       deleted.files.socials === true ||
       deleted.files.full === true
     ) {
@@ -443,7 +400,7 @@ exports.adminDeleteUser = async (req, res, next) => {
 
       const deleteTargets = [];
       for (let i = 0; i < objects.Contents.length; i++) {
-        populate(deleteTargets, objects.Contents[i], deleted, "sneaks");
+        populate(deleteTargets, objects.Contents[i], deleted, "previews");
         populate(deleteTargets, objects.Contents[i], deleted, "full");
         populate(deleteTargets, objects.Contents[i], deleted, "socials");
       }
