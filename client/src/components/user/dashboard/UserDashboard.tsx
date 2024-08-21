@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
 import { userDashboardHeaderItems } from "./data/header/items";
 import { useNavigate } from "react-router-dom";
+import { convertToFile } from "../../admin/dashboard/utils/convertToFile";
+import { handleDownload } from "./utils/handleDownload";
+import JSZip from "jszip";
 
 import Header from "../../global/header/Header";
 import MobileHeader from "../../global/header/mobile/Header";
@@ -90,8 +93,25 @@ export default function UserDashboard() {
       loadImages(); // only run the effect if the imageset has not been populated
   }, [activeImageset, allImagesets, navigate]);
 
+  const createZip = async (
+    fileset: { url: string; filename: string; mime: string }[]
+  ) => {
+    const zip = new JSZip();
+
+    for (let i = 0; i < fileset.length; i++) {
+      const image = convertToFile(
+        fileset[i].url,
+        fileset[i].filename,
+        fileset[i].mime
+      );
+      zip.file(fileset[i].filename, image);
+    }
+
+    return await zip.generateAsync({ type: "base64" });
+  };
+
   return (
-    <div className="w-[calc(100dvw-1.5rem-2px)] h-[calc(100dvh-1.5rem-2px)] overflow-scroll">
+    <div className="w-outer h-outer overflow-scroll">
       {mobile ? (
         <MobileHeader
           logout={true}
@@ -134,6 +154,16 @@ export default function UserDashboard() {
           <button
             type="button"
             className="border border-solid border-white text-lg py-1 px-3 xl:hover:text-rd xl:focus:text-rd transition-colors"
+            onClick={async () => {
+              const url = await createZip(
+                allImagesets[activeImageset as keyof typeof allImagesets]
+              );
+
+              return handleDownload(
+                `data:application/zip;base64,${url}`,
+                `${username}-${activeImageset}.zip`
+              );
+            }}
           >
             DOWNLOAD: ALL
           </button>

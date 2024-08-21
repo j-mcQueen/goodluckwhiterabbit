@@ -36,6 +36,12 @@ export default {
       borderColor: {
         red: "#DC2626",
       },
+      width: {
+        outer: "calc(100dvw - 1.5rem - 2px)",
+      },
+      height: {
+        outer: "calc(100dvh - 1.5rem - 2px)",
+      },
       keyframes: {
         blink: {
           "0%": { opacity: 1 },

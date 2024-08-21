@@ -12,11 +12,16 @@ export default function Views({ ...props }) {
         setFavourites={setFavourites}
       />
 
-      <div className="text-rd text-lg text-center">
+      <div className="text-rd text-lg text-center pb-20">
         <p>SCROLL FOR GRID &#8595;</p>
       </div>
 
-      <Grid imagesets={imagesets} activeImageset={activeImageset} />
+      <Grid
+        imagesets={imagesets}
+        activeImageset={activeImageset}
+        favourites={favourites}
+        setFavourites={setFavourites}
+      />
     </>
   );
 }
