@@ -3,9 +3,7 @@ export default function Grid({ ...props }) {
 
   return (
     <section>
-      <div>
-        <p>grid</p>
-      </div>
+      <div></div>
     </section>
   );
 }

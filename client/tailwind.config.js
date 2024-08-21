@@ -36,6 +36,14 @@ export default {
       borderColor: {
         red: "#DC2626",
       },
+      keyframes: {
+        blink: {
+          "0%": { opacity: 1 },
+        },
+      },
+      animation: {
+        blink: "blink 1.5s steps(2) infinite",
+      },
     },
   },
   plugins: [],

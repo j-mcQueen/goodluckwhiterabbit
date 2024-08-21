@@ -4,8 +4,8 @@ import { useNavigate } from "react-router-dom";
 
 import Header from "../../global/header/Header";
 import MobileHeader from "../../global/header/mobile/Header";
-import Spinner from "../../../assets/media/icons/Spinner";
 import Views from "./Views";
+import StarFilled from "../../../assets/media/icons/StarFilled";
 
 export default function UserDashboard() {
   const navigate = useNavigate();
@@ -19,6 +19,7 @@ export default function UserDashboard() {
     full: [],
     socials: [],
   });
+  const [favourites, setFavourites] = useState([]);
   const [username, setUsername] = useState("");
 
   useEffect(() => {
@@ -90,7 +91,7 @@ export default function UserDashboard() {
   }, [activeImageset, allImagesets, navigate]);
 
   return (
-    <div className="w-[calc(100dvw-1.5rem-2px)] h-[calc(100dvh-1.5rem-2px)]">
+    <div className="w-[calc(100dvw-1.5rem-2px)] h-[calc(100dvh-1.5rem-2px)] overflow-scroll">
       {mobile ? (
         <MobileHeader
           logout={true}
@@ -107,19 +108,52 @@ export default function UserDashboard() {
         />
       )}
 
-      <div>
-        <h1>{username}</h1>
+      <div className="px-3">
+        <div className="flex items-center justify-between">
+          <h1 className="font-liquid text-white xl:text-2xl py-5 tracking-widest opacity-80 drop-shadow-glo">
+            {username.toLowerCase()}
+          </h1>
+
+          {spinner ? (
+            <p className="text-rd text-lg py-5">
+              LOADING...{" "}
+              <span className="animate-blink opacity-0">&#9607;</span>
+            </p>
+          ) : null}
+
+          {getError.status ? (
+            <div className="py-5">
+              <p className="text-rd text-lg">
+                {getError.message}This is a sample error message to be styled.
+              </p>
+            </div>
+          ) : null}
+        </div>
+
+        <div className="font-vt text-white flex flex-col gap-5 items-start">
+          <button
+            type="button"
+            className="border border-solid border-white text-lg py-1 px-3 xl:hover:text-rd xl:focus:text-rd transition-colors"
+          >
+            DOWNLOAD: ALL
+          </button>
+
+          <button
+            type="button"
+            className="border border-solid border-white text-lg flex gap-1 items-center py-1 px-3 xl:hover:text-rd xl:focus:text-rd transition-colors"
+          >
+            DOWNLOAD: <StarFilled className="w-5 h-5" red={true} />
+          </button>
+        </div>
       </div>
 
       <main>
-        {spinner ? <Spinner className="w-[18px] h-[18px]" /> : null}
-        {getError ? (
-          <div className="">
-            <p className="text-rd text-lg p-3">{getError.message}</p>
-          </div>
-        ) : null}
-
-        <Views imagesets={allImagesets} />
+        <Views
+          imagesets={allImagesets}
+          activeImageset={activeImageset}
+          favourites={favourites}
+          setFavourites={setFavourites}
+        />
       </main>
     </div>
   );
