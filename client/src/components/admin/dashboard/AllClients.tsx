@@ -2,6 +2,7 @@ import { v4 as uuidv4 } from "uuid";
 import Copy from "../../../assets/media/icons/Copy";
 import Edit from "../../../assets/media/icons/Edit";
 import Close from "../../../assets/media/icons/Close";
+import Mail from "../../../assets/media/icons/Mail";
 
 export default function AllClients({ ...props }) {
   const { clients, setActivePane, setTargetClient, setDeleteModalToggle } =
@@ -22,20 +23,22 @@ export default function AllClients({ ...props }) {
     }
   };
 
-  // TODO clicking order button should display the "ImageOrder" component for that particular imageset
-  // TODO clicking upload button should display an "UploadImages" component for that particular imageset, and perform a put request to the user
-  // TODO add email button so Kailey can copy their email quickly
   // TODO CHANGE "ADDED" TAB TO "EMAIL" and display email in the list. Display date added in the edit client page
   // TODO implement capability to search by dates too
   // TODO create button that takes Kailey to a page which allows her to "preview" what the client sees
 
   return (
-    <table className="w-full mt-5">
+    <table className="w-full mt-5 border-collapse ">
       <thead>
-        <tr className="text-left text-gray">
-          <th>NAME</th>
-          <th>ADDED</th>
+        <tr className="text-left text-rd">
+          <th className="pl-3">NAME</th>
+          <th>DATE</th>
           <th>CODE</th>
+          <th>COPY</th>
+          <th>FILES</th>
+          <th>EDIT</th>
+          <th>SEND</th>
+          <th></th>
         </tr>
       </thead>
 
@@ -45,36 +48,52 @@ export default function AllClients({ ...props }) {
             name: string;
             added: string;
             code: string;
-            files: { sneaks: boolean; full: boolean; socials: boolean };
+            files: { previews: boolean; full: boolean; socials: boolean };
             _id: string;
           }) => {
             return (
-              <tr key={uuidv4()} className="font-inter text-white">
-                <td>{client.name}</td>
-                <td>{client.added}</td>
+              <tr
+                key={uuidv4()}
+                className={`text-white border-t-[1px] border-b-[1px] border-solid border-white`}
+              >
+                <td className="align-middle pl-3 tracking-wider">
+                  {client.name.toUpperCase()}
+                </td>
+                <td className="align-middle">{client.added}</td>
 
-                <td>
-                  {client.code}
+                <td className="align-middle">{client.code}</td>
 
+                <td className="align-middle">P: 0, G: 0, S: 0</td>
+
+                <td className="align-middle">
                   <button
                     onClick={() => handleCopy(client.code)}
                     type="button"
-                    className="border border-solid xl:hover:drop-shadow-ylw xl:hover:border-ylw xl:transition-all xl:focus:border-white xl:focus:outline-none p-2 ml-3"
+                    className="border border-solid p-2 my-1 xl:hover:border-rd focus:border-rd outline-none transition-colors"
                   >
-                    <Copy className="w-[20px] h-[20px]" />
+                    <Copy className="w-4 h-4" />
+                  </button>
+                </td>
+
+                <td className="align-middle">
+                  <button
+                    type="button"
+                    className="border border-solid p-2 my-1 xl:hover:border-rd focus:border-rd outline-none transition-colors"
+                    onClick={() => {
+                      setTargetClient(client);
+                      setActivePane("EDIT");
+                    }}
+                  >
+                    <Edit className="w-4 h-4" />
                   </button>
                 </td>
 
                 <td>
                   <button
                     type="button"
-                    className="border border-solid border-cyn drop-shadow-cyn xl:hover:border-blu xl:transition-all xl:focus:border-blu xl:focus:outline-none p-2 xl:hover:drop-shadow-blu"
-                    onClick={() => {
-                      setTargetClient(client);
-                      setActivePane("EDIT");
-                    }}
+                    className="border border-solid p-2 my-1 xl:hover:border-rd focus:border-rd outline-none transition-colors"
                   >
-                    <Edit className="w-[20px] h-[20px]" />
+                    <Mail className="w-4 h-4" />
                   </button>
                 </td>
 
@@ -88,9 +107,9 @@ export default function AllClients({ ...props }) {
                       })
                     }
                     type="button"
-                    className="border border-solid border-mag drop-shadow-mag xl:hover:drop-shadow-red xl:hover:border-red xl:transition-all xl:focus:border-red-600 xl:focus:outline-none p-2"
+                    className="border border-solid p-2 my-1 xl:hover:border-rd focus:border-rd outline-none transition-colors"
                   >
-                    <Close customColor="#FFF" className="w-[20px] h-[20px]" />
+                    <Close customColor="#FFF" className="w-4 h-4" />
                   </button>
                 </td>
               </tr>

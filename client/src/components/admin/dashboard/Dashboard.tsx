@@ -69,7 +69,7 @@ export default function AdminDashboard() {
   }, [activePane, navigate]);
 
   return (
-    <main className="w-[calc(100dvw-1.5rem-2px)] h-[calc(100dvh-1.5rem-2px)]">
+    <main className="w-[calc(100dvw-1.5rem-2px)] h-[calc(100dvh-1.5rem-2px)] overflow-scroll">
       {rejectedFiles.length > 0 ? (
         <RejectedFiles
           rejectedFiles={rejectedFiles}
@@ -85,7 +85,7 @@ export default function AdminDashboard() {
       <section className="flex justify-center items-center text-white">
         <>
           {activePane === "ALL" ? (
-            <div className="text-white border border-solid border-white p-3 w-[40dvw]">
+            <div className="text-white border border-solid border-white w-[40dvw]">
               <Actions
                 setClientFilterResult={setClientFilterResult}
                 setActivePane={setActivePane}
