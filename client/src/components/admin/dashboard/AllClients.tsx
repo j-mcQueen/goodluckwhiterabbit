@@ -32,10 +32,10 @@ export default function AllClients({ ...props }) {
       <thead>
         <tr className="text-left text-rd">
           <th className="pl-3">NAME</th>
-          <th>DATE</th>
+          <th className="pb-2">DATE</th>
           <th>CODE</th>
-          <th>COPY</th>
           <th>FILES</th>
+          <th>COPY</th>
           <th>EDIT</th>
           <th>SEND</th>
           <th></th>
@@ -59,6 +59,7 @@ export default function AllClients({ ...props }) {
                 <td className="align-middle pl-3 tracking-wider">
                   {client.name.toUpperCase()}
                 </td>
+
                 <td className="align-middle">{client.added}</td>
 
                 <td className="align-middle">{client.code}</td>
@@ -69,7 +70,7 @@ export default function AllClients({ ...props }) {
                   <button
                     onClick={() => handleCopy(client.code)}
                     type="button"
-                    className="border border-solid p-2 my-1 xl:hover:border-rd focus:border-rd outline-none transition-colors"
+                    className="border border-solid p-2 my-3 xl:hover:border-rd focus:border-rd outline-none transition-colors"
                   >
                     <Copy className="w-4 h-4" />
                   </button>
@@ -78,7 +79,7 @@ export default function AllClients({ ...props }) {
                 <td className="align-middle">
                   <button
                     type="button"
-                    className="border border-solid p-2 my-1 xl:hover:border-rd focus:border-rd outline-none transition-colors"
+                    className="border border-solid p-2 my-3 xl:hover:border-rd focus:border-rd outline-none transition-colors"
                     onClick={() => {
                       setTargetClient(client);
                       setActivePane("EDIT");
@@ -91,7 +92,7 @@ export default function AllClients({ ...props }) {
                 <td>
                   <button
                     type="button"
-                    className="border border-solid p-2 my-1 xl:hover:border-rd focus:border-rd outline-none transition-colors"
+                    className="border border-solid p-2 my-3 xl:hover:border-rd focus:border-rd outline-none transition-colors"
                   >
                     <Mail className="w-4 h-4" />
                   </button>
@@ -107,7 +108,7 @@ export default function AllClients({ ...props }) {
                       })
                     }
                     type="button"
-                    className="border border-solid p-2 my-1 xl:hover:border-rd focus:border-rd outline-none transition-colors"
+                    className="border border-solid p-2 my-3 xl:hover:border-rd focus:border-rd outline-none transition-colors"
                   >
                     <Close customColor="#FFF" className="w-4 h-4" />
                   </button>
