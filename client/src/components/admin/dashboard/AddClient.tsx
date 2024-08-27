@@ -102,7 +102,7 @@ export default function AddClient({ ...props }) {
 
   return (
     <div className="text-white border border-solid border-white p-3 w-[40dvw]">
-      <PaneHeader setActivePane={setActivePane} paneTitle={"ADD NEW CLIENT"} />
+      <PaneHeader setActivePane={setActivePane} paneTitle={"NEW"} />
 
       <form
         onSubmit={(e) => handleSubmit(e)}
@@ -110,49 +110,48 @@ export default function AddClient({ ...props }) {
         className="flex flex-col gap-5"
         encType="multipart/form-data"
       >
-        <label>
+        <label className="text-rd">
           CLIENT NAME
           <input
             type="text"
             name="clientname"
-            placeholder="e.g. Good and Luck"
+            placeholder="E.G. GOOD AND LUCK"
             minLength={4}
-            className="w-full bg-black border border-solid border-white p-3 text-ylw font-inter xl:focus:outline-none xl:focus:border-blu"
+            className="w-full bg-black border border-solid border-white xl:hover:border-rd focus:border-rd p-3 focus:outline-none placeholder:text-white transition-colors"
             required
           />
         </label>
 
-        <label>
+        <label className="text-rd">
           CLIENT EMAIL
           <input
             type="email"
             name="clientemail"
-            placeholder="e.g. goodluck@gmail.com"
+            placeholder="E.G. GOODLUCK@GMAIL.COM"
             onChange={() => {
               if (takenEmail) setTakenEmail(false);
             }}
-            className="w-full bg-black border border-solid border-white p-3 text-ylw font-inter xl:focus:outline-none xl:focus:border-blu"
+            className="w-full bg-black border border-solid border-white xl:hover:border-rd focus:border-rd p-3 text-white focus:outline-none placeholder:text-white transition-colors"
             required
           />
           {errors.takenEmail ? (
-            <p className="text-red-600 font-inter pt-3">
-              Email address already in use.
-            </p>
+            <p className="text-rd pt-3">Email address already in use.</p>
           ) : null}
         </label>
 
-        <div className="flex items-center justify-between">
-          <div className="flex gap-3 items-center font-inter">
-            <p className="text-gray">UPLOAD PREVIEWS:</p>
+        <div className="flex items-center justify-between pt-5">
+          <div className="flex gap-3 items-center">
+            <p>UPLOAD PREVIEWS:</p>
+
             <p
-              className={`${selectedFiles.previews.count > 0 ? "text-red-600" : "text-white"}`}
+              className={`${selectedFiles.previews.count > 0 ? "text-rd" : "text-white"}`}
             >
               {selectedFiles.previews.count}
             </p>
           </div>
 
           <div className="flex gap-2">
-            <label className="flex items-center justify-center border border-solid border-cyn drop-shadow-cyn xl:hover:border-blu xl:hover:drop-shadow-blu xl:focus:border-blu xl:focus:drop-shadow-blu cursor-pointer w-10 h-10 transition-all">
+            <label className="flex items-center justify-center border border-solid border-white xl:hover:border-rd focus:border-rd outline-none cursor-pointer w-10 h-10 transition-colors">
               <input
                 type="file"
                 name={"previews"}
@@ -169,23 +168,23 @@ export default function AddClient({ ...props }) {
                 accept="image/*"
                 multiple
               />
-              <Add className={"w-[18px] h-[18px]"} />
+              <Add className="w-4 h-4" />
             </label>
           </div>
         </div>
 
         <div className="flex items-center justify-between">
-          <div className="flex gap-3 items-center font-inter">
-            <p className="text-gray">UPLOAD FULL GALLERY:</p>
+          <div className="flex gap-3 items-center">
+            <p>UPLOAD FULL GALLERY:</p>
             <p
-              className={`${selectedFiles.full.count > 0 ? "text-red-600" : "text-white"}`}
+              className={`${selectedFiles.full.count > 0 ? "text-rd" : "text-white"}`}
             >
               {selectedFiles.full.count}
             </p>
           </div>
 
           <div className="flex gap-2">
-            <label className="flex items-center justify-center border border-solid border-cyn drop-shadow-cyn xl:hover:border-blu xl:hover:drop-shadow-blu xl:focus:border-blu xl:focus:drop-shadow-blu cursor-pointer w-10 h-10 transition-all">
+            <label className="flex items-center justify-center border border-solid border-white xl:hover:border-rd focus:border-rd outline-none cursor-pointer w-10 h-10 transition-colors">
               <input
                 type="file"
                 name={"full"}
@@ -202,14 +201,14 @@ export default function AddClient({ ...props }) {
                 accept="image/*"
                 multiple
               />
-              <Add className={"w-[18px] h-[18px]"} />
+              <Add className="w-4 h-4" />
             </label>
           </div>
         </div>
 
         <div className="flex items-center justify-between">
-          <div className="flex gap-3 items-center font-inter">
-            <p className="text-gray">UPLOAD SOCIAL MEDIA CROPS:</p>
+          <div className="flex gap-3 items-center">
+            <p>UPLOAD SOCIAL MEDIA CROPS:</p>
             <p
               className={`${selectedFiles.socials.count > 0 ? "text-red-600" : "text-white"}`}
             >
@@ -218,7 +217,7 @@ export default function AddClient({ ...props }) {
           </div>
 
           <div className="flex gap-2">
-            <label className="flex items-center justify-center border border-solid border-cyn drop-shadow-cyn xl:hover:border-blu xl:hover:drop-shadow-blu xl:focus:border-blu xl:focus:drop-shadow-blu cursor-pointer w-10 h-10 transition-all">
+            <label className="flex items-center justify-center border border-solid border-white xl:hover:border-rd focus:border-rd outline-none cursor-pointer w-10 h-10 transition-colors">
               <input
                 type="file"
                 name={"socials"}
@@ -235,7 +234,7 @@ export default function AddClient({ ...props }) {
                 accept="image/*"
                 multiple
               />
-              <Add className={"w-[18px] h-[18px]"} />
+              <Add className="w-4 h-4" />
             </label>
           </div>
         </div>
@@ -243,9 +242,9 @@ export default function AddClient({ ...props }) {
         <div className="text-center">
           <button
             type="submit"
-            className="border border-solid border-ylw drop-shadow-ylw xl:hover:border-grn xl:hover:drop-shadow-grn xl:focus:border-grn xl:focus:drop-shadow-grn py-3 px-5 font-inter italic bold transition-all"
+            className="font-liquid border border-solid border-red xl:hover:text-rd py-3 px-5 transition-colors tracking-widest opacity-80 drop-shadow-glo"
           >
-            {spinner ? <Spinner className="w-[18px] h-[18px]" /> : "ADD CLIENT"}
+            {spinner ? <Spinner className="w-[18px] h-[18px]" /> : "add"}
           </button>
         </div>
 
