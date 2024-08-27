@@ -67,10 +67,10 @@ export default function DeleteModal({ ...props }) {
   return (
     <dialog className="absolute flex items-center justify-center bg-black text-white border border-solid border-white p-3">
       <div className="flex flex-col gap-5">
-        <div className="flex items-center justify-between">
-          <h3 className="italic text-gray">
+        <div className="flex items-center justify-between text-lg">
+          <h3>
             DELETE CLIENT:{" "}
-            <span className="text-white">
+            <span className="text-rd">
               {deleteModalToggle.name.toUpperCase()}
             </span>
           </h3>
@@ -82,21 +82,19 @@ export default function DeleteModal({ ...props }) {
               setDeleteModalToggle({ active: false, target: "", name: "" });
             }}
             type="button"
-            className="border border-solid border-mag drop-shadow-mag xl:hover:border-red xl:hover:drop-shadow-red xl:focus:border-red xl:focus:drop-shadow-red w-10 h-10 flex items-center justify-center outline-none transition-all"
+            className="border border-solid xl:hover:border-rd xl:focus:border-red w-10 h-10 flex items-center justify-center focus:outline-none transition-colors"
           >
-            <Close className="w-[20px] h-[20px]" customColor={"#FFF"} />
+            <Close className="w-4 h-4" customColor={"#FFF"} />
           </button>
         </div>
 
-        <p className="font-inter">
-          Are you sure you want to delete this client's data?
-        </p>
+        <p>ARE YOU SURE YOU WANT TO DELETE ALL OF THIS CLIENT'S DATA?</p>
 
         <div>
           <button
             onClick={() => handleDelete()}
             type="button"
-            className="border border-solid border-red drop-shadow-red xl:hover:bg-red xl:hover:drop-shadow-none xl:focus:bg-red xl:focus:drop-shadow-none w-full py-3 font-inter transition-all"
+            className="font-liquid border border-solid border-red xl:hover:text-rd py-3 px-5 transition-colors tracking-widest opacity-80 drop-shadow-glo w-full"
           >
             DELETE
           </button>
