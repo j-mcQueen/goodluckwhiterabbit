@@ -87,6 +87,8 @@ export default function AdminDashboard() {
           {activePane === "ALL" ? (
             <div className="text-white border border-solid border-white w-[40dvw]">
               <Actions
+                clients={clients}
+                setClients={setClients}
                 setClientFilterResult={setClientFilterResult}
                 setActivePane={setActivePane}
               />
