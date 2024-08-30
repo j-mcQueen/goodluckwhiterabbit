@@ -5,7 +5,7 @@ const UserSchema = new Schema({
   name: String,
   email: String,
   code: String,
-  files: { previews: Boolean, full: Boolean, socials: Boolean },
+  files: { previews: Number, full: Number, socials: Number },
   role: String,
   added: String,
 });

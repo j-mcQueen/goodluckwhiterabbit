@@ -126,14 +126,11 @@ exports.adminAddClient = [
         name: req.body.clientname,
         email: req.body.clientemail,
         code: loginCode,
-        files: {
-          previews: req.body.previewsAttached === "true" ? true : false,
-          full: req.body.fullAttached === "true" ? true : false,
-          socials: req.body.socialsAttached === "true" ? true : false,
-        },
         role: "user",
         added: new Date(Date.now()).toLocaleString("en-US").split(",")[0], // mm/dd/yyyy format
       });
+
+      const files = { previews: 0, full: 0, socials: 0 };
 
       // upload images to s3 if req.files has been populated
       if (req.files.length > 0) {
@@ -149,7 +146,10 @@ exports.adminAddClient = [
           try {
             const added = await client.send(new PutObjectCommand(s3Params));
             if (!added) throw new TypeError("File not added.");
-            else continue;
+            else {
+              files[req.files[i].fieldname]++;
+              continue;
+            }
           } catch (err) {
             rejected.push(req.files[i].originalname);
             continue;
@@ -157,6 +157,7 @@ exports.adminAddClient = [
         }
       }
 
+      user.files = files;
       const savedUser = await user.save();
       const data = {
         name: savedUser.name,

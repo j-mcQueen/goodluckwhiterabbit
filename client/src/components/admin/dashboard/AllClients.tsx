@@ -48,7 +48,7 @@ export default function AllClients({ ...props }) {
             name: string;
             added: string;
             code: string;
-            files: { previews: boolean; full: boolean; socials: boolean };
+            files: { previews: number; full: number; socials: number };
             _id: string;
           }) => {
             return (
@@ -64,7 +64,23 @@ export default function AllClients({ ...props }) {
 
                 <td className="align-middle">{client.code}</td>
 
-                <td className="align-middle">P: 0, G: 0, S: 0</td>
+                <td className="align-middle">
+                  <span
+                    className={`${client.files.previews > 0 ? "text-rd" : "text-white"}`}
+                  >
+                    P: {client.files.previews},&nbsp;
+                  </span>
+                  <span
+                    className={`${client.files.full > 0 ? "text-rd" : "text-white"}`}
+                  >
+                    G: {client.files.full},&nbsp;
+                  </span>
+                  <span
+                    className={`${client.files.socials > 0 ? "text-rd" : "text-white"}`}
+                  >
+                    S: {client.files.socials}
+                  </span>
+                </td>
 
                 <td className="align-middle">
                   <button

@@ -131,7 +131,7 @@ export default function AddClient({ ...props }) {
             onChange={() => {
               if (takenEmail) setTakenEmail(false);
             }}
-            className="w-full bg-black border border-solid border-white xl:hover:border-rd focus:border-rd p-3 text-white focus:outline-none placeholder:text-white transition-colors"
+            className="w-full bg-black border border-solid border-white xl:hover:border-rd focus:border-rd p-3 focus:outline-none placeholder:text-white transition-colors"
             required
           />
           {errors.takenEmail ? (
@@ -252,7 +252,7 @@ export default function AddClient({ ...props }) {
           <p>
             {errors.formValidation
               ? "There was an error in the name or email you typed in. Refresh the page and try again, then notify Jack!"
-              : "Something else went wrong. Please notify Jack!"}
+              : "Something else went wrong. Please notify Jack! Logging you out to keep things secure..."}
           </p>
         ) : null}
       </form>
