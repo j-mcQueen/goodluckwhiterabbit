@@ -5,8 +5,13 @@ import Close from "../../../assets/media/icons/Close";
 import Mail from "../../../assets/media/icons/Mail";
 
 export default function AllClients({ ...props }) {
-  const { clients, setActivePane, setTargetClient, setDeleteModalToggle } =
-    props;
+  const {
+    clients,
+    setNotice,
+    setActivePane,
+    setTargetClient,
+    setDeleteModalToggle,
+  } = props;
 
   const handleCopy = async (code: string) => {
     try {
@@ -14,8 +19,10 @@ export default function AllClients({ ...props }) {
       const copied = await navigator.clipboard.readText();
 
       if (copied === code) {
-        // TODO display success message to user
-        console.log("success");
+        setNotice({
+          status: true,
+          message: "The code has been copied to the clipboard! (say it fast)",
+        });
       }
     } catch (err) {
       // TODO display copy error to user
@@ -23,7 +30,8 @@ export default function AllClients({ ...props }) {
     }
   };
 
-  // TODO CHANGE "ADDED" TAB TO "EMAIL" and display email in the list. Display date added in the edit client page
+  // TODO CHANGE "ADDED" TAB TO "EMAIL" and display email in the list.
+  // TODO set up sendgrid to send emails with the click of a button, ask Kailey to provide email she wants to sign up and send email with
   // TODO implement capability to search by dates too
   // TODO create button that takes Kailey to a page which allows her to "preview" what the client sees
 
@@ -44,17 +52,20 @@ export default function AllClients({ ...props }) {
 
       <tbody>
         {clients.map(
-          (client: {
-            name: string;
-            added: string;
-            code: string;
-            files: { previews: number; full: number; socials: number };
-            _id: string;
-          }) => {
+          (
+            client: {
+              name: string;
+              added: string;
+              code: string;
+              files: { previews: number; full: number; socials: number };
+              _id: string;
+            },
+            index: number
+          ) => {
             return (
               <tr
                 key={uuidv4()}
-                className={`text-white border-t-[1px] border-b-[1px] border-solid border-white`}
+                className={`text-white border-t-[1px] ${index < clients.length - 1 ? "border-b-[1px]" : ""} border-solid border-white`}
               >
                 <td className="align-middle pl-3 tracking-wider">
                   {client.name.toUpperCase()}

@@ -8,7 +8,8 @@ import DeleteModal from "./DeleteModal";
 import Actions from "./Actions";
 import EditClient from "./EditClient";
 import RejectedFiles from "./modals/RejectedFiles";
-import AllClientsError from "./modals/AllClientsError";
+import Notice from "./modals/Notice";
+import { AnimatePresence, motion } from "framer-motion";
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
@@ -22,9 +23,15 @@ export default function AdminDashboard() {
     target: "",
     name: "",
   });
-  const [getAllClientsError, setGetAllClientsError] = useState({
+
+  const [notice, setNotice] = useState<{
+    status: boolean;
+    message: string;
+    logout: { status: boolean; path: string | null };
+  }>({
     status: false,
     message: "",
+    logout: { status: false, path: null },
   });
 
   // TODO how can we organise the pane data here? conditional rendering? we could organise all pane values into an array, then render the pane which matches state -> best option, since this will declutter the return statement
@@ -45,10 +52,11 @@ export default function AdminDashboard() {
               return setClients(data);
 
             case 401:
-              setGetAllClientsError({
+              setNotice({
                 status: true,
                 message:
                   "Your session has expired, so we're logging you out to keep things secure. Please login again to continue.",
+                logout: { status: true, path: "/admin" },
               });
               break;
 
@@ -57,10 +65,11 @@ export default function AdminDashboard() {
           }
         }
       } catch (err) {
-        setGetAllClientsError({
+        setNotice({
           status: true,
           message:
             "There was an unexpected error. We are logging you out to keep things secure. Please log back in and try again. If the problem persists, contact Jack.",
+          logout: { status: true, path: "/admin" },
         });
       }
     };
@@ -69,16 +78,25 @@ export default function AdminDashboard() {
   }, [activePane, navigate]);
 
   return (
-    <main className="w-[calc(100dvw-1.5rem-2px)] h-[calc(100dvh-1.5rem-2px)] overflow-scroll">
+    <main className="w-[calc(100dvw-1.5rem-2px)] h-[calc(100dvh-1.5rem-2px)] overflow-scroll relative">
       {rejectedFiles.length > 0 ? (
         <RejectedFiles
           rejectedFiles={rejectedFiles}
           setRejectedFiles={setRejectedFiles}
         />
       ) : null}
-      {getAllClientsError.status ? (
-        <AllClientsError getAllClientsError={getAllClientsError} />
-      ) : null}
+
+      <AnimatePresence>
+        {notice.status && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <Notice notice={notice} setNotice={setNotice} />
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <Header />
 
@@ -97,6 +115,7 @@ export default function AdminDashboard() {
                 clients={
                   clientFilterResult.length > 0 ? clientFilterResult : clients
                 }
+                setNotice={setNotice}
                 setActivePane={setActivePane}
                 setTargetClient={setTargetClient}
                 setDeleteModalToggle={setDeleteModalToggle}
