@@ -23,7 +23,7 @@ export default function Image({ ...props }) {
       <img
         src={activeImage?.url}
         alt={activeImage?.filename}
-        className="max-h-[55dvh]"
+        className="h-[80dvh]"
       />
 
       <div className="text-white flex justify-between pt-2">

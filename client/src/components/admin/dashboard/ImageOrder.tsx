@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { convertToFile } from "./utils/convertToFile";
-import Check from "../../../assets/media/icons/Check";
-import Spinner from "../../../assets/media/icons/Spinner";
+
+import Loading from "../../global/Loading";
 
 export default function ImageOrder({ ...props }) {
   const {
@@ -48,28 +48,24 @@ export default function ImageOrder({ ...props }) {
     <div className="flex items-start">
       <div className="text-white p-3 border-r-[1px] border-solid min-w-[40vw] flex flex-col items-center justify-center overflow-scroll">
         <header className="flex justify-between items-center w-full py-5 px-5">
-          <hgroup>
-            <h2 className="font-inter italic font-bold xl:text-2xl tracking-tight">
-              {headingText[targetImageset as keyof headingTextType]}
-            </h2>
-          </hgroup>
+          <h2 className="xl:text-2xl tracking-tight">
+            {headingText[targetImageset as keyof headingTextType]}
+          </h2>
 
           <div className="flex gap-5">
             <button
               type="submit"
-              className="border border-solid border-ylw drop-shadow-ylw xl:hover:border-grn xl:hover:drop-shadow-grn xl:focus:border-grn xl:focus:drop-shadow-grn transition-all w-10 h-10 flex items-center justify-center"
+              className="border border-solid border-rd xl:hover:text-rd xl:hover:border-red focus:border-red focus:text-rd  outline-none transition-all flex items-center justify-center px-3 py-2"
               onClick={() => attachFiles()}
             >
-              {spinner ? (
-                <Spinner className="w-[18px] h-[18px]" />
-              ) : (
-                <Check className="w-[18px] h-[18px]" />
-              )}
+              <span className="font-liquid tracking-widest opacity-80">
+                {spinner ? <Loading /> : "confirm"}
+              </span>
             </button>
           </div>
         </header>
 
-        <div className="grid grid-cols-3 gap-5 px-5 overflow-scroll">
+        <div className="flex flex-wrap justify-center max-w-[60dvw] gap-5 px-5 overflow-scroll">
           {orderedImageset.map(
             (
               image: {
@@ -119,7 +115,7 @@ export default function ImageOrder({ ...props }) {
                     setOrderedImageset(newOrderedImages);
                   }}
                   onDragOver={(e) => e.preventDefault()}
-                  className="border border-solid w-[200px] h-[300px]"
+                  className={`${image.url === "" ? "h-[300px] w-[200px]" : "max-h-[300px]"} border border-solid`}
                   key={uuidv4()}
                   src={image.url}
                   alt={image.filename}
@@ -130,42 +126,40 @@ export default function ImageOrder({ ...props }) {
         </div>
       </div>
 
-      <div className="text-white p-3">
-        <div className="grid grid-cols-imageQueue gap-5 h-[75dvh] overflow-scroll">
-          {queuedImages.map(
-            (
-              image: {
-                filename: string;
-                url: string;
-                mime: string;
-                position: number;
-                queued: boolean;
-              } | null,
-              index: number
-            ) => {
-              return (
-                <img
-                  onDragStart={(e) => {
-                    if (image) {
-                      e.dataTransfer.setData("text/uri-list", image.url);
-                      e.dataTransfer.setData("text/plain", image.filename);
-                      e.dataTransfer.setData("text/image-type", image.mime);
-                      e.dataTransfer.setData("text/index", index.toString());
-                      setDraggedIndex(index);
-                    }
-                  }}
-                  draggable={image?.queued === true ? "true" : "false"}
-                  key={uuidv4()}
-                  src={image ? image.url : ""}
-                  alt={image ? image.filename : ""}
-                  className={
-                    image?.queued === true ? "opacity-100" : "opacity-25"
+      <div className="grid grid-cols-3 gap-5 overflow-scroll p-3">
+        {queuedImages.map(
+          (
+            image: {
+              filename: string;
+              url: string;
+              mime: string;
+              position: number;
+              queued: boolean;
+            } | null,
+            index: number
+          ) => {
+            return (
+              <img
+                onDragStart={(e) => {
+                  if (image) {
+                    e.dataTransfer.setData("text/uri-list", image.url);
+                    e.dataTransfer.setData("text/plain", image.filename);
+                    e.dataTransfer.setData("text/image-type", image.mime);
+                    e.dataTransfer.setData("text/index", index.toString());
+                    setDraggedIndex(index);
                   }
-                />
-              );
-            }
-          )}
-        </div>
+                }}
+                draggable={image?.queued === true ? "true" : "false"}
+                key={uuidv4()}
+                src={image ? image.url : ""}
+                alt={image ? image.filename : ""}
+                className={`${
+                  image?.queued === true ? "opacity-100" : "opacity-25"
+                } max-w-[15dvh] xl:hover:cursor-pointer`}
+              />
+            );
+          }
+        )}
       </div>
     </div>
   );

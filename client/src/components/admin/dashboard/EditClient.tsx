@@ -1,5 +1,4 @@
 import { FormEvent, useEffect, useRef, useState } from "react";
-import Return from "../../../assets/media/icons/Return";
 import ImageOrder from "./ImageOrder";
 
 export default function EditClient({ ...props }) {
@@ -55,6 +54,8 @@ export default function EditClient({ ...props }) {
   useEffect(() => {
     // retrieve images if there have been no images set in order yet
     const getImages = async () => {
+      setSpinner(true);
+
       try {
         const response = await fetch(
           `http://localhost:3000/admin/users/${targetClient._id}/getImages/${targetImageset}`,
@@ -72,6 +73,7 @@ export default function EditClient({ ...props }) {
           });
           setQueuedImages(data);
           setOrderedImageset(dummy);
+          setSpinner(false);
         }
       } catch (err) {
         //
@@ -113,74 +115,87 @@ export default function EditClient({ ...props }) {
   // TODO create button that takes Kailey to a page which allows her to "preview" what the client sees
 
   return (
-    <form onSubmit={(e) => handleSubmit(e)}>
-      <div>
-        <hgroup>
-          <h1>{targetClient.name}</h1>
-          <p>test text</p>
-        </hgroup>
+    <form onSubmit={(e) => handleSubmit(e)} className="pb-10 border-spacing-0">
+      <hgroup className="flex flex-col items-center pb-10">
+        <h1 className="font-liquid xl:text-4xl pb-3 tracking-widest opacity-80 drop-shadow-glo">
+          {targetClient.name.toUpperCase()}
+        </h1>
 
-        <button
-          type="button"
-          onClick={() => {
-            setTargetClient([]);
-            setActivePane("ALL");
-          }}
-          className="bg-white w-10 h-10 flex items-center justify-center"
-        >
-          <Return className="w-[20px] h-[20px]" />
-        </button>
-      </div>
+        <p className="font-vt">DATE ADDED: {targetClient.added}</p>
+      </hgroup>
 
       <div>
-        <div>
-          <button
-            type="button"
-            className={`${targetImageset === "previews" ? "bg-red border border-solid border-white" : "border border-solid border-white"} font-inter font-bold border-b-0 text-center py-2 px-3`}
-            onClick={() => setTargetImageset("previews")}
-          >
-            PREVIEW
-            <label className="opacity-0 w-0">
-              <input
-                type="file"
-                name="previews"
-                className="w-0 opacity-0"
-                ref={previewsRef}
-              />
-              {/* when we change the image order, we are updating the files object of these inputs */}
-            </label>
-          </button>
+        <div className="flex justify-between">
+          <div className="font-liquid">
+            <button
+              type="button"
+              className={`${targetImageset === "previews" ? "bg-rd" : ""} font-liquid border border-solid border-white border-b-0 text-center py-2 px-3 xl:hover:bg-rd focus:bg-red focus:outline-none transition-all`}
+              onClick={() => setTargetImageset("previews")}
+            >
+              <span className="tracking-widest opacity-80 drop-shadow-glo">
+                preview
+              </span>
+
+              <label className="opacity-0 w-0">
+                <input
+                  type="file"
+                  name="previews"
+                  className="w-0 opacity-0"
+                  ref={previewsRef}
+                />
+                {/* when we change the image order, we are updating the files object of these inputs */}
+              </label>
+            </button>
+
+            <button
+              type="button"
+              className={`${targetImageset === "full" ? "bg-rd" : ""} border-t-[1px] border-solid border-white text-center py-2 px-3 xl:hover:bg-rd focus:bg-red focus:outline-none transition-all`}
+              onClick={() => setTargetImageset("full")}
+            >
+              <span className="tracking-widest opacity-80 drop-shadow-glo">
+                gallery
+              </span>
+              <label className="opacity-0 w-0">
+                <input
+                  type="file"
+                  name="full"
+                  className="w-0 opacity-0"
+                  ref={galleryRef}
+                />
+              </label>
+            </button>
+
+            <button
+              type="button"
+              className={`${targetImageset === "socials" ? "bg-rd" : ""} border border-solid border-white border-b-0 text-center py-2 px-3 xl:hover:bg-rd focus:bg-red focus:outline-none transition-all`}
+              onClick={() => setTargetImageset("socials")}
+            >
+              <span className="tracking-widest opacity-80 drop-shadow-glo">
+                social
+              </span>
+
+              <label className="opacity-0 w-0">
+                <input
+                  type="file"
+                  name="socials"
+                  className="w-0 opacity-0"
+                  ref={socialsRef}
+                />
+              </label>
+            </button>
+          </div>
 
           <button
             type="button"
-            className={`${targetImageset === "full" ? "bg-red-600 border border-solid border-white" : "border border-solid border-white"} font-inter font-bold border-b-0 text-center py-2 px-3`}
-            onClick={() => setTargetImageset("full")}
+            onClick={() => {
+              setTargetClient([]);
+              setActivePane("ALL");
+            }}
+            className="font-liquid border border-solid border-b-0 border-white xl:hover:bg-rd focus:bg-rd focus:outline-none flex items-center justify-center transition-all px-3"
           >
-            GALLERY
-            <label className="opacity-0 w-0">
-              <input
-                type="file"
-                name="full"
-                className="w-0 opacity-0"
-                ref={galleryRef}
-              />
-            </label>
-          </button>
-
-          <button
-            type="button"
-            className={`${targetImageset === "socials" ? "bg-red-600 border border-solid border-white" : "border border-solid border-white"} font-inter font-bold border-b-0 text-center py-2 px-3`}
-            onClick={() => setTargetImageset("socials")}
-          >
-            SOCIAL
-            <label className="opacity-0 w-0">
-              <input
-                type="file"
-                name="socials"
-                className="w-0 opacity-0"
-                ref={socialsRef}
-              />
-            </label>
+            <span className="tracking-widest opacity-80 drop-shadow-glo">
+              return
+            </span>
           </button>
         </div>
 
