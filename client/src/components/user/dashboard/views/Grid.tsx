@@ -1,5 +1,6 @@
 import { v4 as uuidv4 } from "uuid";
 import { Fragment } from "react/jsx-runtime";
+
 import Image from "../Image";
 
 export default function Grid({ ...props }) {
@@ -7,7 +8,7 @@ export default function Grid({ ...props }) {
 
   return (
     <section className="flex justify-center basis-[80dvw] pb-10">
-      <div className="grid grid-cols-2 gap-10 relative overflow-hidden px-10">
+      <div className="flex flex-wrap justify-center gap-x-24 gap-y-12 relative overflow-hidden px-10">
         {imagesets[activeImageset].map((image: object) => {
           return (
             <Fragment key={uuidv4()}>
@@ -15,6 +16,7 @@ export default function Grid({ ...props }) {
                 activeImage={image}
                 favourites={favourites}
                 setFavourites={setFavourites}
+                carousel={false}
               />
             </Fragment>
           );

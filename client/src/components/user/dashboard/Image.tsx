@@ -1,22 +1,7 @@
-import { handleDownload } from "./utils/handleDownload";
-
-import Download from "../../../assets/media/icons/Download";
-import Star from "../../../assets/media/icons/Star";
-import StarFilled from "../../../assets/media/icons/StarFilled";
+import ActionBar from "./ActionBar";
 
 export default function Image({ ...props }) {
-  const { activeImage, setFavourites, favourites } = props;
-
-  const handleToggle = () => {
-    if (!favourites.includes(activeImage)) {
-      setFavourites([...favourites, activeImage]);
-    } else {
-      const filtered = favourites.filter(
-        (item: object) => item !== activeImage
-      );
-      setFavourites(filtered);
-    }
-  };
+  const { activeImage, setFavourites, favourites, carousel } = props;
 
   return (
     <div className="relative">
@@ -26,27 +11,16 @@ export default function Image({ ...props }) {
         className="h-[80dvh]"
       />
 
-      <div className="text-white flex justify-between pt-2">
-        <button
-          type="button"
-          className="border border-solid border-white p-1 xl:hover:border-red xl:focus:border-red focus:outline-none transition-colors"
-          onClick={() => handleDownload(activeImage.url, activeImage.filename)}
-        >
-          <Download className="w-5 h-5" />
-        </button>
-
-        <button
-          type="button"
-          className="border border-solid border-white p-1 xl:hover:border-red xl:focus:border-red focus:outline-none transition-colors"
-          onClick={() => handleToggle()}
-        >
-          {favourites.includes(activeImage) ? (
-            <StarFilled className="w-5 h-5" red={true} />
-          ) : (
-            <Star className="w-5 h-5" />
-          )}
-        </button>
-      </div>
+      {!carousel ? (
+        <div className="text-white flex justify-between py-2">
+          <ActionBar
+            favourites={favourites}
+            setFavourites={setFavourites}
+            activeImage={activeImage}
+            carousel={carousel}
+          />
+        </div>
+      ) : null}
     </div>
   );
 }

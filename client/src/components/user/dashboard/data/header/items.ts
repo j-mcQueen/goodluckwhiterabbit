@@ -1,1 +1,1 @@
-export const userDashboardHeaderItems = ["PREVIEW", "FULL GALLERY", "SOCIAL"];
+export const userDashboardHeaderItems = ["preview", "full gallery", "social"];

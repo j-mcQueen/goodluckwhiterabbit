@@ -35,7 +35,7 @@ export default function Header({ ...props }) {
           />
         </div>
 
-        <ul className="flex justify-evenly w-full">
+        <ul className="flex justify-evenly w-full font-liquid">
           {data.map((tab: string, index: number) => {
             return (
               <li
@@ -44,7 +44,7 @@ export default function Header({ ...props }) {
               >
                 <button
                   type="button"
-                  className="xl:hover:text-rd focus:text-rd transition-colors w-full h-full"
+                  className="xl:hover:text-rd focus:text-rd transition-colors w-full h-full tracking-widest"
                   onClick={() => setActiveTab(index)}
                 >
                   {tab}
@@ -57,10 +57,10 @@ export default function Header({ ...props }) {
         {logout ? (
           <button
             type="button"
-            className="xl:hover:text-rd focus:text-rd transition-colors px-5 border-b border-solid border-white"
+            className="xl:hover:text-rd focus:text-rd transition-colors px-5 border-b border-solid border-white font-liquid tracking-widest"
             onClick={() => handleLogout()}
           >
-            EXIT
+            exit
           </button>
         ) : (
           <a

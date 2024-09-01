@@ -9,6 +9,7 @@ import Header from "../../global/header/Header";
 import MobileHeader from "../../global/header/mobile/Header";
 import Views from "./Views";
 import StarFilled from "../../../assets/media/icons/StarFilled";
+import Loading from "../../global/Loading";
 
 export default function UserDashboard() {
   const navigate = useNavigate();
@@ -128,18 +129,13 @@ export default function UserDashboard() {
         />
       )}
 
-      <div className="px-3">
+      <div>
         <div className="flex items-center justify-between">
-          <h1 className="font-liquid text-white xl:text-2xl py-5 tracking-widest opacity-80 drop-shadow-glo">
-            {username.toLowerCase()}
+          <h1 className="text-white xl:text-2xl py-5 max-w-[240px] pl-3">
+            {username.toUpperCase()}
           </h1>
 
-          {spinner ? (
-            <p className="text-rd text-lg py-5">
-              LOADING...{" "}
-              <span className="animate-blink opacity-0">&#9607;</span>
-            </p>
-          ) : null}
+          {spinner ? <Loading /> : null}
 
           {getError.status ? (
             <div className="py-5">
@@ -150,10 +146,10 @@ export default function UserDashboard() {
           ) : null}
         </div>
 
-        <div className="font-vt text-white flex flex-col gap-5 items-start">
+        <div className="text-white flex flex-col gap-5 items-start pl-3">
           <button
             type="button"
-            className="border border-solid border-white text-lg py-1 px-3 xl:hover:text-rd xl:focus:text-rd transition-colors"
+            className="border border-solid border-white text-lg py-1 px-3 xl:hover:border-rd xl:focus:border-rd transition-colors"
             onClick={async () => {
               const url = await createZip(
                 allImagesets[activeImageset as keyof typeof allImagesets]
@@ -170,7 +166,14 @@ export default function UserDashboard() {
 
           <button
             type="button"
-            className="border border-solid border-white text-lg flex gap-1 items-center py-1 px-3 xl:hover:text-rd xl:focus:text-rd transition-colors"
+            className="border border-solid border-white text-lg flex gap-1 items-center py-1 px-3 xl:hover:border-rd xl:focus:border-rd transition-colors"
+            onClick={async () => {
+              const url = await createZip(favourites);
+              return handleDownload(
+                `data:application/zip;base64,${url}`,
+                `${username}-${activeImageset}.zip`
+              );
+            }}
           >
             DOWNLOAD: <StarFilled className="w-5 h-5" red={true} />
           </button>

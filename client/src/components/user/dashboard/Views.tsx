@@ -12,7 +12,7 @@ export default function Views({ ...props }) {
         setFavourites={setFavourites}
       />
 
-      <div className="text-rd text-lg text-center pb-20">
+      <div className="text-rd text-lg text-center py-20">
         <p>SCROLL FOR GRID &#8595;</p>
       </div>
 
