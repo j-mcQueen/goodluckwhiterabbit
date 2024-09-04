@@ -2,7 +2,6 @@ const {
   adminGetClients,
   adminLogin,
   adminAddClient,
-  adminLogout,
   adminDeleteUser,
   adminGetUserImages,
   adminPutImageOrder,
