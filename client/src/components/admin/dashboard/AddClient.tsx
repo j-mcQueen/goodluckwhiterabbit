@@ -1,8 +1,9 @@
 import { FormEvent } from "react";
 import { useState } from "react";
 import PaneHeader from "./PaneHeader";
+
 import Add from "../../../assets/media/icons/Add";
-import Spinner from "../../../assets/media/icons/Spinner";
+import Loading from "../../global/Loading";
 
 export default function AddClient({ ...props }) {
   interface filesType {
@@ -117,7 +118,7 @@ export default function AddClient({ ...props }) {
             name="clientname"
             placeholder="E.G. GOOD AND LUCK"
             minLength={4}
-            className="w-full bg-black border border-solid border-white xl:hover:border-rd focus:border-rd p-3 focus:outline-none placeholder:text-white transition-colors"
+            className="w-full bg-black border border-solid border-white text-white xl:hover:border-rd focus:border-rd p-3 focus:outline-none placeholder:text-white transition-colors"
             required
           />
         </label>
@@ -131,7 +132,7 @@ export default function AddClient({ ...props }) {
             onChange={() => {
               if (takenEmail) setTakenEmail(false);
             }}
-            className="w-full bg-black border border-solid border-white xl:hover:border-rd focus:border-rd p-3 focus:outline-none placeholder:text-white transition-colors"
+            className="w-full bg-black border border-solid border-white text-white xl:hover:border-rd focus:border-rd p-3 focus:outline-none placeholder:text-white transition-colors"
             required
           />
           {errors.takenEmail ? (
@@ -242,9 +243,11 @@ export default function AddClient({ ...props }) {
         <div className="text-center">
           <button
             type="submit"
-            className="font-liquid border border-solid border-red xl:hover:text-rd py-3 px-5 transition-colors tracking-widest opacity-80 drop-shadow-glo"
+            className="font-liquid border border-solid border-red xl:hover:text-rd py-3 px-5 transition-colors"
           >
-            {spinner ? <Spinner className="w-[18px] h-[18px]" /> : "add"}
+            <span className="font-liquid tracking-widest opacity-80">
+              {spinner ? <Loading /> : "add"}
+            </span>
           </button>
         </div>
 
