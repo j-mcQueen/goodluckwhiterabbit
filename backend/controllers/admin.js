@@ -1,8 +1,6 @@
 require("dotenv").config();
-const asyncHandler = require("express-async-handler");
 const passport = require("passport");
 const jwt = require("jsonwebtoken");
-const bcrypt = require("bcryptjs");
 const User = require("../models/user");
 const consumers = require("node:stream/consumers");
 const { body, validationResult } = require("express-validator");
@@ -19,7 +17,7 @@ const {
   DeleteObjectsCommand,
 } = require("@aws-sdk/client-s3");
 const client = new S3Client({
-  region: "us-east-1", // TODO move this to .env
+  region: process.env.AWS_REGION, // TODO move this to .env
   credentials: {
     accessKeyId: process.env.AWS_ACCESS_KEY_ID,
     secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
@@ -136,7 +134,7 @@ exports.adminAddClient = [
       if (req.files.length > 0) {
         for (let i = 0; i < req.files.length; i++) {
           const s3Params = {
-            Bucket: "glwr-client-files",
+            Bucket: process.env.AWS_PRIMARY_BUCKET,
             Key: `${user._id}/${req.files[i].fieldname}/${i}/${req.files[i].originalname}`, // ensures files are associated to a user and that each file has a key containing a reference to it's position
             Body: req.files[i].buffer,
             ContentType: req.files[i].mimetype,
@@ -204,7 +202,7 @@ exports.adminGetUserImages = async (req, res, next) => {
       // TODO if nothing has changed since the last request, we don't need to tap S3. Determine if nothing has changed
       const images = [];
       const objects = await client.send(
-        new ListObjectsV2Command({ Bucket: "glwr-client-files" })
+        new ListObjectsV2Command({ Bucket: process.env.AWS_PRIMARY_BUCKET })
       );
 
       for (let i = 0; i < objects.Contents.length; i++) {
@@ -215,7 +213,7 @@ exports.adminGetUserImages = async (req, res, next) => {
           // if the requested imageset and matching user id are present in the key of the object, this is a target file
           const file = await client.send(
             new GetObjectCommand({
-              Bucket: "glwr-client-files",
+              Bucket: process.env.AWS_PRIMARY_BUCKET,
               Key: objects.Contents[i].Key,
             })
           );
@@ -261,7 +259,7 @@ exports.adminPutImageOrder = async (req, res, next) => {
     let objects;
     try {
       objects = await client.send(
-        new ListObjectsV2Command({ Bucket: "glwr-client-files" })
+        new ListObjectsV2Command({ Bucket: process.env.AWS_PRIMARY_BUCKET })
       );
     } catch (err) {
       // TODO what happens if we can't get all our s3 objects?
@@ -279,14 +277,14 @@ exports.adminPutImageOrder = async (req, res, next) => {
             // delete object
             client.send(
               new DeleteObjectCommand({
-                Bucket: "glwr-client-files",
+                Bucket: process.env.AWS_PRIMARY_BUCKET,
                 Key: objects.Contents[i].Key,
               })
             ),
             // then add new image
             client.send(
               new PutObjectCommand({
-                Bucket: "glwr-client-files",
+                Bucket: process.env.AWS_PRIMARY_BUCKET,
                 Key: `${req.params.id}/${req.params.imageset}/${[j]}/${
                   req.files[j].originalname
                 }`,
@@ -376,7 +374,7 @@ exports.adminDeleteUser = async (req, res, next) => {
       let objects;
       try {
         objects = await client.send(
-          new ListObjectsV2Command({ Bucket: "glwr-client-files" })
+          new ListObjectsV2Command({ Bucket: process.env.AWS_PRIMARY_BUCKET })
         );
         if (!objects || objects.Contents.length === 0)
           throw new TypeError("No files found.");
@@ -410,7 +408,7 @@ exports.adminDeleteUser = async (req, res, next) => {
       try {
         const deletedFiles = await client.send(
           new DeleteObjectsCommand({
-            Bucket: "glwr-client-files",
+            Bucket: process.env.AWS_PRIMARY_BUCKET,
             Delete: { Objects: deleteTargets },
           })
         );

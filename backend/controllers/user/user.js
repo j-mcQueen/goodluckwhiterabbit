@@ -10,7 +10,7 @@ const {
   GetObjectCommand,
 } = require("@aws-sdk/client-s3");
 const client = new S3Client({
-  region: "us-east-1", // TODO move this to .env
+  region: process.env.AWS_REGION,
   credentials: {
     accessKeyId: process.env.AWS_ACCESS_KEY_ID,
     secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
@@ -110,7 +110,7 @@ exports.getImages = async (req, res, next) => {
     let objects;
     try {
       objects = await client.send(
-        new ListObjectsV2Command({ Bucket: "glwr-client-files" })
+        new ListObjectsV2Command({ Bucket: process.env.AWS_PRIMARY_BUCKET })
       );
       if (!objects)
         throw new TypeError("Failed to retrieve all images from storage.");
@@ -123,7 +123,7 @@ exports.getImages = async (req, res, next) => {
         // if the matching user id is present in the key of the object, this is a target file
         const file = await client.send(
           new GetObjectCommand({
-            Bucket: "glwr-client-files",
+            Bucket: process.env.AWS_PRIMARY_BUCKET,
             Key: objects.Contents[i].Key,
           })
         );
