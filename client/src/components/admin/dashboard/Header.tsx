@@ -5,7 +5,7 @@ import Eject from "../../../assets/media/icons/Eject";
 export default function Header() {
   const navigate = useNavigate();
   const handleLogout = async () => {
-    const response = await fetch("http://localhost:3000/logout", {
+    const response = await fetch(`${process.env.REACT_APP_API_URL}/logout`, {
       method: "POST",
       credentials: "include",
     });

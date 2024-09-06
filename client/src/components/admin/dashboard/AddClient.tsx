@@ -46,11 +46,14 @@ export default function AddClient({ ...props }) {
     );
 
     try {
-      const response = await fetch("http://localhost:3000/admin/add", {
-        method: "POST",
-        body: formData,
-        credentials: "include",
-      });
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/admin/add`,
+        {
+          method: "POST",
+          body: formData,
+          credentials: "include",
+        }
+      );
 
       const data = await response.json();
 

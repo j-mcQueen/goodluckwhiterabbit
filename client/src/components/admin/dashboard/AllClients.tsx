@@ -7,6 +7,7 @@ import Mail from "../../../assets/media/icons/Mail";
 export default function AllClients({ ...props }) {
   const {
     clients,
+    notice,
     setNotice,
     setActivePane,
     setTargetClient,
@@ -22,11 +23,16 @@ export default function AllClients({ ...props }) {
         setNotice({
           status: true,
           message: "The code has been copied to the clipboard! (say it fast)",
+          logout: false,
         });
       }
     } catch (err) {
-      // TODO display copy error to user
-      console.log(err);
+      setNotice({
+        status: true,
+        message:
+          "Whoops! Something went wrong. The code has not been copied to the clipboard. Please refresh the page and try again.",
+        logout: false,
+      });
     }
   };
 
@@ -95,6 +101,7 @@ export default function AllClients({ ...props }) {
 
                 <td className="align-middle">
                   <button
+                    disabled={notice.status}
                     onClick={() => handleCopy(client.code)}
                     type="button"
                     className="border border-solid p-2 my-3 xl:hover:border-rd focus:border-rd outline-none transition-colors"

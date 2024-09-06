@@ -9,6 +9,8 @@ const path = require("path");
 const passport = require("passport");
 const createError = require("http-errors");
 const bcrypt = require("bcryptjs");
+const helmet = require("helmet");
+const RateLimit = require("express-rate-limit");
 
 // models
 const Admin = require("./models/admin");
@@ -36,6 +38,12 @@ const main = async () => {
 };
 main();
 
+const limiter = RateLimit({
+  windowMs: 1 * 60 * 1000,
+  limit: 100,
+  // 100 requests max per minute
+});
+
 app.use(cookieParser());
 app.use(
   cors({
@@ -43,6 +51,8 @@ app.use(
     origin: ["http://localhost:5173", "http://localhost:4173"],
   })
 );
+app.use(limiter);
+app.use(helmet());
 app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));

@@ -95,7 +95,7 @@ export default function EditClient({ ...props }) {
 
     try {
       const response = await fetch(
-        `http://localhost:3000/admin/users/${targetClient._id}/editImageOrder/${targetImageset}`,
+        `${process.env.REACT_APP_API_URL}/admin/users/${targetClient._id}/editImageOrder/${targetImageset}`,
         { method: "PUT", body: formData, credentials: "include" }
       ); // server can detect, via request params, whose images and which imageset is being updated
 

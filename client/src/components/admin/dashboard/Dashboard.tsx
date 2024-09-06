@@ -39,10 +39,13 @@ export default function AdminDashboard() {
   useEffect(() => {
     const getAllClients = async () => {
       try {
-        const response = await fetch("http://localhost:3000/admin/users", {
-          method: "GET",
-          credentials: "include",
-        });
+        const response = await fetch(
+          `${process.env.REACT_APP_API_URL}/admin/users`,
+          {
+            method: "GET",
+            credentials: "include",
+          }
+        );
         const data = await response.json();
 
         if (data) {
@@ -115,6 +118,7 @@ export default function AdminDashboard() {
                 clients={
                   clientFilterResult.length > 0 ? clientFilterResult : clients
                 }
+                notice={notice}
                 setNotice={setNotice}
                 setActivePane={setActivePane}
                 setTargetClient={setTargetClient}

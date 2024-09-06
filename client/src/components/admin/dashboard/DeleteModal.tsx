@@ -15,7 +15,7 @@ export default function DeleteModal({ ...props }) {
   const handleDelete = async () => {
     try {
       const response = await fetch(
-        `http://localhost:3000/admin/deleteUser/${deleteModalToggle.target}`,
+        `${process.env.REACT_APP_API_URL}/logout/admin/deleteUser/${deleteModalToggle.target}`,
         {
           method: "DELETE",
           credentials: "include",

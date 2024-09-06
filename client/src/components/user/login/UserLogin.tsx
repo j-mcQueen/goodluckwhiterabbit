@@ -14,11 +14,14 @@ export default function UserLogin() {
     const formData = new FormData(e.currentTarget);
 
     try {
-      const response = await fetch("http://localhost:3000/user/login", {
-        method: "POST",
-        body: formData,
-        credentials: "include",
-      });
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/user/login`,
+        {
+          method: "POST",
+          body: formData,
+          credentials: "include",
+        }
+      );
       const data = await response.json();
 
       switch (data.status) {

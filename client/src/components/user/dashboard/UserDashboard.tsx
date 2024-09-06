@@ -51,10 +51,13 @@ export default function UserDashboard() {
 
       let files;
       try {
-        const response = await fetch(`http://localhost:3000/user/${id}`, {
-          method: "GET",
-          credentials: "include",
-        });
+        const response = await fetch(
+          `${process.env.REACT_APP_API_URL}/user/${id}`,
+          {
+            method: "GET",
+            credentials: "include",
+          }
+        );
         const data = await response.json();
 
         if (data) {
