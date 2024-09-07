@@ -73,9 +73,9 @@ passport.use(
 );
 
 passport.initialize();
-app.use("/", globalRouter);
-app.use("/admin", indexRouter);
-app.use("/user", userRouter);
+app.use("/api", globalRouter);
+app.use("/api/admin", indexRouter);
+app.use("/api/user", userRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
