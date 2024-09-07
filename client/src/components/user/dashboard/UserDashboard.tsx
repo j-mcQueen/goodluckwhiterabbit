@@ -13,6 +13,11 @@ import Loading from "../../global/Loading";
 
 export default function UserDashboard() {
   const navigate = useNavigate();
+  const host =
+    process.env.ENV === "production"
+      ? process.env.REACT_APP_API_URL
+      : "http://localhost:3000";
+
   const mobile = window.matchMedia("(max-width: 1080px)").matches;
   const [activeTab, setActiveTab] = useState(0);
   const [activeImageset, setActiveImageset] = useState("previews");
@@ -51,13 +56,10 @@ export default function UserDashboard() {
 
       let files;
       try {
-        const response = await fetch(
-          `${process.env.REACT_APP_API_URL}/user/${id}`,
-          {
-            method: "GET",
-            credentials: "include",
-          }
-        );
+        const response = await fetch(`${host}/user/${id}`, {
+          method: "GET",
+          credentials: "include",
+        });
         const data = await response.json();
 
         if (data) {
@@ -95,7 +97,7 @@ export default function UserDashboard() {
 
     if (allImagesets[activeImageset as keyof typeof allImagesets].length === 0)
       loadImages(); // only run the effect if the imageset has not been populated
-  }, [activeImageset, allImagesets, navigate]);
+  }, [activeImageset, allImagesets, navigate, host]);
 
   const createZip = async (
     fileset: { url: string; filename: string; mime: string }[]
@@ -118,6 +120,7 @@ export default function UserDashboard() {
     <div className="w-outer h-outer overflow-scroll">
       {mobile ? (
         <MobileHeader
+          host={host}
           logout={true}
           data={userDashboardHeaderItems}
           activeTab={activeTab}
@@ -125,6 +128,7 @@ export default function UserDashboard() {
         />
       ) : (
         <Header
+          host={host}
           logout={true}
           data={userDashboardHeaderItems}
           activeTab={activeTab}
@@ -142,9 +146,7 @@ export default function UserDashboard() {
 
           {getError.status ? (
             <div className="py-5">
-              <p className="text-rd text-lg">
-                {getError.message}This is a sample error message to be styled.
-              </p>
+              <p className="text-rd text-lg">{getError.message}</p>
             </div>
           ) : null}
         </div>

@@ -5,20 +5,21 @@ import Rabbit from "../../global/forms/Rabbit";
 export default function Login() {
   const navigate = useNavigate();
   const [authError, setAuthError] = useState(false);
+  const host =
+    process.env.ENV === "production"
+      ? process.env.REACT_APP_API_URL
+      : "http://localhost:3000";
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     const formData = new FormData(e.currentTarget);
     e.preventDefault();
 
     try {
-      const response = await fetch(
-        `${process.env.REACT_APP_API_URL}/admin/login`,
-        {
-          method: "POST",
-          body: formData,
-          credentials: "include",
-        }
-      );
+      const response = await fetch(`${host}/admin/login`, {
+        method: "POST",
+        body: formData,
+        credentials: "include",
+      });
 
       const data = await response.json();
 

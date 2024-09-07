@@ -13,6 +13,11 @@ import { AnimatePresence, motion } from "framer-motion";
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
+  const host =
+    process.env.ENV === "production"
+      ? process.env.REACT_APP_API_URL
+      : "http://localhost:3000";
+
   const [activePane, setActivePane] = useState("ALL");
   const [clients, setClients] = useState([]);
   const [targetClient, setTargetClient] = useState({});
@@ -39,13 +44,10 @@ export default function AdminDashboard() {
   useEffect(() => {
     const getAllClients = async () => {
       try {
-        const response = await fetch(
-          `${process.env.REACT_APP_API_URL}/admin/users`,
-          {
-            method: "GET",
-            credentials: "include",
-          }
-        );
+        const response = await fetch(`${host}/admin/users`, {
+          method: "GET",
+          credentials: "include",
+        });
         const data = await response.json();
 
         if (data) {
@@ -78,7 +80,7 @@ export default function AdminDashboard() {
     };
 
     if (activePane === "ALL") getAllClients(); // TODO perhaps extend this to check if clients hasn't changed in length?
-  }, [activePane, navigate]);
+  }, [activePane, navigate, host]);
 
   return (
     <main className="w-[calc(100dvw-1.5rem-2px)] h-[calc(100dvh-1.5rem-2px)] overflow-scroll relative">
@@ -101,7 +103,7 @@ export default function AdminDashboard() {
         )}
       </AnimatePresence>
 
-      <Header />
+      <Header host={host} />
 
       <section className="flex justify-center items-center text-white">
         <>
@@ -127,6 +129,7 @@ export default function AdminDashboard() {
             </div>
           ) : activePane === "ADD" ? (
             <AddClient
+              host={host}
               clients={clients}
               setClients={setClients}
               setActivePane={setActivePane}
@@ -134,6 +137,7 @@ export default function AdminDashboard() {
             />
           ) : activePane === "EDIT" ? (
             <EditClient
+              host={host}
               targetClient={targetClient}
               setTargetClient={setTargetClient}
               setActivePane={setActivePane}
@@ -144,6 +148,7 @@ export default function AdminDashboard() {
 
       {deleteModalToggle.active === true ? (
         <DeleteModal
+          host={host}
           clients={clients}
           setClients={setClients}
           deleteModalToggle={deleteModalToggle}

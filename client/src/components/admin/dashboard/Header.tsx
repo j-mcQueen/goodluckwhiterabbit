@@ -2,10 +2,12 @@ import { useNavigate } from "react-router-dom";
 import rabbit from "../../../assets/media/gifs/glwr-lenticular.gif";
 import Eject from "../../../assets/media/icons/Eject";
 
-export default function Header() {
+export default function Header({ ...props }) {
+  const { host } = props;
   const navigate = useNavigate();
+
   const handleLogout = async () => {
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/logout`, {
+    const response = await fetch(`${host}/logout`, {
       method: "POST",
       credentials: "include",
     });

@@ -3,7 +3,7 @@ import Close from "../../../assets/media/icons/Close";
 import { useNavigate } from "react-router-dom";
 
 export default function DeleteModal({ ...props }) {
-  const { clients, setClients, deleteModalToggle, setDeleteModalToggle } =
+  const { host, clients, setClients, deleteModalToggle, setDeleteModalToggle } =
     props;
   const navigate = useNavigate();
 
@@ -15,7 +15,7 @@ export default function DeleteModal({ ...props }) {
   const handleDelete = async () => {
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_API_URL}/logout/admin/deleteUser/${deleteModalToggle.target}`,
+        `${host}/logout/admin/deleteUser/${deleteModalToggle.target}`,
         {
           method: "DELETE",
           credentials: "include",

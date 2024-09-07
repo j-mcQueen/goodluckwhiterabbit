@@ -7,6 +7,11 @@ export default function UserLogin() {
     document.title = "LOGIN — GOOD LUCK WHITE RABBIT";
   }, []);
   const navigate = useNavigate();
+  const host =
+    process.env.ENV === "production"
+      ? process.env.REACT_APP_API_URL
+      : "http://localhost:3000";
+
   const [authError, setAuthError] = useState({ active: false, message: "" });
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
@@ -14,14 +19,11 @@ export default function UserLogin() {
     const formData = new FormData(e.currentTarget);
 
     try {
-      const response = await fetch(
-        `${process.env.REACT_APP_API_URL}/user/login`,
-        {
-          method: "POST",
-          body: formData,
-          credentials: "include",
-        }
-      );
+      const response = await fetch(`${host}/user/login`, {
+        method: "POST",
+        body: formData,
+        credentials: "include",
+      });
       const data = await response.json();
 
       switch (data.status) {

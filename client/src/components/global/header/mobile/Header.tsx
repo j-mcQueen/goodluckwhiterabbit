@@ -7,7 +7,7 @@ import rabbit from "../../../../assets/media/gifs/glwr-lenticular.gif";
 import Instagram from "../../../../assets/media/icons/Instagram";
 
 export default function MobileHeader({ ...props }) {
-  const { logout, data, activeTab, setActiveTab } = props;
+  const { logout, data, activeTab, setActiveTab, target } = props;
   const navigate = useNavigate();
 
   const listItemVariants = {
@@ -26,7 +26,7 @@ export default function MobileHeader({ ...props }) {
   };
 
   const handleLogout = async () => {
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/logout`, {
+    const response = await fetch(`${target}/logout`, {
       method: "POST",
       credentials: "include",
     });

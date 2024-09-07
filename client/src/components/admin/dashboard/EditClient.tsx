@@ -2,7 +2,7 @@ import { FormEvent, useEffect, useRef, useState } from "react";
 import ImageOrder from "./ImageOrder";
 
 export default function EditClient({ ...props }) {
-  const { targetClient, setTargetClient, setActivePane } = props;
+  const { host, targetClient, setTargetClient, setActivePane } = props;
   const previewsRef = useRef<HTMLInputElement>(null);
   const socialsRef = useRef<HTMLInputElement>(null);
   const galleryRef = useRef<HTMLInputElement>(null);
@@ -58,7 +58,7 @@ export default function EditClient({ ...props }) {
 
       try {
         const response = await fetch(
-          `http://localhost:3000/admin/users/${targetClient._id}/getImages/${targetImageset}`,
+          `${host}/admin/users/${targetClient._id}/getImages/${targetImageset}`,
           { method: "GET", credentials: "include" }
         );
         const data = await response.json();
@@ -85,7 +85,7 @@ export default function EditClient({ ...props }) {
         .length === 0
     )
       getImages();
-  }, [allOrderedImagesets, targetImageset, targetClient._id]);
+  }, [allOrderedImagesets, targetImageset, targetClient._id, host]);
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     // target file input dynamically passed
@@ -95,7 +95,7 @@ export default function EditClient({ ...props }) {
 
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_API_URL}/admin/users/${targetClient._id}/editImageOrder/${targetImageset}`,
+        `${host}/admin/users/${targetClient._id}/editImageOrder/${targetImageset}`,
         { method: "PUT", body: formData, credentials: "include" }
       ); // server can detect, via request params, whose images and which imageset is being updated
 

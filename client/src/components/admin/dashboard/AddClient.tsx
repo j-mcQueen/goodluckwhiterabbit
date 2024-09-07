@@ -25,7 +25,7 @@ export default function AddClient({ ...props }) {
   const [takenEmail, setTakenEmail] = useState(false);
   const [spinner, setSpinner] = useState(false);
 
-  const { clients, setClients, setActivePane, setRejectedFiles } = props;
+  const { host, clients, setClients, setActivePane, setRejectedFiles } = props;
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -46,14 +46,11 @@ export default function AddClient({ ...props }) {
     );
 
     try {
-      const response = await fetch(
-        `${process.env.REACT_APP_API_URL}/admin/add`,
-        {
-          method: "POST",
-          body: formData,
-          credentials: "include",
-        }
-      );
+      const response = await fetch(`${host}/admin/add`, {
+        method: "POST",
+        body: formData,
+        credentials: "include",
+      });
 
       const data = await response.json();
 
