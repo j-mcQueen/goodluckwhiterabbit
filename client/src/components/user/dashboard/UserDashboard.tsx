@@ -16,7 +16,7 @@ export default function UserDashboard() {
   const host =
     import.meta.env.VITE_ENV === "production"
       ? import.meta.env.VITE_API_URL
-      : "http://localhost:3000";
+      : "http://localhost:3000/api";
 
   const mobile = window.matchMedia("(max-width: 1080px)").matches;
   const [activeTab, setActiveTab] = useState(0);
@@ -28,6 +28,7 @@ export default function UserDashboard() {
     full: [],
     socials: [],
   });
+  const [loaded, setLoaded] = useState(false); // prevents "nothing to display" message from inadvertently appearing
   const [favourites, setFavourites] = useState([]);
   const [username, setUsername] = useState("");
 
@@ -67,8 +68,8 @@ export default function UserDashboard() {
           switch (response.status) {
             case 200:
             case 304:
-              files = data.files;
-              setUsername(data.name);
+              if (data.files) files = data.files;
+              if (data.name) setUsername(data.name);
               break;
 
             case 404:
@@ -93,11 +94,10 @@ export default function UserDashboard() {
       }
 
       setAllImagesets(files);
+      setLoaded(true);
     };
-
-    if (allImagesets[activeImageset as keyof typeof allImagesets].length === 0)
-      loadImages(); // only run the effect if the imageset has not been populated
-  }, [activeImageset, allImagesets, navigate, host]);
+    loadImages();
+  }, [navigate, host]);
 
   const createZip = async (
     fileset: { url: string; filename: string; mime: string }[]
@@ -136,63 +136,90 @@ export default function UserDashboard() {
         />
       )}
 
-      <div>
-        <div className="flex items-center justify-between">
-          <h1 className="text-white xl:text-2xl py-5 max-w-[240px] pl-3">
-            {username.toUpperCase()}
-          </h1>
+      {spinner ? (
+        <div className="text-rd text-center text-xl pt-5">
+          <Loading />
+        </div>
+      ) : loaded ? (
+        <>
+          {allImagesets[activeImageset as keyof typeof allImagesets].length >
+          0 ? (
+            <>
+              <div>
+                <div className="flex items-center justify-between">
+                  <h1 className="text-white xl:text-2xl py-5 max-w-[240px] pl-3">
+                    {username.toUpperCase()}
+                  </h1>
 
-          {spinner ? <Loading /> : null}
+                  {getError.status ? (
+                    <div className="py-5">
+                      <p className="text-rd text-lg">{getError.message}</p>
+                    </div>
+                  ) : null}
+                </div>
 
-          {getError.status ? (
-            <div className="py-5">
-              <p className="text-rd text-lg">{getError.message}</p>
+                <div className="text-white flex flex-col gap-5 items-start pl-3">
+                  <button
+                    type="button"
+                    className="border border-solid border-white text-lg py-1 px-3 xl:hover:border-rd xl:focus:border-rd transition-colors"
+                    onClick={async () => {
+                      const url = await createZip(
+                        allImagesets[
+                          activeImageset as keyof typeof allImagesets
+                        ]
+                      );
+
+                      return handleDownload(
+                        `data:application/zip;base64,${url}`,
+                        `${username}-${activeImageset}.zip`
+                      );
+                    }}
+                  >
+                    DOWNLOAD: ALL
+                  </button>
+
+                  <button
+                    type="button"
+                    className="border border-solid border-white text-lg flex gap-1 items-center py-1 px-3 xl:hover:border-rd xl:focus:border-rd transition-colors"
+                    onClick={async () => {
+                      const url = await createZip(favourites);
+                      return handleDownload(
+                        `data:application/zip;base64,${url}`,
+                        `${username}-${activeImageset}.zip`
+                      );
+                    }}
+                  >
+                    DOWNLOAD: <StarFilled className="w-5 h-5" red={true} />
+                  </button>
+                </div>
+              </div>
+
+              <main>
+                <Views
+                  imagesets={allImagesets}
+                  activeImageset={activeImageset}
+                  favourites={favourites}
+                  setFavourites={setFavourites}
+                />
+              </main>
+            </>
+          ) : (
+            <div className="h-[calc(100dvh-1.5rem-59px)] flex items-center justify-center">
+              <hgroup className="text-white flex flex-col items-center justify-stretch">
+                <h1 className="text-6xl font-liquid drop-shadow-glo tracking-widest opacity-80">
+                  magic is on the way
+                </h1>
+
+                <p className="text-xl w-3/5 text-justify pt-5">
+                  WE'RE WORKING HARD TO GET THESE PHOTOGRAPHS READY FOR THE
+                  GRAND REVEAL - YOU'LL RECEIVE AN EMAIL WHEN THERE ARE UPDATES.
+                  THANK YOU FOR YOUR PATIENCE!
+                </p>
+              </hgroup>
             </div>
-          ) : null}
-        </div>
-
-        <div className="text-white flex flex-col gap-5 items-start pl-3">
-          <button
-            type="button"
-            className="border border-solid border-white text-lg py-1 px-3 xl:hover:border-rd xl:focus:border-rd transition-colors"
-            onClick={async () => {
-              const url = await createZip(
-                allImagesets[activeImageset as keyof typeof allImagesets]
-              );
-
-              return handleDownload(
-                `data:application/zip;base64,${url}`,
-                `${username}-${activeImageset}.zip`
-              );
-            }}
-          >
-            DOWNLOAD: ALL
-          </button>
-
-          <button
-            type="button"
-            className="border border-solid border-white text-lg flex gap-1 items-center py-1 px-3 xl:hover:border-rd xl:focus:border-rd transition-colors"
-            onClick={async () => {
-              const url = await createZip(favourites);
-              return handleDownload(
-                `data:application/zip;base64,${url}`,
-                `${username}-${activeImageset}.zip`
-              );
-            }}
-          >
-            DOWNLOAD: <StarFilled className="w-5 h-5" red={true} />
-          </button>
-        </div>
-      </div>
-
-      <main>
-        <Views
-          imagesets={allImagesets}
-          activeImageset={activeImageset}
-          favourites={favourites}
-          setFavourites={setFavourites}
-        />
-      </main>
+          )}
+        </>
+      ) : null}
     </div>
   );
 }
