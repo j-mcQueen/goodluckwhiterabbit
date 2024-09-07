@@ -14,8 +14,8 @@ import Loading from "../../global/Loading";
 export default function UserDashboard() {
   const navigate = useNavigate();
   const host =
-    process.env.ENV === "production"
-      ? process.env.REACT_APP_API_URL
+    import.meta.env.VITE_ENV === "production"
+      ? import.meta.env.VITE_API_URL
       : "http://localhost:3000";
 
   const mobile = window.matchMedia("(max-width: 1080px)").matches;

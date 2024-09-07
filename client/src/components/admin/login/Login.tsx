@@ -6,8 +6,8 @@ export default function Login() {
   const navigate = useNavigate();
   const [authError, setAuthError] = useState(false);
   const host =
-    process.env.ENV === "production"
-      ? process.env.REACT_APP_API_URL
+    import.meta.env.VITE_ENV === "production"
+      ? import.meta.env.VITE_API_URL
       : "http://localhost:3000";
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {

@@ -5,7 +5,7 @@ import rabbit from "../../../assets/media/gifs/glwr-lenticular.gif";
 import Instagram from "../../../assets/media/icons/Instagram";
 
 export default function Header({ ...props }) {
-  const { logout, data, activeTab, setActiveTab, target } = props;
+  const { logout, data, activeTab, setActiveTab, host } = props;
   const navigate = useNavigate();
 
   const listItemVariants = {
@@ -14,7 +14,7 @@ export default function Header({ ...props }) {
   };
 
   const handleLogout = async () => {
-    const response = await fetch(`${target}/logout`, {
+    const response = await fetch(`${host}/logout`, {
       method: "POST",
       credentials: "include",
     });

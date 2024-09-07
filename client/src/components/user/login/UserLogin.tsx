@@ -8,8 +8,8 @@ export default function UserLogin() {
   }, []);
   const navigate = useNavigate();
   const host =
-    process.env.ENV === "production"
-      ? process.env.REACT_APP_API_URL
+    import.meta.env.VITE_ENV === "production"
+      ? import.meta.env.VITE_API_URL
       : "http://localhost:3000";
 
   const [authError, setAuthError] = useState({ active: false, message: "" });
