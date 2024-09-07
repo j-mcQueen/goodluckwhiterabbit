@@ -45,7 +45,12 @@ const limiter = RateLimit({
 });
 
 app.use(cookieParser());
-app.use(cors());
+app.use(
+  cors({
+    origin: ["http://localhost:5173", "http://localhost:4173"],
+    credentials: true,
+  })
+);
 app.use(limiter);
 app.use(helmet());
 app.use(logger("dev"));

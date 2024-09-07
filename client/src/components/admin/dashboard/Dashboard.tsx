@@ -16,7 +16,7 @@ export default function AdminDashboard() {
   const host =
     import.meta.env.VITE_ENV === "production"
       ? import.meta.env.VITE_API_URL
-      : "http://localhost:3000";
+      : "http://localhost:3000/api";
 
   const [activePane, setActivePane] = useState("ALL");
   const [clients, setClients] = useState([]);

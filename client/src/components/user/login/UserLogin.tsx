@@ -10,7 +10,7 @@ export default function UserLogin() {
   const host =
     import.meta.env.VITE_ENV === "production"
       ? import.meta.env.VITE_API_URL
-      : "http://localhost:3000";
+      : "http://localhost:3000/api";
 
   const [authError, setAuthError] = useState({ active: false, message: "" });
 

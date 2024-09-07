@@ -8,7 +8,7 @@ export default function Login() {
   const host =
     import.meta.env.VITE_ENV === "production"
       ? import.meta.env.VITE_API_URL
-      : "http://localhost:3000";
+      : "http://localhost:3000/api";
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     const formData = new FormData(e.currentTarget);

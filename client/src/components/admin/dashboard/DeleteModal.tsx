@@ -15,7 +15,7 @@ export default function DeleteModal({ ...props }) {
   const handleDelete = async () => {
     try {
       const response = await fetch(
-        `${host}/logout/admin/deleteUser/${deleteModalToggle.target}`,
+        `${host}/admin/deleteUser/${deleteModalToggle.target}`,
         {
           method: "DELETE",
           credentials: "include",
@@ -94,7 +94,7 @@ export default function DeleteModal({ ...props }) {
           <button
             onClick={() => handleDelete()}
             type="button"
-            className="font-liquid border border-solid border-red xl:hover:text-rd py-3 px-5 transition-colors tracking-widest opacity-80 drop-shadow-glo w-full"
+            className="font-liquid border border-solid border-red xl:hover:text-rd py-3 px-5 transition-colors tracking-widest w-full"
           >
             DELETE
           </button>
@@ -102,8 +102,12 @@ export default function DeleteModal({ ...props }) {
       </div>
 
       {serverError.status === true ? (
-        <div className="text-red-500 max-w-[350px] pb-3">
-          <p>{serverError.message}</p>
+        <div className="text-red-500 max-w-[350px] text-center text-lg">
+          <p>
+            {serverError.message.toUpperCase()}THERE WAS AN UNEXPECTED ERROR. WE
+            ARE LOGGING YOU OUT TO KEEP THINGS SECURE. PLEASE LOG BACK IN AND
+            TRY AGAIN. IF THE PROBLEM PERSISTS, CONTACT JACK.
+          </p>
         </div>
       ) : null}
     </dialog>
