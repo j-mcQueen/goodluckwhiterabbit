@@ -47,7 +47,12 @@ const limiter = RateLimit({
 app.use(cookieParser());
 app.use(
   cors({
-    origin: ["http://localhost:5173", "http://localhost:4173"],
+    origin: [
+      "http://localhost:5173",
+      "http://localhost:4173",
+      "https://goodluckwhiterabbit.com",
+      "https://www.goodluckwhiterabbit.com",
+    ],
     credentials: true,
   })
 );
