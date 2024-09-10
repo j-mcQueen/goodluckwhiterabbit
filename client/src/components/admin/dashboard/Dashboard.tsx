@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { AnimatePresence, motion } from "framer-motion";
 
 import AllClients from "./AllClients";
 import Header from "./Header";
@@ -9,10 +10,13 @@ import Actions from "./Actions";
 import EditClient from "./EditClient";
 import RejectedFiles from "./modals/RejectedFiles";
 import Notice from "./modals/Notice";
-import { AnimatePresence, motion } from "framer-motion";
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
+  useEffect(() => {
+    document.title = "ADMIN DASHBOARD — GOOD LUCK WHITE RABBIT";
+  }, []);
+
   const host =
     import.meta.env.VITE_ENV === "production"
       ? import.meta.env.VITE_API_URL

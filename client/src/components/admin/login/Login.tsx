@@ -1,9 +1,13 @@
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Rabbit from "../../global/forms/Rabbit";
 
 export default function Login() {
   const navigate = useNavigate();
+
+  useEffect(() => {
+    document.title = "ADMIN LOGIN — GOOD LUCK WHITE RABBIT";
+  }, []);
   const [authError, setAuthError] = useState(false);
   const host =
     import.meta.env.VITE_ENV === "production"

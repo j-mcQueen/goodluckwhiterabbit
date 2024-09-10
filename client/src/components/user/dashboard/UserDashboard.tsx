@@ -33,6 +33,10 @@ export default function UserDashboard() {
   const [username, setUsername] = useState("");
 
   useEffect(() => {
+    document.title = "CLIENT GALLERIES — GOOD LUCK WHITE RABBIT";
+  }, []);
+
+  useEffect(() => {
     switch (activeTab) {
       case 0:
         setActiveImageset("previews");
