@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 
 import AllClients from "./AllClients";
@@ -13,6 +13,8 @@ import Notice from "./modals/Notice";
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
+  const location = useLocation();
+
   useEffect(() => {
     document.title = "ADMIN DASHBOARD — GOOD LUCK WHITE RABBIT";
   }, []);
@@ -55,6 +57,8 @@ export default function AdminDashboard() {
         const data = await response.json();
 
         if (data) {
+          window.history.replaceState({}, ""); // ensures fn does not rerun after login
+
           switch (response.status) {
             case 200:
             case 304:
@@ -83,8 +87,8 @@ export default function AdminDashboard() {
       }
     };
 
-    if (activePane === "ALL") getAllClients(); // TODO perhaps extend this to check if clients hasn't changed in length?
-  }, [activePane, navigate, host]);
+    if (location.state.login === true) getAllClients(); // if admin has just logged in, fetch clients
+  }, [location, navigate, host]);
 
   return (
     <main className="w-[calc(100dvw-1.5rem-2px)] h-[calc(100dvh-1.5rem-2px)] overflow-scroll relative">
@@ -137,10 +141,11 @@ export default function AdminDashboard() {
               clients={clients}
               setClients={setClients}
               setActivePane={setActivePane}
-              setRejectedFiles={setRejectedFiles}
             />
           ) : activePane === "EDIT" ? (
             <EditClient
+              clients={clients}
+              setClients={setClients}
               host={host}
               targetClient={targetClient}
               setTargetClient={setTargetClient}

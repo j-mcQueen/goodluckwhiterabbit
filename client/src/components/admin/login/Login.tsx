@@ -33,7 +33,7 @@ export default function Login() {
       } else {
         // success!
         setAuthError(false);
-        return navigate("/admin/dashboard");
+        return navigate("/admin/dashboard", { state: { login: true } });
       }
     } catch (err) {
       return setAuthError(true);
