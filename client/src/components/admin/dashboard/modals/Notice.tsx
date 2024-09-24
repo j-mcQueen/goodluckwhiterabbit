@@ -15,8 +15,8 @@ export default function Notice({ ...props }) {
   }, 5000);
 
   return (
-    <dialog open className="absolute bottom-0 mx-0 p-2 bg-inherit">
-      <p className="text-white text-lg border border-solid border-white p-2">
+    <dialog open className="bg-black absolute bottom-0 mx-0 p-2 bg-inherit">
+      <p className="text-white text-lg border border-solid border-rd p-2">
         + {notice.message.toUpperCase()}
       </p>
     </dialog>
