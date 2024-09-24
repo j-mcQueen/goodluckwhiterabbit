@@ -23,7 +23,7 @@ export default function AllClients({ ...props }) {
         setNotice({
           status: true,
           message: "The code has been copied to the clipboard! (say it fast)",
-          logout: false,
+          logout: { status: false, path: null },
         });
       }
     } catch (err) {
@@ -31,14 +31,13 @@ export default function AllClients({ ...props }) {
         status: true,
         message:
           "Whoops! Something went wrong. The code has not been copied to the clipboard. Please refresh the page and try again.",
-        logout: false,
+        logout: { status: false, path: null },
       });
     }
   };
 
   // TODO CHANGE "ADDED" TAB TO "EMAIL" and display email in the list.
   // TODO set up sendgrid to send emails with the click of a button, ask Kailey to provide email she wants to sign up and send email with
-  // TODO implement capability to search by dates too
   // TODO create button that takes Kailey to a page which allows her to "preview" what the client sees
 
   return (
@@ -63,7 +62,11 @@ export default function AllClients({ ...props }) {
               name: string;
               added: string;
               code: string;
-              files: { previews: number; full: number; socials: number };
+              files: {
+                previews: { count: number };
+                full: { count: number };
+                socials: { count: number };
+              };
               _id: string;
             },
             index: number
@@ -83,19 +86,19 @@ export default function AllClients({ ...props }) {
 
                 <td className="align-middle">
                   <span
-                    className={`${client.files.previews > 0 ? "text-rd" : "text-white"}`}
+                    className={`${client.files.previews.count > 0 ? "text-rd" : "text-white"}`}
                   >
-                    P: {client.files.previews},&nbsp;
+                    P: {client.files.previews.count},&nbsp;
                   </span>
                   <span
-                    className={`${client.files.full > 0 ? "text-rd" : "text-white"}`}
+                    className={`${client.files.full.count > 0 ? "text-rd" : "text-white"}`}
                   >
-                    G: {client.files.full},&nbsp;
+                    G: {client.files.full.count},&nbsp;
                   </span>
                   <span
-                    className={`${client.files.socials > 0 ? "text-rd" : "text-white"}`}
+                    className={`${client.files.socials.count > 0 ? "text-rd" : "text-white"}`}
                   >
-                    S: {client.files.socials}
+                    S: {client.files.socials.count}
                   </span>
                 </td>
 

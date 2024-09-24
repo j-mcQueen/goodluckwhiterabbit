@@ -12,43 +12,41 @@ export default function AddClient({ ...props }) {
     socials: { count: number; files: FileList | null };
   }
 
+  const [inputValues, setInputValues] = useState({
+    clientname: "",
+    clientemail: "",
+  });
   const [selectedFiles, setSelectedFiles] = useState<filesType>({
     previews: { count: 0, files: null },
     full: { count: 0, files: null },
     socials: { count: 0, files: null },
   });
   const [errors, setErrors] = useState({
-    takenEmail: false,
-    formValidation: false,
-    other: false,
+    takenEmail: { state: false, status: 200, message: "" },
+    formValidation: { state: false, status: 200, message: "" },
+    other: { state: false, status: 200, message: "" },
   });
-  const [takenEmail, setTakenEmail] = useState(false);
   const [spinner, setSpinner] = useState(false);
 
-  const { host, clients, setClients, setActivePane, setRejectedFiles } = props;
+  const { host, clients, setClients, setActivePane } = props;
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setSpinner(true);
 
-    const formData = new FormData(e.currentTarget);
-    formData.append(
-      "previewsAttached",
-      selectedFiles.previews.files !== null ? "true" : "false"
-    );
-    formData.append(
-      "fullAttached",
-      selectedFiles.full.files !== null ? "true" : "false"
-    );
-    formData.append(
-      "socialsAttached",
-      selectedFiles.socials.files !== null ? "true" : "false"
-    );
-
     try {
       const response = await fetch(`${host}/admin/add`, {
         method: "POST",
-        body: formData,
+        body: JSON.stringify({
+          ...inputValues,
+          previews: selectedFiles.previews.count,
+          full: selectedFiles.full.count,
+          socials: selectedFiles.socials.count,
+        }),
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
         credentials: "include",
       });
 
@@ -60,44 +58,64 @@ export default function AddClient({ ...props }) {
           case 200:
             // A client has been added
             setErrors({
-              takenEmail: false,
-              formValidation: false, // this should always be false
-              other: false,
+              takenEmail: { state: false, status: 200, message: "" },
+              formValidation: { state: false, status: 200, message: "" }, // this should always be false
+              other: { state: false, status: 200, message: "" },
             });
-            if (data.rejected) {
-              setRejectedFiles(data.rejected);
-              setClients([
-                ...clients,
-                {
-                  name: data.name,
-                  code: data.code,
-                  _id: data._id,
-                  files: data.files,
-                  added: data.added,
+
+            setClients([
+              ...clients,
+              {
+                name: data.name,
+                code: data.code,
+                _id: data._id,
+                files: {
+                  previews: selectedFiles.previews,
+                  full: selectedFiles.full,
+                  socials: selectedFiles.socials,
                 },
-              ]);
-            } else {
-              setClients([...clients, data]);
-            }
+                added: data.added,
+              },
+            ]);
+
             setActivePane("ALL");
             break;
 
           case 401:
             // form validation errors
-            setErrors({ ...errors, formValidation: true });
+            setErrors({
+              ...errors,
+              formValidation: {
+                state: true,
+                status: data.status,
+                message: data.message,
+              },
+            });
             break;
 
           case 409:
             // Client email already in use
-            setErrors({ ...errors, takenEmail: true });
+            setErrors({
+              ...errors,
+              takenEmail: {
+                state: true,
+                status: data.status,
+                message: data.message,
+              },
+            });
             break;
 
           default:
-            throw new TypeError("Error with 500 status code.");
+            throw new TypeError(data.message);
         }
       }
-    } catch (err) {
-      return setErrors({ ...errors, other: true });
+    } catch (error) {
+      if (error instanceof Error) {
+        return setErrors({
+          ...errors,
+          other: { state: true, status: 500, message: error.message },
+        });
+      }
     }
   };
 
@@ -115,6 +133,9 @@ export default function AddClient({ ...props }) {
           CLIENT NAME
           <input
             type="text"
+            onChange={(e) =>
+              setInputValues({ ...inputValues, clientname: e.target.value })
+            }
             name="clientname"
             placeholder="E.G. GOOD AND LUCK"
             minLength={4}
@@ -129,14 +150,19 @@ export default function AddClient({ ...props }) {
             type="email"
             name="clientemail"
             placeholder="E.G. GOODLUCK@GMAIL.COM"
-            onChange={() => {
-              if (takenEmail) setTakenEmail(false);
+            onChange={(e) => {
+              if (errors.takenEmail.state === true)
+                setErrors({
+                  ...errors,
+                  takenEmail: { state: false, status: 200, message: "" },
+                });
+              setInputValues({ ...inputValues, clientemail: e.target.value });
             }}
             className="w-full bg-black border border-solid border-white text-white xl:hover:border-rd focus:border-rd p-3 focus:outline-none placeholder:text-white transition-colors"
             required
           />
-          {errors.takenEmail ? (
-            <p className="text-rd pt-3">Email address already in use.</p>
+          {errors.takenEmail.state === true ? (
+            <p className="text-rd pt-3">{errors.takenEmail.message}</p>
           ) : null}
         </label>
 
@@ -251,11 +277,11 @@ export default function AddClient({ ...props }) {
           </button>
         </div>
 
-        {errors.formValidation || errors.other ? (
+        {errors.formValidation.state === true || errors.other.state === true ? (
           <p>
             {errors.formValidation
-              ? "There was an error in the name or email you typed in. Refresh the page and try again, then notify Jack!"
-              : "Something else went wrong. Please notify Jack! Logging you out to keep things secure..."}
+              ? errors.formValidation.message
+              : errors.other.message}
           </p>
         ) : null}
       </form>
