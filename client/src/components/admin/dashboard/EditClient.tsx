@@ -1,124 +1,49 @@
-import { FormEvent, useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import ImageOrder from "./ImageOrder";
 
 export default function EditClient({ ...props }) {
-  const { host, targetClient, setTargetClient, setActivePane } = props;
-  const previewsRef = useRef<HTMLInputElement>(null);
-  const socialsRef = useRef<HTMLInputElement>(null);
-  const galleryRef = useRef<HTMLInputElement>(null);
-
-  const chooseRef = (imageset: string) => {
-    switch (imageset) {
-      case "previews":
-        return previewsRef;
-
-      case "socials":
-        return socialsRef;
-
-      case "gallery":
-        return galleryRef;
-    }
-  };
-
-  const [allOrderedImagesets, setAllOrderedImagesets] = useState({
-    previews: [],
-    full: [],
-    socials: [],
-  });
-
-  // explicitly setting single imageset in state (rather than referencing the imageset in allOrderedImagesets) to prevent warning in the effect hook below
-  const [orderedImageset, setOrderedImageset] = useState<
-    {
-      filename: string;
-      url: string;
-      mime: string;
-      position: number;
-      file: File;
-      queueIndex: number;
-    }[]
-  >([]);
-
-  const [queuedImages, setQueuedImages] = useState<
-    {
-      filename: string;
-      url: string;
-      position: number;
-      queued: boolean;
-      mime: string;
-    }[]
-  >([]);
+  const {
+    clients,
+    setClients,
+    setNotice,
+    host,
+    targetClient,
+    setTargetClient,
+    setActivePane,
+  } = props;
 
   const [targetImageset, setTargetImageset] = useState("previews"); // this value is passed to ImageOrder component
   const [spinner, setSpinner] = useState(false);
 
-  useEffect(() => {
-    // retrieve images if there have been no images set in order yet
-    const getImages = async () => {
-      setSpinner(true);
+  const [orderedImagesets, setOrderedImagesets] = useState({
+    previews: {
+      count: targetClient.files["previews"].count,
+      files: Array(targetClient.files["previews"].count).fill({}),
+    },
+    full: {
+      count: targetClient.files["full"].count,
+      files: Array(targetClient.files["full"].count).fill({}),
+    },
+    socials: {
+      count: targetClient.files["socials"].count,
+      files: Array(targetClient.files["socials"].count).fill({}),
+    },
+  });
+  // orderedImageset is contained within the dummy array inside clients
 
-      try {
-        const response = await fetch(
-          `${host}/admin/users/${targetClient._id}/getImages/${targetImageset}`,
-          { method: "GET", credentials: "include" }
-        );
-        const data = await response.json();
-
-        if (data && response.status === 200) {
-          const dummy = Array(data.length).fill({
-            filename: "",
-            url: "",
-            mime: "",
-            position: 0,
-            queueIndex: 0,
-          });
-          setQueuedImages(data);
-          setOrderedImageset(dummy);
-          setSpinner(false);
-        }
-      } catch (err) {
-        //
-      }
-    };
-
-    if (
-      allOrderedImagesets[targetImageset as keyof typeof allOrderedImagesets]
-        .length === 0
-    )
-      getImages();
-  }, [allOrderedImagesets, targetImageset, targetClient._id, host]);
-
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    // target file input dynamically passed
-    e.preventDefault();
-    setSpinner(true);
-    const formData = new FormData(e.currentTarget);
-
-    try {
-      const response = await fetch(
-        `${host}/admin/users/${targetClient._id}/editImageOrder/${targetImageset}`,
-        { method: "PUT", body: formData, credentials: "include" }
-      ); // server can detect, via request params, whose images and which imageset is being updated
-
-      if (response.status === 200) {
-        setAllOrderedImagesets({
-          ...allOrderedImagesets,
-          [targetImageset]: orderedImageset,
-        });
-        setSpinner(false);
-      }
-    } catch (err) {
-      setAllOrderedImagesets({ ...allOrderedImagesets, [targetImageset]: [] });
-      // TODO display a message saying that something went wrong!
-    }
-  };
-
+  // TODO implement search function that will notify Kailey about duplicate files
   // TODO create button that takes Kailey to a page which allows her to "preview" what the client sees
 
   return (
-    <form onSubmit={(e) => handleSubmit(e)} className="pb-10 border-spacing-0">
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+      }}
+      className="pb-10 border-spacing-0"
+    >
       <hgroup className="flex flex-col items-center pb-10">
         <h1 className="font-liquid xl:text-4xl pb-3 tracking-widest opacity-80 drop-shadow-glo">
-          {targetClient.name.toUpperCase()}
+          {targetClient.name.toLowerCase()}
         </h1>
 
         <p className="font-vt">DATE ADDED: {targetClient.added}</p>
@@ -137,12 +62,7 @@ export default function EditClient({ ...props }) {
               </span>
 
               <label className="opacity-0 w-0">
-                <input
-                  type="file"
-                  name="previews"
-                  className="w-0 opacity-0"
-                  ref={previewsRef}
-                />
+                <input type="file" name="previews" className="w-0 opacity-0" />
                 {/* when we change the image order, we are updating the files object of these inputs */}
               </label>
             </button>
@@ -156,12 +76,7 @@ export default function EditClient({ ...props }) {
                 gallery
               </span>
               <label className="opacity-0 w-0">
-                <input
-                  type="file"
-                  name="full"
-                  className="w-0 opacity-0"
-                  ref={galleryRef}
-                />
+                <input type="file" name="full" className="w-0 opacity-0" />
               </label>
             </button>
 
@@ -175,12 +90,7 @@ export default function EditClient({ ...props }) {
               </span>
 
               <label className="opacity-0 w-0">
-                <input
-                  type="file"
-                  name="socials"
-                  className="w-0 opacity-0"
-                  ref={socialsRef}
-                />
+                <input type="file" name="socials" className="w-0 opacity-0" />
               </label>
             </button>
           </div>
@@ -188,6 +98,13 @@ export default function EditClient({ ...props }) {
           <button
             type="button"
             onClick={() => {
+              const nextClients = clients.map((client: { _id: string }) => {
+                if (client._id === targetClient._id) {
+                  return { ...client, files: orderedImagesets };
+                } else return client;
+              });
+
+              setClients(nextClients);
               setTargetClient([]);
               setActivePane("ALL");
             }}
@@ -201,13 +118,15 @@ export default function EditClient({ ...props }) {
 
         <div className="border border-solid border-white">
           <ImageOrder
-            queuedImages={queuedImages}
-            setQueuedImages={setQueuedImages}
+            host={host}
+            setNotice={setNotice}
+            targetClient={targetClient}
+            setTargetClient={setTargetClient}
             targetImageset={targetImageset}
-            orderedImageset={orderedImageset}
-            setOrderedImageset={setOrderedImageset}
+            orderedImagesets={orderedImagesets}
+            setOrderedImagesets={setOrderedImagesets}
             spinner={spinner}
-            innerRef={chooseRef(targetImageset)}
+            setSpinner={setSpinner}
           />
         </div>
       </div>
