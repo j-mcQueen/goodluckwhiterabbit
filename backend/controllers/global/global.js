@@ -23,7 +23,7 @@ exports.logout = async (req, res, next) => {
     .end();
 };
 
-exports.generatePresignedUrl = async (req, res, next) => {
+exports.generatePutPresigned = async (req, res, next) => {
   const verified = await verifyTokens(req, res);
 
   if (verified) {

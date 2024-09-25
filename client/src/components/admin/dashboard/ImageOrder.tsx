@@ -191,7 +191,7 @@ export default function ImageOrder({ ...props }) {
       // if so, then we need to supply the fetch body with the filename of the delete target
       // then in the response, we should have an array of urls, the first being the delete target, the second being the new file for that index
       // delete first, then upload
-      const response = await fetch(`${host}/generateUrl`, {
+      const response = await fetch(`${host}/generatePutPresigned`, {
         method: "POST",
         body: JSON.stringify({
           _id: targetClient._id,
