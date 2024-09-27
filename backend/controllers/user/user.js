@@ -3,19 +3,12 @@ const jwt = require("jsonwebtoken");
 const User = require("../../models/user");
 const { body, validationResult } = require("express-validator");
 const { verifyTokens } = require("../utils/verifyTokens");
-const consumers = require("node:stream/consumers");
-const {
-  S3Client,
-  ListObjectsV2Command,
-  GetObjectCommand,
-} = require("@aws-sdk/client-s3");
-const client = new S3Client({
-  region: process.env.AWS_REGION,
-  credentials: {
-    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-  },
-});
+// const { client } = require("../config/s3");
+// const consumers = require("node:stream/consumers");
+// const {
+//   ListObjectsV2Command,
+//   GetObjectCommand,
+// } = require("@aws-sdk/client-s3");
 
 exports.login = [
   // sanitize received input
@@ -88,65 +81,87 @@ exports.login = [
   },
 ];
 
-exports.getImages = async (req, res, next) => {
+exports.getUser = async (req, res, next) => {
   const verified = await verifyTokens(req, res);
 
   if (verified) {
-    let user;
     try {
-      user = await User.findById(req.params.id).exec();
-      if (!user)
-        throw TypeError(
-          "The server produced an unexpected error. Please refresh the page and try again."
-        );
-    } catch (err) {
-      return res.status(404).json({
-        status: 404,
-        message: err.message,
+      const user = await User.findById({ _id: req.params.id }).exec();
+      if (!user) throw new Error("500");
+      else
+        return res
+          .status(200)
+          .json({ _id: user._id, name: user.name, files: user.files });
+    } catch (error) {
+      return res.status(500).json({
+        status: true,
+        message:
+          "Something went wrong. Please refresh the page and try again. If the problem persists, please contact GLWR.",
+        logout: { status: false, path: null },
       });
     }
-
-    const imagesets = { previews: [], full: [], socials: [] };
-    let objects;
-    try {
-      objects = await client.send(
-        new ListObjectsV2Command({ Bucket: process.env.AWS_PRIMARY_BUCKET })
-      );
-      if (!objects)
-        throw new TypeError("Failed to retrieve all images from storage.");
-    } catch (err) {
-      return res.status(404).json({ status: 404, message: err.message });
-    }
-
-    for (let i = 0; i < objects.Contents.length; i++) {
-      if (objects.Contents[i].Key.includes(req.params.id)) {
-        // if the matching user id is present in the key of the object, this is a target file
-        const file = await client.send(
-          new GetObjectCommand({
-            Bucket: process.env.AWS_PRIMARY_BUCKET,
-            Key: objects.Contents[i].Key,
-          })
-        );
-
-        // create a data URL and isolate filename to present to the client
-        // this ensures we can render the image + handle editing of image order correctly on the frontend
-        const imageData = {};
-        const imgBuffer = (await consumers.buffer(file.Body)).toString(
-          "base64"
-        );
-
-        // pass the data the frontend needs for state management
-        const keyStrings = objects.Contents[i].Key.split("/");
-        imageData.url = `data:${file.ContentType};base64, ${imgBuffer}`;
-        imageData.position = keyStrings[2];
-        imageData.filename = keyStrings[3];
-        imageData.mime = file.ContentType;
-        imageData.queued = true;
-
-        imagesets[keyStrings[1]].push(imageData); // adds imageData into the property with the corresponding imageset name
-      } else continue;
-    }
-
-    return res.status(200).json({ files: imagesets, name: user.name });
   }
 };
+
+// exports.getPresignsBatch = async (req, res, next) => {
+//   const verified = await verifyTokens(req, res);
+
+//   if (verified) {
+//     let user;
+//     try {
+//       user = await User.findById(req.params.id).exec();
+//       if (!user)
+//         throw TypeError(
+//           "The server produced an unexpected error. Please refresh the page and try again."
+//         );
+//     } catch (err) {
+//       return res.status(404).json({
+//         status: 404,
+//         message: err.message,
+//       });
+//     }
+
+//     const imagesets = { previews: [], full: [], socials: [] };
+//     let objects;
+//     try {
+//       objects = await client.send(
+//         new ListObjectsV2Command({ Bucket: process.env.AWS_PRIMARY_BUCKET })
+//       );
+//       if (!objects)
+//         throw new TypeError("Failed to retrieve all images from storage.");
+//     } catch (err) {
+//       return res.status(404).json({ status: 404, message: err.message });
+//     }
+
+//     for (let i = 0; i < objects.Contents.length; i++) {
+//       if (objects.Contents[i].Key.includes(req.params.id)) {
+//         // if the matching user id is present in the key of the object, this is a target file
+//         const file = await client.send(
+//           new GetObjectCommand({
+//             Bucket: process.env.AWS_PRIMARY_BUCKET,
+//             Key: objects.Contents[i].Key,
+//           })
+//         );
+
+//         // create a data URL and isolate filename to present to the client
+//         // this ensures we can render the image + handle editing of image order correctly on the frontend
+//         const imageData = {};
+//         const imgBuffer = (await consumers.buffer(file.Body)).toString(
+//           "base64"
+//         );
+
+//         // pass the data the frontend needs for state management
+//         const keyStrings = objects.Contents[i].Key.split("/");
+//         imageData.url = `data:${file.ContentType};base64, ${imgBuffer}`;
+//         imageData.position = keyStrings[2];
+//         imageData.filename = keyStrings[3];
+//         imageData.mime = file.ContentType;
+//         imageData.queued = true;
+
+//         imagesets[keyStrings[1]].push(imageData); // adds imageData into the property with the corresponding imageset name
+//       } else continue;
+//     }
+
+//     return res.status(200).json({ files: imagesets, name: user.name });
+//   }
+// };
