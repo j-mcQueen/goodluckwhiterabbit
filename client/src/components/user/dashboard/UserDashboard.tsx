@@ -37,6 +37,11 @@ export default function UserDashboard() {
     previews: false,
     full: false,
     socials: false,
+  }); // TODO we must make sure that if user toggles between tabs, the previous tab is turned to false before setting another to true
+  const [images, setImages] = useState({
+    previews: { urls: [], files: [] },
+    full: { urls: [], files: [] },
+    socials: { urls: [], files: [] },
   });
 
   const [userRetrieved, setUserRetrieved] = useState(false);
@@ -249,8 +254,11 @@ export default function UserDashboard() {
         // data has been retrieved, but user has not clicked the enter button yet
         <Splash
           user={user}
+          images={images}
+          setImages={setImages}
           activated={activated}
           setActivated={setActivated}
+          setNotice={setNotice}
           activeImageset={activeImageset}
         />
       ) : null}
@@ -259,7 +267,12 @@ export default function UserDashboard() {
       activated[activeImageset as keyof typeof activated] === true ? (
         // data has been retrieved and the user has performed the action to see their images
         <main>
-          <Views activeImageset={activeImageset} />
+          <Views
+            user={user}
+            images={images[activeImageset as keyof typeof images]}
+            setImages={setImages}
+            activeImageset={activeImageset}
+          />
         </main>
       ) : null}
 

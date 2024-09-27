@@ -2,14 +2,13 @@ import Carousel from "./views/Carousel";
 import Grid from "./views/Grid";
 
 export default function Views({ ...props }) {
-  const { imagesets, activeImageset, favourites, setFavourites } = props;
+  const { images, setImages, activeImageset } = props;
   return (
     <>
       <Carousel
-        imagesets={imagesets}
+        images={images}
+        setImages={setImages}
         activeImageset={activeImageset}
-        favourites={favourites}
-        setFavourites={setFavourites}
       />
 
       <div className="text-rd text-lg text-center py-20">
@@ -17,10 +16,9 @@ export default function Views({ ...props }) {
       </div>
 
       <Grid
-        imagesets={imagesets}
+        images={images}
+        setImages={setImages}
         activeImageset={activeImageset}
-        favourites={favourites}
-        setFavourites={setFavourites}
       />
     </>
   );
