@@ -83,9 +83,9 @@ export default function Views({ ...props }) {
       </div>
 
       <Carousel
+        favourites={favourites}
         setFavourites={setFavourites}
         images={images}
-        setImages={setImages}
         activeImageset={activeImageset}
       />
 
@@ -94,6 +94,7 @@ export default function Views({ ...props }) {
       </div>
 
       <Grid
+        favourites={favourites}
         setFavourites={setFavourites}
         images={images}
         setImages={setImages}

@@ -4,15 +4,16 @@ import { Fragment } from "react/jsx-runtime";
 import Image from "../Image";
 
 export default function Grid({ ...props }) {
-  const { imagesets, activeImageset, favourites, setFavourites } = props;
+  const { favourites, setFavourites, images, activeImageset } = props;
 
   return (
     <section className="flex justify-center basis-[80dvw] pb-10">
       <div className="flex flex-wrap justify-center gap-x-24 gap-y-12 relative overflow-hidden px-10">
-        {imagesets[activeImageset].map((image: object) => {
+        {images[activeImageset].files.map((image: object) => {
           return (
             <Fragment key={uuidv4()}>
               <Image
+                images={images}
                 activeImage={image}
                 favourites={favourites}
                 setFavourites={setFavourites}

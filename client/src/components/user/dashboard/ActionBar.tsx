@@ -5,15 +5,13 @@ import Star from "../../../assets/media/icons/Star";
 import StarFilled from "../../../assets/media/icons/StarFilled";
 
 export default function ActionBar({ ...props }) {
-  const { allImages, activeImage, favourites, setFavourites, carousel } = props;
+  const { images, activeImage, favourites, setFavourites, carousel } = props;
 
   const handleToggle = () => {
     if (!favourites.includes(activeImage)) {
       setFavourites([...favourites, activeImage]);
     } else {
-      const filtered = favourites.filter(
-        (item: object) => item !== activeImage
-      );
+      const filtered = favourites.filter((item: File) => item !== activeImage);
       setFavourites(filtered);
     }
   };
@@ -31,15 +29,17 @@ export default function ActionBar({ ...props }) {
       <button
         type="button"
         className="border border-solid border-white p-1 xl:hover:border-red xl:focus:border-red focus:outline-none transition-colors"
-        onClick={() => handleDownload(activeImage.url, activeImage.filename)}
+        onClick={() =>
+          handleDownload(URL.createObjectURL(activeImage), activeImage.name)
+        }
       >
         <Download className="w-5 h-5" />
       </button>
 
       {carousel ? (
         <p className="text-2xl">
-          {numberCount(allImages.indexOf(activeImage) + 1)} /{" "}
-          {numberCount(allImages.length)}
+          {numberCount(images.indexOf(activeImage) + 1)} /{" "}
+          {numberCount(images.length)}
         </p>
       ) : null}
 

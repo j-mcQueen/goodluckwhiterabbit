@@ -6,8 +6,8 @@ export default function Image({ ...props }) {
   return (
     <div className="relative">
       <img
-        src={activeImage?.url}
-        alt={activeImage?.filename}
+        src={URL.createObjectURL(activeImage)}
+        alt={activeImage.name}
         className="h-[80dvh]"
       />
 
