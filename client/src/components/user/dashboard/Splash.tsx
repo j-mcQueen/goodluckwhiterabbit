@@ -4,7 +4,6 @@ import { generateImagesetGetUrls } from "./utils/generateImagesetGetUrls";
 export default function Splash({ ...props }) {
   const {
     user,
-    images,
     setImages,
     activated,
     setActivated,
@@ -22,11 +21,7 @@ export default function Splash({ ...props }) {
 
   const handleClick = async () => {
     const urls = await generateImagesetGetUrls(activeImageset, setNotice);
-    const files = await generateFileBatch(urls, 0);
-
-    const nextImages = { ...images };
-    nextImages[activeImageset] = { urls, files };
-    setImages(nextImages);
+    await generateFileBatch({ urls, files: [] }, 0, undefined, setImages);
 
     const nextActivated = { ...activated };
     nextActivated[activeImageset] = true;
