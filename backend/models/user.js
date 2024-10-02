@@ -5,10 +5,10 @@ const UserSchema = new Schema({
   name: String,
   email: String,
   code: String,
-  files: {
-    previews: { count: Number, files: Array },
-    full: { count: Number, files: Array },
-    socials: { count: Number, files: Array },
+  fileCounts: {
+    previews: Number,
+    full: Number,
+    socials: Number,
   },
   role: String,
   added: String,

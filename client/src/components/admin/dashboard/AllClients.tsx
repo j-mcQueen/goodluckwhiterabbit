@@ -36,6 +36,11 @@ export default function AllClients({ ...props }) {
     }
   };
 
+  const handleClick = (client: object) => {
+    setTargetClient(client);
+    setActivePane("EDIT");
+  };
+
   // TODO CHANGE "ADDED" TAB TO "EMAIL" and display email in the list.
   // TODO set up sendgrid to send emails with the click of a button, ask Kailey to provide email she wants to sign up and send email with
   // TODO create button that takes Kailey to a page which allows her to "preview" what the client sees
@@ -62,10 +67,10 @@ export default function AllClients({ ...props }) {
               name: string;
               added: string;
               code: string;
-              files: {
-                previews: { count: number };
-                full: { count: number };
-                socials: { count: number };
+              fileCounts: {
+                previews: number;
+                full: number;
+                socials: number;
               };
               _id: string;
             },
@@ -86,19 +91,19 @@ export default function AllClients({ ...props }) {
 
                 <td className="align-middle">
                   <span
-                    className={`${client.files.previews.count > 0 ? "text-rd" : "text-white"}`}
+                    className={`${client.fileCounts.previews > 0 ? "text-rd" : "text-white"}`}
                   >
-                    P: {client.files.previews.count},&nbsp;
+                    P: {client.fileCounts.previews > 0},&nbsp;
                   </span>
                   <span
-                    className={`${client.files.full.count > 0 ? "text-rd" : "text-white"}`}
+                    className={`${client.fileCounts.full > 0 ? "text-rd" : "text-white"}`}
                   >
-                    G: {client.files.full.count},&nbsp;
+                    G: {client.fileCounts.full},&nbsp;
                   </span>
                   <span
-                    className={`${client.files.socials.count > 0 ? "text-rd" : "text-white"}`}
+                    className={`${client.fileCounts.socials > 0 ? "text-rd" : "text-white"}`}
                   >
-                    S: {client.files.socials.count}
+                    S: {client.fileCounts.socials}
                   </span>
                 </td>
 
@@ -118,8 +123,7 @@ export default function AllClients({ ...props }) {
                     type="button"
                     className="border border-solid p-2 my-3 xl:hover:border-rd focus:border-rd outline-none transition-colors"
                     onClick={() => {
-                      setTargetClient(client);
-                      setActivePane("EDIT");
+                      handleClick(client);
                     }}
                   >
                     <Edit className="w-4 h-4" />

@@ -7,9 +7,9 @@ import Loading from "../../global/Loading";
 
 export default function AddClient({ ...props }) {
   interface filesType {
-    previews: { count: number; files: FileList | null };
-    full: { count: number; files: FileList | null };
-    socials: { count: number; files: FileList | null };
+    previews: FileList | null;
+    full: FileList | null;
+    socials: FileList | null;
   }
 
   const [inputValues, setInputValues] = useState({
@@ -17,9 +17,9 @@ export default function AddClient({ ...props }) {
     clientemail: "",
   });
   const [selectedFiles, setSelectedFiles] = useState<filesType>({
-    previews: { count: 0, files: null },
-    full: { count: 0, files: null },
-    socials: { count: 0, files: null },
+    previews: null,
+    full: null,
+    socials: null,
   });
   const [errors, setErrors] = useState({
     takenEmail: { state: false, status: 200, message: "" },
@@ -37,12 +37,7 @@ export default function AddClient({ ...props }) {
     try {
       const response = await fetch(`${host}/admin/add`, {
         method: "POST",
-        body: JSON.stringify({
-          ...inputValues,
-          previews: selectedFiles.previews.count,
-          full: selectedFiles.full.count,
-          socials: selectedFiles.socials.count,
-        }),
+        body: JSON.stringify({ ...inputValues }),
         headers: {
           Accept: "application/json",
           "Content-Type": "application/json",
@@ -69,7 +64,8 @@ export default function AddClient({ ...props }) {
                 name: data.name,
                 code: data.code,
                 _id: data._id,
-                files: {
+                fileCounts: data.fileCounts,
+                queue: {
                   previews: selectedFiles.previews,
                   full: selectedFiles.full,
                   socials: selectedFiles.socials,
@@ -171,9 +167,11 @@ export default function AddClient({ ...props }) {
             <p>UPLOAD PREVIEWS:</p>
 
             <p
-              className={`${selectedFiles.previews.count > 0 ? "text-rd" : "text-white"}`}
+              className={`${selectedFiles.previews === null ? "text-white" : "text-rd"}`}
             >
-              {selectedFiles.previews.count}
+              {selectedFiles.previews === null
+                ? 0
+                : [...selectedFiles.previews].length}
             </p>
           </div>
 
@@ -185,10 +183,7 @@ export default function AddClient({ ...props }) {
                 onChange={(e) => {
                   setSelectedFiles({
                     ...selectedFiles,
-                    previews: {
-                      count: e.target.files?.length || 0,
-                      files: e.target.files,
-                    },
+                    previews: e.target.files,
                   });
                 }}
                 className="opacity-0 w-[1px]"
@@ -204,9 +199,9 @@ export default function AddClient({ ...props }) {
           <div className="flex gap-3 items-center">
             <p>UPLOAD FULL GALLERY:</p>
             <p
-              className={`${selectedFiles.full.count > 0 ? "text-rd" : "text-white"}`}
+              className={`${selectedFiles.full === null ? "text-white" : "text-rd"}`}
             >
-              {selectedFiles.full.count}
+              {selectedFiles.full === null ? 0 : [...selectedFiles.full].length}
             </p>
           </div>
 
@@ -218,10 +213,7 @@ export default function AddClient({ ...props }) {
                 onChange={(e) => {
                   setSelectedFiles({
                     ...selectedFiles,
-                    full: {
-                      count: e.target.files?.length || 0,
-                      files: e.target.files,
-                    },
+                    full: e.target.files,
                   });
                 }}
                 className="opacity-0 w-[1px]"
@@ -237,9 +229,11 @@ export default function AddClient({ ...props }) {
           <div className="flex gap-3 items-center">
             <p>UPLOAD SOCIAL MEDIA CROPS:</p>
             <p
-              className={`${selectedFiles.socials.count > 0 ? "text-red-600" : "text-white"}`}
+              className={`${selectedFiles.socials === null ? "text-white" : "text-rd"}`}
             >
-              {selectedFiles.socials.count}
+              {selectedFiles.socials === null
+                ? 0
+                : [...selectedFiles.socials].length}
             </p>
           </div>
 
@@ -251,10 +245,7 @@ export default function AddClient({ ...props }) {
                 onChange={(e) => {
                   setSelectedFiles({
                     ...selectedFiles,
-                    socials: {
-                      count: e.target.files?.length || 0,
-                      files: e.target.files,
-                    },
+                    socials: e.target.files,
                   });
                 }}
                 className="opacity-0 w-[1px]"
