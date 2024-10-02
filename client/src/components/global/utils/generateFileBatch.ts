@@ -1,10 +1,6 @@
-import { Dispatch, SetStateAction } from "react";
-
 export const generateFileBatch = async (
-  images: { urls: string[]; files: File[] },
-  start: number,
-  setNewCount: Dispatch<SetStateAction<number>> | undefined,
-  setNewFiles: Dispatch<SetStateAction<object>>
+  images: { urls: string[]; files: object[] },
+  start: number
 ) => {
   let counter = start;
   const newFiles = images.files;
@@ -20,10 +16,7 @@ export const generateFileBatch = async (
     const file = new File([data], filename![1], { type: data.type });
 
     newFiles.push(file);
-    setNewFiles({ urls: images.urls, files: newFiles });
-
     counter++;
-    if (setNewCount !== undefined) setNewCount(counter);
 
     if (i === 9 || i === images.urls.length - 1) break;
   }

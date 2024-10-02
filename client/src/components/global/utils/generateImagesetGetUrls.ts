@@ -1,28 +1,29 @@
 import { Dispatch, SetStateAction } from "react";
 
 export const generateImagesetGetUrls = async (
+  start: number,
   activeImageset: string,
-  setNotice: Dispatch<SetStateAction<object>>
+  setNotice: Dispatch<SetStateAction<object>>,
+  userId: string | undefined
 ) => {
   const host =
     import.meta.env.VITE_ENV === "production"
       ? import.meta.env.VITE_API_URL
       : "http://localhost:3000/api";
-  // turn on loading component and extract user id from URL
-  const url = document.location.href;
-  const regex = /\/user\/([a-zA-Z0-9]+)\//;
-  const id = url.match(regex)![1];
 
   let presigns;
   try {
-    const response = await fetch(`${host}/users/${id}/${activeImageset}`, {
-      method: "GET",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-      credentials: "include",
-    });
+    const response = await fetch(
+      `${host}/users/${userId}/${activeImageset}/${start}`,
+      {
+        method: "GET",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+      }
+    );
     const data = await response.json();
 
     switch (response.status) {
