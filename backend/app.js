@@ -1,11 +1,12 @@
-require("dotenv").config();
+const path = require("path");
+require("dotenv").config({ path: path.join(__dirname, ".env") });
 
 // middleware + utils
 const cors = require("cors");
 const express = require("express");
+
 const cookieParser = require("cookie-parser");
 const logger = require("morgan");
-const path = require("path");
 const passport = require("passport");
 const createError = require("http-errors");
 const bcrypt = require("bcryptjs");
@@ -14,7 +15,6 @@ const RateLimit = require("express-rate-limit");
 
 // models
 const Admin = require("./models/admin");
-const User = require("./models/user");
 
 // routes
 const globalRouter = require("./routes/global");
@@ -76,7 +76,7 @@ passport.use(
       // oooh, a real admin!
       return done(null, admin);
     } catch (err) {
-      // TODO either the admin search or password matches returned false so send an unauthorized response
+      // either the admin search or password matches returned false so send an unauthorized response
       return done(err);
     }
   })
