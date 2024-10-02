@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { userDashboardHeaderItems } from "./data/header/items";
-import { determineHost } from "./utils/determineHost";
+import { determineHost } from "../../global/utils/determineHost";
 
 import Header from "../../global/header/Header";
 import MobileHeader from "../../global/header/mobile/Header";
@@ -29,11 +29,14 @@ export default function UserDashboard() {
     full: false,
     socials: false,
   });
+
   const [images, setImages] = useState({
-    previews: { urls: [], files: [] },
-    full: { urls: [], files: [] },
-    socials: { urls: [], files: [] },
+    previews: [],
+    full: [],
+    socials: [],
   });
+
+  const [imagesetCounts, setImagesetCounts] = useState({});
 
   const [userRetrieved, setUserRetrieved] = useState(false);
 
@@ -152,7 +155,10 @@ export default function UserDashboard() {
         // data has been retrieved, but user has not clicked the enter button yet
         <Splash
           user={user}
+          images={images}
           setImages={setImages}
+          imagesetCounts={imagesetCounts}
+          setImagesetCounts={setImagesetCounts}
           activated={activated}
           setActivated={setActivated}
           setNotice={setNotice}
@@ -168,7 +174,9 @@ export default function UserDashboard() {
             user={user}
             images={images[activeImageset as keyof typeof images]}
             setImages={setImages}
+            imagesetCounts={imagesetCounts}
             activeImageset={activeImageset}
+            setNotice={setNotice}
           />
         </main>
       ) : null}

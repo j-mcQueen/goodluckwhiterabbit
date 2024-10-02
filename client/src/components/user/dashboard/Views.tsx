@@ -1,26 +1,32 @@
 import { useState } from "react";
 import { handleDownload } from "./utils/handleDownload";
 import { createZip } from "./utils/createZip";
-import { generateFileBatch } from "./utils/generateFileBatch";
 
 import StarFilled from "../../../assets/media/icons/StarFilled";
 import Carousel from "./views/Carousel";
 import Grid from "./views/Grid";
+import { executeGenerationChain } from "../../global/utils/executeGenerationChain";
 
 export default function Views({ ...props }) {
-  const { user, images, setImages, activeImageset } = props;
+  const { user, images, setImages, activeImageset, setNotice } = props;
   const [favourites, setFavourites] = useState([]);
   const [loaded, setLoaded] = useState(images[activeImageset].files.length);
   const [disabled, setDisabled] = useState(false);
 
   const handleClick = async () => {
     setDisabled(true);
-    await generateFileBatch(
+
+    const data = await executeGenerationChain(
       images[activeImageset],
+      activeImageset,
+      setNotice,
       loaded,
-      setLoaded,
-      setImages
+      user._id
     );
+
+    setImages({ ...images, [activeImageset]: data.files });
+    setLoaded(data.count);
+
     setDisabled(false);
   };
 
