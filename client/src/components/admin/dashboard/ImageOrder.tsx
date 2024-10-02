@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 
 import Loading from "../../global/Loading";
@@ -11,6 +11,8 @@ export default function ImageOrder({ ...props }) {
     targetImageset,
     orderedImagesets,
     setOrderedImagesets,
+    imagesetCount,
+    setImagesetCounts,
     spinner,
     setSpinner,
   } = props;
@@ -27,129 +29,17 @@ export default function ImageOrder({ ...props }) {
     socials: string;
   }
 
-  const [queuedImages, setQueuedImages] = useState<File[]>([
-    ...targetClient.files[targetImageset].files,
-  ]);
-  const [loaded, setLoaded] = useState(0); // helps determine where to loop from when user wants to load more files
-
-  const orderedImagesetsRef = useRef(orderedImagesets);
-  const targetClientRef = useRef(targetClient);
-
-  useEffect(() => {
-    // only run this when ordered imagesets has no files
-    const generatePresigns = async () => {
-      let presigns;
-      try {
-        const response = await fetch(
-          `${host}/admin/users/${targetClientRef.current._id}/getPresigns/${targetImageset}`,
-          {
-            method: "GET",
-            headers: {
-              Accept: "application/json",
-              "Content-Type": "application/json",
-            },
-            credentials: "include",
-          }
-        );
-        const data = await response.json();
-
-        switch (response.status) {
-          case 200:
-          case 304:
-            if (data.files === false) return data;
-            presigns = data.presigns;
-
-            if (data.skipped) {
-              const filenames = data.skipped.join(" ");
-
-              setNotice({
-                status: true,
-                message: `We could not receive permission to retrieve these files: ${filenames}`,
-                logout: { status: false, path: null },
-              });
-            }
-            break;
-
-          case 500:
-            setNotice(data);
-            break;
-
-          default:
-            throw new Error("Other");
-        }
-      } catch (error) {
-        setNotice({
-          status: true,
-          message:
-            "Something went wrong. To keep things secure, we are logging you out. Please log back in and try again.",
-          logout: { status: true, path: "/admin" },
-        });
-      }
-
-      return presigns;
-    };
-
-    const convertUrls = async (urls: string[]) => {
-      let counter = loaded;
-      const nextOrderedImagesets = { ...orderedImagesetsRef.current };
-
-      for (let i = 0; i < urls.length; i++) {
-        // get the file name
-        const filenameRegex = /\/([^/?]+)\?/; // match the substring between "/" and "?"
-        const filename = urls[counter].match(filenameRegex);
-
-        // convert presigned url to file
-        const response = await fetch(urls[counter], { method: "GET" });
-        const data = await response.blob();
-        const file = new File([data], filename![1], { type: data.type });
-
-        // get the index of file, add file to state at correct position, reflect changes in UI
-        const indexRegex = /\/(\d{1,3})\//; // matches up to 3 digits between two "/"
-        const index = urls[counter].match(indexRegex);
-        nextOrderedImagesets[targetImageset].files[index![1]] = file;
-
-        counter++;
-
-        if (i === 9 || i === urls.length - 1) {
-          const nextLoaded = counter;
-          setLoaded(nextLoaded);
-          break;
-        }
-      }
-      return nextOrderedImagesets;
-    };
-
-    const renderImages = async () => {
-      setSpinner(true);
-      const urls = await generatePresigns();
-      if (urls.files === false) {
-        setSpinner(false);
-        setNotice({
-          status: true,
-          message: "There were no files found in S3.",
-          logout: { status: false, path: null },
-        });
-        return;
-      }
-
-      const nextOrderedImagesets = await convertUrls(urls);
-      setOrderedImagesets(nextOrderedImagesets);
-      setSpinner(false);
-    };
-
-    const containsFiles = orderedImagesetsRef.current[
-      targetImageset
-    ].files.some((item: File | object) => item instanceof File);
-
-    if (containsFiles === false) renderImages();
-  }, [
-    host,
-    targetImageset,
-    loaded,
-    setSpinner,
-    setNotice,
-    setOrderedImagesets,
-  ]);
+  const [queuedImages, setQueuedImages] = useState(() => {
+    if (targetClient.queue !== undefined) {
+      return [...targetClient.queue[targetImageset]];
+    } else return [];
+  });
+  const [loaded, setLoaded] = useState(() => {
+    const filtered = orderedImagesets[targetImageset].filter(
+      (item: object | File) => item instanceof File
+    );
+    return filtered.length;
+  }); // helps determine where to loop from when user wants to load more files (represents actual number of files loaded from storage)
 
   const handleDragStart = (
     e: React.DragEvent<HTMLImageElement>,
@@ -267,6 +157,8 @@ export default function ImageOrder({ ...props }) {
     }
   };
 
+  const handleClick = async () => {};
+
   // TODO include a feature that allows GLWR to remove an image from the imageset completely? i.e. performs a delete request and sends to s3
 
   return (
@@ -277,11 +169,19 @@ export default function ImageOrder({ ...props }) {
             {headingText[targetImageset as keyof headingTextType]}
           </h2>
 
-          <div className="flex items-center gap-5">
-            {spinner ? <Loading /> : null}
+          <ul className="flex gap-5 text-xl">
+            <li>
+              <span className="text-rd">{imagesetCount}</span> FILES IN STORAGE
+            </li>
 
-            <label className="font-liquid tracking-widest opacity-80 border border-solid border-white flex items-center px-3 py-2 transition-colors xl:hover:text-rd xl:focus:text-rd xl:hover:cursor-pointer">
-              add
+            <li>
+              <span className="text-rd">{loaded}</span> FILES LOADED
+            </li>
+          </ul>
+
+          <div className="flex items-center gap-5">
+            <label className="border border-solid border-white flex items-center px-3 py-2 transition-colors xl:hover:text-rd xl:focus:text-rd xl:hover:cursor-pointer">
+              {spinner ? <Loading /> : "ADD FILES"}
               <input
                 type="file"
                 name="additions"
@@ -290,6 +190,7 @@ export default function ImageOrder({ ...props }) {
                     setQueuedImages([...queuedImages, ...e.target.files]);
                   }
                 }}
+                disabled={spinner}
                 className="opacity-0 w-[1px]"
                 accept="image/*"
                 multiple
@@ -300,7 +201,7 @@ export default function ImageOrder({ ...props }) {
 
         <div className="flex flex-col items-center ">
           <div className="flex flex-wrap justify-center max-w-[60dvw] gap-5 px-5 overflow-scroll">
-            {orderedImagesets[targetImageset].files.map(
+            {orderedImagesets[targetImageset].map(
               (file: File | object, index: number) => {
                 return (
                   <img
@@ -328,9 +229,9 @@ export default function ImageOrder({ ...props }) {
             )}
           </div>
 
-          {orderedImagesets[targetImageset].count <
-          targetClient.files[targetImageset].count ? (
+          {orderedImagesets[targetImageset].length < imagesetCount ? (
             <button
+              onClick={() => handleClick()}
               type="button"
               className="border border-solid border-red px-4 py-2 xl:hover:text-rd xl:focus:text-rd transition-colors"
             >

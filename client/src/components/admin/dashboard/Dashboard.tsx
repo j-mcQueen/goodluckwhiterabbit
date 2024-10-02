@@ -27,6 +27,7 @@ export default function AdminDashboard() {
   const [activePane, setActivePane] = useState("ALL");
   const [clients, setClients] = useState([]);
   const [targetClient, setTargetClient] = useState({});
+
   const [clientFilterResult, setClientFilterResult] = useState([]);
   const [rejectedFiles, setRejectedFiles] = useState([]);
   const [deleteModalToggle, setDeleteModalToggle] = useState({
@@ -45,8 +46,6 @@ export default function AdminDashboard() {
     logout: { status: false, path: null },
   });
 
-  // TODO how can we organise the pane data here? conditional rendering? we could organise all pane values into an array, then render the pane which matches state -> best option, since this will declutter the return statement
-
   useEffect(() => {
     const getAllClients = async () => {
       try {
@@ -57,7 +56,7 @@ export default function AdminDashboard() {
         const data = await response.json();
 
         if (data) {
-          window.history.replaceState({}, ""); // ensures fn does not rerun after login
+          location.state.login = false; // ensures fn does not rerun after login
 
           switch (response.status) {
             case 200:
@@ -90,6 +89,7 @@ export default function AdminDashboard() {
     if (location.state.login === true) getAllClients(); // if admin has just logged in, fetch clients
   }, [location, navigate, host]);
 
+  // TODO how can we organise the pane data here? conditional rendering? we could organise all pane values into an array, then render the pane which matches state -> best option, since this will declutter the return statement
   return (
     <main className="w-[calc(100dvw-1.5rem-2px)] h-[calc(100dvh-1.5rem-2px)] overflow-scroll relative">
       {rejectedFiles.length > 0 ? (
@@ -147,6 +147,7 @@ export default function AdminDashboard() {
               clients={clients}
               setClients={setClients}
               host={host}
+              setNotice={setNotice}
               targetClient={targetClient}
               setTargetClient={setTargetClient}
               setActivePane={setActivePane}
