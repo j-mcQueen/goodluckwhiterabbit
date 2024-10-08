@@ -214,6 +214,14 @@ exports.adminGetClients = async (req, res, next) => {
   }
 };
 
+exports.adminGetFileAndDelete = async (req, res, next) => {
+  const verified = await verifyTokens(req, res);
+
+  if (verified) {
+    //
+  }
+};
+
 // exports.getImagesetPresigns = async (req, res, next) => {
 //   const verified = verifyTokens(req, res);
 

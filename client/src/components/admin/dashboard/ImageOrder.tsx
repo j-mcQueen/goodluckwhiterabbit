@@ -34,6 +34,7 @@ export default function ImageOrder({ ...props }) {
       return [...targetClient.queue[targetImageset]];
     } else return [];
   });
+
   const [loaded, setLoaded] = useState(() => {
     const filtered = orderedImagesets[targetImageset].filter(
       (item: object | File) => item instanceof File
@@ -77,10 +78,7 @@ export default function ImageOrder({ ...props }) {
         : orderedImagesets[targetImageset].files[draggedIndex];
     let presigned = "";
     try {
-      // does where we are dragging into (index) have a file in place already?
-      // if so, then we need to supply the fetch body with the filename of the delete target
-      // then in the response, we should have an array of urls, the first being the delete target, the second being the new file for that index
-      // delete first, then upload
+      // generate the url used to add the file to S3
       const response = await fetch(`${host}/generatePutPresigned`, {
         method: "POST",
         body: JSON.stringify({
@@ -130,6 +128,23 @@ export default function ImageOrder({ ...props }) {
       }
     }
 
+    // verify if there is an existing file and remove from S3 if true
+    try {
+      const response = await fetch(
+        `${host}/admin/users/${targetClient._id}/getFile/${index}`,
+        {
+          method: "GET",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+        }
+      );
+    } catch (error) {
+      //
+    }
+
     // send s3 request and upload single image
     try {
       const response = await fetch(presigned, {
@@ -140,7 +155,8 @@ export default function ImageOrder({ ...props }) {
       if (response.status === 200 || response.status === 304) {
         // update images locked into order
         const updatedImagesetOrder = { ...orderedImagesets };
-        updatedImagesetOrder[targetImageset].files[index] = file;
+        // TODO if there is a file already with the target index in s3, we need to remove the one already in place
+        updatedImagesetOrder[targetImageset][index] = file;
         setOrderedImagesets(updatedImagesetOrder);
       } else {
         throw new Error("Other");
