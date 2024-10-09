@@ -16,7 +16,7 @@ const upload = multer(); // enable form data to be unpacked
 
 // GET
 router.get("/users", adminGetClients);
-router.get("/users/:id/getFile/:index", adminGetFileAndDelete);
+router.get("/users/:id/getFile/:imageset/:index", adminGetFileAndDelete);
 // router.get("/users/:id/getPresigns/:imageset", getImagesetPresigns);
 // POST
 router.post("/login", upload.none(), adminLogin);

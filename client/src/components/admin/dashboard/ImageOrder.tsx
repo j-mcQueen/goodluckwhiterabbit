@@ -11,10 +11,10 @@ export default function ImageOrder({ ...props }) {
     targetImageset,
     orderedImagesets,
     setOrderedImagesets,
-    imagesetCount,
+    imagesetCounts,
     setImagesetCounts,
     spinner,
-    setSpinner,
+    // setSpinner,
   } = props;
 
   const headingText: headingTextType = {
@@ -35,12 +35,11 @@ export default function ImageOrder({ ...props }) {
     } else return [];
   });
 
-  const [loaded, setLoaded] = useState(() => {
-    const filtered = orderedImagesets[targetImageset].filter(
+  const [loaded, setLoaded] = useState(
+    orderedImagesets[targetImageset].filter(
       (item: object | File) => item instanceof File
-    );
-    return filtered.length;
-  }); // helps determine where to loop from when user wants to load more files (represents actual number of files loaded from storage)
+    ).length
+  ); // helps determine where to loop from when user wants to load more files (represents actual number of files loaded from storage)
 
   const handleDragStart = (
     e: React.DragEvent<HTMLImageElement>,
@@ -70,6 +69,8 @@ export default function ImageOrder({ ...props }) {
     // 4. after url generation, fetch to the url to remove object at dragged index
     // 5. iterate over all ordered images for the targetImageset and update their indexes and remove object at dragged index on client in state
     // for now, we are assuming image has been dragged from queuedImages
+
+    if (index === draggedIndex && source !== "queue") return; // user made a mistake
 
     // generate presigned URL for file upload
     const file =
@@ -131,7 +132,7 @@ export default function ImageOrder({ ...props }) {
     // verify if there is an existing file and remove from S3 if true
     try {
       const response = await fetch(
-        `${host}/admin/users/${targetClient._id}/getFile/${index}`,
+        `${host}/admin/users/${targetClient._id}/getFile/${targetImageset}/${index}`,
         {
           method: "GET",
           headers: {
@@ -141,8 +142,26 @@ export default function ImageOrder({ ...props }) {
           credentials: "include",
         }
       );
+      const data = await response.json();
+
+      if (data) {
+        switch (response.status) {
+          case 200:
+          case 304:
+            break;
+
+          case 500:
+            throw new TypeError(data.message);
+        }
+      }
     } catch (error) {
-      //
+      if (error instanceof Error) {
+        return setNotice({
+          status: true,
+          message: error.message,
+          logout: { status: false, path: null },
+        });
+      }
     }
 
     // send s3 request and upload single image
@@ -155,9 +174,18 @@ export default function ImageOrder({ ...props }) {
       if (response.status === 200 || response.status === 304) {
         // update images locked into order
         const updatedImagesetOrder = { ...orderedImagesets };
-        // TODO if there is a file already with the target index in s3, we need to remove the one already in place
         updatedImagesetOrder[targetImageset][index] = file;
         setOrderedImagesets(updatedImagesetOrder);
+
+        // update imagesetCount
+        const nextImagesetCount = imagesetCounts[targetImageset] + 1;
+        setImagesetCounts({
+          ...imagesetCounts,
+          [targetImageset]: nextImagesetCount,
+        });
+
+        const nextLoaded = loaded + 1;
+        setLoaded(nextLoaded);
       } else {
         throw new Error("Other");
       }
@@ -187,11 +215,12 @@ export default function ImageOrder({ ...props }) {
 
           <ul className="flex gap-5 text-xl">
             <li>
-              <span className="text-rd">{imagesetCount}</span> FILES IN STORAGE
+              <span className="text-rd">{imagesetCounts[targetImageset]}</span>{" "}
+              FILES IN STORAGE
             </li>
 
             <li>
-              <span className="text-rd">{loaded}</span> FILES LOADED
+              <span className="text-rd">{loaded}</span> FILES DISPLAYED
             </li>
           </ul>
 
@@ -245,7 +274,8 @@ export default function ImageOrder({ ...props }) {
             )}
           </div>
 
-          {orderedImagesets[targetImageset].length < imagesetCount ? (
+          {orderedImagesets[targetImageset].length <
+          imagesetCounts[targetImageset] ? (
             <button
               onClick={() => handleClick()}
               type="button"

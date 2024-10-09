@@ -2,7 +2,7 @@ require("dotenv").config();
 const passport = require("passport");
 const jwt = require("jsonwebtoken");
 const User = require("../models/user");
-const consumers = require("node:stream/consumers");
+// const consumers = require("node:stream/consumers");
 const { body, validationResult } = require("express-validator");
 const { returnClients } = require("./utils/returnClients");
 const { createCode } = require("./utils/createCode");
@@ -10,8 +10,8 @@ const { verifyTokens } = require("./utils/verifyTokens");
 const { s3 } = require("./config/s3");
 
 const {
-  PutObjectCommand,
-  GetObjectCommand,
+  // PutObjectCommand,
+  // GetObjectCommand,
   ListObjectsV2Command,
   DeleteObjectCommand,
   DeleteObjectsCommand,
@@ -218,7 +218,51 @@ exports.adminGetFileAndDelete = async (req, res, next) => {
   const verified = await verifyTokens(req, res);
 
   if (verified) {
-    //
+    let existingFile;
+    try {
+      existingFile = await s3.send(
+        new ListObjectsV2Command({
+          Bucket: process.env.AWS_PRIMARY_BUCKET,
+          Prefix: `${req.params.id}/${req.params.imageset}/${req.params.index}/`, // bucket/userId/activeImageset/targetIndex
+        })
+      );
+
+      if (!existingFile) throw new Error("500");
+      if (!existingFile.Contents)
+        return res.status(200).json({ success: true });
+    } catch (error) {
+      return res.status(500).json({
+        status: true,
+        message:
+          "There was an error retrieving your images from S3. Please refresh the page and try again. Let Jack know if the problem persists!",
+        logout: { status: false, path: null },
+      });
+    }
+
+    if (existingFile.Contents.length > 0) {
+      // there is a pre-existing object at the target index, so delete it in preparation for replacement
+      try {
+        const deleted = await s3.send(
+          new DeleteObjectCommand({
+            Bucket: process.env.AWS_PRIMARY_BUCKET,
+            Key: existingFile.Contents[0].Key,
+          })
+        );
+
+        if (!deleted) throw new Error("500");
+        else return res.status(200).json({ success: true });
+      } catch (error) {
+        return res.status(500).json({
+          status: true,
+          message:
+            "There was an error removing the previous image at this position from storage. Please refresh the page and try again. Let Jack know if the problem persists!",
+          logout: { status: false, path: null },
+        });
+      }
+    } else {
+      // there is no pre-existing file at the target index, so no further action is necessary
+      return res.status(200).json({ success: true });
+    }
   }
 };
 
@@ -279,62 +323,62 @@ exports.adminGetFileAndDelete = async (req, res, next) => {
 //   }
 // };
 
-exports.adminGetUserImages = async (req, res, next) => {
-  try {
-    // TODO try block should only envelop the below variable. Catch block should be for the response to a verification error
-    // this will allow following try catch blocks specific to the async operations to come. Enables targeted error handling
-    const decodedAccess = jwt.verify(
-      req.cookies.accessToken,
-      process.env.JWT_SECRET
-    );
+// exports.adminGetUserImages = async (req, res, next) => {
+//   try {
+//     // TODO try block should only envelop the below variable. Catch block should be for the response to a verification error
+//     // this will allow following try catch blocks specific to the async operations to come. Enables targeted error handling
+//     const decodedAccess = jwt.verify(
+//       req.cookies.accessToken,
+//       process.env.JWT_SECRET
+//     );
 
-    if (decodedAccess.exp > 0) {
-      // TODO if nothing has changed since the last request, we don't need to tap S3. Determine if nothing has changed
-      const images = [];
-      const objects = await client.send(
-        new ListObjectsV2Command({ Bucket: process.env.AWS_PRIMARY_BUCKET })
-      );
+//     if (decodedAccess.exp > 0) {
+//       // TODO if nothing has changed since the last request, we don't need to tap S3. Determine if nothing has changed
+//       const images = [];
+//       const objects = await client.send(
+//         new ListObjectsV2Command({ Bucket: process.env.AWS_PRIMARY_BUCKET })
+//       );
 
-      for (let i = 0; i < objects.Contents.length; i++) {
-        if (
-          objects.Contents[i].Key.includes(req.params.imageset) &&
-          objects.Contents[i].Key.includes(req.params.id)
-        ) {
-          // if the requested imageset and matching user id are present in the key of the object, this is a target file
-          const file = await client.send(
-            new GetObjectCommand({
-              Bucket: process.env.AWS_PRIMARY_BUCKET,
-              Key: objects.Contents[i].Key,
-            })
-          );
+//       for (let i = 0; i < objects.Contents.length; i++) {
+//         if (
+//           objects.Contents[i].Key.includes(req.params.imageset) &&
+//           objects.Contents[i].Key.includes(req.params.id)
+//         ) {
+//           // if the requested imageset and matching user id are present in the key of the object, this is a target file
+//           const file = await client.send(
+//             new GetObjectCommand({
+//               Bucket: process.env.AWS_PRIMARY_BUCKET,
+//               Key: objects.Contents[i].Key,
+//             })
+//           );
 
-          // create a data URL and isolate filename to present to the client
-          // this ensures we can render the image + handle editing of image order correctly on the frontend
-          const imageData = {};
-          const imgBuffer = (await consumers.buffer(file.Body)).toString(
-            "base64"
-          );
+//           // create a data URL and isolate filename to present to the client
+//           // this ensures we can render the image + handle editing of image order correctly on the frontend
+//           const imageData = {};
+//           const imgBuffer = (await consumers.buffer(file.Body)).toString(
+//             "base64"
+//           );
 
-          // pass the data the frontend needs for state management
-          const keyStrings = objects.Contents[i].Key.split("/");
-          imageData.url = `data:${file.ContentType};base64, ${imgBuffer}`;
-          imageData.position = keyStrings[2];
-          imageData.filename = keyStrings[3];
-          imageData.mime = file.ContentType;
-          imageData.queued = true;
+//           // pass the data the frontend needs for state management
+//           const keyStrings = objects.Contents[i].Key.split("/");
+//           imageData.url = `data:${file.ContentType};base64, ${imgBuffer}`;
+//           imageData.position = keyStrings[2];
+//           imageData.filename = keyStrings[3];
+//           imageData.mime = file.ContentType;
+//           imageData.queued = true;
 
-          images.push(imageData);
-        } else continue;
-      }
+//           images.push(imageData);
+//         } else continue;
+//       }
 
-      const sorted = images.sort((a, b) => a.position - b.position);
-      return res.status(200).send(sorted);
-    }
-  } catch (err) {
-    //
-    console.log(err);
-  }
-};
+//       const sorted = images.sort((a, b) => a.position - b.position);
+//       return res.status(200).send(sorted);
+//     }
+//   } catch (err) {
+//     //
+//     console.log(err);
+//   }
+// };
 
 // exports.adminAddImages = async (req, res, next) => {
 //   const verified = await verifyTokens(req, res);

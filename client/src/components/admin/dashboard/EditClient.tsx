@@ -182,9 +182,7 @@ export default function EditClient({ ...props }) {
                 targetImageset={targetImageset}
                 orderedImagesets={orderedImagesets}
                 setOrderedImagesets={setOrderedImagesets}
-                imagesetCount={
-                  imagesetCounts[targetImageset as keyof typeof imagesetCounts]
-                }
+                imagesetCounts={imagesetCounts}
                 setImagesetCounts={setImagesetCounts}
                 spinner={spinner}
                 setSpinner={setSpinner}
