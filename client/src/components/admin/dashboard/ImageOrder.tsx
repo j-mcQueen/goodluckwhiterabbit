@@ -2,6 +2,7 @@ import { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 
 import Loading from "../../global/Loading";
+import Close from "../../../assets/media/icons/Close";
 
 export default function ImageOrder({ ...props }) {
   const {
@@ -123,7 +124,7 @@ export default function ImageOrder({ ...props }) {
           return setNotice({
             status: true,
             message: "Something went wrong - please try again.",
-            logout: { status: false, path: "" },
+            logout: { status: false, path: null },
           });
         }
       }
@@ -195,7 +196,7 @@ export default function ImageOrder({ ...props }) {
         setNotice({
           status: true,
           message: "We could not upload your image. Please try again.",
-          logout: { status: false, path: "" },
+          logout: { status: false, path: null },
         });
       }
     }
@@ -203,7 +204,46 @@ export default function ImageOrder({ ...props }) {
 
   const handleClick = async () => {};
 
-  // TODO include a feature that allows GLWR to remove an image from the imageset completely? i.e. performs a delete request and sends to s3
+  const handleDeleteClick = async (index: number, filename: string) => {
+    try {
+      const response = await fetch(
+        `${host}/admin/users/${targetClient._id}/${targetImageset}/${index}/${filename}/delete`,
+        {
+          method: "DELETE",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+        }
+      );
+      const data = await response.json();
+
+      if (data && (response.status === 200 || response.status === 304)) {
+        const updatedImagesetOrder = { ...orderedImagesets };
+        updatedImagesetOrder[targetImageset][index] = {};
+        setOrderedImagesets(updatedImagesetOrder);
+
+        // update imagesetCount
+        const nextImagesetCount = imagesetCounts[targetImageset] - 1;
+        setImagesetCounts({
+          ...imagesetCounts,
+          [targetImageset]: nextImagesetCount,
+        });
+
+        const nextLoaded = loaded - 1;
+        setLoaded(nextLoaded);
+        return;
+      }
+    } catch (error) {
+      return setNotice({
+        status: true,
+        message:
+          "There was an error deleting this image. Please refresh the page and try again.",
+        logout: { status: false, path: null },
+      });
+    }
+  };
 
   return (
     <div className="flex items-start">
@@ -245,45 +285,54 @@ export default function ImageOrder({ ...props }) {
         </header>
 
         <div className="flex flex-col items-center ">
-          <div className="flex flex-wrap justify-center max-w-[60dvw] gap-5 px-5 overflow-scroll">
+          <div className="flex flex-wrap justify-center max-w-[60dvw] gap-5 px-5 overflow-scroll relative">
             {orderedImagesets[targetImageset].map(
               (file: File | object, index: number) => {
                 return (
-                  <img
-                    draggable={true}
-                    onDragStart={(e) =>
-                      file instanceof File
-                        ? handleDragStart(e, file, "order", index)
-                        : null
-                    }
-                    onDrop={(e) => {
-                      const draggedIndex = Number(
-                        e.dataTransfer.getData("text/index")
-                      );
-                      const source = e.dataTransfer.getData("text/source");
+                  <div key={uuidv4()}>
+                    {file instanceof File ? (
+                      <button
+                        onClick={() => handleDeleteClick(index, file.name)}
+                        className="absolute bg-black m-1 border border-solid border-rd p-1"
+                      >
+                        <Close className={"w-4 h-4"} customColor={"#FFF"} />
+                      </button>
+                    ) : null}
 
-                      handleDrop(index, draggedIndex, source);
-                    }}
-                    onDragOver={(e) => e.preventDefault()}
-                    className={`${file instanceof File === false ? "h-[300px] w-[200px]" : "max-h-[300px]"} border border-solid`}
-                    key={uuidv4()}
-                    src={file instanceof File ? URL.createObjectURL(file) : ""}
-                  />
+                    <img
+                      draggable={true}
+                      onDragStart={(e) =>
+                        file instanceof File
+                          ? handleDragStart(e, file, "order", index)
+                          : null
+                      }
+                      onDrop={(e) => {
+                        const draggedIndex = Number(
+                          e.dataTransfer.getData("text/index")
+                        );
+                        const source = e.dataTransfer.getData("text/source");
+
+                        handleDrop(index, draggedIndex, source);
+                      }}
+                      onDragOver={(e) => e.preventDefault()}
+                      className={`${file instanceof File === false ? "h-[300px] w-[200px]" : "max-h-[300px]"} border border-solid`}
+                      src={
+                        file instanceof File ? URL.createObjectURL(file) : ""
+                      }
+                    />
+                  </div>
                 );
               }
             )}
           </div>
 
-          {orderedImagesets[targetImageset].length <
-          imagesetCounts[targetImageset] ? (
-            <button
-              onClick={() => handleClick()}
-              type="button"
-              className="border border-solid border-red px-4 py-2 xl:hover:text-rd xl:focus:text-rd transition-colors"
-            >
-              LOAD MORE
-            </button>
-          ) : null}
+          <button
+            onClick={() => handleClick()}
+            type="button"
+            className="border border-solid border-red px-4 py-2 xl:hover:text-rd xl:focus:text-rd transition-colors mt-8 mb-5"
+          >
+            LOAD NEXT BATCH
+          </button>
         </div>
       </div>
 

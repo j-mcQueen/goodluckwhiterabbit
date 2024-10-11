@@ -4,6 +4,7 @@ const {
   adminLogin,
   adminAddClient,
   adminDeleteUser,
+  adminDeleteFile,
   // adminGetUserImages,
   // adminAddImages,
   // adminPutImageOrder,
@@ -30,5 +31,6 @@ router.post("/add", upload.any(), adminAddClient); // using .any() here to accom
 // router.put("/users/:id/addImages/:imageset", upload.any(), adminAddImages);
 // DELETE
 router.delete("/deleteUser/:id", adminDeleteUser);
+router.delete("/users/:id/:imageset/:index/:filename/delete", adminDeleteFile);
 
 module.exports = router;

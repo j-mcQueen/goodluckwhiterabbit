@@ -570,3 +570,18 @@ exports.adminDeleteUser = async (req, res, next) => {
     } else return res.status(200).json(deleted._id); // no images to remove from S3, so return success response
   }
 };
+
+exports.adminDeleteFile = async (req, res, next) => {
+  const verified = await verifyTokens(req, res);
+
+  if (verified) {
+    const deleted = await s3.send(
+      new DeleteObjectCommand({
+        Bucket: process.env.AWS_PRIMARY_BUCKET,
+        Key: `${req.params.id}/${req.params.imageset}/${req.params.index}/${req.params.filename}`,
+      })
+    );
+
+    return res.status(200).json(deleted);
+  }
+};
