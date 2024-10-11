@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { executeGenerationChain } from "../../global/utils/executeGenerationChain";
-import { determineHost } from "../../global/utils/determineHost";
 import ImageOrder from "./ImageOrder";
 
 export default function EditClient({ ...props }) {
@@ -36,26 +35,6 @@ export default function EditClient({ ...props }) {
     setStarted(true);
     setSpinner(true);
 
-    if (Object.keys(imagesetCounts).length === 0) {
-      // imagesetCounts will not be an empty object if imagesetTotals has already been calculated
-      // so only run this function when the component is freshly rendered
-
-      const host = determineHost;
-      const response = await fetch(
-        `${host}/users/${targetClient._id}/getImagesetTotals`,
-        {
-          method: "GET",
-          headers: {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-          },
-          credentials: "include",
-        }
-      );
-      const totals = await response.json();
-      setImagesetCounts(totals);
-    }
-
     const data = await executeGenerationChain(
       orderedImagesets[newTargetImageset as keyof typeof orderedImagesets],
       newTargetImageset,
@@ -63,6 +42,34 @@ export default function EditClient({ ...props }) {
       0,
       targetClient._id
     );
+
+    try {
+      const response = await fetch(
+        `${host}/admin/users/${targetClient._id}/updateFileCount/${newTargetImageset}/${data.count}`,
+        {
+          method: "POST",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+        }
+      );
+      const newCounts = await response.json();
+
+      if (newCounts && (response.status === 200 || response.status === 304)) {
+        setImagesetCounts(newCounts);
+        const nextTargetClient = { ...targetClient };
+        nextTargetClient.fileCounts = newCounts;
+        setTargetClient(nextTargetClient);
+      }
+    } catch (error) {
+      setNotice({
+        status: true,
+        message: "",
+        logout: { status: false, path: null },
+      });
+    }
 
     setOrderedImagesets({
       ...orderedImagesets,

@@ -64,10 +64,13 @@ exports.generateGetPresigned = async (req, res, next) => {
     const presigns = [];
     const skipped = [];
 
-    for (let i = Number(req.params.start); i < s3Objects.Contents.length; i++) {
+    const indexRegex = /\/(\d{1,3})\//;
+    for (let i = 0; i < s3Objects.Contents.length; i++) {
+      const position = s3Objects.Contents[i].Key.match(indexRegex);
       if (
         s3Objects.Contents[i].Key.includes(req.params.imageset) &&
-        s3Objects.Contents[i].Key.includes(req.params.id)
+        s3Objects.Contents[i].Key.includes(req.params.id) &&
+        Number(position[1]) >= Number(req.params.start) // this ensures we will always pick up from where we left off when a new batch has been requested
       ) {
         const cmd = new GetObjectCommand({
           Bucket: process.env.AWS_PRIMARY_BUCKET,

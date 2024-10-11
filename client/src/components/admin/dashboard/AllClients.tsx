@@ -93,7 +93,7 @@ export default function AllClients({ ...props }) {
                   <span
                     className={`${client.fileCounts.previews > 0 ? "text-rd" : "text-white"}`}
                   >
-                    P: {client.fileCounts.previews > 0},&nbsp;
+                    P: {client.fileCounts.previews},&nbsp;
                   </span>
                   <span
                     className={`${client.fileCounts.full > 0 ? "text-rd" : "text-white"}`}

@@ -2,7 +2,7 @@ require("dotenv").config();
 const passport = require("passport");
 const jwt = require("jsonwebtoken");
 const User = require("../models/user");
-// const consumers = require("node:stream/consumers");
+
 const { body, validationResult } = require("express-validator");
 const { returnClients } = require("./utils/returnClients");
 const { createCode } = require("./utils/createCode");
@@ -10,13 +10,10 @@ const { verifyTokens } = require("./utils/verifyTokens");
 const { s3 } = require("./config/s3");
 
 const {
-  // PutObjectCommand,
-  // GetObjectCommand,
   ListObjectsV2Command,
   DeleteObjectCommand,
   DeleteObjectsCommand,
 } = require("@aws-sdk/client-s3");
-const { getSignedUrl } = require("@aws-sdk/s3-request-presigner");
 
 exports.adminLogin = [
   // sanitize received input with body from express validator
@@ -195,6 +192,23 @@ exports.adminAddClient = [
   },
 ];
 
+exports.adminUpdateUserImagesetCount = async (req, res, next) => {
+  const verified = await verifyTokens(req, res);
+
+  if (verified) {
+    // retrieve user by Id and update the filecount of the active imageset passed in the request with count passed in request
+    const updatedUser = await User.findByIdAndUpdate(
+      req.params.id,
+      {
+        [`fileCounts.${req.params.imageset}`]: req.params.count,
+      },
+      { new: true }
+    );
+
+    return res.status(200).json(updatedUser.fileCounts);
+  }
+};
+
 exports.adminGetClients = async (req, res, next) => {
   const verified = await verifyTokens(req, res);
 
@@ -223,7 +237,7 @@ exports.adminGetFileAndDelete = async (req, res, next) => {
       existingFile = await s3.send(
         new ListObjectsV2Command({
           Bucket: process.env.AWS_PRIMARY_BUCKET,
-          Prefix: `${req.params.id}/${req.params.imageset}/${req.params.index}/`, // bucket/userId/activeImageset/targetIndex
+          Prefix: `${req.params.id}/${req.params.imageset}/${req.params.index}/`,
         })
       );
 
