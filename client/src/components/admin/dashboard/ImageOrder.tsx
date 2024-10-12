@@ -8,7 +8,11 @@ import Close from "../../../assets/media/icons/Close";
 export default function ImageOrder({ ...props }) {
   const {
     host,
+    clients,
+    setClients,
     setNotice,
+    renderCount,
+    setRenderCount,
     targetClient,
     setTargetClient,
     targetImageset,
@@ -35,12 +39,6 @@ export default function ImageOrder({ ...props }) {
       return [...targetClient.queue[targetImageset]];
     } else return [];
   });
-
-  const [loaded, setLoaded] = useState(() => {
-    return orderedImagesets[targetImageset].filter(
-      (item: object | File) => item instanceof File
-    ).length;
-  }); // helps determine where to loop from when user wants to load more files (represents actual number of files loaded from storage)
 
   const handleDragStart = (
     e: React.DragEvent<HTMLImageElement>,
@@ -181,8 +179,13 @@ export default function ImageOrder({ ...props }) {
         updatedTargetClient.fileCounts = newCounts;
         setTargetClient(updatedTargetClient);
 
-        const nextLoaded = loaded + 1;
-        setLoaded(nextLoaded);
+        const nextLoaded = renderCount + 1;
+        setRenderCount(nextLoaded);
+
+        const nextClients = clients.map((client: { _id: string }) => {
+          return client._id === targetClient._id ? updatedTargetClient : client;
+        });
+        setClients(nextClients);
       } else {
         throw new Error("Other");
       }
@@ -238,8 +241,13 @@ export default function ImageOrder({ ...props }) {
         updatedTargetClient.fileCounts = newCounts;
         setTargetClient(updatedTargetClient);
 
-        const nextLoaded = loaded - 1;
-        setLoaded(nextLoaded);
+        const nextClients = clients.map((client: { _id: string }) => {
+          return client._id === targetClient._id ? updatedTargetClient : client;
+        });
+        setClients(nextClients);
+
+        const nextLoaded = renderCount - 1;
+        setRenderCount(nextLoaded);
         return;
       }
     } catch (error) {
@@ -269,7 +277,7 @@ export default function ImageOrder({ ...props }) {
             </li>
 
             <li>
-              <span className="text-rd">{loaded}</span> FILES DISPLAYED
+              <span className="text-rd">{renderCount}</span> FILES DISPLAYED
             </li>
           </ul>
 

@@ -25,6 +25,8 @@ export default function EditClient({ ...props }) {
   });
   // orderedImageset is contained within the dummy array inside clients
 
+  const [renderCount, setRenderCount] = useState(0);
+
   // TODO implement search function that will notify Kailey about duplicate files
   // TODO create button that takes Kailey to a page which allows her to "preview" what the client sees
 
@@ -59,19 +61,32 @@ export default function EditClient({ ...props }) {
         const nextTargetClient = { ...targetClient };
         nextTargetClient.fileCounts = newCounts;
         setTargetClient(nextTargetClient);
+
+        const nextClients = clients.map((client: { _id: string }) => {
+          return client._id === targetClient._id ? nextTargetClient : client;
+        });
+        setClients(nextClients);
       }
     } catch (error) {
       setNotice({
         status: true,
-        message: "",
+        message:
+          "There was an issue updating the number of files your client has in storage. Upon your next addition, the system will correct itself.",
         logout: { status: false, path: null },
       });
     }
 
-    setOrderedImagesets({
+    const nextOrderedImagesets = {
       ...orderedImagesets,
       [newTargetImageset]: data.files,
-    });
+    };
+    setOrderedImagesets(nextOrderedImagesets);
+
+    const rendered = nextOrderedImagesets[
+      newTargetImageset as keyof typeof nextOrderedImagesets
+    ].filter((item: object | File) => item instanceof File).length;
+    setRenderCount(rendered);
+
     setSpinner(false);
     return;
   };
@@ -180,6 +195,10 @@ export default function EditClient({ ...props }) {
             >
               <ImageOrder
                 host={host}
+                clients={clients}
+                setClients={setClients}
+                renderCount={renderCount}
+                setRenderCount={setRenderCount}
                 setNotice={setNotice}
                 targetClient={targetClient}
                 setTargetClient={setTargetClient}
