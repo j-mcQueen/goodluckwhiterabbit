@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
+import { updateFileCount } from "./utils/updateFileCounts";
 
 import Loading from "../../global/Loading";
 import Close from "../../../assets/media/icons/Close";
@@ -9,11 +10,10 @@ export default function ImageOrder({ ...props }) {
     host,
     setNotice,
     targetClient,
+    setTargetClient,
     targetImageset,
     orderedImagesets,
     setOrderedImagesets,
-    imagesetCounts,
-    setImagesetCounts,
     spinner,
     // setSpinner,
   } = props;
@@ -36,11 +36,11 @@ export default function ImageOrder({ ...props }) {
     } else return [];
   });
 
-  const [loaded, setLoaded] = useState(
-    orderedImagesets[targetImageset].filter(
+  const [loaded, setLoaded] = useState(() => {
+    return orderedImagesets[targetImageset].filter(
       (item: object | File) => item instanceof File
-    ).length
-  ); // helps determine where to loop from when user wants to load more files (represents actual number of files loaded from storage)
+    ).length;
+  }); // helps determine where to loop from when user wants to load more files (represents actual number of files loaded from storage)
 
   const handleDragStart = (
     e: React.DragEvent<HTMLImageElement>,
@@ -62,15 +62,6 @@ export default function ImageOrder({ ...props }) {
     draggedIndex: number,
     source: string
   ) => {
-    // TODO potential solution to handle previously-ordered images being dragged to new positions:
-    // intended functionality is that when this happens every following object moves up an index
-    // 1. server needs to be able to determine when this happens, so supply source parameter to fetch body
-    // 2. on server-side, update all keys of s3 objects in targetImageset from index onwards (increases by 1) if req.body.source is "order"
-    // 3. object at dragged index must then be removed, so generate url to perform this action
-    // 4. after url generation, fetch to the url to remove object at dragged index
-    // 5. iterate over all ordered images for the targetImageset and update their indexes and remove object at dragged index on client in state
-    // for now, we are assuming image has been dragged from queuedImages
-
     if (index === draggedIndex && source !== "queue") return; // user made a mistake
 
     // generate presigned URL for file upload
@@ -178,12 +169,17 @@ export default function ImageOrder({ ...props }) {
         updatedImagesetOrder[targetImageset][index] = file;
         setOrderedImagesets(updatedImagesetOrder);
 
-        // update imagesetCount
-        const nextImagesetCount = imagesetCounts[targetImageset] + 1;
-        setImagesetCounts({
-          ...imagesetCounts,
-          [targetImageset]: nextImagesetCount,
-        });
+        const nextImagesetCount = targetClient.fileCounts[targetImageset] + 1;
+        const newCounts = await updateFileCount(
+          host,
+          targetClient,
+          targetImageset,
+          nextImagesetCount
+        );
+
+        const updatedTargetClient = { ...targetClient };
+        updatedTargetClient.fileCounts = newCounts;
+        setTargetClient(updatedTargetClient);
 
         const nextLoaded = loaded + 1;
         setLoaded(nextLoaded);
@@ -202,7 +198,12 @@ export default function ImageOrder({ ...props }) {
     }
   };
 
-  const handleClick = async () => {};
+  const handleLoadClick = async () => {
+    // there is one circumstance whereby we should add another 10 empty slots to the order
+    // if the number of files displayed is equal to the number of files in storage
+    // if the number of files in storage is equal to the number of files displayed, then we just update state by spreading old array to a new one of 10 empty objects
+    // in order for this to work properly, fileCounts should be updated in the user db. Any time we actually upload a file to s3, we should also update the user's filecount for the active imageset
+  };
 
   const handleDeleteClick = async (index: number, filename: string) => {
     try {
@@ -225,11 +226,17 @@ export default function ImageOrder({ ...props }) {
         setOrderedImagesets(updatedImagesetOrder);
 
         // update imagesetCount
-        const nextImagesetCount = imagesetCounts[targetImageset] - 1;
-        setImagesetCounts({
-          ...imagesetCounts,
-          [targetImageset]: nextImagesetCount,
-        });
+        const nextImagesetCount = targetClient.fileCounts[targetImageset] - 1;
+        const newCounts = await updateFileCount(
+          host,
+          targetClient,
+          targetImageset,
+          nextImagesetCount
+        );
+
+        const updatedTargetClient = { ...targetClient };
+        updatedTargetClient.fileCounts = newCounts;
+        setTargetClient(updatedTargetClient);
 
         const nextLoaded = loaded - 1;
         setLoaded(nextLoaded);
@@ -255,7 +262,9 @@ export default function ImageOrder({ ...props }) {
 
           <ul className="flex gap-5 text-xl">
             <li>
-              <span className="text-rd">{imagesetCounts[targetImageset]}</span>{" "}
+              <span className="text-rd">
+                {targetClient.fileCounts[targetImageset]}
+              </span>{" "}
               FILES IN STORAGE
             </li>
 
@@ -327,7 +336,7 @@ export default function ImageOrder({ ...props }) {
           </div>
 
           <button
-            onClick={() => handleClick()}
+            onClick={() => handleLoadClick()}
             type="button"
             className="border border-solid border-red px-4 py-2 xl:hover:text-rd xl:focus:text-rd transition-colors mt-8 mb-5"
           >

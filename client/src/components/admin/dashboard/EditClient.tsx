@@ -18,8 +18,6 @@ export default function EditClient({ ...props }) {
   const [started, setStarted] = useState(false);
   const [spinner, setSpinner] = useState(false);
 
-  const [imagesetCounts, setImagesetCounts] = useState({});
-
   const [orderedImagesets, setOrderedImagesets] = useState({
     previews: Array(10).fill({}),
     full: Array(10).fill({}),
@@ -58,7 +56,6 @@ export default function EditClient({ ...props }) {
       const newCounts = await response.json();
 
       if (newCounts && (response.status === 200 || response.status === 304)) {
-        setImagesetCounts(newCounts);
         const nextTargetClient = { ...targetClient };
         nextTargetClient.fileCounts = newCounts;
         setTargetClient(nextTargetClient);
@@ -189,8 +186,6 @@ export default function EditClient({ ...props }) {
                 targetImageset={targetImageset}
                 orderedImagesets={orderedImagesets}
                 setOrderedImagesets={setOrderedImagesets}
-                imagesetCounts={imagesetCounts}
-                setImagesetCounts={setImagesetCounts}
                 spinner={spinner}
                 setSpinner={setSpinner}
               />
