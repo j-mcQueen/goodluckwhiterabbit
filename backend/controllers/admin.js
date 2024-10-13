@@ -192,6 +192,21 @@ exports.adminAddClient = [
   },
 ];
 
+exports.adminGetUserImagesetCount = async (req, res, next) => {
+  const verified = await verifyTokens(req, res);
+
+  if (verified) {
+    const imagesetFiles = await s3.send(
+      new ListObjectsV2Command({
+        Bucket: process.env.AWS_PRIMARY_BUCKET,
+        Prefix: `${req.params.id}/${req.params.imageset}/`,
+      })
+    );
+
+    return res.status(200).json(imagesetFiles.Contents.length);
+  }
+};
+
 exports.adminUpdateUserImagesetCount = async (req, res, next) => {
   const verified = await verifyTokens(req, res);
 

@@ -15,6 +15,7 @@ export default function EditClient({ ...props }) {
   } = props;
 
   const [targetImageset, setTargetImageset] = useState("");
+  const [renderCount, setRenderCount] = useState(0);
   const [started, setStarted] = useState(false);
   const [spinner, setSpinner] = useState(false);
 
@@ -23,9 +24,6 @@ export default function EditClient({ ...props }) {
     full: Array(10).fill({}),
     socials: Array(10).fill({}),
   });
-  // orderedImageset is contained within the dummy array inside clients
-
-  const [renderCount, setRenderCount] = useState(0);
 
   // TODO implement search function that will notify Kailey about duplicate files
   // TODO create button that takes Kailey to a page which allows her to "preview" what the client sees
@@ -40,14 +38,26 @@ export default function EditClient({ ...props }) {
       newTargetImageset,
       setNotice,
       0,
+      10,
       targetClient._id
     );
 
     try {
+      // const response = await fetch(
+      //   `${host}/admin/users/${targetClient._id}/updateFileCount/${newTargetImageset}/${data.count}`,
+      //   {
+      //     method: "POST",
+      //     headers: {
+      //       Accept: "application/json",
+      //       "Content-Type": "application/json",
+      //     },
+      //     credentials: "include",
+      //   }
+      // );
       const response = await fetch(
-        `${host}/admin/users/${targetClient._id}/updateFileCount/${newTargetImageset}/${data.count}`,
+        `${host}/admin/users/${targetClient._id}/${newTargetImageset}/getCount`,
         {
-          method: "POST",
+          method: "GET",
           headers: {
             Accept: "application/json",
             "Content-Type": "application/json",
@@ -59,7 +69,7 @@ export default function EditClient({ ...props }) {
 
       if (newCounts && (response.status === 200 || response.status === 304)) {
         const nextTargetClient = { ...targetClient };
-        nextTargetClient.fileCounts = newCounts;
+        nextTargetClient.fileCounts[newTargetImageset] = newCounts;
         setTargetClient(nextTargetClient);
 
         const nextClients = clients.map((client: { _id: string }) => {

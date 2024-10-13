@@ -6,6 +6,7 @@ const {
   adminDeleteUser,
   adminDeleteFile,
   adminUpdateUserImagesetCount,
+  adminGetUserImagesetCount,
   // adminGetUserImages,
   // adminAddImages,
   // adminPutImageOrder,
@@ -18,6 +19,7 @@ const upload = multer(); // enable form data to be unpacked
 
 // GET
 router.get("/users", adminGetClients);
+router.get("/users/:id/:imageset/getCount", adminGetUserImagesetCount);
 router.get("/users/:id/getFile/:imageset/:index", adminGetFileAndDelete);
 // router.get("/users/:id/getPresigns/:imageset", getImagesetPresigns);
 // POST
