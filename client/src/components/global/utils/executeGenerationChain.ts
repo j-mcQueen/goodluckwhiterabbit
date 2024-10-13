@@ -7,10 +7,12 @@ export const executeGenerationChain = async (
   targetImageset: string,
   setNotice: Dispatch<SetStateAction<object>>,
   counter: number,
+  endPoint: number,
   id: string | undefined
 ) => {
   const urls = await generateImagesetGetUrls(
     counter,
+    endPoint,
     targetImageset,
     setNotice,
     id

@@ -43,17 +43,6 @@ export default function EditClient({ ...props }) {
     );
 
     try {
-      // const response = await fetch(
-      //   `${host}/admin/users/${targetClient._id}/updateFileCount/${newTargetImageset}/${data.count}`,
-      //   {
-      //     method: "POST",
-      //     headers: {
-      //       Accept: "application/json",
-      //       "Content-Type": "application/json",
-      //     },
-      //     credentials: "include",
-      //   }
-      // );
       const response = await fetch(
         `${host}/admin/users/${targetClient._id}/${newTargetImageset}/getCount`,
         {

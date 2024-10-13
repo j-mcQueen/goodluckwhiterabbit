@@ -70,7 +70,8 @@ exports.generateGetPresigned = async (req, res, next) => {
       if (
         s3Objects.Contents[i].Key.includes(req.params.imageset) &&
         s3Objects.Contents[i].Key.includes(req.params.id) &&
-        Number(position[1]) >= Number(req.params.start) // this ensures we will always pick up from where we left off when a new batch has been requested
+        Number(position[1]) >= Number(req.params.start) && // this ensures we will always pick up from where we left off when a new batch has been requested
+        Number(position[1]) <= Number(req.params.end) // ensures "out-of-bounds" presigns aren't included
       ) {
         const cmd = new GetObjectCommand({
           Bucket: process.env.AWS_PRIMARY_BUCKET,

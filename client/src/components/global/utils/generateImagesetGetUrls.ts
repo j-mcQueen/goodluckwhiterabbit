@@ -2,6 +2,7 @@ import { Dispatch, SetStateAction } from "react";
 
 export const generateImagesetGetUrls = async (
   start: number,
+  end: number,
   activeImageset: string,
   setNotice: Dispatch<SetStateAction<object>>,
   userId: string | undefined
@@ -14,7 +15,7 @@ export const generateImagesetGetUrls = async (
   let presigns;
   try {
     const response = await fetch(
-      `${host}/users/${userId}/${activeImageset}/${start}`,
+      `${host}/users/${userId}/${activeImageset}/${start}/${end}`,
       {
         method: "GET",
         headers: {

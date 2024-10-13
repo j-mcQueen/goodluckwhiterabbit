@@ -4,6 +4,7 @@ import { updateFileCount } from "./utils/updateFileCounts";
 
 import Loading from "../../global/Loading";
 import Close from "../../../assets/media/icons/Close";
+import { executeGenerationChain } from "../../global/utils/executeGenerationChain";
 
 export default function ImageOrder({ ...props }) {
   const {
@@ -19,7 +20,7 @@ export default function ImageOrder({ ...props }) {
     orderedImagesets,
     setOrderedImagesets,
     spinner,
-    // setSpinner,
+    setSpinner,
   } = props;
 
   const headingText: headingTextType = {
@@ -202,10 +203,68 @@ export default function ImageOrder({ ...props }) {
   };
 
   const handleLoadClick = async () => {
-    // there is one circumstance whereby we should add another 10 empty slots to the order
-    // if the number of files displayed is equal to the number of files in storage
-    // if the number of files in storage is equal to the number of files displayed, then we just update state by spreading old array to a new one of 10 empty objects
-    // in order for this to work properly, fileCounts should be updated in the user db. Any time we actually upload a file to s3, we should also update the user's filecount for the active imageset
+    if (renderCount === targetClient.fileCounts[targetImageset]) {
+      const nextOrderedImagesets = {
+        ...orderedImagesets,
+        [targetImageset]: [
+          ...orderedImagesets[targetImageset],
+          ...Array(10).fill({}),
+        ],
+      };
+      return setOrderedImagesets(nextOrderedImagesets);
+    } else if (renderCount < targetClient.fileCounts[targetImageset]) {
+      setSpinner(true);
+
+      const imagesetLength = orderedImagesets[targetImageset].length;
+      const data = await executeGenerationChain(
+        orderedImagesets[targetImageset],
+        targetImageset,
+        setNotice,
+        imagesetLength,
+        imagesetLength + 10,
+        targetClient._id
+      );
+
+      const count = renderCount + data.count;
+      const response = await fetch(
+        `${host}/admin/users/${targetClient._id}/updateFileCount/${targetImageset}/${count}`,
+        {
+          method: "POST",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+        }
+      );
+      const newCounts = await response.json();
+
+      if (newCounts && (response.status === 200 || response.status === 304)) {
+        const nextTargetClient = { ...targetClient };
+        nextTargetClient.fileCounts[targetImageset] = newCounts[targetImageset];
+        setTargetClient(nextTargetClient);
+        console.log(nextTargetClient);
+
+        const nextClients = clients.map((client: { _id: string }) => {
+          return client._id === targetClient._id ? nextTargetClient : client;
+        });
+        setClients(nextClients);
+
+        const nextOrderedImagesets = {
+          ...orderedImagesets,
+          [targetImageset]: data.files,
+        };
+        setOrderedImagesets(nextOrderedImagesets);
+
+        const rendered = nextOrderedImagesets[targetImageset].filter(
+          (item: object | File) => item instanceof File
+        ).length;
+        setRenderCount(rendered);
+
+        setSpinner(false);
+        return;
+      }
+    }
   };
 
   const handleDeleteClick = async (index: number, filename: string) => {
