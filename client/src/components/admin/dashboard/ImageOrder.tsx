@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { updateFileCount } from "./utils/updateFileCounts";
-
-import Loading from "../../global/Loading";
-import Close from "../../../assets/media/icons/Close";
+import { handleDragStart } from "./utils/handleDragStart";
 import { executeGenerationChain } from "../../global/utils/executeGenerationChain";
+
+import Close from "../../../assets/media/icons/Close";
 
 export default function ImageOrder({ ...props }) {
   const {
@@ -17,46 +17,14 @@ export default function ImageOrder({ ...props }) {
     targetClient,
     setTargetClient,
     targetImageset,
-    orderedImagesets,
-    setOrderedImagesets,
-    spinner,
+    orderedImageset,
     setSpinner,
   } = props;
 
-  const headingText: headingTextType = {
-    previews: "PREVIEWS",
-    full: "GALLERY",
-    socials: "SOCIAL",
-  };
-
-  interface headingTextType {
-    previews: string;
-    full: string;
-    socials: string;
-  }
-
-  const [queuedImages, setQueuedImages] = useState(() => {
-    if (targetClient.queue !== undefined) {
-      return [...targetClient.queue[targetImageset]];
-    } else return [];
-  });
-
-  const handleDragStart = (
-    e: React.DragEvent<HTMLImageElement>,
-    file: File,
-    source: string,
-    index: number
-  ) => {
-    if (e.dataTransfer) {
-      e.dataTransfer.setData("text/uri", URL.createObjectURL(file));
-      e.dataTransfer.setData("text/plain", URL.createObjectURL(file));
-      e.dataTransfer.setData("text/index", String(index));
-      e.dataTransfer.setData("text/source", source);
-    }
-    return;
-  };
+  const [order, setOrder] = useState(orderedImageset);
 
   const handleDrop = async (
+    file: File,
     index: number,
     draggedIndex: number,
     source: string
@@ -64,10 +32,6 @@ export default function ImageOrder({ ...props }) {
     if (index === draggedIndex && source !== "queue") return; // user made a mistake
 
     // generate presigned URL for file upload
-    const file =
-      source === "queue"
-        ? queuedImages[draggedIndex]
-        : orderedImagesets[targetImageset].files[draggedIndex];
     let presigned = "";
     try {
       // generate the url used to add the file to S3
@@ -164,9 +128,9 @@ export default function ImageOrder({ ...props }) {
 
       if (response.status === 200 || response.status === 304) {
         // update images locked into order
-        const updatedImagesetOrder = { ...orderedImagesets };
-        updatedImagesetOrder[targetImageset][index] = file;
-        setOrderedImagesets(updatedImagesetOrder);
+        const updatedOrder = [...order];
+        updatedOrder[index] = file;
+        setOrder(updatedOrder);
 
         const nextImagesetCount = targetClient.fileCounts[targetImageset] + 1;
         const newCounts = await updateFileCount(
@@ -204,20 +168,14 @@ export default function ImageOrder({ ...props }) {
 
   const handleLoadClick = async () => {
     if (renderCount === targetClient.fileCounts[targetImageset]) {
-      const nextOrderedImagesets = {
-        ...orderedImagesets,
-        [targetImageset]: [
-          ...orderedImagesets[targetImageset],
-          ...Array(10).fill({}),
-        ],
-      };
-      return setOrderedImagesets(nextOrderedImagesets);
+      const nextOrder = [...order, ...Array(10).fill({})];
+      return setOrder(nextOrder);
     } else if (renderCount < targetClient.fileCounts[targetImageset]) {
       setSpinner(true);
 
-      const imagesetLength = orderedImagesets[targetImageset].length;
+      const imagesetLength = order.length;
       const data = await executeGenerationChain(
-        orderedImagesets[targetImageset],
+        order,
         targetImageset,
         setNotice,
         imagesetLength,
@@ -243,20 +201,16 @@ export default function ImageOrder({ ...props }) {
         const nextTargetClient = { ...targetClient };
         nextTargetClient.fileCounts[targetImageset] = newCounts[targetImageset];
         setTargetClient(nextTargetClient);
-        console.log(nextTargetClient);
 
         const nextClients = clients.map((client: { _id: string }) => {
           return client._id === targetClient._id ? nextTargetClient : client;
         });
         setClients(nextClients);
 
-        const nextOrderedImagesets = {
-          ...orderedImagesets,
-          [targetImageset]: data.files,
-        };
-        setOrderedImagesets(nextOrderedImagesets);
+        const nextOrder = data.files;
+        setOrder(nextOrder);
 
-        const rendered = nextOrderedImagesets[targetImageset].filter(
+        const rendered = nextOrder.filter(
           (item: object | File) => item instanceof File
         ).length;
         setRenderCount(rendered);
@@ -283,9 +237,9 @@ export default function ImageOrder({ ...props }) {
       const data = await response.json();
 
       if (data && (response.status === 200 || response.status === 304)) {
-        const updatedImagesetOrder = { ...orderedImagesets };
-        updatedImagesetOrder[targetImageset][index] = {};
-        setOrderedImagesets(updatedImagesetOrder);
+        const updatedOrder = [...order];
+        updatedOrder[index] = {};
+        setOrder(updatedOrder);
 
         // update imagesetCount
         const nextImagesetCount = targetClient.fileCounts[targetImageset] - 1;
@@ -322,84 +276,44 @@ export default function ImageOrder({ ...props }) {
   return (
     <div className="flex items-start">
       <div className="text-white p-3 min-w-[40vw] flex flex-col items-center justify-center overflow-scroll">
-        <header className="flex justify-between items-center w-full py-5 px-5">
-          <h2 className="xl:text-2xl tracking-tight">
-            {headingText[targetImageset as keyof headingTextType]}
-          </h2>
-
-          <ul className="flex gap-5 text-xl">
-            <li>
-              <span className="text-rd">
-                {targetClient.fileCounts[targetImageset]}
-              </span>{" "}
-              FILES IN STORAGE
-            </li>
-
-            <li>
-              <span className="text-rd">{renderCount}</span> FILES DISPLAYED
-            </li>
-          </ul>
-
-          <div className="flex items-center gap-5">
-            <label className="border border-solid border-white flex items-center px-3 py-2 transition-colors xl:hover:text-rd xl:focus:text-rd xl:hover:cursor-pointer">
-              {spinner ? <Loading /> : "ADD FILES"}
-              <input
-                type="file"
-                name="additions"
-                onChange={(e) => {
-                  if (e.target.files) {
-                    setQueuedImages([...queuedImages, ...e.target.files]);
-                  }
-                }}
-                disabled={spinner}
-                className="opacity-0 w-[1px]"
-                accept="image/*"
-                multiple
-              />
-            </label>
-          </div>
-        </header>
-
         <div className="flex flex-col items-center ">
           <div className="flex flex-wrap justify-center max-w-[60dvw] gap-5 px-5 overflow-scroll relative">
-            {orderedImagesets[targetImageset].map(
-              (file: File | object, index: number) => {
-                return (
-                  <div key={uuidv4()}>
-                    {file instanceof File ? (
-                      <button
-                        onClick={() => handleDeleteClick(index, file.name)}
-                        className="absolute bg-black m-1 border border-solid border-rd p-1"
-                      >
-                        <Close className={"w-4 h-4"} customColor={"#FFF"} />
-                      </button>
-                    ) : null}
+            {order.map((file: File | object, index: number) => {
+              return (
+                <div key={uuidv4()}>
+                  {file instanceof File ? (
+                    <button
+                      onClick={() => handleDeleteClick(index, file.name)}
+                      className="absolute bg-black m-1 border border-solid border-rd p-1"
+                    >
+                      <Close className={"w-4 h-4"} customColor={"#FFF"} />
+                    </button>
+                  ) : null}
 
-                    <img
-                      draggable={true}
-                      onDragStart={(e) =>
-                        file instanceof File
-                          ? handleDragStart(e, file, "order", index)
-                          : null
-                      }
-                      onDrop={(e) => {
-                        const draggedIndex = Number(
-                          e.dataTransfer.getData("text/index")
-                        );
-                        const source = e.dataTransfer.getData("text/source");
+                  <img
+                    loading="lazy"
+                    draggable={true}
+                    onDragStart={(e) =>
+                      file instanceof File
+                        ? handleDragStart(e, file, "order", index)
+                        : null
+                    }
+                    onDrop={(e) => {
+                      const draggedIndex = Number(
+                        e.dataTransfer.getData("text/index")
+                      );
+                      const source = e.dataTransfer.getData("text/source");
+                      const file = e.dataTransfer.files[0];
 
-                        handleDrop(index, draggedIndex, source);
-                      }}
-                      onDragOver={(e) => e.preventDefault()}
-                      className={`${file instanceof File === false ? "h-[300px] w-[200px]" : "max-h-[300px]"} border border-solid`}
-                      src={
-                        file instanceof File ? URL.createObjectURL(file) : ""
-                      }
-                    />
-                  </div>
-                );
-              }
-            )}
+                      handleDrop(file, index, draggedIndex, source);
+                    }}
+                    onDragOver={(e) => e.preventDefault()}
+                    className={`${file instanceof File === false ? "h-[300px] w-[200px]" : "max-h-[300px]"} border border-solid`}
+                    src={file instanceof File ? URL.createObjectURL(file) : ""}
+                  />
+                </div>
+              );
+            })}
           </div>
 
           <button
@@ -409,23 +323,6 @@ export default function ImageOrder({ ...props }) {
           >
             LOAD NEXT BATCH
           </button>
-        </div>
-      </div>
-
-      <div className="border-l-[1px] border-solid">
-        <div className="grid grid-cols-3 gap-5 overflow-scroll p-3">
-          {queuedImages.map((file: File, index: number) => {
-            return (
-              <img
-                draggable={true}
-                onDragStart={(e) => handleDragStart(e, file, "queue", index)}
-                key={uuidv4()}
-                src={file instanceof File ? URL.createObjectURL(file) : ""}
-                alt=""
-                className="opacity-100 max-w-[15dvh] xl:hover:cursor-pointer"
-              />
-            );
-          })}
         </div>
       </div>
     </div>

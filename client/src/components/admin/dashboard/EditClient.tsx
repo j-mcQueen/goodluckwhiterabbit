@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { executeGenerationChain } from "../../global/utils/executeGenerationChain";
-import ImageOrder from "./ImageOrder";
+import ImageQueue from "./ImageQueue";
+import OrderContainer from "./OrderContainer";
 
 export default function EditClient({ ...props }) {
   const {
@@ -15,7 +16,6 @@ export default function EditClient({ ...props }) {
   } = props;
 
   const [targetImageset, setTargetImageset] = useState("");
-  const [renderCount, setRenderCount] = useState(0);
   const [started, setStarted] = useState(false);
   const [spinner, setSpinner] = useState(false);
 
@@ -23,6 +23,12 @@ export default function EditClient({ ...props }) {
     previews: Array(10).fill({}),
     full: Array(10).fill({}),
     socials: Array(10).fill({}),
+  });
+
+  const [queuedImages, setQueuedImages] = useState(() => {
+    if (targetClient.queue !== undefined) {
+      return [...targetClient.queue[targetImageset]];
+    } else return [];
   });
 
   // TODO implement search function that will notify Kailey about duplicate files
@@ -80,12 +86,6 @@ export default function EditClient({ ...props }) {
       [newTargetImageset]: data.files,
     };
     setOrderedImagesets(nextOrderedImagesets);
-
-    const rendered = nextOrderedImagesets[
-      newTargetImageset as keyof typeof nextOrderedImagesets
-    ].filter((item: object | File) => item instanceof File).length;
-    setRenderCount(rendered);
-
     setSpinner(false);
     return;
   };
@@ -190,23 +190,28 @@ export default function EditClient({ ...props }) {
               initial={{ opacity: 0, translateY: -25 }}
               animate={{ opacity: 1, translateY: 0 }}
               transition={{ duration: 0.25 }}
-              className="border border-solid border-white"
+              className="border border-solid border-white flex"
             >
-              <ImageOrder
+              <OrderContainer
                 host={host}
                 clients={clients}
-                setClients={setClients}
-                renderCount={renderCount}
-                setRenderCount={setRenderCount}
-                setNotice={setNotice}
+                queuedImages={queuedImages}
                 targetClient={targetClient}
-                setTargetClient={setTargetClient}
                 targetImageset={targetImageset}
-                orderedImagesets={orderedImagesets}
-                setOrderedImagesets={setOrderedImagesets}
+                setClients={setClients}
+                setNotice={setNotice}
+                setTargetClient={setTargetClient}
+                orderedImageset={
+                  orderedImagesets[
+                    targetImageset as keyof typeof orderedImagesets
+                  ]
+                }
+                setQueuedImages={setQueuedImages}
                 spinner={spinner}
                 setSpinner={setSpinner}
               />
+
+              <ImageQueue />
             </motion.div>
           )}
         </AnimatePresence>

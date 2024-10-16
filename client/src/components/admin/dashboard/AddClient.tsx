@@ -2,24 +2,12 @@ import { FormEvent } from "react";
 import { useState } from "react";
 import PaneHeader from "./PaneHeader";
 
-import Add from "../../../assets/media/icons/Add";
 import Loading from "../../global/Loading";
 
 export default function AddClient({ ...props }) {
-  interface filesType {
-    previews: FileList | null;
-    full: FileList | null;
-    socials: FileList | null;
-  }
-
   const [inputValues, setInputValues] = useState({
     clientname: "",
     clientemail: "",
-  });
-  const [selectedFiles, setSelectedFiles] = useState<filesType>({
-    previews: null,
-    full: null,
-    socials: null,
   });
   const [errors, setErrors] = useState({
     takenEmail: { state: false, status: 200, message: "" },
@@ -65,11 +53,6 @@ export default function AddClient({ ...props }) {
                 code: data.code,
                 _id: data._id,
                 fileCounts: data.fileCounts,
-                queue: {
-                  previews: selectedFiles.previews,
-                  full: selectedFiles.full,
-                  socials: selectedFiles.socials,
-                },
                 added: data.added,
               },
             ]);
@@ -161,101 +144,6 @@ export default function AddClient({ ...props }) {
             <p className="text-rd pt-3">{errors.takenEmail.message}</p>
           ) : null}
         </label>
-
-        <div className="flex items-center justify-between pt-5">
-          <div className="flex gap-3 items-center">
-            <p>UPLOAD PREVIEWS:</p>
-
-            <p
-              className={`${selectedFiles.previews === null ? "text-white" : "text-rd"}`}
-            >
-              {selectedFiles.previews === null
-                ? 0
-                : [...selectedFiles.previews].length}
-            </p>
-          </div>
-
-          <div className="flex gap-2">
-            <label className="flex items-center justify-center border border-solid border-white xl:hover:border-rd focus:border-rd outline-none cursor-pointer w-10 h-10 transition-colors">
-              <input
-                type="file"
-                name={"previews"}
-                onChange={(e) => {
-                  setSelectedFiles({
-                    ...selectedFiles,
-                    previews: e.target.files,
-                  });
-                }}
-                className="opacity-0 w-[1px]"
-                accept="image/*"
-                multiple
-              />
-              <Add className="w-4 h-4" />
-            </label>
-          </div>
-        </div>
-
-        <div className="flex items-center justify-between">
-          <div className="flex gap-3 items-center">
-            <p>UPLOAD FULL GALLERY:</p>
-            <p
-              className={`${selectedFiles.full === null ? "text-white" : "text-rd"}`}
-            >
-              {selectedFiles.full === null ? 0 : [...selectedFiles.full].length}
-            </p>
-          </div>
-
-          <div className="flex gap-2">
-            <label className="flex items-center justify-center border border-solid border-white xl:hover:border-rd focus:border-rd outline-none cursor-pointer w-10 h-10 transition-colors">
-              <input
-                type="file"
-                name={"full"}
-                onChange={(e) => {
-                  setSelectedFiles({
-                    ...selectedFiles,
-                    full: e.target.files,
-                  });
-                }}
-                className="opacity-0 w-[1px]"
-                accept="image/*"
-                multiple
-              />
-              <Add className="w-4 h-4" />
-            </label>
-          </div>
-        </div>
-
-        <div className="flex items-center justify-between">
-          <div className="flex gap-3 items-center">
-            <p>UPLOAD SOCIAL MEDIA CROPS:</p>
-            <p
-              className={`${selectedFiles.socials === null ? "text-white" : "text-rd"}`}
-            >
-              {selectedFiles.socials === null
-                ? 0
-                : [...selectedFiles.socials].length}
-            </p>
-          </div>
-
-          <div className="flex gap-2">
-            <label className="flex items-center justify-center border border-solid border-white xl:hover:border-rd focus:border-rd outline-none cursor-pointer w-10 h-10 transition-colors">
-              <input
-                type="file"
-                name={"socials"}
-                onChange={(e) => {
-                  setSelectedFiles({
-                    ...selectedFiles,
-                    socials: e.target.files,
-                  });
-                }}
-                className="opacity-0 w-[1px]"
-                accept="image/*"
-                multiple
-              />
-              <Add className="w-4 h-4" />
-            </label>
-          </div>
-        </div>
 
         <div className="text-center">
           <button

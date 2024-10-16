@@ -203,7 +203,8 @@ exports.adminGetUserImagesetCount = async (req, res, next) => {
       })
     );
 
-    return res.status(200).json(imagesetFiles.Contents.length);
+    const count = imagesetFiles.Contents ? imagesetFiles.Contents.length : 0;
+    return res.status(200).json(count);
   }
 };
 
