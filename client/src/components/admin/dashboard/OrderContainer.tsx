@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import FileInfo from "./FileInfo";
 import ImageOrder from "./ImageOrder";
 
@@ -6,7 +6,7 @@ const OrderContainer = ({ ...props }) => {
   const {
     clients,
     host,
-    orderedImageset,
+    orderedImagesets,
     setClients,
     setNotice,
     setSpinner,
@@ -16,9 +16,15 @@ const OrderContainer = ({ ...props }) => {
     targetImageset,
   } = props;
 
-  const [renderCount, setRenderCount] = useState(
-    orderedImageset.filter((item: object | File) => item instanceof File).length
-  );
+  const [renderCount, setRenderCount] = useState(0);
+
+  useEffect(() => {
+    setRenderCount(
+      orderedImagesets[targetImageset].filter(
+        (item: object | File) => item instanceof File
+      ).length
+    );
+  }, [orderedImagesets, targetImageset]);
 
   return (
     <div className="flex flex-col">
@@ -39,9 +45,7 @@ const OrderContainer = ({ ...props }) => {
         targetClient={targetClient}
         setTargetClient={setTargetClient}
         targetImageset={targetImageset}
-        orderedImageset={orderedImageset}
-        // spinner={spinner}
-        // queuedImages={queuedImages}
+        orderedImageset={orderedImagesets[targetImageset]}
         setSpinner={setSpinner}
       />
     </div>

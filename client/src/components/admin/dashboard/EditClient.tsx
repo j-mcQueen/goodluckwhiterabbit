@@ -201,11 +201,7 @@ export default function EditClient({ ...props }) {
                 setClients={setClients}
                 setNotice={setNotice}
                 setTargetClient={setTargetClient}
-                orderedImageset={
-                  orderedImagesets[
-                    targetImageset as keyof typeof orderedImagesets
-                  ]
-                }
+                orderedImagesets={orderedImagesets}
                 setQueuedImages={setQueuedImages}
                 spinner={spinner}
                 setSpinner={setSpinner}
