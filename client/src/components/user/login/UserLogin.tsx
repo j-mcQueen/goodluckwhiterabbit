@@ -1,16 +1,15 @@
 import { FormEvent, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { determineHost as host } from "../../global/utils/determineHost";
 import Rabbit from "../../global/forms/Rabbit";
 
 export default function UserLogin() {
+  // TODO on successful login, indicate to user and fade out login screen, then navigate
+  // upon navigation, fade-in menu options that allow a client to choose which gallery they want to see
   useEffect(() => {
     document.title = "LOGIN — GOOD LUCK WHITE RABBIT";
   }, []);
   const navigate = useNavigate();
-  const host =
-    import.meta.env.VITE_ENV === "production"
-      ? import.meta.env.VITE_API_URL
-      : "http://localhost:3000/api";
 
   const [authError, setAuthError] = useState({ active: false, message: "" });
 

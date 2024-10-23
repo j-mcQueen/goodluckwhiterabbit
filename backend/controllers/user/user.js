@@ -91,7 +91,11 @@ exports.getUser = async (req, res, next) => {
       else
         return res
           .status(200)
-          .json({ _id: user._id, name: user.name, files: user.files });
+          .json({
+            _id: user._id,
+            name: user.name,
+            fileCounts: user.fileCounts,
+          });
     } catch (error) {
       return res.status(500).json({
         status: true,

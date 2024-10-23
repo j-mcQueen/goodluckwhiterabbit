@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { userDashboardHeaderItems } from "./data/header/items";
-import { determineHost } from "../../global/utils/determineHost";
+import { determineHost as host } from "../../global/utils/determineHost";
+import SelectGallery from "./SelectGallery";
+import { motion } from "framer-motion";
 
 import Header from "../../global/header/Header";
 import MobileHeader from "../../global/header/mobile/Header";
@@ -24,6 +26,7 @@ export default function UserDashboard() {
     message: "",
     logout: { status: false, path: null },
   });
+  const [initialized, setInitialized] = useState(false);
   const [activated, setActivated] = useState({
     previews: false,
     full: false,
@@ -37,7 +40,6 @@ export default function UserDashboard() {
   });
 
   const [imagesetCounts, setImagesetCounts] = useState({});
-
   const [userRetrieved, setUserRetrieved] = useState(false);
 
   useEffect(() => {
@@ -67,7 +69,6 @@ export default function UserDashboard() {
     const getUser = async () => {
       setSpinner(true);
 
-      const host = determineHost();
       const url = document.location.href;
       const regex = /\/user\/([a-zA-Z0-9]+)\//;
       const id = url.match(regex)![1];
@@ -119,11 +120,23 @@ export default function UserDashboard() {
     // in order for this to work properly, when an admin adds clients, the count of files inside the user data should contain the number of files actually uploaded rather than how many files were first added at the start
   }, []);
 
-  return (
-    <div className="w-outer h-outer overflow-scroll">
+  const handleSelect = () => {};
+
+  return !initialized ? (
+    <SelectGallery
+      initialized={initialized}
+      handleSelect={handleSelect}
+      setInitialized={setInitialized}
+    />
+  ) : (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      className="w-outer h-outer overflow-scroll"
+    >
       {mobile ? (
         <MobileHeader
-          host={determineHost()}
+          host={host}
           logout={true}
           data={userDashboardHeaderItems}
           activeTab={activeTab}
@@ -131,7 +144,7 @@ export default function UserDashboard() {
         />
       ) : (
         <Header
-          host={determineHost()}
+          host={host}
           logout={true}
           data={userDashboardHeaderItems}
           activeTab={activeTab}
@@ -139,18 +152,18 @@ export default function UserDashboard() {
         />
       )}
 
-      {notice.status === true ? (
+      {/* {notice.status === true ? (
         <Notice notice={notice} setNotice={setNotice} />
-      ) : null}
+      ) : null} */}
 
-      {spinner === true ? (
+      {/* {spinner === true ? (
         // user is being retrieved, so indicate to the user that an action is progress
         <div className="text-rd text-center text-xl pt-5">
           <Loading />
         </div>
-      ) : null}
+      ) : null} */}
 
-      {userRetrieved === true &&
+      {/* {userRetrieved === true &&
       activated[activeImageset as keyof typeof activated] === false ? (
         // data has been retrieved, but user has not clicked the enter button yet
         <Splash
@@ -164,9 +177,9 @@ export default function UserDashboard() {
           setNotice={setNotice}
           activeImageset={activeImageset}
         />
-      ) : null}
+      ) : null} */}
 
-      {userRetrieved === true &&
+      {/* {userRetrieved === true &&
       activated[activeImageset as keyof typeof activated] === true ? (
         // data has been retrieved and the user has performed the action to see their images
         <main>
@@ -179,7 +192,7 @@ export default function UserDashboard() {
             setNotice={setNotice}
           />
         </main>
-      ) : null}
-    </div>
+      ) : null} */}
+    </motion.div>
   );
 }
