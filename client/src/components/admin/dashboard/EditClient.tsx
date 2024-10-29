@@ -116,7 +116,7 @@ export default function EditClient({ ...props }) {
                 transition={{ duration: 0.25 }}
                 className="pb-5"
               >
-                CHOOSEN AN IMAGE SET TO WORK WITH:
+                CHOOSE AN IMAGE SET TO WORK WITH:
               </motion.h2>
             )}
           </AnimatePresence>

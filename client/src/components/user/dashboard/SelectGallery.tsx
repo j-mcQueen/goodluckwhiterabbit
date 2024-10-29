@@ -1,7 +1,14 @@
 import { AnimatePresence, motion } from "framer-motion";
 
 const SelectGallery = ({ ...props }) => {
-  const { initialized, setInitialized } = props;
+  const { initialized, handleSelect, user } = props;
+
+  const buttonVariants = {
+    populated:
+      "border border-solid border-white py-2 px-3 xl:hover:bg-rd focus:bg-red focus:outline-none transition-all",
+    empty:
+      "border border-solid border-white py-2 px-3 relative line-through text-black bg-white",
+  };
 
   return (
     <AnimatePresence>
@@ -17,28 +24,45 @@ const SelectGallery = ({ ...props }) => {
                 only one click away
               </h1>
 
-              <p>SELECT THE SET OF IMAGES YOU WANT TO VIEW:</p>
+              <p className="pt-4">SELECT THE SET OF IMAGES YOU WANT TO VIEW:</p>
             </hgroup>
 
             <div className="flex gap-5">
               <button
+                disabled={user.fileCounts.previews === 0}
                 type="button"
-                className="border border-solid border-white py-2 px-3 xl:hover:bg-rd focus:bg-red focus:outline-none transition-all"
-                onClick={() => setInitialized(true)}
+                className={
+                  user.fileCounts.previews === 0
+                    ? buttonVariants["empty"]
+                    : buttonVariants["populated"]
+                }
+                onClick={() => handleSelect("socials")}
               >
                 PREVIEWS
               </button>
 
               <button
+                disabled={user.fileCounts.full === 0}
                 type="button"
-                className="border border-solid border-white py-2 px-3 xl:hover:bg-rd focus:bg-red focus:outline-none transition-all"
+                className={
+                  user.fileCounts.full === 0
+                    ? buttonVariants["empty"]
+                    : buttonVariants["populated"]
+                }
+                onClick={() => handleSelect("full")}
               >
                 GALLERY
               </button>
 
               <button
+                disabled={user.fileCounts.socials === 0}
                 type="button"
-                className="border border-solid border-white py-2 px-3 xl:hover:bg-rd focus:bg-red focus:outline-none transition-all"
+                className={
+                  user.fileCounts.socials === 0
+                    ? buttonVariants["empty"]
+                    : buttonVariants["populated"]
+                }
+                onClick={() => handleSelect("socials")}
               >
                 SOCIALS
               </button>
