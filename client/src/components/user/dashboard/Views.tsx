@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { handleDownload } from "./utils/handleDownload";
 import { createZip } from "./utils/createZip";
 import { executeGenerationChain } from "../../global/utils/executeGenerationChain";
@@ -6,10 +6,18 @@ import { executeGenerationChain } from "../../global/utils/executeGenerationChai
 import StarFilled from "../../../assets/media/icons/StarFilled";
 import Carousel from "./views/Carousel";
 import Grid from "./views/Grid";
+import Loading from "../../global/Loading";
 
 export default function Views({ ...props }) {
-  const { user, images, imageset, setImages, activeImageset, setNotice } =
-    props;
+  const {
+    user,
+    images,
+    imageset,
+    setImages,
+    activeImageset,
+    setNotice,
+    spinner,
+  } = props;
   const [favourites, setFavourites] = useState([]);
   const [loaded, setLoaded] = useState(imageset.length);
   const [disabled, setDisabled] = useState(false);
@@ -31,15 +39,21 @@ export default function Views({ ...props }) {
     setDisabled(false);
   };
 
+  useEffect(() => {
+    setLoaded(imageset.length);
+  }, [imageset]);
+
   // TODO create component which displays if the user clicks a header item that has no files yet
 
   return (
     <>
-      <div>
+      <div className="flex flex-col">
         <div className="flex items-center justify-between">
           <h1 className="text-white xl:text-2xl py-5 max-w-[240px] pl-3">
             {user.name.toUpperCase()}
           </h1>
+
+          {spinner ? <Loading /> : null}
         </div>
 
         <div className="text-white flex flex-col gap-5 items-start pl-3">
@@ -75,16 +89,27 @@ export default function Views({ ...props }) {
           >
             DOWNLOAD: <StarFilled className="w-5 h-5" red={true} />
           </button>
-        </div>
 
-        <div>
-          <p>
-            LOADED: {loaded} / {user.fileCounts[activeImageset]}
-          </p>
-
-          <button type="button" disabled={disabled} onClick={handleClick}>
+          <button
+            type="button"
+            disabled={disabled}
+            onClick={handleClick}
+            className="text-white border border-solid text-lg py-2 px-3 xl:hover:border-rd xl:focus:border-rd transition-colors"
+          >
             LOAD MORE
           </button>
+
+          <p className="text-lg">
+            LOADED: {loaded} / {user.fileCounts[activeImageset]}
+          </p>
+        </div>
+
+        <div className="text-white"></div>
+      </div>
+
+      <div className="absolute bottom-[25px] left-[25px] z-10 bg-black">
+        <div className="text-white border border-solid border-white py-2 px-3">
+          TEST BOX
         </div>
       </div>
 
