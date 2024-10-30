@@ -6,7 +6,7 @@ import Image from "../Image";
 import ActionBar from "../ActionBar";
 
 export default function Carousel({ ...props }) {
-  const { favourites, setFavourites, images, activeImageset } = props;
+  const { favourites, setFavourites, imageset } = props;
   const [activeImage, setActiveImage] = useState(0);
 
   return (
@@ -23,8 +23,8 @@ export default function Carousel({ ...props }) {
         <div className="relative flex flex-col basis-[80dvw] items-center overflow-hidden">
           <div className="flex items-center gap-5 text-white py-20">
             <ActionBar
-              images={images[activeImageset]}
-              activeImage={images[activeImageset].files[activeImage]}
+              imageset={imageset}
+              activeImage={imageset[activeImage]}
               favourites={favourites}
               setFavourites={setFavourites}
               carousel={true}
@@ -32,14 +32,14 @@ export default function Carousel({ ...props }) {
           </div>
 
           <Image
-            activeImage={images[activeImageset].files[activeImage]}
+            activeImage={imageset[activeImage]}
             favourites={favourites}
             setFavourites={setFavourites}
             carousel={true}
           />
         </div>
 
-        {activeImage !== images.files.length - 1 ? (
+        {activeImage !== imageset.length - 1 ? (
           <button type="button" onClick={() => setActiveImage(activeImage + 1)}>
             <Next className="w-5 h-5" />
           </button>

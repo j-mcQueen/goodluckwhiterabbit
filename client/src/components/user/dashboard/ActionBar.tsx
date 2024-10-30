@@ -5,7 +5,7 @@ import Star from "../../../assets/media/icons/Star";
 import StarFilled from "../../../assets/media/icons/StarFilled";
 
 export default function ActionBar({ ...props }) {
-  const { images, activeImage, favourites, setFavourites, carousel } = props;
+  const { imageset, activeImage, favourites, setFavourites, carousel } = props;
 
   const handleToggle = () => {
     if (!favourites.includes(activeImage)) {
@@ -38,8 +38,8 @@ export default function ActionBar({ ...props }) {
 
       {carousel ? (
         <p className="text-2xl">
-          {numberCount(images.indexOf(activeImage) + 1)} /{" "}
-          {numberCount(images.length)}
+          {numberCount(imageset.indexOf(activeImage) + 1)} /{" "}
+          {numberCount(imageset.length)}
         </p>
       ) : null}
 

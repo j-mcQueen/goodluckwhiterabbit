@@ -4,7 +4,13 @@ export const generateImagesetGetUrls = async (
   start: number,
   end: number,
   activeImageset: string,
-  setNotice: Dispatch<SetStateAction<object>>,
+  setNotice: Dispatch<
+    SetStateAction<{
+      status: boolean;
+      message: string;
+      logout: { status: boolean; path: string | null };
+    }>
+  >,
   userId: string | undefined
 ) => {
   const host =

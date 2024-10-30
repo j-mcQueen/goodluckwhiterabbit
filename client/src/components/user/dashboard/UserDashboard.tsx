@@ -1,21 +1,23 @@
 import { useEffect, useState } from "react";
 import { userDashboardHeaderItems } from "./data/header/items";
 import { determineHost as host } from "../../global/utils/determineHost";
-import SelectGallery from "./SelectGallery";
+import { executeGenerationChain } from "../../global/utils/executeGenerationChain";
 import { motion } from "framer-motion";
 
+import SelectGallery from "./SelectGallery";
 import Header from "../../global/header/Header";
 import MobileHeader from "../../global/header/mobile/Header";
 import Views from "./Views";
-import Loading from "../../global/Loading";
-import Splash from "./Splash";
 import Notice from "../../admin/dashboard/modals/Notice";
 
 export default function UserDashboard() {
   const mobile = window.matchMedia("(max-width: 1080px)").matches;
-  const [user, setUser] = useState({});
+  const [user, setUser] = useState({
+    _id: "",
+    fileCounts: { previews: 0, full: 0, socials: 0 },
+  });
   const [activeTab, setActiveTab] = useState(0);
-  const [activeImageset, setActiveImageset] = useState("previews");
+  const [activeImageset, setActiveImageset] = useState("");
   const [spinner, setSpinner] = useState(false);
   const [notice, setNotice] = useState<{
     status: boolean;
@@ -27,20 +29,12 @@ export default function UserDashboard() {
     logout: { status: false, path: null },
   });
   const [initialized, setInitialized] = useState(false);
-  const [activated, setActivated] = useState({
-    previews: false,
-    full: false,
-    socials: false,
-  });
 
   const [images, setImages] = useState({
     previews: [],
     full: [],
     socials: [],
   });
-
-  const [imagesetCounts, setImagesetCounts] = useState({});
-  const [userRetrieved, setUserRetrieved] = useState(false);
 
   useEffect(() => {
     document.title = "CLIENT GALLERIES — GOOD LUCK WHITE RABBIT";
@@ -50,17 +44,14 @@ export default function UserDashboard() {
     switch (activeTab) {
       case 0:
         setActiveImageset("previews");
-        setActivated({ previews: true, full: false, socials: false });
         break;
 
       case 1:
         setActiveImageset("full");
-        setActivated({ previews: false, full: true, socials: false });
         break;
 
       case 2:
         setActiveImageset("socials");
-        setActivated({ previews: false, full: false, socials: true });
         break;
     }
   }, [activeTab]);
@@ -88,7 +79,6 @@ export default function UserDashboard() {
           switch (response.status) {
             case 200:
             case 304:
-              setUserRetrieved(true);
               setUser(data);
               break;
 
@@ -120,13 +110,27 @@ export default function UserDashboard() {
     // in order for this to work properly, when an admin adds clients, the count of files inside the user data should contain the number of files actually uploaded rather than how many files were first added at the start
   }, []);
 
-  const handleSelect = () => {};
+  const handleSelect = async (targetImageset: string) => {
+    setInitialized(true);
+    setActiveImageset(targetImageset);
+    setSpinner(true);
+
+    const data = await executeGenerationChain(
+      Array(10).fill({}),
+      targetImageset,
+      setNotice,
+      0,
+      10,
+      user._id
+    );
+    setImages({ ...images, [targetImageset]: data.files });
+  };
 
   return !initialized ? (
     <SelectGallery
-      initialized={initialized}
       handleSelect={handleSelect}
-      setInitialized={setInitialized}
+      initialized={initialized}
+      user={user}
     />
   ) : (
     <motion.div
@@ -152,9 +156,22 @@ export default function UserDashboard() {
         />
       )}
 
-      {/* {notice.status === true ? (
+      <main>
+        <Views
+          activeImageset={activeImageset}
+          images={images}
+          imageset={images[activeImageset as keyof typeof images]}
+          setImages={setImages}
+          setNotice={setNotice}
+          setSpinner={setSpinner}
+          spinner={spinner}
+          user={user}
+        />
+      </main>
+
+      {notice.status === true ? (
         <Notice notice={notice} setNotice={setNotice} />
-      ) : null} */}
+      ) : null}
 
       {/* {spinner === true ? (
         // user is being retrieved, so indicate to the user that an action is progress

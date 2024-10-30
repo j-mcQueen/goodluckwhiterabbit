@@ -36,7 +36,7 @@ const SelectGallery = ({ ...props }) => {
                     ? buttonVariants["empty"]
                     : buttonVariants["populated"]
                 }
-                onClick={() => handleSelect("socials")}
+                onClick={() => handleSelect("previews")}
               >
                 PREVIEWS
               </button>
