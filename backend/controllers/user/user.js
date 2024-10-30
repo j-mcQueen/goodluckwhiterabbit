@@ -25,7 +25,7 @@ exports.login = [
 
     if (!errors.isEmpty()) {
       // there are backend validation errors
-      return res.status(401).json({ errors: errors.array() });
+      return res.status(401).json({ status: 401, errors: errors.array() });
     }
     next();
   },
@@ -89,13 +89,11 @@ exports.getUser = async (req, res, next) => {
       const user = await User.findById({ _id: req.params.id }).exec();
       if (!user) throw new Error("500");
       else
-        return res
-          .status(200)
-          .json({
-            _id: user._id,
-            name: user.name,
-            fileCounts: user.fileCounts,
-          });
+        return res.status(200).json({
+          _id: user._id,
+          name: user.name,
+          fileCounts: user.fileCounts,
+        });
     } catch (error) {
       return res.status(500).json({
         status: true,

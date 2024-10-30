@@ -4,8 +4,6 @@ import { determineHost as host } from "../../global/utils/determineHost";
 import Rabbit from "../../global/forms/Rabbit";
 
 export default function UserLogin() {
-  // TODO on successful login, indicate to user and fade out login screen, then navigate
-  // upon navigation, fade-in menu options that allow a client to choose which gallery they want to see
   useEffect(() => {
     document.title = "LOGIN — GOOD LUCK WHITE RABBIT";
   }, []);
@@ -26,6 +24,7 @@ export default function UserLogin() {
       const data = await response.json();
 
       switch (data.status) {
+        case 401:
         case 404:
           // user not found
           throw new TypeError(
@@ -38,7 +37,8 @@ export default function UserLogin() {
             "Something went wrong. Please reach out for assistance."
           );
 
-        default:
+        case 200:
+        case 304:
           // we have a winner!
           setAuthError({ active: false, message: "" });
           return navigate(`/user/${data}/dashboard`);
