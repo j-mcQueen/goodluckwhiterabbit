@@ -39,7 +39,10 @@ export default function ActionBar({ ...props }) {
       {carousel ? (
         <p className="text-2xl">
           {numberCount(imageset.indexOf(activeImage) + 1)} /{" "}
-          {numberCount(imageset.length)}
+          {numberCount(
+            imageset.filter((item: object) => item instanceof File === true)
+              .length
+          )}
         </p>
       ) : null}
 

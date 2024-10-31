@@ -4,8 +4,9 @@ export default function Image({ ...props }) {
   const { activeImage, setFavourites, favourites, carousel } = props;
 
   return (
-    <div className="relative">
+    <div className="relative z-0">
       <img
+        loading="lazy"
         src={
           activeImage instanceof File ? URL.createObjectURL(activeImage) : ""
         }

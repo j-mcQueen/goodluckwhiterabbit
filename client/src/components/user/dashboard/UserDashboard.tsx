@@ -103,11 +103,6 @@ export default function UserDashboard() {
       }
     };
     getUser();
-
-    // TODO retrieve user information
-    // we are trying to determine whether an imageset has files uploaded to it
-    // if true, then we display a "splash" page with a button on it which when clicked, runs the function to generate presigned urls for that imageset, which in turn runs the function to generate files from those urls, which in turn renders the first set of images to the user
-    // in order for this to work properly, when an admin adds clients, the count of files inside the user data should contain the number of files actually uploaded rather than how many files were first added at the start
   }, []);
 
   const handleSelect = async (targetImageset: string) => {
@@ -124,6 +119,7 @@ export default function UserDashboard() {
       user._id
     );
     setImages({ ...images, [targetImageset]: data.files });
+    if (data.files) setSpinner(false);
   };
 
   return !initialized ? (
@@ -145,6 +141,11 @@ export default function UserDashboard() {
           data={userDashboardHeaderItems}
           activeTab={activeTab}
           setActiveTab={setActiveTab}
+          dashboard={[
+            user.fileCounts["previews"],
+            user.fileCounts["full"],
+            user.fileCounts["socials"],
+          ]}
         />
       ) : (
         <Header
@@ -153,8 +154,17 @@ export default function UserDashboard() {
           data={userDashboardHeaderItems}
           activeTab={activeTab}
           setActiveTab={setActiveTab}
+          dashboard={[
+            user.fileCounts["previews"],
+            user.fileCounts["full"],
+            user.fileCounts["socials"],
+          ]}
         />
       )}
+
+      {notice.status === true ? (
+        <Notice notice={notice} setNotice={setNotice} />
+      ) : null}
 
       <main>
         <Views
@@ -168,48 +178,6 @@ export default function UserDashboard() {
           user={user}
         />
       </main>
-
-      {notice.status === true ? (
-        <Notice notice={notice} setNotice={setNotice} />
-      ) : null}
-
-      {/* {spinner === true ? (
-        // user is being retrieved, so indicate to the user that an action is progress
-        <div className="text-rd text-center text-xl pt-5">
-          <Loading />
-        </div>
-      ) : null} */}
-
-      {/* {userRetrieved === true &&
-      activated[activeImageset as keyof typeof activated] === false ? (
-        // data has been retrieved, but user has not clicked the enter button yet
-        <Splash
-          user={user}
-          images={images}
-          setImages={setImages}
-          imagesetCounts={imagesetCounts}
-          setImagesetCounts={setImagesetCounts}
-          activated={activated}
-          setActivated={setActivated}
-          setNotice={setNotice}
-          activeImageset={activeImageset}
-        />
-      ) : null} */}
-
-      {/* {userRetrieved === true &&
-      activated[activeImageset as keyof typeof activated] === true ? (
-        // data has been retrieved and the user has performed the action to see their images
-        <main>
-          <Views
-            user={user}
-            images={images[activeImageset as keyof typeof images]}
-            setImages={setImages}
-            imagesetCounts={imagesetCounts}
-            activeImageset={activeImageset}
-            setNotice={setNotice}
-          />
-        </main>
-      ) : null} */}
     </motion.div>
   );
 }

@@ -37,8 +37,7 @@ export default function UserLogin() {
             "Something went wrong. Please reach out for assistance."
           );
 
-        case 200:
-        case 304:
+        default:
           // we have a winner!
           setAuthError({ active: false, message: "" });
           return navigate(`/user/${data}/dashboard`);
