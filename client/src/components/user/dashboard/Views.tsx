@@ -89,6 +89,9 @@ export default function Views({ ...props }) {
           {imageset.filter((item: object) => item instanceof File === true)
             .length < user.fileCounts[activeImageset] && (
             <motion.button
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
               type="button"
               disabled={disabled}
               className="text-white border border-solid border-rd py-1 px-3 bg-black"
@@ -99,26 +102,31 @@ export default function Views({ ...props }) {
           )}
         </AnimatePresence>
 
-        {user.fileCounts[activeImageset] ===
-        imageset.filter((item: object) => item instanceof File === true)
-          .length ? (
-          // encourages user to look through all their files first before downloading
-          // hugely resource intensive operation if immediately available
-          <button
-            type="button"
-            className="border border-solid border-white text-lg text-white py-1 px-3 xl:hover:border-rd xl:focus:border-rd transition-colors"
-            onClick={async () => {
-              const url = await createZip(imageset);
+        <AnimatePresence>
+          {user.fileCounts[activeImageset] ===
+            imageset.filter((item: object) => item instanceof File === true)
+              .length && (
+            // encourages user to look through all their files first before downloading
+            // hugely resource intensive operation if immediately available
+            <motion.button
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              type="button"
+              className="border border-solid border-white text-lg text-white py-1 px-3 xl:hover:border-rd xl:focus:border-rd transition-colors"
+              onClick={async () => {
+                const url = await createZip(imageset);
 
-              return handleDownload(
-                `data:application/zip;base64,${url}`,
-                `${user.name}-${activeImageset}.zip`
-              );
-            }}
-          >
-            DOWNLOAD: ALL
-          </button>
-        ) : null}
+                return handleDownload(
+                  `data:application/zip;base64,${url}`,
+                  `${user.name}-${activeImageset}.zip`
+                );
+              }}
+            >
+              DOWNLOAD: ALL
+            </motion.button>
+          )}
+        </AnimatePresence>
       </div>
 
       <Carousel
