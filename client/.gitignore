@@ -7,7 +7,9 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+# Files and folders
 node_modules
+TODO.md
 dist
 dist-ssr
 .env
