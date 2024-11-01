@@ -4,7 +4,7 @@ import { Fragment } from "react/jsx-runtime";
 import Image from "../Image";
 
 export default function Grid({ ...props }) {
-  const { favourites, setFavourites, imageset } = props;
+  const { imageset } = props;
 
   return (
     <section className="flex justify-center basis-[80dvw] pb-10">
@@ -14,12 +14,7 @@ export default function Grid({ ...props }) {
           .map((image: object) => {
             return (
               <Fragment key={uuidv4()}>
-                <Image
-                  activeImage={image}
-                  favourites={favourites}
-                  setFavourites={setFavourites}
-                  carousel={false}
-                />
+                <Image activeImage={image} carousel={false} />
               </Fragment>
             );
           })}

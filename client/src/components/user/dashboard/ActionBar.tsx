@@ -1,20 +1,8 @@
 import { handleDownload } from "./utils/handleDownload";
-
 import Download from "../../../assets/media/icons/Download";
-import Star from "../../../assets/media/icons/Star";
-import StarFilled from "../../../assets/media/icons/StarFilled";
 
 export default function ActionBar({ ...props }) {
-  const { imageset, activeImage, favourites, setFavourites, carousel } = props;
-
-  const handleToggle = () => {
-    if (!favourites.includes(activeImage)) {
-      setFavourites([...favourites, activeImage]);
-    } else {
-      const filtered = favourites.filter((item: File) => item !== activeImage);
-      setFavourites(filtered);
-    }
-  };
+  const { imageset, activeImage, carousel } = props;
 
   const numberCount = (n: number) => {
     if (n >= 0 && n < 100) {
@@ -45,18 +33,6 @@ export default function ActionBar({ ...props }) {
           )}
         </p>
       ) : null}
-
-      <button
-        type="button"
-        className="border border-solid border-white p-1 xl:hover:border-red xl:focus:border-red focus:outline-none transition-colors"
-        onClick={() => handleToggle()}
-      >
-        {favourites.includes(activeImage) ? (
-          <StarFilled className="w-5 h-5" red={true} />
-        ) : (
-          <Star className="w-5 h-5" />
-        )}
-      </button>
     </>
   );
 }

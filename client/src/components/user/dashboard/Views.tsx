@@ -16,7 +16,6 @@ export default function Views({ ...props }) {
     setSpinner,
     spinner,
   } = props;
-  const [favourites, setFavourites] = useState([]);
   const [loaded, setLoaded] = useState(imageset.length);
   const [disabled, setDisabled] = useState(false);
 
@@ -92,21 +91,13 @@ export default function Views({ ...props }) {
         )}
       </div>
 
-      <Carousel
-        favourites={favourites}
-        setFavourites={setFavourites}
-        imageset={imageset}
-      />
+      <Carousel imageset={imageset} />
 
       <div className="text-rd text-lg text-center py-20">
         <p>SCROLL FOR GRID &#8595;</p>
       </div>
 
-      <Grid
-        favourites={favourites}
-        setFavourites={setFavourites}
-        imageset={imageset}
-      />
+      <Grid imageset={imageset} />
     </>
   );
 }
