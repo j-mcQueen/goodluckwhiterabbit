@@ -103,11 +103,7 @@ export default function DeleteModal({ ...props }) {
 
       {serverError.status === true ? (
         <div className="text-red-500 max-w-[350px] text-center text-lg">
-          <p>
-            {serverError.message.toUpperCase()}THERE WAS AN UNEXPECTED ERROR. WE
-            ARE LOGGING YOU OUT TO KEEP THINGS SECURE. PLEASE LOG BACK IN AND
-            TRY AGAIN. IF THE PROBLEM PERSISTS, CONTACT JACK.
-          </p>
+          <p>{serverError.message.toUpperCase()}</p>
         </div>
       ) : null}
     </dialog>
