@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 
 import rabbit from "../../../assets/media/gifs/glwr-lenticular.gif";
 import Instagram from "../../../assets/media/icons/Instagram";
+import Eject from "../../../assets/media/icons/Eject";
+import Next from "../../../assets/media/icons/Next";
 
 export default function Header({ ...props }) {
   const { logout, data, activeTab, setActiveTab, host, dashboard } = props;
@@ -14,7 +16,7 @@ export default function Header({ ...props }) {
   };
 
   const buttonVariants = {
-    disabled: "text-black bg-white line-through w-full h-full tracking-widest",
+    disabled: "opacity-40 w-full h-full tracking-widest",
     regular:
       "xl:hover:text-rd focus:text-rd transition-colors w-full h-full tracking-widest",
   };
@@ -30,24 +32,10 @@ export default function Header({ ...props }) {
     }
   };
 
-  // begin with the end in mind
-  // what is the objective? header item button should be disabled if it is associated with a user dashboard header item and there are no files to show for that item
-  // how can we determine if the header item is a user dashboard header item?
-  // by a prop -> if the "dashboard" prop has been passed, it is a user dashboard header item
-  // if it has been passed, then we now need to determine how many files for this item have been passed
-  // how do we determine this?
-  // we can't access the user.fileCounts object through the text available (data.tab) because they are inconsistent
-  // what if in the dashboard prop we pass, it is an array of integers?
-
-  // if a fileCounts prop has been passed and it is 0, disable the button
-
-  // user dashboard header items will only have a length of 3 with indexes 0, 1, 2
-  // in the data map below, if the header ite
-
   return (
     <header className="text-white">
       <nav className="flex">
-        <div className="border-r border-b border-solid border-white w-72 flex justify-center">
+        <div className="border-r border-b border-solid border-white min-w-[245px] flex justify-center">
           <img
             src={rabbit}
             alt="A white rabbit against a black background shimmering from left to right"
@@ -59,7 +47,7 @@ export default function Header({ ...props }) {
           {data.map((tab: string, index: number) => {
             return (
               <li
-                className={`${activeTab === index ? listItemVariants.active : listItemVariants.std} ${dashboard && dashboard[index] === 0 && index !== data.length - 1 ? "border-r-black" : ""} border-r border-b border-solid border-white w-full flex items-center justify-center`}
+                className={`${activeTab === index ? listItemVariants.active : listItemVariants.std} ${dashboard && dashboard[index] === 0 && index !== data.length - 1 ? "border-r-white inline" : ""} border-r border-b border-solid border-white w-full flex items-center justify-center relative`}
                 key={uuidv4()}
               >
                 <button
@@ -70,10 +58,17 @@ export default function Header({ ...props }) {
                       ? buttonVariants.disabled
                       : buttonVariants.regular
                   }
-                  // className="xl:hover:text-rd focus:text-rd transition-colors w-full h-full tracking-widest"
                   onClick={() => setActiveTab(index)}
                 >
                   {tab}
+
+                  {dashboard && dashboard[index] === 0 ? (
+                    <span className="absolute -translate-y-1">
+                      <span className="font-vt text-sm tracking-normal flex items-center gap-1">
+                        <Next className="w-4 h-4" /> <span>COMING SOON</span>
+                      </span>
+                    </span>
+                  ) : null}
                 </button>
               </li>
             );
@@ -83,10 +78,10 @@ export default function Header({ ...props }) {
         {logout ? (
           <button
             type="button"
-            className="xl:hover:text-rd focus:text-rd transition-colors px-5 border-b border-solid border-white font-liquid tracking-widest"
+            className="xl:hover:text-rd focus:text-rd transition-colors px-[18px] border-b border-solid border-white font-liquid tracking-widest group"
             onClick={() => handleLogout()}
           >
-            exit
+            <Eject className="w-5 h-5 group-hover:fill-rd group-focus:fill-rd group-hover:drop-shadow-red group-focus:drop-shadow-red transition-colors" />
           </button>
         ) : (
           <a

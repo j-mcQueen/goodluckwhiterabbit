@@ -5,9 +5,8 @@ const SelectGallery = ({ ...props }) => {
 
   const buttonVariants = {
     populated:
-      "border border-solid border-white py-2 px-3 xl:hover:bg-rd focus:bg-red focus:outline-none transition-all",
-    empty:
-      "border border-solid border-white py-2 px-3 relative line-through text-black bg-white",
+      "border border-solid border-white py-2 px-3 xl:hover:text-rd xl:hover:border-rd focus:text-red focus:border-rd xl:hover:drop-shadow-red focus:outline-none transition-all",
+    empty: "border border-solid border-white py-2 px-3 relative opacity-40",
   };
 
   return (

@@ -16,23 +16,23 @@ export default function ActionBar({ ...props }) {
     <>
       <button
         type="button"
-        className="border border-solid border-white p-1 xl:hover:border-red xl:focus:border-red focus:outline-none transition-colors"
+        className="border border-solid border-white p-1 xl:hover:border-red xl:focus:border-red focus:outline-none transition-colors group"
         onClick={() =>
           handleDownload(URL.createObjectURL(activeImage), activeImage.name)
         }
       >
-        <Download className="w-5 h-5" />
+        <Download className="w-5 h-5 xl:group-hover:fill-rd xl:group-hover:drop-shadow-red xl:group-focus:fill-rd xl:group-focus:drop-shadow-red" />
       </button>
 
-      {carousel ? (
-        <p className="text-2xl">
-          {numberCount(imageset.indexOf(activeImage) + 1)} /{" "}
-          {numberCount(
-            imageset.filter((item: object) => item instanceof File === true)
-              .length
-          )}
-        </p>
-      ) : null}
+      <p className="text-2xl">
+        {numberCount(imageset.indexOf(activeImage) + 1)}{" "}
+        {carousel
+          ? ` / ${numberCount(
+              imageset.filter((item: object) => item instanceof File === true)
+                .length
+            )}`
+          : null}
+      </p>
     </>
   );
 }

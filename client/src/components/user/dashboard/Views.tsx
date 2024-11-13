@@ -43,61 +43,67 @@ export default function Views({ ...props }) {
   }, [imageset]);
 
   return (
-    <>
-      <div className="flex flex-col">
-        <h1 className="text-white xl:text-2xl py-5 max-w-[240px] pl-3">
+    <div className="flex">
+      <aside className="flex flex-col gap-5 min-w-[245px] max-h-[calc(100dvh-57px-1.5rem)] border-r border-solid border-white">
+        <h1 className="text-white text-center xl:text-2xl pt-5">
           {user.name.toUpperCase()}
         </h1>
+
+        <div className="text-center">
+          <p className="text-white text-center pb-2">
+            LOADED:{" "}
+            {
+              imageset.filter((item: object) => item instanceof File === true)
+                .length
+            }{" "}
+            / {user.fileCounts[activeImageset]}
+          </p>
+
+          {user.fileCounts[activeImageset] ===
+          imageset.filter((item: object) => item instanceof File === true)
+            .length ? (
+            // encourages user to look through all their files first before downloading
+            // hugely resource intensive operation if immediately available
+            <button
+              type="button"
+              className="border border-solid border-white text-lg text-white py-1 px-3 xl:hover:border-rd xl:hover:text-rd xl:hover:drop-shadow-red xl:focus:drop-shadow-red xl:focus:text-rd xl:focus:border-rd transition-colors mt-5"
+              onClick={async () => {
+                const filtered = imageset.filter(
+                  (item: object) => item instanceof File === true
+                );
+                await createZip(filtered, `${user.name}-${activeImageset}.zip`);
+              }}
+            >
+              DOWNLOAD: ALL
+            </button>
+          ) : !spinner ? (
+            <button
+              type="button"
+              disabled={disabled}
+              className="border border-solid border-white text-lg text-white py-1 px-3 xl:hover:border-rd xl:hover:text-rd xl:hover:drop-shadow-red xl:focus:drop-shadow-red xl:focus:text-rd xl:focus:border-rd transition-colors mt-5"
+              onClick={handleClick}
+            >
+              LOAD MORE
+            </button>
+          ) : null}
+
+          {spinner ? (
+            <div className="pt-5">
+              <Loading />
+            </div>
+          ) : null}
+        </div>
+      </aside>
+
+      <div className="w-full h-[calc(100dvh-57px-1.5rem)] overflow-y-scroll">
+        <Carousel imageset={imageset} />
+
+        <div className="text-rd text-lg text-center py-20">
+          <p>SCROLL FOR GRID &#8595;</p>
+        </div>
+
+        <Grid imageset={imageset} />
       </div>
-
-      <div className="absolute bottom-[25px] left-[25px] z-10 text-lg">
-        {spinner ? <Loading /> : null}
-
-        <p className="text-white text-center pb-2">
-          LOADED:{" "}
-          {
-            imageset.filter((item: object) => item instanceof File === true)
-              .length
-          }{" "}
-          / {user.fileCounts[activeImageset]}
-        </p>
-
-        {user.fileCounts[activeImageset] ===
-        imageset.filter((item: object) => item instanceof File === true)
-          .length ? (
-          // encourages user to look through all their files first before downloading
-          // hugely resource intensive operation if immediately available
-          <button
-            type="button"
-            className="border border-solid border-white text-lg text-white py-1 px-3 xl:hover:border-rd xl:focus:border-rd transition-colors"
-            onClick={async () => {
-              const filtered = imageset.filter(
-                (item: object) => item instanceof File === true
-              );
-              await createZip(filtered, `${user.name}-${activeImageset}.zip`);
-            }}
-          >
-            DOWNLOAD: ALL
-          </button>
-        ) : (
-          <button
-            type="button"
-            disabled={disabled}
-            className="text-white border border-solid border-rd py-1 px-3 bg-black"
-            onClick={handleClick}
-          >
-            LOAD MORE
-          </button>
-        )}
-      </div>
-
-      <Carousel imageset={imageset} />
-
-      <div className="text-rd text-lg text-center py-20">
-        <p>SCROLL FOR GRID &#8595;</p>
-      </div>
-
-      <Grid imageset={imageset} />
-    </>
+    </div>
   );
 }

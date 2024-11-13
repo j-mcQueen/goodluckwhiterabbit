@@ -132,7 +132,7 @@ export default function UserDashboard() {
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="w-outer h-outer overflow-scroll"
+      className="w-outer h-outer"
     >
       {mobile ? (
         <MobileHeader

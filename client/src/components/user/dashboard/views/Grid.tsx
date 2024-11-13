@@ -14,7 +14,11 @@ export default function Grid({ ...props }) {
           .map((image: object) => {
             return (
               <Fragment key={uuidv4()}>
-                <Image activeImage={image} carousel={false} />
+                <Image
+                  activeImage={image}
+                  imageset={imageset}
+                  carousel={false}
+                />
               </Fragment>
             );
           })}
