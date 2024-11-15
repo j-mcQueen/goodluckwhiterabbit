@@ -16,7 +16,7 @@ export default function Header({ ...props }) {
   };
 
   const buttonVariants = {
-    disabled: "opacity-40 w-full h-full tracking-widest",
+    disabled: "opacity-15 w-full h-full tracking-widest",
     regular:
       "xl:hover:text-rd focus:text-rd transition-colors w-full h-full tracking-widest",
   };

@@ -56,8 +56,8 @@ export default function UserLogin() {
         <Rabbit />
 
         <hgroup className="pt-10 xl:pb-5 xl:pl-10 pl-3">
-          <h1 className="font-liquid text-2xl xl:text-3xl tracking-widest opacity-80 drop-shadow-glo pt-10">
-            magic awaits
+          <h1 className="font-tnrBI text-2xl xl:text-3xl tracking-widest opacity-80 drop-shadow-glo pt-10">
+            MEMORIES AWAIT
           </h1>
 
           <p className="text-lg">ENTER LOGIN CODE TO ACCESS PORTAL</p>
@@ -98,8 +98,8 @@ export default function UserLogin() {
               type="submit"
               className="text-white border border-solid border-white xl:hover:text-rd xl:hover:border-red focus:border-red focus:text-rd drop-shadow-glo focus:drop-shadow-red xl:hover:drop-shadow-red outline-none pl-6 pr-5 pt-3 pb-2 xl:transition-all xl:mr-10"
             >
-              <span className="font-liquid text-[20px] tracking-widest opacity-80">
-                begin
+              <span className="font-tnrBI text-[20px] tracking-widest opacity-80">
+                ENTER
               </span>
             </button>
           </div>

@@ -5,8 +5,9 @@ const SelectGallery = ({ ...props }) => {
 
   const buttonVariants = {
     populated:
-      "border border-solid border-white py-2 px-3 xl:hover:text-rd xl:hover:border-rd focus:text-red focus:border-rd xl:hover:drop-shadow-red focus:outline-none transition-all",
-    empty: "border border-solid border-white py-2 px-3 relative opacity-40",
+      "border border-solid border-white py-2 px-3 text-lg xl:hover:text-rd xl:hover:border-rd focus:text-red focus:border-rd xl:hover:drop-shadow-red focus:outline-none transition-all",
+    empty:
+      "border border-solid border-white py-2 px-3 text-lg relative opacity-15",
   };
 
   return (
@@ -19,14 +20,12 @@ const SelectGallery = ({ ...props }) => {
         >
           <div className="flex flex-col gap-5 items-center justify-center text-white h-outer w-outer">
             <hgroup className="text-center">
-              <h1 className="font-liquid text-2xl xl:text-3xl tracking-widest opacity-80 drop-shadow-glo">
-                only one click away
+              <h1 className="font-tnrBI text-2xl xl:text-3xl tracking-widest opacity-80 drop-shadow-glo">
+                ENJOY !
               </h1>
-
-              <p className="pt-4">SELECT THE SET OF IMAGES YOU WANT TO VIEW:</p>
             </hgroup>
 
-            <div className="flex gap-5">
+            <div className="flex gap-5 tracking-wider">
               <button
                 disabled={user.fileCounts.previews === 0}
                 type="button"
@@ -37,7 +36,7 @@ const SelectGallery = ({ ...props }) => {
                 }
                 onClick={() => handleSelect("previews")}
               >
-                PREVIEWS
+                SNAPSHOTS
               </button>
 
               <button
@@ -50,7 +49,7 @@ const SelectGallery = ({ ...props }) => {
                 }
                 onClick={() => handleSelect("full")}
               >
-                GALLERY
+                KEEPSAKE PREVIEW
               </button>
 
               <button
@@ -63,7 +62,16 @@ const SelectGallery = ({ ...props }) => {
                 }
                 onClick={() => handleSelect("socials")}
               >
-                SOCIALS
+                CORE COLLECTION
+              </button>
+
+              <button
+                disabled={true}
+                type="button"
+                className={buttonVariants["empty"]}
+                onClick={() => handleSelect("socials")}
+              >
+                SNIPS
               </button>
             </div>
           </div>

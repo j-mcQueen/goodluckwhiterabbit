@@ -28,6 +28,12 @@
     url("/fonts/lc/LiquidCrystal-Light.woff2") format("woff2");
 }
 
+@font-face {
+  font-family: "Times New Roman Bold Italic";
+  src:
+    local("Times New Roman Bold Italic"),
+    url("/fonts/tnr/TimesNewRoman-BoldIt.woff2") format("woff2");
+}
 :root {
   font-family: "VT323", serif;
   min-width: 300px;
