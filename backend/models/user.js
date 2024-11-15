@@ -9,6 +9,7 @@ const UserSchema = new Schema({
     previews: Number,
     full: Number,
     socials: Number,
+    snips: Number,
   },
   role: String,
   added: String,

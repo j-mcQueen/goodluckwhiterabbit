@@ -1,1 +1,6 @@
-export const userDashboardHeaderItems = ["preview", "full gallery", "social"];
+export const userDashboardHeaderItems = [
+  "snapshots",
+  "keepsake preview",
+  "core collection",
+  "snips",
+];

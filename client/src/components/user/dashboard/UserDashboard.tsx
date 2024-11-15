@@ -14,7 +14,7 @@ export default function UserDashboard() {
   const mobile = window.matchMedia("(max-width: 1080px)").matches;
   const [user, setUser] = useState({
     _id: "",
-    fileCounts: { previews: 0, full: 0, socials: 0 },
+    fileCounts: { previews: 0, full: 0, socials: 0, snips: 0 },
   });
   const [activeTab, setActiveTab] = useState(0);
   const [activeImageset, setActiveImageset] = useState("");
@@ -52,6 +52,10 @@ export default function UserDashboard() {
 
       case 2:
         setActiveImageset("socials");
+        break;
+
+      case 3:
+        setActiveImageset("snips");
         break;
     }
   }, [activeTab]);
@@ -145,6 +149,7 @@ export default function UserDashboard() {
             user.fileCounts["previews"],
             user.fileCounts["full"],
             user.fileCounts["socials"],
+            user.fileCounts["snips"],
           ]}
         />
       ) : (
@@ -158,6 +163,7 @@ export default function UserDashboard() {
             user.fileCounts["previews"],
             user.fileCounts["full"],
             user.fileCounts["socials"],
+            user.fileCounts["snips"],
           ]}
         />
       )}

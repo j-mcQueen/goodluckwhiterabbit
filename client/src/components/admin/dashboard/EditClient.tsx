@@ -134,7 +134,7 @@ export default function EditClient({ ...props }) {
               onClick={() => handleClick("previews")}
               disabled={targetImageset === "previews" ? true : false}
             >
-              PREVIEWS
+              SNAPSHOTS
               <label className="opacity-0 w-0">
                 <input type="file" name="previews" className="w-0 opacity-0" />
               </label>
@@ -146,7 +146,7 @@ export default function EditClient({ ...props }) {
               onClick={() => handleClick("full")}
               disabled={targetImageset === "full" ? true : false}
             >
-              GALLERY
+              KEEPSAKE PREVIEW
               <label className="opacity-0 w-0">
                 <input type="file" name="full" className="w-0 opacity-0" />
               </label>
@@ -158,9 +158,21 @@ export default function EditClient({ ...props }) {
               onClick={() => handleClick("socials")}
               disabled={targetImageset === "socials" ? true : false}
             >
-              SOCIALS
+              CORE COLLECTION
               <label className="opacity-0 w-0">
                 <input type="file" name="socials" className="w-0 opacity-0" />
+              </label>
+            </button>
+
+            <button
+              type="button"
+              className={`${targetImageset === "snips" ? "bg-rd" : ""} border border-solid border-white py-2 px-3 xl:hover:bg-rd focus:bg-red focus:outline-none transition-all`}
+              onClick={() => handleClick("snips")}
+              disabled={targetImageset === "snips" ? true : false}
+            >
+              SNIPS
+              <label className="opacity-0 w-0">
+                <input type="file" name="snips" className="w-0 opacity-0" />
               </label>
             </button>
 

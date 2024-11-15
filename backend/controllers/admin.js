@@ -127,6 +127,7 @@ exports.adminAddClient = [
           previews: 0,
           full: 0,
           socials: 0,
+          snips: 0,
         },
         added: new Date(Date.now()).toLocaleString("en-US").split(",")[0], // mm/dd/yyyy format
       });
@@ -150,44 +151,6 @@ exports.adminAddClient = [
             "There was an error adding this user into the database. Please refresh the page and try again.",
         });
       }
-
-      // // initialize array to hold any files not uploaded to S3 for notification purposes
-      // const rejected = [];
-      // const files = { previews: 0, full: 0, socials: 0 };
-      // // upload images to s3 if req.files has been populated
-      // if (req.files.length > 0) {
-      //   for (let i = 0; i < req.files.length; i++) {
-      //     const s3Params = {
-      //       Bucket: process.env.AWS_PRIMARY_BUCKET,
-      //       Key: `${user._id}/${req.files[i].fieldname}/${i}/${req.files[i].originalname}`, // ensures files are associated to a user and that each file has a key containing a reference to it's position
-      //       Body: req.files[i].buffer,
-      //       ContentType: req.files[i].mimetype,
-      //     };
-      //     // fish for upload errors and handle them
-      //     try {
-      //       const added = await client.send(new PutObjectCommand(s3Params));
-      //       if (!added) throw new TypeError("File not added.");
-      //       else {
-      //         files[req.files[i].fieldname]++;
-      //         continue;
-      //       }
-      //     } catch (err) {
-      //       rejected.push(req.files[i].originalname);
-      //       continue;
-      //     }
-      //   }
-      // }
-      // user.files = files;
-      // const savedUser = await user.save();
-      // const data = {
-      //   name: savedUser.name,
-      //   code: loginCode,
-      //   _id: savedUser._id,
-      //   files: savedUser.files,
-      //   added: savedUser.added,
-      // };
-      // if (rejected.length > 0) data.rejected = rejected;
-      // return res.status(200).json(data);
     }
   },
 ];
@@ -544,7 +507,8 @@ exports.adminDeleteUser = async (req, res, next) => {
     if (
       deleted.fileCounts.previews > 0 ||
       deleted.fileCounts.socials > 0 ||
-      deleted.fileCounts.full > 0
+      deleted.fileCounts.full > 0 ||
+      deleted.fileCounts.snips > 0
     ) {
       // we have images to remove, so grab all files from S3
       let objects;
@@ -577,6 +541,7 @@ exports.adminDeleteUser = async (req, res, next) => {
         populate(deleteTargets, objects.Contents[i], deleted, "previews");
         populate(deleteTargets, objects.Contents[i], deleted, "full");
         populate(deleteTargets, objects.Contents[i], deleted, "socials");
+        populate(deleteTargets, objects.Contents[i], deleted, "snips");
       }
 
       // delete target files in one step using populated array
