@@ -104,7 +104,7 @@ export default function AllClients({ ...props }) {
                   <span
                     className={`${client.fileCounts.socials > 0 ? "text-rd" : "text-white"}`}
                   >
-                    C: {client.fileCounts.socials}, &nhsp;
+                    C: {client.fileCounts.socials},&nbsp;
                   </span>
                   <span
                     className={`${client.fileCounts.snips > 0 ? "text-rd" : "text-white"}`}
