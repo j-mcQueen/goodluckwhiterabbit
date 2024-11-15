@@ -46,8 +46,8 @@ export default function Login() {
         <Rabbit />
 
         <hgroup className="pt-10 xl:pb-5">
-          <h1 className="font-liquid text-2xl xl:text-3xl tracking-widest opacity-80 drop-shadow-glo xl:pl-10 pl-3 pb-7 xl:pb-0">
-            welcome back
+          <h1 className="font-tnrBI text-2xl xl:text-3xl tracking-widest opacity-80 drop-shadow-glo xl:pl-10 pl-3 pb-7 xl:pb-0">
+            WELCOME BACK
           </h1>
         </hgroup>
 
@@ -100,8 +100,8 @@ export default function Login() {
               type="submit"
               className="text-white border border-solid border-white xl:hover:text-rd xl:hover:border-red focus:border-red focus:text-rd drop-shadow-glo focus:drop-shadow-red xl:hover:drop-shadow-red outline-none pl-6 pr-5 pt-3 pb-2 xl:transition-all xl:mr-10"
             >
-              <span className="font-liquid text-[20px] tracking-widest opacity-80">
-                login
+              <span className="font-tnrBI text-[20px] tracking-widest opacity-80">
+                ENTER
               </span>
             </button>
           </div>
