@@ -43,11 +43,26 @@ exports.generateGetPresigned = async (req, res, next) => {
 
   if (verified) {
     // retrieve all S3 objects
+    const indexRegex = /\/(\d{1,3})\//;
     let s3Objects;
     try {
-      s3Objects = await s3.send(
-        new ListObjectsV2Command({ Bucket: process.env.AWS_PRIMARY_BUCKET })
+      let objects = await s3.send(
+        new ListObjectsV2Command({
+          Bucket: process.env.AWS_PRIMARY_BUCKET,
+          Prefix: `${req.params.id}`,
+        })
       );
+
+      const sorted = objects.Contents.sort((a, b) => {
+        const posA = a.Key.match(indexRegex);
+        const posB = b.Key.match(indexRegex);
+
+        if (Number(posA[1]) < Number(posB[1])) return -1;
+        if (Number(posA[1]) > Number(posB[1])) return 1;
+        return 0;
+      });
+      objects.Contents = sorted;
+      s3Objects = objects;
 
       if (!s3Objects.Contents) return res.status(200).json({ files: false });
       if (!s3Objects) throw new Error("500");
@@ -63,8 +78,6 @@ exports.generateGetPresigned = async (req, res, next) => {
     // loop over S3 objects and generate presigns for matches
     const presigns = [];
     const skipped = [];
-
-    const indexRegex = /\/(\d{1,3})\//;
     for (let i = 0; i < s3Objects.Contents.length; i++) {
       const position = s3Objects.Contents[i].Key.match(indexRegex);
       if (
