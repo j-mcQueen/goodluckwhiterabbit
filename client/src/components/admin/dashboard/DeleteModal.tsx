@@ -1,6 +1,8 @@
-import { useState } from "react";
-import Close from "../../../assets/media/icons/Close";
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { icons } from "./styles/styles";
+
+import Close from "../../../assets/media/icons/Close";
 
 export default function DeleteModal({ ...props }) {
   const { host, clients, setClients, deleteModalToggle, setDeleteModalToggle } =
@@ -68,9 +70,12 @@ export default function DeleteModal({ ...props }) {
     <dialog className="absolute flex items-center justify-center bg-black text-white border border-solid border-white p-3">
       <div className="flex flex-col gap-5">
         <div className="flex items-center justify-between text-lg">
-          <h3>
-            DELETE CLIENT:{" "}
-            <span className="text-rd">
+          <h3 className="font-tnrBI">
+            <span className="drop-shadow-glo tracking-widest opacity-80">
+              DELETE CLIENT:{" "}
+            </span>
+
+            <span className="text-rd drop-shadow-red tracking-widest opacity-80 pr-3">
               {deleteModalToggle.name.toUpperCase()}
             </span>
           </h3>
@@ -82,19 +87,21 @@ export default function DeleteModal({ ...props }) {
               setDeleteModalToggle({ active: false, target: "", name: "" });
             }}
             type="button"
-            className="border border-solid xl:hover:border-rd xl:focus:border-red w-10 h-10 flex items-center justify-center focus:outline-none transition-colors"
+            className="border border-solid xl:hover:border-rd xl:focus:border-red p-2 flex items-center justify-center focus:outline-none transition-colors group"
           >
-            <Close className="w-4 h-4" customColor={"#FFF"} />
+            <Close className={icons} />
           </button>
         </div>
 
-        <p>ARE YOU SURE YOU WANT TO DELETE ALL OF THIS CLIENT'S DATA?</p>
+        <p className="tracking-wider">
+          ARE YOU SURE YOU WANT TO DELETE THIS CLIENT'S DATA?
+        </p>
 
         <div>
           <button
             onClick={() => handleDelete()}
             type="button"
-            className="font-liquid border border-solid border-red xl:hover:text-rd py-3 px-5 transition-colors tracking-widest w-full"
+            className="font-tnrBI drop-shadow-glo opacity-80 border border-solid xl:hover:drop-shadow-red xl:hover:text-rd xl:focus:drop-shadow-red xl:focus:text-rd py-3 px-5 transition-colors tracking-widest w-full"
           >
             DELETE
           </button>

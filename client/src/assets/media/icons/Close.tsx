@@ -1,12 +1,11 @@
 export default function Close({ ...props }) {
-  const { className, customColor } = props;
+  const { className } = props;
 
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 24 24"
-      fill="currentColor"
-      color={customColor ? customColor : "#000"}
+      fill="#fff"
       className={className}
     >
       <path d="M0 0h24v24H0z" fill="none"></path>

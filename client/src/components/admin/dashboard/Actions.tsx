@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
+import { icons } from "./styles/styles";
 
 import Add from "../../../assets/media/icons/Add";
 import Search from "../../../assets/media/icons/Search";
@@ -84,9 +85,9 @@ export default function Actions({ ...props }) {
 
         <button
           type="button"
-          className="w-10 h-10 border border-l-0 border-solid flex justify-center p-[10px] focus:border-rd xl:hover:border-rd xl:transition-colors xl:focus:outline-none"
+          className="w-10 h-10 border border-l-0 border-solid flex justify-center p-[10px] focus:border-rd xl:hover:border-rd xl:transition-colors xl:focus:outline-none group"
         >
-          <Search className="w-4 h-4" />
+          <Search className={icons} />
         </button>
       </div>
 
@@ -98,7 +99,7 @@ export default function Actions({ ...props }) {
         type="button"
         className="w-10 h-10 border border-solid flex justify-center items-center focus:border-rd xl:transition-all xl:hover:border-rd xl:focus:outline-none"
       >
-        <Add className="w-4 h-4" />
+        <Add className={icons} />
       </button>
     </div>
   );

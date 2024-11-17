@@ -148,10 +148,10 @@ export default function AddClient({ ...props }) {
         <div className="text-center">
           <button
             type="submit"
-            className="font-liquid border border-solid border-red xl:hover:text-rd py-3 px-5 transition-colors"
+            className="border border-solid xl:hover:text-rd drop-shadow-glo xl:hover:drop-shadow-red xl:focus:text-rd xl:focus:drop-shadow-red py-3 px-5 transition-colors group"
           >
-            <span className="font-liquid tracking-widest opacity-80">
-              {spinner ? <Loading /> : "add"}
+            <span className="font-tnrBI tracking-widest opacity-80">
+              {spinner ? <Loading /> : "ADD"}
             </span>
           </button>
         </div>

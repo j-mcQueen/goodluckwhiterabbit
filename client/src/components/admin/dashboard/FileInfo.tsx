@@ -1,24 +1,20 @@
+import { file_info_heading } from "./types/types";
 import Loading from "../../global/Loading";
 
 const FileInfo = ({ ...props }) => {
   const { spinner, renderCount, targetClient, targetImageset } = props;
 
-  const headingText: headingTextType = {
+  const headingText: file_info_heading = {
     previews: "PREVIEWS",
     full: "GALLERY",
     socials: "SOCIAL",
+    snips: "SNIPS",
   };
-
-  interface headingTextType {
-    previews: string;
-    full: string;
-    socials: string;
-  }
 
   return (
     <header className="flex justify-between items-center w-full py-5 px-5">
       <h2 className="xl:text-2xl tracking-tight">
-        {headingText[targetImageset as keyof headingTextType]}
+        {headingText[targetImageset as keyof file_info_heading]}
       </h2>
 
       <ul className="flex gap-5 text-xl">

@@ -1,4 +1,7 @@
 import { v4 as uuidv4 } from "uuid";
+import { dashboard_btns, icons } from "./styles/styles";
+import { dashboard_client } from "./types/types";
+
 import Copy from "../../../assets/media/icons/Copy";
 import Edit from "../../../assets/media/icons/Edit";
 import Close from "../../../assets/media/icons/Close";
@@ -41,10 +44,6 @@ export default function AllClients({ ...props }) {
     setActivePane("EDIT");
   };
 
-  // TODO CHANGE "ADDED" TAB TO "EMAIL" and display email in the list.
-  // TODO set up sendgrid to send emails with the click of a button, ask Kailey to provide email she wants to sign up and send email with
-  // TODO create button that takes Kailey to a page which allows her to "preview" what the client sees
-
   return (
     <table className="w-full mt-5 border-collapse ">
       <thead>
@@ -61,109 +60,90 @@ export default function AllClients({ ...props }) {
       </thead>
 
       <tbody>
-        {clients.map(
-          (
-            client: {
-              name: string;
-              added: string;
-              code: string;
-              fileCounts: {
-                previews: number;
-                full: number;
-                socials: number;
-                snips: number;
-              };
-              _id: string;
-            },
-            index: number
-          ) => {
-            return (
-              <tr
-                key={uuidv4()}
-                className={`text-white border-t-[1px] ${index < clients.length - 1 ? "border-b-[1px]" : ""} border-solid border-white`}
-              >
-                <td className="align-middle pl-3 tracking-wider">
-                  {client.name.toUpperCase()}
-                </td>
+        {clients.map((client: dashboard_client, index: number) => {
+          return (
+            <tr
+              key={uuidv4()}
+              className={`text-white border-t-[1px] ${index < clients.length - 1 ? "border-b-[1px]" : ""} border-solid border-white`}
+            >
+              <td className="align-middle pl-3 tracking-wider">
+                {client.name.toUpperCase()}
+              </td>
 
-                <td className="align-middle">{client.added}</td>
+              <td className="align-middle">{client.added}</td>
 
-                <td className="align-middle">{client.code}</td>
+              <td className="align-middle">{client.code}</td>
 
-                <td className="align-middle">
-                  <span
-                    className={`${client.fileCounts.previews > 0 ? "text-rd" : "text-white"}`}
-                  >
-                    S: {client.fileCounts.previews},&nbsp;
-                  </span>
-                  <span
-                    className={`${client.fileCounts.full > 0 ? "text-rd" : "text-white"}`}
-                  >
-                    K: {client.fileCounts.full},&nbsp;
-                  </span>
-                  <span
-                    className={`${client.fileCounts.socials > 0 ? "text-rd" : "text-white"}`}
-                  >
-                    C: {client.fileCounts.socials},&nbsp;
-                  </span>
-                  <span
-                    className={`${client.fileCounts.snips > 0 ? "text-rd" : "text-white"}`}
-                  >
-                    S: {client.fileCounts.snips}
-                  </span>
-                </td>
+              <td className="align-middle">
+                <span
+                  className={`${client.fileCounts.previews > 0 ? "text-rd" : "text-white"}`}
+                >
+                  S: {client.fileCounts.previews},&nbsp;
+                </span>
+                <span
+                  className={`${client.fileCounts.full > 0 ? "text-rd" : "text-white"}`}
+                >
+                  K: {client.fileCounts.full},&nbsp;
+                </span>
+                <span
+                  className={`${client.fileCounts.socials > 0 ? "text-rd" : "text-white"}`}
+                >
+                  C: {client.fileCounts.socials},&nbsp;
+                </span>
+                <span
+                  className={`${client.fileCounts.snips > 0 ? "text-rd" : "text-white"}`}
+                >
+                  S: {client.fileCounts.snips}
+                </span>
+              </td>
 
-                <td className="align-middle">
-                  <button
-                    disabled={notice.status}
-                    onClick={() => handleCopy(client.code)}
-                    type="button"
-                    className="border border-solid p-2 my-3 xl:hover:border-rd focus:border-rd outline-none transition-colors"
-                  >
-                    <Copy className="w-4 h-4" />
-                  </button>
-                </td>
+              <td className="align-middle">
+                <button
+                  disabled={notice.status}
+                  onClick={() => handleCopy(client.code)}
+                  type="button"
+                  className={dashboard_btns}
+                >
+                  <Copy className={icons} />
+                </button>
+              </td>
 
-                <td className="align-middle">
-                  <button
-                    type="button"
-                    className="border border-solid p-2 my-3 xl:hover:border-rd focus:border-rd outline-none transition-colors"
-                    onClick={() => {
-                      handleClick(client);
-                    }}
-                  >
-                    <Edit className="w-4 h-4" />
-                  </button>
-                </td>
+              <td className="align-middle">
+                <button
+                  type="button"
+                  className={dashboard_btns}
+                  onClick={() => {
+                    handleClick(client);
+                  }}
+                >
+                  <Edit className={icons} />
+                </button>
+              </td>
 
-                <td>
-                  <button
-                    type="button"
-                    className="border border-solid p-2 my-3 xl:hover:border-rd focus:border-rd outline-none transition-colors"
-                  >
-                    <Mail className="w-4 h-4" />
-                  </button>
-                </td>
+              <td>
+                <button type="button" className={dashboard_btns}>
+                  <Mail className={icons} />
+                </button>
+              </td>
 
-                <td>
-                  <button
-                    onClick={() =>
-                      setDeleteModalToggle({
-                        active: true,
-                        target: client._id,
-                        name: client.name,
-                      })
-                    }
-                    type="button"
-                    className="border border-solid p-2 my-3 xl:hover:border-rd focus:border-rd outline-none transition-colors"
-                  >
-                    <Close customColor="#FFF" className="w-4 h-4" />
-                  </button>
-                </td>
-              </tr>
-            );
-          }
-        )}
+              <td>
+                <button
+                  onClick={() =>
+                    setDeleteModalToggle({
+                      active: true,
+                      target: client._id,
+                      name: client.name,
+                    })
+                  }
+                  type="button"
+                  className={dashboard_btns}
+                >
+                  <Close className={icons} />
+                </button>
+              </td>
+            </tr>
+          );
+        })}
       </tbody>
     </table>
   );

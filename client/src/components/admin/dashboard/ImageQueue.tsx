@@ -48,7 +48,7 @@ const ImageQueue = memo(function ImageQueue() {
                   onClick={() => handleDeleteClick(index)}
                   className="absolute bg-black m-1 border border-solid border-rd p-1"
                 >
-                  <Close className={"w-3 h-3"} customColor={"#FFF"} />
+                  <Close className={"w-3 h-3"} />
                 </button>
 
                 <img

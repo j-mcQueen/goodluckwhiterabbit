@@ -286,7 +286,7 @@ export default function ImageOrder({ ...props }) {
                       onClick={() => handleDeleteClick(index, file.name)}
                       className="absolute bg-black m-1 border border-solid border-rd p-1"
                     >
-                      <Close className={"w-4 h-4"} customColor={"#FFF"} />
+                      <Close className="w-4 h-4" />
                     </button>
                   ) : null}
 
