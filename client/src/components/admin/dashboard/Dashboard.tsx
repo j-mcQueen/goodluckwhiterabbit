@@ -111,7 +111,12 @@ export default function AdminDashboard() {
         )}
       </AnimatePresence>
 
-      <Header host={host} />
+      <Header
+        host={host}
+        edit={activePane === "EDIT" ? true : false}
+        setTargetClient={activePane === "EDIT" ? setTargetClient : false}
+        setActivePane={activePane === "EDIT" ? setActivePane : false}
+      />
 
       <section className="flex justify-center items-center text-white">
         <>

@@ -12,7 +12,6 @@ export default function EditClient({ ...props }) {
     host,
     targetClient,
     setTargetClient,
-    setActivePane,
   } = props;
 
   const [targetImageset, setTargetImageset] = useState("");
@@ -98,8 +97,8 @@ export default function EditClient({ ...props }) {
       className="pb-10 border-spacing-0"
     >
       <hgroup className="flex flex-col items-center pb-10">
-        <h1 className="font-liquid xl:text-4xl pb-3 tracking-widest opacity-80 drop-shadow-glo">
-          {targetClient.name.toLowerCase()}
+        <h1 className="font-tnrBI xl:text-4xl pb-3 tracking-widest opacity-80 drop-shadow-glo">
+          {targetClient.name.toUpperCase()}
         </h1>
 
         <p className="font-vt">DATE ADDED: {targetClient.added}</p>
@@ -130,7 +129,7 @@ export default function EditClient({ ...props }) {
           >
             <button
               type="button"
-              className={`${targetImageset === "previews" ? "bg-rd" : ""} border border-solid border-white py-2 px-3 xl:hover:bg-rd focus:bg-red focus:outline-none transition-all`}
+              className={`${targetImageset === "previews" ? "bg-rd" : ""} border border-solid border-white py-2 px-3 xl:hover:bg-rd focus:bg-red focus:outline-none transition-all `}
               onClick={() => handleClick("previews")}
               disabled={targetImageset === "previews" ? true : false}
             >
@@ -176,7 +175,7 @@ export default function EditClient({ ...props }) {
               </label>
             </button>
 
-            <button
+            {/* <button
               type="button"
               onClick={() => {
                 const nextClients = clients.map((client: { _id: string }) => {
@@ -192,7 +191,7 @@ export default function EditClient({ ...props }) {
               className="border border-solid border-rd xl:hover:bg-rd xl:hover:border-white focus:bg-rd focus:outline-none flex items-center justify-center transition-all px-3"
             >
               RETURN
-            </button>
+            </button> */}
           </motion.div>
         </div>
 
