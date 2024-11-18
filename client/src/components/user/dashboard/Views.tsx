@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { createZip } from "./utils/createZip";
 import { executeGenerationChain } from "../../global/utils/executeGenerationChain";
+
 import Carousel from "./views/Carousel";
 import Grid from "./views/Grid";
 import Loading from "../../global/Loading";
@@ -76,15 +77,6 @@ export default function Views({ ...props }) {
             >
               DOWNLOAD: ALL
             </button>
-          ) : !spinner ? (
-            <button
-              type="button"
-              disabled={disabled}
-              className="border border-solid border-white text-lg text-white py-1 px-3 xl:hover:border-rd xl:hover:text-rd xl:hover:drop-shadow-red xl:focus:drop-shadow-red xl:focus:text-rd xl:focus:border-rd transition-colors mt-5"
-              onClick={handleClick}
-            >
-              LOAD MORE
-            </button>
           ) : null}
 
           {spinner ? (
@@ -102,7 +94,13 @@ export default function Views({ ...props }) {
           <p>SCROLL FOR GRID &#8595;</p>
         </div>
 
-        <Grid imageset={imageset} />
+        <Grid
+          spinner={spinner}
+          imageset={imageset}
+          fileCounts={user.fileCounts[activeImageset]}
+          disabled={disabled}
+          handleClick={handleClick}
+        />
       </div>
     </div>
   );

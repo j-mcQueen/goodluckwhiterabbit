@@ -308,7 +308,7 @@ export default function ImageOrder({ ...props }) {
                       handleDrop(file, index, draggedIndex, source);
                     }}
                     onDragOver={(e) => e.preventDefault()}
-                    className={`${file instanceof File === false ? "h-[300px] w-[200px]" : "max-h-[300px]"} border border-solid`}
+                    className={`${file instanceof File === false ? "h-[300px] w-[200px]" : "min-h-[300px] max-h-[350px]"} border border-solid`}
                     src={file instanceof File ? URL.createObjectURL(file) : ""}
                   />
                 </div>
@@ -319,7 +319,7 @@ export default function ImageOrder({ ...props }) {
           <button
             onClick={() => handleLoadClick()}
             type="button"
-            className="border border-solid border-red px-4 py-2 xl:hover:text-rd xl:focus:text-rd transition-colors mt-8 mb-5"
+            className="font-tnrBI tracking-widest opacity-80 drop-shadow-glo border border-solid px-4 py-2 xl:hover:text-rd xl:hover:drop-shadow-red xl:focus:text-rd xl:focus:drop-shadow-red transition-colors mt-8 mb-5"
           >
             LOAD NEXT BATCH
           </button>

@@ -23,7 +23,7 @@ const ImageQueue = memo(function ImageQueue() {
             {queue.length === 1 ? " FILE " : " FILES "} QUEUED
           </p>
 
-          <label className="border border-solid border-white flex items-center px-2 py-1 transition-colors text-xl xl:hover:text-rd xl:focus:text-rd xl:hover:cursor-pointer">
+          <label className="font-tnrBI tracking-widest opacity-80 drop-shadow-glo border border-solid flex items-center px-2 py-1 transition-colors xl:hover:text-rd xl:hover:drop-shadow-red xl:focus:text-rd xl:focus:drop-shadow-red xl:hover:cursor-pointer">
             ADD FILES
             <input
               type="file"
