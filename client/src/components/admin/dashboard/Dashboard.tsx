@@ -89,7 +89,6 @@ export default function AdminDashboard() {
     if (location.state.login === true) getAllClients(); // if admin has just logged in, fetch clients
   }, [location, navigate, host]);
 
-  // TODO how can we organise the pane data here? conditional rendering? we could organise all pane values into an array, then render the pane which matches state -> best option, since this will declutter the return statement
   return (
     <main className="w-[calc(100dvw-1.5rem-2px)] h-[calc(100dvh-1.5rem-2px)] overflow-scroll relative">
       {rejectedFiles.length > 0 ? (
