@@ -65,8 +65,10 @@ exports.generateGetPresigned = async (req, res, next) => {
       s3Objects = objects;
 
       if (!s3Objects.Contents) return res.status(200).json({ files: false });
-      if (!s3Objects) throw new Error("500");
     } catch (error) {
+      if (typeof s3Objects === "undefined")
+        return res.status(200).json({ files: false });
+
       return res.status(500).json({
         status: true,
         message:
