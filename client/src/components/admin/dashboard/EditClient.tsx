@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { executeGenerationChain } from "../../global/utils/executeGenerationChain";
+import { imageset_select_btns } from "./styles/styles";
+
 import ImageQueue from "./ImageQueue";
 import OrderContainer from "./OrderContainer";
 
@@ -29,9 +31,6 @@ export default function EditClient({ ...props }) {
       return [...targetClient.queue[targetImageset]];
     } else return [];
   });
-
-  // TODO implement search function that will notify Kailey about duplicate files
-  // TODO create button that takes Kailey to a page which allows her to "preview" what the client sees
 
   const handleClick = async (newTargetImageset: string) => {
     setTargetImageset(newTargetImageset);
@@ -129,7 +128,7 @@ export default function EditClient({ ...props }) {
           >
             <button
               type="button"
-              className={`${targetImageset === "previews" ? "bg-rd" : ""} border border-solid border-white py-2 px-3 xl:hover:bg-rd focus:bg-red focus:outline-none transition-all `}
+              className={`${targetImageset === "previews" ? "text-rd drop-shadow-red" : ""} ${imageset_select_btns} `}
               onClick={() => handleClick("previews")}
               disabled={targetImageset === "previews" ? true : false}
             >
@@ -141,7 +140,7 @@ export default function EditClient({ ...props }) {
 
             <button
               type="button"
-              className={`${targetImageset === "full" ? "bg-rd" : ""} border border-solid border-white py-2 px-3 xl:hover:bg-rd focus:bg-red focus:outline-none transition-all`}
+              className={`${targetImageset === "full" ? "text-rd drop-shadow-red" : ""} ${imageset_select_btns}`}
               onClick={() => handleClick("full")}
               disabled={targetImageset === "full" ? true : false}
             >
@@ -153,7 +152,7 @@ export default function EditClient({ ...props }) {
 
             <button
               type="button"
-              className={`${targetImageset === "socials" ? "bg-rd" : ""} border border-solid border-white py-2 px-3 xl:hover:bg-rd focus:bg-red focus:outline-none transition-all`}
+              className={`${targetImageset === "socials" ? "text-rd drop-shadow-red" : ""} ${imageset_select_btns}`}
               onClick={() => handleClick("socials")}
               disabled={targetImageset === "socials" ? true : false}
             >
@@ -165,7 +164,7 @@ export default function EditClient({ ...props }) {
 
             <button
               type="button"
-              className={`${targetImageset === "snips" ? "bg-rd" : ""} border border-solid border-white py-2 px-3 xl:hover:bg-rd focus:bg-red focus:outline-none transition-all`}
+              className={`${targetImageset === "snips" ? "text-rd drop-shadow-red" : ""} ${imageset_select_btns}`}
               onClick={() => handleClick("snips")}
               disabled={targetImageset === "snips" ? true : false}
             >
@@ -174,24 +173,6 @@ export default function EditClient({ ...props }) {
                 <input type="file" name="snips" className="w-0 opacity-0" />
               </label>
             </button>
-
-            {/* <button
-              type="button"
-              onClick={() => {
-                const nextClients = clients.map((client: { _id: string }) => {
-                  if (client._id === targetClient._id) {
-                    return { ...client, files: orderedImagesets };
-                  } else return client;
-                });
-
-                setClients(nextClients);
-                setTargetClient([]);
-                setActivePane("ALL");
-              }}
-              className="border border-solid border-rd xl:hover:bg-rd xl:hover:border-white focus:bg-rd focus:outline-none flex items-center justify-center transition-all px-3"
-            >
-              RETURN
-            </button> */}
           </motion.div>
         </div>
 
