@@ -1,5 +1,6 @@
 import { memo, useState } from "react";
 import { handleDragStart } from "./utils/handleDragStart";
+import { handleDragEnd } from "./utils/handleDragEnd";
 import { v4 as uuidv4 } from "uuid";
 import Close from "../../../assets/media/icons/Close";
 
@@ -54,7 +55,11 @@ const ImageQueue = memo(function ImageQueue() {
                 <img
                   loading="lazy"
                   draggable={true}
-                  onDragStart={(e) => handleDragStart(e, file, "queue", index)}
+                  onDragStart={(e) => {
+                    e.currentTarget.style.opacity = "0.25";
+                    handleDragStart(e, file, "queue", index);
+                  }}
+                  onDragEnd={(e) => handleDragEnd(e)}
                   src={file instanceof File ? URL.createObjectURL(file) : ""}
                   alt={file.name}
                   className="opacity-100 max-w-[15dvh] xl:hover:cursor-pointer"
