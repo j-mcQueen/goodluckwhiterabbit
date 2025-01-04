@@ -13,7 +13,7 @@ const ImageQueue = memo(function ImageQueue() {
 
   return (
     <div className="border-l-[1px] border-solid">
-      <div className="sticky top-0 oveflow-y-scroll">
+      <div className="h-[1000px] overflow-y-scroll">
         <div className="flex justify-between items-center gap-5 py-4 px-4">
           <p className="text-xl">
             <span className={`${queue.length > 0 ? "text-rd" : ""}`}>
@@ -51,7 +51,7 @@ const ImageQueue = memo(function ImageQueue() {
                       index
                     )
                   }
-                  className="absolute bg-black m-1 border border-solid border-rd p-1"
+                  className="bg-black border border-solid border-rd p-1 relative"
                 >
                   <Close className={"w-3 h-3"} />
                 </button>
