@@ -56,11 +56,13 @@ export const resize = async (file: File, type: string) => {
         canvas.width,
         canvas.height
       );
+      oc.remove();
       resolve();
     };
     img.onerror = reject;
     if (typeof imageUrl === "string") img.src = imageUrl;
   });
   const dUrl = canvas.toDataURL(type, 0.9);
+  canvas.remove();
   return dUrl;
 };
