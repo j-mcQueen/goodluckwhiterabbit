@@ -28,13 +28,22 @@ exports.generatePutPresigned = async (req, res, next) => {
   const verified = await verifyTokens(req, res);
 
   if (verified) {
-    const cmd = new PutObjectCommand({
+    // resized file
+    const cmd1 = new PutObjectCommand({
       Bucket: process.env.AWS_PRIMARY_BUCKET,
-      Key: `${req.body._id}/${req.body.imageset}/${req.body.index}/${req.body.filename}`,
+      Key: `${req.body._id}/${req.body.imageset}/resized/${req.body.index}/${req.body.files[0]}`,
     });
 
-    const url = await getSignedUrl(s3, cmd, { expiresIn: 600 });
-    return res.status(200).json(url);
+    // original file
+    const cmd2 = new PutObjectCommand({
+      Bucket: process.env.AWS_PRIMARY_BUCKET,
+      Key: `${req.body._id}/${req.body.imageset}/original/${req.body.index}/${req.body.files[1]}`,
+    });
+
+    const url1 = await getSignedUrl(s3, cmd1, { expiresIn: 600 });
+    const url2 = await getSignedUrl(s3, cmd2, { expiresIn: 600 });
+
+    return res.status(200).json([url1, url2]);
   }
 };
 

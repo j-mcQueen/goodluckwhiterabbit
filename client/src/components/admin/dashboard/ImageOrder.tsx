@@ -5,6 +5,8 @@ import { handleDelete } from "./utils/handlers/ordering/handleDelete";
 import { handleDeleteTypes } from "./types/handleDeleteTypes";
 import { handleLoad } from "./utils/handlers/ordering/handleLoad";
 import { handleLoadTypes } from "./types/handleLoadTypes";
+import { handleDrop } from "./utils/handlers/ordering/handleDrop";
+import { handleDropTypes } from "./types/handleDropTypes";
 
 import Close from "../../../assets/media/icons/Close";
 
@@ -219,7 +221,7 @@ export default function ImageOrder({ ...props }) {
                       const file = e.dataTransfer.files[0];
                       const fFile = e.dataTransfer.files[1]; // full res file
 
-                      const args = {
+                      const args: handleDropTypes = {
                         clients,
                         draggedIndex,
                         fFile,
@@ -238,7 +240,7 @@ export default function ImageOrder({ ...props }) {
                         targetImageset,
                       };
 
-                      // handleDrop(args);
+                      handleDrop(args);
 
                       const updatedOrder = [...order];
                       updatedOrder[index] = file;
