@@ -16,7 +16,7 @@ const ImageQueue = memo(function ImageQueue() {
       <div className="h-[1000px] overflow-y-scroll">
         <div className="flex justify-between items-center gap-5 py-4 px-4">
           <p className="text-xl">
-            <span className={`${queue.length > 0 ? "text-rd" : ""}`}>
+            <span className={`${uploadCount > 0 ? "text-rd" : ""}`}>
               {uploadCount}
             </span>
             {uploadCount === 1 ? " FILE " : " FILES "} QUEUED
@@ -45,10 +45,12 @@ const ImageQueue = memo(function ImageQueue() {
                   onClick={() =>
                     handleDelete(
                       uploadCount,
-                      setUploadCount,
+                      index,
+                      fullRes,
                       queue,
-                      setQueue,
-                      index
+                      setUploadCount,
+                      setFullRes,
+                      setQueue
                     )
                   }
                   className="bg-black border border-solid border-rd p-1 relative"
