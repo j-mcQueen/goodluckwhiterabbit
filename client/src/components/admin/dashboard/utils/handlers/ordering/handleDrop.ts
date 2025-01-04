@@ -57,39 +57,39 @@ export const handleDrop = async ({ ...params }) => {
   }
 
   // verify if there is an existing file and remove from S3 if true
-  // try {
-  //   const response = await fetch(
-  //     `${params.host}/admin/users/${params.targetClient._id}/getFile/${params.targetImageset}/${params.index}`,
-  //     {
-  //       method: "GET",
-  //       headers: {
-  //         Accept: "application/json",
-  //         "Content-Type": "application/json",
-  //       },
-  //       credentials: "include",
-  //     }
-  //   );
-  //   const data = await response.json();
+  try {
+    const response = await fetch(
+      `${params.host}/admin/users/${params.targetClient._id}/getFile/${params.targetImageset}/${params.index}`,
+      {
+        method: "GET",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+      }
+    );
+    const data = await response.json();
 
-  //   if (data) {
-  //     switch (response.status) {
-  //       case 200:
-  //       case 304:
-  //         break;
+    if (data) {
+      switch (response.status) {
+        case 200:
+        case 304:
+          break;
 
-  //       case 500:
-  //         throw new TypeError(data.message);
-  //     }
-  //   }
-  // } catch (error) {
-  //   if (error instanceof Error) {
-  //     return params.setNotice({
-  //       status: true,
-  //       message: error.message,
-  //       logout: { status: false, path: null },
-  //     });
-  //   }
-  // }
+        case 500:
+          throw new TypeError(data.message);
+      }
+    }
+  } catch (error) {
+    if (error instanceof Error) {
+      return params.setNotice({
+        status: true,
+        message: error.message,
+        logout: { status: false, path: null },
+      });
+    }
+  }
 
   // // send s3 request and upload single image
   // try {

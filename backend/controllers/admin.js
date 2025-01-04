@@ -211,18 +211,32 @@ exports.adminGetFileAndDelete = async (req, res, next) => {
   const verified = await verifyTokens(req, res);
 
   if (verified) {
-    let existingFile;
+    let existingFiles = [];
     try {
-      existingFile = await s3.send(
+      const existingResized = await s3.send(
         new ListObjectsV2Command({
           Bucket: process.env.AWS_PRIMARY_BUCKET,
-          Prefix: `${req.params.id}/${req.params.imageset}/${req.params.index}/`,
+          Prefix: `${req.params.id}/${req.params.imageset}/resized/${req.params.index}/`,
+          MaxKeys: 1,
         })
       );
 
-      if (!existingFile) throw new Error("500");
-      if (!existingFile.Contents)
+      const existingOriginal = await s3.send(
+        new ListObjectsV2Command({
+          Bucket: process.env.AWS_PRIMARY_BUCKET,
+          Prefix: `${req.params.id}/${req.params.imageset}/original/${req.params.index}/`,
+          MaxKeys: 1,
+        })
+      );
+
+      if (!existingResized || !existingOriginal) {
+        throw new Error("500");
+      } else if (!existingResized.Contents && !existingOriginal.Contents) {
+        // query executed and returned empty, therefore end req/res cycle
         return res.status(200).json({ success: true });
+      } else {
+        existingFiles.push(existingResized, existingOriginal);
+      }
     } catch (error) {
       return res.status(500).json({
         status: true,
@@ -232,13 +246,18 @@ exports.adminGetFileAndDelete = async (req, res, next) => {
       });
     }
 
-    if (existingFile.Contents.length > 0) {
-      // there is a pre-existing object at the target index, so delete it in preparation for replacement
+    if (existingResized.Contents.length > 0) {
+      // there are matching pre-existing objects at the target index, so delete it in preparation for replacement
       try {
         const deleted = await s3.send(
-          new DeleteObjectCommand({
+          new DeleteObjectsCommand({
             Bucket: process.env.AWS_PRIMARY_BUCKET,
-            Key: existingFile.Contents[0].Key,
+            Delete: {
+              Objects: [
+                { Key: existingFiles[0].Contents[0].Key },
+                { Key: existingFiles[1].Contents[0].Key },
+              ],
+            },
           })
         );
 
