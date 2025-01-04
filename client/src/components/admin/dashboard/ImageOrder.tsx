@@ -1,8 +1,12 @@
 import { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { updateFileCount } from "./utils/updateFileCounts";
-import { handleDragStart } from "./utils/handleDragStart";
-import { executeGenerationChain } from "../../global/utils/executeGenerationChain";
+import { handleDragStart } from "./utils/handlers/handleDragStart";
+// import { executeGenerationChain } from "../../global/utils/executeGenerationChain";
+import { handleDelete } from "./utils/handlers/ordering/handleDelete";
+import { handleDeleteTypes } from "./types/handleDeleteTypes";
+import { handleLoad } from "./utils/handlers/ordering/handleLoad";
+import { handleLoadTypes } from "./types/handleLoadTypes";
 
 import Close from "../../../assets/media/icons/Close";
 
@@ -166,112 +170,115 @@ export default function ImageOrder({ ...props }) {
     }
   };
 
-  const handleLoadClick = async () => {
-    if (renderCount === targetClient.fileCounts[targetImageset]) {
-      const nextOrder = [...order, ...Array(10).fill({})];
-      return setOrder(nextOrder);
-    } else if (renderCount < targetClient.fileCounts[targetImageset]) {
-      setSpinner(true);
+  // const handleLoadClick = async () => {
+  //   if (renderCount === targetClient.fileCounts[targetImageset]) {
+  //     const nextOrder = [...order, ...Array(10).fill({})];
+  //     return setOrder(nextOrder);
+  //   } else if (renderCount < targetClient.fileCounts[targetImageset]) {
+  //     setSpinner(true);
 
-      const imagesetLength = order.length;
-      const data = await executeGenerationChain(
-        order,
-        targetImageset,
-        setNotice,
-        imagesetLength,
-        imagesetLength + 10,
-        targetClient._id
-      );
+  //     const imagesetLength = order.length;
+  //     const data = await executeGenerationChain(
+  //       order,
+  //       targetImageset,
+  //       setNotice,
+  //       imagesetLength,
+  //       imagesetLength + 10,
+  //       targetClient._id
+  //     );
 
-      const count = renderCount + data.count;
-      const response = await fetch(
-        `${host}/admin/users/${targetClient._id}/updateFileCount/${targetImageset}/${count}`,
-        {
-          method: "POST",
-          headers: {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-          },
-          credentials: "include",
-        }
-      );
-      const newCounts = await response.json();
+  //     const count = renderCount + data.count;
+  //     if (count > targetClient.fileCounts[targetImageset]) {
+  //       const response = await fetch(
+  //         `${host}/admin/users/${targetClient._id}/updateFileCount/${targetImageset}/${count}`,
+  //         {
+  //           method: "POST",
+  //           headers: {
+  //             Accept: "application/json",
+  //             "Content-Type": "application/json",
+  //           },
+  //           credentials: "include",
+  //         }
+  //       );
+  //       const newCounts = await response.json();
 
-      if (newCounts && (response.status === 200 || response.status === 304)) {
-        const nextTargetClient = { ...targetClient };
-        nextTargetClient.fileCounts[targetImageset] = newCounts[targetImageset];
-        setTargetClient(nextTargetClient);
+  //       if (response.status === 200 || response.status === 304) {
+  //         const nextTargetClient = { ...targetClient };
+  //         nextTargetClient.fileCounts[targetImageset] =
+  //           newCounts[targetImageset];
+  //         setTargetClient(nextTargetClient);
 
-        const nextClients = clients.map((client: { _id: string }) => {
-          return client._id === targetClient._id ? nextTargetClient : client;
-        });
-        setClients(nextClients);
+  //         const nextClients = clients.map((client: { _id: string }) => {
+  //           return client._id === targetClient._id ? nextTargetClient : client;
+  //         });
+  //         setClients(nextClients);
+  //       }
+  //     }
 
-        const nextOrder = data.files;
-        setOrder(nextOrder);
+  //     const nextOrder = data.files;
+  //     setOrder(nextOrder);
 
-        const rendered = nextOrder.filter(
-          (item: object | File) => item instanceof File
-        ).length;
-        setRenderCount(rendered);
+  //     const rendered = nextOrder.filter(
+  //       (item: object | File) => item instanceof File
+  //     ).length;
+  //     setRenderCount(rendered);
 
-        setSpinner(false);
-        return;
-      }
-    }
-  };
+  //     setSpinner(false);
+  //     return;
+  //   }
+  // };
 
-  const handleDeleteClick = async (index: number, filename: string) => {
-    try {
-      const response = await fetch(
-        `${host}/admin/users/${targetClient._id}/${targetImageset}/${index}/${filename}/delete`,
-        {
-          method: "DELETE",
-          headers: {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-          },
-          credentials: "include",
-        }
-      );
-      const data = await response.json();
+  // const handleDeleteClick = async (index: number, filename: string) => {
+  //   try {
+  //     const response = await fetch(
+  //       `${host}/admin/users/${targetClient._id}/${targetImageset}/${index}/${filename}/delete`,
+  //       {
+  //         method: "DELETE",
+  //         headers: {
+  //           Accept: "application/json",
+  //           "Content-Type": "application/json",
+  //         },
+  //         credentials: "include",
+  //       }
+  //     );
+  //     const data = await response.json();
 
-      if (data && (response.status === 200 || response.status === 304)) {
-        const updatedOrder = [...order];
-        updatedOrder[index] = {};
-        setOrder(updatedOrder);
+  //     if (data && (response.status === 200 || response.status === 304)) {
+  //       const updatedOrder = [...order];
+  //       updatedOrder[index] = {};
+  //       setOrder(updatedOrder);
 
-        // update imagesetCount
-        const nextImagesetCount = targetClient.fileCounts[targetImageset] - 1;
-        const newCounts = await updateFileCount(
-          host,
-          targetClient,
-          targetImageset,
-          nextImagesetCount
-        );
+  //       // update imagesetCount
+  //       const nextImagesetCount = targetClient.fileCounts[targetImageset] - 1;
+  //       const newCounts = await updateFileCount(
+  //         host,
+  //         targetClient,
+  //         targetImageset,
+  //         nextImagesetCount
+  //       );
 
-        const updatedTargetClient = { ...targetClient };
-        updatedTargetClient.fileCounts = newCounts;
-        setTargetClient(updatedTargetClient);
+  //       const updatedTargetClient = { ...targetClient };
+  //       updatedTargetClient.fileCounts = newCounts;
+  //       setTargetClient(updatedTargetClient);
 
-        const nextClients = clients.map((client: { _id: string }) => {
-          return client._id === targetClient._id ? updatedTargetClient : client;
-        });
-        setClients(nextClients);
+  //       const nextClients = clients.map((client: { _id: string }) => {
+  //         return client._id === targetClient._id ? updatedTargetClient : client;
+  //       });
+  //       setClients(nextClients);
 
-        const nextLoaded = renderCount - 1;
-        setRenderCount(nextLoaded);
-        return;
-      }
-    } catch (error) {
-      return setNotice({
-        status: true,
-        message:
-          "There was an error deleting this image. Please refresh the page and try again.",
-        logout: { status: false, path: null },
-      });
-    }
-  };
+  //       const nextLoaded = renderCount - 1;
+  //       setRenderCount(nextLoaded);
+  //       return;
+  //     }
+  //   } catch (error) {
+  //     return setNotice({
+  //       status: true,
+  //       message:
+  //         "There was an error deleting this image. Please refresh the page and try again.",
+  //       logout: { status: false, path: null },
+  //     });
+  //   }
+  // };
 
   return (
     <div className="flex items-start">
@@ -283,7 +290,25 @@ export default function ImageOrder({ ...props }) {
                 <div key={uuidv4()}>
                   {file instanceof File ? (
                     <button
-                      onClick={() => handleDeleteClick(index, file.name)}
+                      onClick={() => {
+                        const params: handleDeleteTypes = {
+                          clients,
+                          filename: file.name,
+                          host,
+                          index,
+                          order,
+                          renderCount,
+                          setClients,
+                          setNotice,
+                          setOrder,
+                          setRenderCount,
+                          setTargetClient,
+                          targetClient,
+                          targetImageset,
+                        };
+
+                        handleDelete(params);
+                      }}
                       className="absolute bg-black m-1 border border-solid border-rd p-1"
                     >
                       <Close className="w-4 h-4" />
@@ -298,17 +323,25 @@ export default function ImageOrder({ ...props }) {
                         ? handleDragStart(e, file, "order", index)
                         : null
                     }
-                    onDrop={(e) => {
+                    onDrop={async (e) => {
                       const draggedIndex = Number(
                         e.dataTransfer.getData("text/index")
                       );
                       const source = e.dataTransfer.getData("text/source");
+                      const type = e.dataTransfer.getData("text/type");
                       const file = e.dataTransfer.files[0];
+                      const fFile = e.dataTransfer.files[1]; // full res file
 
-                      handleDrop(file, index, draggedIndex, source);
+                      console.log(file, fFile);
+
+                      // const updatedOrder = [...order];
+                      // updatedOrder[index] = file;
+                      // setOrder(updatedOrder);
+
+                      // handleDrop(file, index, draggedIndex, source);
                     }}
                     onDragOver={(e) => e.preventDefault()}
-                    className={`${file instanceof File === false ? "h-[300px] w-[200px]" : "min-h-[300px] max-h-[350px]"} border border-solid`}
+                    className={`${file instanceof File === false ? "h-[300px] w-[200px] min-h-[300px]" : "min-h-[300px] max-h-[350px]"} border border-solid`}
                     src={file instanceof File ? URL.createObjectURL(file) : ""}
                   />
                 </div>
@@ -317,7 +350,19 @@ export default function ImageOrder({ ...props }) {
           </div>
 
           <button
-            onClick={() => handleLoadClick()}
+            onClick={() => {
+              const params: handleLoadTypes = {
+                clients,
+                host,
+                order,
+                renderCount,
+                setOrder,
+                setSpinner,
+                targetClient,
+                targetImageset,
+              };
+              handleLoad(params);
+            }}
             type="button"
             className="font-tnrBI tracking-widest opacity-80 drop-shadow-glo border border-solid px-4 py-2 xl:hover:text-rd xl:hover:drop-shadow-red xl:focus:text-rd xl:focus:drop-shadow-red transition-colors mt-8 mb-5"
           >
