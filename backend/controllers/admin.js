@@ -367,10 +367,12 @@ exports.adminDeleteFile = async (req, res, next) => {
         Delete: {
           Objects: [
             {
-              Key: `${req.params.id}/${req.params.imageset}/resized/${req.params.index}/c_${req.params.filename}`,
+              Key: `${req.params.id}/${req.params.imageset}/resized/${req.params.index}/${req.params.filename}`,
             },
             {
-              Key: `${req.params.id}/${req.params.imageset}/original/${req.params.index}/${req.params.filename}`,
+              Key: `${req.params.id}/${req.params.imageset}/original/${
+                req.params.index
+              }/${req.params.filename.slice(2)}`,
             },
           ],
         },
