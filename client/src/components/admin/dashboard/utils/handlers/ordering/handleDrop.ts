@@ -110,8 +110,6 @@ export const handleDrop = async ({ ...params }) => {
         nextImagesetCount
       );
 
-      params.setNotice({ status: true, message: "S3 upload complete." });
-
       const updatedTargetClient = { ...params.targetClient };
       updatedTargetClient.fileCounts = newCounts;
       params.setTargetClient(updatedTargetClient);
