@@ -162,7 +162,7 @@ exports.adminGetUserImagesetCount = async (req, res, next) => {
     const imagesetFiles = await s3.send(
       new ListObjectsV2Command({
         Bucket: process.env.AWS_PRIMARY_BUCKET,
-        Prefix: `${req.params.id}/${req.params.imageset}/`,
+        Prefix: `${req.params.id}/${req.params.imageset}/resized`,
       })
     );
 
