@@ -246,7 +246,7 @@ exports.adminGetFileAndDelete = async (req, res, next) => {
       });
     }
 
-    if (existingResized.Contents.length > 0) {
+    if (existingFiles[0].Contents.length > 0) {
       // there are matching pre-existing objects at the target index, so delete it in preparation for replacement
       try {
         const deleted = await s3.send(
@@ -278,6 +278,7 @@ exports.adminGetFileAndDelete = async (req, res, next) => {
   }
 };
 
+// TODO update
 exports.adminDeleteUser = async (req, res, next) => {
   const verified = await verifyTokens(req, res);
 
@@ -361,9 +362,18 @@ exports.adminDeleteFile = async (req, res, next) => {
 
   if (verified) {
     const deleted = await s3.send(
-      new DeleteObjectCommand({
+      new DeleteObjectsCommand({
         Bucket: process.env.AWS_PRIMARY_BUCKET,
-        Key: `${req.params.id}/${req.params.imageset}/${req.params.index}/${req.params.filename}`,
+        Delete: {
+          Objects: [
+            {
+              Key: `${req.params.id}/${req.params.imageset}/resized/${req.params.index}/c_${req.params.filename}`,
+            },
+            {
+              Key: `${req.params.id}/${req.params.imageset}/original/${req.params.index}/${req.params.filename}`,
+            },
+          ],
+        },
       })
     );
 
