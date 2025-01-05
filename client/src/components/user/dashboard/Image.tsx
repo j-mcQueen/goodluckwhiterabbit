@@ -23,7 +23,7 @@ export default function Image({ ...props }) {
                   : ""
               }
               alt={activeImage?.name}
-              className="h-[65dvh]"
+              className={carousel ? "h-[50dvh]" : "h-[40dvh]"}
             />
 
             <div className="text-white flex justify-between py-2">
