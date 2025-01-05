@@ -1,6 +1,9 @@
 require("dotenv").config();
 const jwt = require("jsonwebtoken");
 const User = require("../../models/user");
+const { s3 } = require("../config/s3");
+const { GetObjectCommand } = require("@aws-sdk/client-s3");
+const { getSignedUrl } = require("@aws-sdk/s3-request-presigner");
 const { body, validationResult } = require("express-validator");
 const { verifyTokens } = require("../utils/verifyTokens");
 
@@ -96,5 +99,32 @@ exports.getUser = async (req, res, next) => {
         logout: { status: false, path: null },
       });
     }
+  }
+};
+
+exports.generateOriginalGetPresigned = async (req, res, next) => {
+  // generate presigned url for a single original file
+  const verified = await verifyTokens(req, res);
+
+  if (verified) {
+    const cmd = new GetObjectCommand({
+      Bucket: process.env.AWS_PRIMARY_BUCKET,
+      Key: `${req.params.id}/${req.params.imageset}/original/${req.params.index}/${req.params.filename}`,
+    });
+
+    let url = "";
+    try {
+      url = await getSignedUrl(s3, cmd, { expiresIn: 600 });
+      if (!url) throw new Error("500");
+    } catch (error) {
+      // TODO write error message
+      return res.status(500).json({
+        status: true,
+        message: "",
+        logout: { status: false, path: null },
+      });
+    }
+
+    return res.status(200).json(url);
   }
 };

@@ -4,7 +4,15 @@ import { Fragment } from "react/jsx-runtime";
 import Image from "../Image";
 
 export default function Grid({ ...props }) {
-  const { imageset, fileCounts, disabled, handleClick, spinner } = props;
+  const {
+    imageset,
+    activeImageset,
+    userId,
+    fileCounts,
+    disabled,
+    handleClick,
+    spinner,
+  } = props;
 
   return (
     <section className="flex flex-col justify-center basis-[80dvw] pb-10">
@@ -15,6 +23,8 @@ export default function Grid({ ...props }) {
             return (
               <Fragment key={uuidv4()}>
                 <Image
+                  activeImageset={activeImageset}
+                  userId={userId}
                   activeImage={image}
                   imageset={imageset}
                   carousel={false}

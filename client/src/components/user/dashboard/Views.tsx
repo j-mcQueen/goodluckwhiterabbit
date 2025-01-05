@@ -88,7 +88,11 @@ export default function Views({ ...props }) {
       </aside>
 
       <div className="w-full h-[calc(100dvh-57px-1.5rem)] overflow-y-scroll">
-        <Carousel imageset={imageset} />
+        <Carousel
+          userId={user._id}
+          activeImageset={activeImageset}
+          imageset={imageset}
+        />
 
         <div className="text-rd text-lg text-center py-20">
           <p>SCROLL FOR GRID &#8595;</p>
@@ -97,6 +101,8 @@ export default function Views({ ...props }) {
         <Grid
           spinner={spinner}
           imageset={imageset}
+          userId={user._id}
+          activeImageset={activeImageset}
           fileCounts={user.fileCounts[activeImageset]}
           disabled={disabled}
           handleClick={handleClick}

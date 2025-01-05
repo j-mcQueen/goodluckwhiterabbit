@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from "uuid";
 import ActionBar from "./ActionBar";
 
 export default function Image({ ...props }) {
-  const { activeImage, imageset, carousel } = props;
+  const { activeImage, activeImageset, userId, imageset, carousel } = props;
 
   return (
     <div className="relative z-0 pt-20">
@@ -28,7 +28,9 @@ export default function Image({ ...props }) {
 
             <div className="text-white flex justify-between py-2">
               <ActionBar
+                userId={userId}
                 activeImage={activeImage}
+                activeImageset={activeImageset}
                 imageset={imageset}
                 carousel={carousel}
               />

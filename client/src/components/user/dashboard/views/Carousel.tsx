@@ -5,7 +5,7 @@ import Next from "../../../../assets/media/icons/Next";
 import Image from "../Image";
 
 export default function Carousel({ ...props }) {
-  const { imageset } = props;
+  const { userId, activeImageset, imageset } = props;
   const [activeImage, setActiveImage] = useState(0);
 
   return (
@@ -25,6 +25,8 @@ export default function Carousel({ ...props }) {
 
         <div className="relative flex flex-col basis-[80dvw] items-center overflow-hidden">
           <Image
+            activeImageset={activeImageset}
+            userId={userId}
             imageset={imageset}
             activeImage={imageset[activeImage]}
             carousel={true}
