@@ -13,7 +13,7 @@ const ImageQueue = memo(function ImageQueue() {
 
   return (
     <div className="border-l-[1px] border-solid">
-      <div className="h-[1000px] overflow-y-scroll">
+      <div>
         <div className="flex justify-between items-center gap-5 py-4 px-4">
           <p className="text-xl">
             <span className={`${uploadCount > 0 ? "text-rd" : ""}`}>
@@ -36,7 +36,7 @@ const ImageQueue = memo(function ImageQueue() {
           </label>
         </div>
 
-        <div className="grid grid-cols-3 gap-5 overflow-scroll p-3">
+        <div className="grid grid-cols-3 gap-5 overflow-scroll h-[1200px] p-3">
           {queue.map((file: File, index: number) => {
             return (
               <div key={uuidv4()}>

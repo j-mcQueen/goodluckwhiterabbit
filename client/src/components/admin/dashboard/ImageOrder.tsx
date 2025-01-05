@@ -29,9 +29,9 @@ export default function ImageOrder({ ...props }) {
 
   return (
     <div className="flex items-start">
-      <div className="text-white p-3 min-w-[40vw] flex flex-col items-center justify-center overflow-scroll">
+      <div className="text-white p-3 min-w-[40vw] flex flex-col items-center justify-center">
         <div className="flex flex-col items-center ">
-          <div className="flex flex-wrap justify-center max-w-[60dvw] gap-5 px-5 overflow-scroll relative">
+          <div className="flex flex-wrap justify-center max-w-[60dvw] gap-5 px-5 overflow-scroll h-[1200px] relative">
             {order.map((file: File | object, index: number) => {
               return (
                 <div key={uuidv4()}>
