@@ -5,7 +5,6 @@ import { resize } from "../../compress/resize";
 export const handleChange = async (
   e: React.ChangeEvent<HTMLInputElement>,
   setUploadCount: Dispatch<SetStateAction<number>>,
-  setFullRes: Dispatch<SetStateAction<File[]>>,
   setQueue: Dispatch<SetStateAction<File[]>>
 ) => {
   const placeholder = [];
@@ -24,7 +23,6 @@ export const handleChange = async (
       placeholder.push(converted);
     }
     setQueue([...placeholder]);
-    setFullRes([...e.target.files]);
   }
   return;
 };

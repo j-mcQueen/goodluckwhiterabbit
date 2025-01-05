@@ -1,4 +1,4 @@
-import { memo, useState } from "react";
+import { memo, useRef, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { handleDragStart } from "./utils/handlers/handleDragStart";
 import { handleDragEnd } from "./utils/handlers/handleDragEnd";
@@ -7,9 +7,9 @@ import { handleDelete } from "./utils/handlers/queueing/handleDelete";
 import Close from "../../../assets/media/icons/Close";
 
 const ImageQueue = memo(function ImageQueue() {
-  const [fullRes, setFullRes] = useState<File[]>([]);
   const [queue, setQueue] = useState<File[]>([]);
   const [uploadCount, setUploadCount] = useState(0);
+  const fileRef = useRef<HTMLInputElement>(null);
 
   return (
     <div className="border-l-[1px] border-solid">
@@ -25,11 +25,10 @@ const ImageQueue = memo(function ImageQueue() {
           <label className="font-tnrBI tracking-widest opacity-80 drop-shadow-glo border border-solid flex items-center px-2 py-1 transition-colors xl:hover:text-rd xl:hover:drop-shadow-red xl:focus:text-rd xl:focus:drop-shadow-red xl:hover:cursor-pointer">
             ADD FILES
             <input
+              ref={fileRef}
               type="file"
               name="additions"
-              onChange={(e) =>
-                handleChange(e, setUploadCount, setFullRes, setQueue)
-              }
+              onChange={(e) => handleChange(e, setUploadCount, setQueue)}
               className="opacity-0 w-[1px]"
               accept="image/*"
               multiple
@@ -46,10 +45,8 @@ const ImageQueue = memo(function ImageQueue() {
                     handleDelete(
                       uploadCount,
                       index,
-                      fullRes,
                       queue,
                       setUploadCount,
-                      setFullRes,
                       setQueue
                     )
                   }
@@ -63,12 +60,10 @@ const ImageQueue = memo(function ImageQueue() {
                   draggable={true}
                   onDragStart={(e) => {
                     e.currentTarget.style.opacity = "0.25";
-
-                    const j = fullRes.findIndex(
-                      (item) =>
-                        item.name === file.name.slice(2, file.name.length)
-                    );
-                    handleDragStart(e, file, "queue", index, fullRes[j]);
+                    if (fileRef.current?.files) {
+                      const fFile = fileRef.current.files[index];
+                      handleDragStart(e, file, "queue", index, fFile);
+                    }
                   }}
                   onDragEnd={(e) => handleDragEnd(e)}
                   src={file instanceof File ? URL.createObjectURL(file) : ""}
