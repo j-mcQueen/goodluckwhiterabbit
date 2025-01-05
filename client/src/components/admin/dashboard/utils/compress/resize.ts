@@ -1,17 +1,16 @@
-import { toBase64 } from "./toBase64";
-
 export const resize = async (file: File, type: string) => {
   const canvas = document.createElement("canvas");
-  const ctx = canvas.getContext("2d");
+  const ctx = canvas.getContext("2d", { alpha: false });
 
-  const imageUrl = await toBase64(file);
+  const imageUrl = URL.createObjectURL(file);
   const img = new Image();
 
   await new Promise<void>((resolve, reject) => {
     // promise ensures conversion to dataURL always receives a value
     img.onload = () => {
+      URL.revokeObjectURL(imageUrl);
       const oc = document.createElement("canvas");
-      const octx = oc.getContext("2d");
+      const octx = oc.getContext("2d", { alpha: false });
 
       canvas.width = img.width * (1 / 10); // target width -> determines size of final image
       canvas.height = canvas.width * (img.height / img.width);
@@ -62,7 +61,7 @@ export const resize = async (file: File, type: string) => {
     img.onerror = reject;
     if (typeof imageUrl === "string") img.src = imageUrl;
   });
-  const dUrl = canvas.toDataURL(type, 0.9);
+  const url = canvas.toDataURL(type, 0.9);
   canvas.remove();
-  return dUrl;
+  return url;
 };
