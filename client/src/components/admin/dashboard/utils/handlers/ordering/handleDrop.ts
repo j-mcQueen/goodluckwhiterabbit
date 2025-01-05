@@ -4,7 +4,7 @@ export const handleDrop = async ({ ...params }) => {
   if (params.index === params.draggedIndex && params.source !== "queue") return; // user made a mistake
 
   // generate presigned URL for file upload
-  let presigned = "";
+  const presigned = [];
   try {
     // generate the urls used to add each file to S3
     const response = await fetch(`${params.host}/generatePutPresigned`, {
@@ -27,7 +27,7 @@ export const handleDrop = async ({ ...params }) => {
       switch (response.status) {
         case 200:
         case 304:
-          presigned = data;
+          presigned.push(...data);
           break;
 
         case 401:
@@ -56,6 +56,7 @@ export const handleDrop = async ({ ...params }) => {
     }
   }
 
+  // TODO can't we just check if there's an existing file at the given index in the order array before executing this request?
   // verify if there is an existing file and remove from S3 if true
   try {
     const response = await fetch(
@@ -91,52 +92,50 @@ export const handleDrop = async ({ ...params }) => {
     }
   }
 
-  // // send s3 request and upload single image
-  // try {
-  //   const response = await fetch(presigned, {
-  //     method: "PUT",
-  //     body: params.file,
-  //   });
+  // // send s3 request and upload images
+  try {
+    const [response1, response2] = await Promise.all([
+      fetch(presigned[0], { method: "PUT", body: params.file }),
+      fetch(presigned[1], { method: "PUT", body: params.fFile }),
+    ]);
 
-  //   if (response.status === 200 || response.status === 304) {
-  //     // update images locked into order
-  //     const updatedOrder = [...params.order];
-  //     updatedOrder[params.index] = params.file;
-  //     params.setOrder(updatedOrder);
+    if (response1.status === 200 && response2.status === 200) {
+      // update images locked into order
+      const nextImagesetCount =
+        params.targetClient.fileCounts[params.targetImageset] + 1;
+      const newCounts = await updateFileCount(
+        params.host,
+        params.targetClient,
+        params.targetImageset,
+        nextImagesetCount
+      );
 
-  //     const nextImagesetCount =
-  //       params.targetClient.fileCounts[params.targetImageset] + 1;
-  //     const newCounts = await updateFileCount(
-  //       params.host,
-  //       params.targetClient,
-  //       params.targetImageset,
-  //       nextImagesetCount
-  //     );
+      const nextLoaded = params.renderCount + 1;
+      params.setRenderCount(nextLoaded);
 
-  //     const updatedTargetClient = { ...params.targetClient };
-  //     updatedTargetClient.fileCounts = newCounts;
-  //     params.setTargetClient(updatedTargetClient);
+      params.setNotice({ status: true, message: "S3 upload complete." });
 
-  //     const nextLoaded = params.renderCount + 1;
-  //     params.setRenderCount(nextLoaded);
+      const updatedTargetClient = { ...params.targetClient };
+      updatedTargetClient.fileCounts = newCounts;
+      params.setTargetClient(updatedTargetClient);
 
-  //     const nextClients = params.clients.map((client: { _id: string }) => {
-  //       return client._id === params.targetClient._id
-  //         ? updatedTargetClient
-  //         : client;
-  //     });
-  //     params.setClients(nextClients);
-  //   } else {
-  //     throw new Error("Other");
-  //   }
-  // } catch (error) {
-  //   if (error instanceof Error) {
-  //     console.log(error);
-  //     params.setNotice({
-  //       status: true,
-  //       message: "We could not upload your image. Please try again.",
-  //       logout: { status: false, path: null },
-  //     });
-  //   }
-  // }
+      const nextClients = params.clients.map((client: { _id: string }) => {
+        return client._id === params.targetClient._id
+          ? updatedTargetClient
+          : client;
+      });
+      params.setClients(nextClients);
+    } else {
+      throw new Error("Other");
+    }
+  } catch (error) {
+    if (error instanceof Error) {
+      console.log(error);
+      params.setNotice({
+        status: true,
+        message: "We could not upload your images. Please try again.",
+        logout: { status: false, path: null },
+      });
+    }
+  }
 };
