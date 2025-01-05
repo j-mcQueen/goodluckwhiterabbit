@@ -79,7 +79,7 @@ export default function UserLogin() {
               onChange={() => {
                 if (authError) setAuthError({ active: false, message: "" });
               }}
-              className="bg-black border border-solid border-white xl:focus:border-red transition-all font-liquid text-rd h-10 pl-2 mt-2 outline-none"
+              className="bg-black border border-solid border-white xl:focus:border-red transition-all font-vt text-rd h-10 pl-2 mt-2 outline-none"
               required
             />
           </label>
