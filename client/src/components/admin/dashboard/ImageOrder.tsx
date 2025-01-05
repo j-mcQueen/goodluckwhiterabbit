@@ -86,11 +86,9 @@ export default function ImageOrder({ ...props }) {
                         host,
                         index,
                         order,
-                        renderCount,
                         setClients,
                         setNotice,
                         setOrder,
-                        setRenderCount,
                         setTargetClient,
                         source,
                         targetClient,
@@ -99,8 +97,11 @@ export default function ImageOrder({ ...props }) {
 
                       handleDrop(args);
 
+                      const nextLoaded = renderCount + 1;
                       const updatedOrder = [...order];
                       updatedOrder[index] = file;
+
+                      setRenderCount(nextLoaded);
                       setOrder(updatedOrder);
                     }}
                     onDragOver={(e) => e.preventDefault()}

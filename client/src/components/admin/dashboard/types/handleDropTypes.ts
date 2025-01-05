@@ -8,7 +8,6 @@ export interface handleDropTypes {
   host: string;
   index: number;
   order: (File | object)[];
-  renderCount: number;
   setClients: Dispatch<SetStateAction<{ _id: string }[]>>;
   setNotice: Dispatch<
     SetStateAction<{
@@ -18,7 +17,6 @@ export interface handleDropTypes {
     }>
   >;
   setOrder: Dispatch<SetStateAction<(File | object)[]>>;
-  setRenderCount: Dispatch<SetStateAction<number>>;
   setTargetClient: Dispatch<SetStateAction<{ _id: string }>>;
   source: string;
   targetClient: {
