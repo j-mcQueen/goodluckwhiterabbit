@@ -7,10 +7,7 @@ const {
   adminDeleteFile,
   adminUpdateUserImagesetCount,
   adminGetUserImagesetCount,
-  // adminGetUserImages,
-  // adminAddImages,
-  // adminPutImageOrder,
-  // getImagesetPresigns,
+  adminAddDriveLinks,
 } = require("../controllers/admin");
 const express = require("express");
 const multer = require("multer");
@@ -29,13 +26,7 @@ router.post(
   "/users/:id/updateFileCount/:imageset/:count",
   adminUpdateUserImagesetCount
 );
-// PUT
-// router.put(
-//   "/users/:id/editImageOrder/:imageset",
-//   upload.any(),
-//   adminPutImageOrder
-// );
-// router.put("/users/:id/addImages/:imageset", upload.any(), adminAddImages);
+router.post("/users/:id/addLinks", adminAddDriveLinks);
 // DELETE
 router.delete("/deleteUser/:id", adminDeleteUser);
 router.delete("/users/:id/:imageset/:index/:filename/delete", adminDeleteFile);

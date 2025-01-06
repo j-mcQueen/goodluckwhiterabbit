@@ -10,6 +10,7 @@ import Actions from "./Actions";
 import EditClient from "./EditClient";
 import RejectedFiles from "./modals/RejectedFiles";
 import Notice from "./modals/Notice";
+import AddLinks from "./AddLinks";
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
@@ -155,6 +156,13 @@ export default function AdminDashboard() {
               targetClient={targetClient}
               setTargetClient={setTargetClient}
               setActivePane={setActivePane}
+            />
+          ) : activePane === "LINKS" ? (
+            <AddLinks
+              setActivePane={setActivePane}
+              setClients={setClients}
+              clients={clients}
+              targetClient={targetClient}
             />
           ) : null}
         </>

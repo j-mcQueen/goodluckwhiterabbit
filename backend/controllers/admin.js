@@ -129,6 +129,7 @@ exports.adminAddClient = [
           socials: 0,
           snips: 0,
         },
+        links: { previews: "", full: "", socials: "", snips: "" },
         added: new Date(Date.now()).toLocaleString("en-US").split(",")[0], // mm/dd/yyyy format
       });
 
@@ -141,6 +142,7 @@ exports.adminAddClient = [
             code: user.code,
             added: user.added,
             fileCounts: user.fileCounts,
+            links: user.links,
           });
         }
       } catch (err) {
@@ -380,5 +382,21 @@ exports.adminDeleteFile = async (req, res, next) => {
     );
 
     return res.status(200).json(deleted);
+  }
+};
+
+exports.adminAddDriveLinks = async (req, res, next) => {
+  const verified = await verifyTokens(req, res);
+
+  if (verified) {
+    const updatedUser = await User.findByIdAndUpdate(
+      req.params.id,
+      {
+        links: req.body,
+      },
+      { new: true }
+    );
+
+    return res.status(200).json(updatedUser.links);
   }
 };

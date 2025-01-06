@@ -11,6 +11,12 @@ const UserSchema = new Schema({
     socials: Number,
     snips: Number,
   },
+  links: {
+    previews: String,
+    full: String,
+    socials: String,
+    snips: String,
+  },
   role: String,
   added: String,
 });

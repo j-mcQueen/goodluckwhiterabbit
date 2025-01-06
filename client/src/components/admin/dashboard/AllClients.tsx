@@ -1,11 +1,13 @@
 import { v4 as uuidv4 } from "uuid";
 import { dashboard_btns, icons } from "./styles/styles";
 import { dashboard_client } from "./types/types";
+import { handleActionClick } from "./utils/handlers/dashboard/handleActionClick";
 
 import Copy from "../../../assets/media/icons/Copy";
 import Edit from "../../../assets/media/icons/Edit";
 import Close from "../../../assets/media/icons/Close";
 import Mail from "../../../assets/media/icons/Mail";
+import Links from "../../../assets/media/icons/Links";
 
 export default function AllClients({ ...props }) {
   const {
@@ -39,11 +41,6 @@ export default function AllClients({ ...props }) {
     }
   };
 
-  const handleClick = (client: object) => {
-    setTargetClient(client);
-    setActivePane("EDIT");
-  };
-
   return (
     <table className="w-full mt-5 border-collapse ">
       <thead>
@@ -52,6 +49,7 @@ export default function AllClients({ ...props }) {
           <th className="pb-2">DATE</th>
           <th>CODE</th>
           <th>FILES</th>
+          <th>LINKS</th>
           <th>COPY</th>
           <th>EDIT</th>
           <th>SEND</th>
@@ -99,6 +97,23 @@ export default function AllClients({ ...props }) {
 
               <td className="align-middle">
                 <button
+                  onClick={() =>
+                    handleActionClick(
+                      client,
+                      setTargetClient,
+                      "LINKS",
+                      setActivePane
+                    )
+                  }
+                  type="button"
+                  className={dashboard_btns}
+                >
+                  <Links className={icons} />
+                </button>
+              </td>
+
+              <td className="align-middle">
+                <button
                   disabled={notice.status}
                   onClick={() => handleCopy(client.code)}
                   type="button"
@@ -112,9 +127,14 @@ export default function AllClients({ ...props }) {
                 <button
                   type="button"
                   className={dashboard_btns}
-                  onClick={() => {
-                    handleClick(client);
-                  }}
+                  onClick={() =>
+                    handleActionClick(
+                      client,
+                      setTargetClient,
+                      "EDIT",
+                      setActivePane
+                    )
+                  }
                 >
                   <Edit className={icons} />
                 </button>

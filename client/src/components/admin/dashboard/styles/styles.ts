@@ -6,3 +6,6 @@ export const dashboard_btns =
 
 export const imageset_select_btns =
   "font-tnrBI tracking-widest opacity-80 drop-shadow-glo border border-solid py-2 px-3 xl:hover:text-rd xl:hover:drop-shadow-red focus:text-rd focus:drop-shadow-red focus:outline-none transition-all";
+
+export const form_inputs =
+  "w-full bg-black border border-solid border-white text-white xl:hover:border-rd focus:border-rd p-3 focus:outline-none placeholder:text-white transition-colors";
