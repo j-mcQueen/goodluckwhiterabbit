@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { createZip } from "./utils/createZip";
 import { executeGenerationChain } from "../../global/utils/executeGenerationChain";
+import { handleDownloadAll } from "./utils/handleDownloadAll";
 
 import Carousel from "./views/Carousel";
 import Grid from "./views/Grid";
@@ -19,6 +19,7 @@ export default function Views({ ...props }) {
   } = props;
   const [loaded, setLoaded] = useState(imageset.length);
   const [disabled, setDisabled] = useState(false);
+  const [retrieving, setRetrieving] = useState(false);
 
   const handleClick = async () => {
     setSpinner(true);
@@ -68,15 +69,26 @@ export default function Views({ ...props }) {
             <button
               type="button"
               className="border border-solid border-white text-lg text-white py-1 px-3 xl:hover:border-rd xl:hover:text-rd xl:hover:drop-shadow-red xl:focus:drop-shadow-red xl:focus:text-rd xl:focus:border-rd transition-colors mt-5"
-              onClick={async () => {
-                const filtered = imageset.filter(
-                  (item: object) => item instanceof File === true
-                );
-                await createZip(filtered, `${user.name}-${activeImageset}.zip`);
+              onClick={() => {
+                const args = {
+                  activeImageset,
+                  link: user.links[activeImageset],
+                  name: user.name,
+                  setRetrieving,
+                };
+
+                handleDownloadAll(args);
               }}
             >
               DOWNLOAD: ALL
             </button>
+          ) : null}
+
+          {retrieving ? (
+            <p className="text-yellow-400 max-w-[245px] px-5 pt-5">
+              Please keep portal open while your zip file downloads... Slow and
+              steady wins the race!
+            </p>
           ) : null}
 
           {spinner ? (

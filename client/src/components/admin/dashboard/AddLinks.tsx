@@ -14,10 +14,10 @@ export default function AddLinks({ ...props }) {
     message: "",
   });
   const [inputVals, setInputVals] = useState({
-    previews: "",
-    full: "",
-    socials: "",
-    snips: "",
+    previews: "https://drive.google.com/uc?export=download&id=",
+    full: "https://drive.google.com/uc?export=download&id=",
+    socials: "https://drive.google.com/uc?export=download&id=",
+    snips: "https://drive.google.com/uc?export=download&id=",
   });
 
   return (
@@ -52,6 +52,7 @@ export default function AddLinks({ ...props }) {
           SNAPSHOTS
           <input
             type="text"
+            value={inputVals.previews}
             onChange={(e) =>
               setInputVals({ ...inputVals, previews: e.target.value })
             }
@@ -63,6 +64,7 @@ export default function AddLinks({ ...props }) {
         <label className="text-rd">
           KEEPSAKE PREVIEW
           <input
+            value={inputVals.full}
             type="text"
             onChange={(e) =>
               setInputVals({ ...inputVals, full: e.target.value })
@@ -75,6 +77,7 @@ export default function AddLinks({ ...props }) {
         <label className="text-rd">
           CORE COLLECTION
           <input
+            value={inputVals.socials}
             type="text"
             onChange={(e) =>
               setInputVals({ ...inputVals, socials: e.target.value })
@@ -87,6 +90,7 @@ export default function AddLinks({ ...props }) {
         <label className="text-rd">
           SNIPS
           <input
+            value={inputVals.snips}
             type="text"
             onChange={(e) =>
               setInputVals({ ...inputVals, snips: e.target.value })
