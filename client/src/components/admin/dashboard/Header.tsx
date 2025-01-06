@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { icons } from "./styles/styles";
+import { handleActionClick } from "./utils/handlers/dashboard/handleActionClick";
 
 import rabbit from "../../../assets/media/gifs/glwr-lenticular.gif";
 import Eject from "../../../assets/media/icons/Eject";
@@ -28,10 +29,9 @@ export default function Header({ ...props }) {
         {edit ? (
           <button
             type="button"
-            onClick={() => {
-              setTargetClient([]);
-              setActivePane("ALL");
-            }}
+            onClick={() =>
+              handleActionClick([], setTargetClient, "ALL", setActivePane)
+            }
             className="xl:hover:border-rd focus:border-rd outline-none transition-colors border border-solid border-white w-10 h-10 flex items-center justify-center group"
           >
             <Prev className={icons} />
