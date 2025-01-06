@@ -1,6 +1,6 @@
 export const userDashboardHeaderItems = [
   "snapshots",
-  "keepsake preview",
+  // "keepsake preview",
   "core collection",
   "snips",
 ];
