@@ -363,25 +363,35 @@ exports.adminDeleteFile = async (req, res, next) => {
   const verified = await verifyTokens(req, res);
 
   if (verified) {
-    const deleted = await s3.send(
-      new DeleteObjectsCommand({
-        Bucket: process.env.AWS_PRIMARY_BUCKET,
-        Delete: {
-          Objects: [
-            {
-              Key: `${req.params.id}/${req.params.imageset}/resized/${req.params.index}/${req.params.filename}`,
-            },
-            {
-              Key: `${req.params.id}/${req.params.imageset}/original/${
-                req.params.index
-              }/${req.params.filename.slice(2)}`,
-            },
-          ],
-        },
-      })
-    );
+    try {
+      const deleted = await s3.send(
+        new DeleteObjectsCommand({
+          Bucket: process.env.AWS_PRIMARY_BUCKET,
+          Delete: {
+            Objects: [
+              {
+                Key: `${req.params.id}/${req.params.imageset}/resized/${req.params.index}/${req.params.filename}`,
+              },
+              {
+                Key: `${req.params.id}/${req.params.imageset}/original/${
+                  req.params.index
+                }/${req.params.filename.slice(2)}`,
+              },
+            ],
+          },
+        })
+      );
 
-    return res.status(200).json(deleted);
+      if (deleted) res.status(200).json(deleted);
+    } catch (error) {
+      console.log(error);
+      return res
+        .status(500)
+        .json({
+          status: 500,
+          message: "We could not delete this file from S3.",
+        });
+    }
   }
 };
 

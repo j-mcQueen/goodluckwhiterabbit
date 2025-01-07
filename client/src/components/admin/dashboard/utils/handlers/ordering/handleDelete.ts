@@ -16,10 +16,6 @@ export const handleDelete = async ({ ...params }) => {
     const data = await response.json();
 
     if (data && (response.status === 200 || response.status === 304)) {
-      const updatedOrder = [...params.order];
-      updatedOrder[params.index] = {};
-      params.setOrder(updatedOrder);
-
       // update imagesetCount
       const nextImagesetCount =
         params.targetClient.fileCounts[
@@ -31,6 +27,10 @@ export const handleDelete = async ({ ...params }) => {
         params.targetImageset,
         nextImagesetCount
       );
+
+      const updatedOrder = [...params.order];
+      updatedOrder[params.index] = {};
+      params.setOrder(updatedOrder);
 
       const updatedTargetClient = { ...params.targetClient };
       updatedTargetClient.fileCounts = newCounts;
@@ -48,6 +48,7 @@ export const handleDelete = async ({ ...params }) => {
       return;
     }
   } catch (error) {
+    console.log(error);
     return params.setNotice({
       status: true,
       message:
