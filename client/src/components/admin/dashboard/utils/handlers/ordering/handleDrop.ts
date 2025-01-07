@@ -95,12 +95,14 @@ export const handleDrop = async ({ ...params }) => {
 
   // // send s3 request and upload images
   try {
-    console.log(presigned[0], presigned[1]);
-    const [response1, response2] = await Promise.all([
-      fetch(presigned[0], { method: "PUT", body: params.file }),
-      fetch(presigned[1], { method: "PUT", body: params.fFile }),
-    ]);
-    console.log(response1, response2);
+    const response1 = await fetch(presigned[0], {
+      method: "PUT",
+      body: params.file,
+    });
+    const response2 = await fetch(presigned[1], {
+      method: "PUT",
+      body: params.fFile,
+    });
 
     if (response1.status === 200 && response2.status === 200) {
       // update images locked into order
