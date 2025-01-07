@@ -22,7 +22,6 @@ export const handleDrop = async ({ ...params }) => {
       credentials: "include",
     });
     const data = await response.json();
-    console.log(data);
 
     if (data) {
       switch (response.status) {

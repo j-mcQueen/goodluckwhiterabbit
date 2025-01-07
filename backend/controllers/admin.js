@@ -382,15 +382,13 @@ exports.adminDeleteFile = async (req, res, next) => {
         })
       );
 
-      if (deleted) res.status(200).json(deleted);
+      if (deleted.Deleted.length > 0) return res.status(200).json(deleted);
     } catch (error) {
       console.log(error);
-      return res
-        .status(500)
-        .json({
-          status: 500,
-          message: "We could not delete this file from S3.",
-        });
+      return res.status(500).json({
+        status: 500,
+        message: "We could not delete this file from S3.",
+      });
     }
   }
 };
