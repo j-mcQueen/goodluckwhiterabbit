@@ -27,7 +27,7 @@ export const handleDrop = async ({ ...params }) => {
       switch (response.status) {
         case 200:
         case 304:
-          presigned.push(...data);
+          presigned.push(...data.urls);
           break;
 
         case 401:
@@ -91,6 +91,8 @@ export const handleDrop = async ({ ...params }) => {
       });
     }
   }
+
+  console.log(presigned);
 
   // // send s3 request and upload images
   try {

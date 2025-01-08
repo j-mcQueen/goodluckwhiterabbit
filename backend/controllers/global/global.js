@@ -43,7 +43,7 @@ exports.generatePutPresigned = async (req, res, next) => {
     const url1 = await getSignedUrl(s3, cmd1, { expiresIn: 600 });
     const url2 = await getSignedUrl(s3, cmd2, { expiresIn: 600 });
 
-    return res.status(200).json([url1, url2]);
+    return res.status(200).json({ urls: [url1, url2] });
   }
 };
 
