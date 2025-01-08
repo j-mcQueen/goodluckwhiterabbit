@@ -4,6 +4,7 @@ import { form_inputs } from "./styles/styles";
 
 import PaneHeader from "./PaneHeader";
 import Loading from "../../global/Loading";
+import { handleLinksSubmitTypes } from "./types/dashboard/handleLinksSubmitTypes";
 
 export default function AddLinks({ ...props }) {
   const { setActivePane, setClients, clients, targetClient } = props;
@@ -27,11 +28,9 @@ export default function AddLinks({ ...props }) {
         paneTitle={"SET DOWNLOAD LINKS"}
       />
       <form
-        onSubmit={(e) => {
-          // TODO add types to these args
-          const args = {
+        onSubmit={() => {
+          const args: handleLinksSubmitTypes = {
             clients,
-            e,
             error,
             inputVals,
             setClients,
