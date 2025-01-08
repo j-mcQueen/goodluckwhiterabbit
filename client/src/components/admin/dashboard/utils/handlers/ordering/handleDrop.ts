@@ -21,14 +21,13 @@ export const handleDrop = async ({ ...params }) => {
       },
       credentials: "include",
     });
-    console.log(response, "A");
     const data = await response.json();
 
     if (data) {
       switch (response.status) {
         case 200:
         case 304:
-          presigned = data.presigns;
+          presigned = data;
           break;
 
         case 401:
@@ -93,15 +92,12 @@ export const handleDrop = async ({ ...params }) => {
     }
   }
 
-  console.log(presigned, "B");
-
   // // send s3 request and upload images
   try {
     const [response1, response2] = await Promise.all([
       fetch(presigned[0], { method: "PUT", body: params.file }),
       fetch(presigned[1], { method: "PUT", body: params.fFile }),
     ]);
-    console.log(response1, response2, "C");
 
     if (response1.status === 200 && response2.status === 200) {
       // update images locked into order

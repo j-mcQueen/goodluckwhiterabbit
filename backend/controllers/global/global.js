@@ -40,12 +40,20 @@ exports.generatePutPresigned = async (req, res, next) => {
       Key: `${req.body._id}/${req.body.imageset}/original/${req.body.index}/${req.body.files[1]}`,
     });
 
-    const presigns = [];
-    const url1 = await getSignedUrl(s3, cmd1, { expiresIn: 600 });
-    const url2 = await getSignedUrl(s3, cmd2, { expiresIn: 600 });
-    presigns.push(url1, url2);
+    try {
+      const [url1, url2] = await Promise.all([
+        await getSignedUrl(s3, cmd1, { expiresIn: 600 }),
+        await getSignedUrl(s3, cmd2, { expiresIn: 600 }),
+      ]);
 
-    return res.status(200).json({ presigns });
+      if (url1 && url2) {
+        console.log(url1, url2, "success");
+        return res.status(200).json([url1, url2]);
+      }
+    } catch (error) {
+      console.log(error, "URL generation failed");
+      return res.status(500).json("URL generation failed");
+    }
   }
 };
 
