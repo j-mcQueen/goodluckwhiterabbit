@@ -40,10 +40,12 @@ exports.generatePutPresigned = async (req, res, next) => {
       Key: `${req.body._id}/${req.body.imageset}/original/${req.body.index}/${req.body.files[1]}`,
     });
 
+    const presigns = [];
     const url1 = await getSignedUrl(s3, cmd1, { expiresIn: 600 });
     const url2 = await getSignedUrl(s3, cmd2, { expiresIn: 600 });
+    presigns.push(url1, url2);
 
-    return res.status(200).json({ urls: [url1, url2] });
+    return res.status(200).json({ presigns });
   }
 };
 

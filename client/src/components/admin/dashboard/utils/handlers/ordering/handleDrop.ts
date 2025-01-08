@@ -4,7 +4,7 @@ export const handleDrop = async ({ ...params }) => {
   if (params.index === params.draggedIndex && params.source !== "queue") return; // user made a mistake
 
   // generate presigned URL for file upload
-  const presigned = [];
+  let presigned;
   try {
     // generate the urls used to add each file to S3
     const response = await fetch(`${params.host}/generatePutPresigned`, {
@@ -21,13 +21,14 @@ export const handleDrop = async ({ ...params }) => {
       },
       credentials: "include",
     });
+    console.log(response, "A");
     const data = await response.json();
 
     if (data) {
       switch (response.status) {
         case 200:
         case 304:
-          presigned.push(...data.urls);
+          presigned = data.presigns;
           break;
 
         case 401:
@@ -92,7 +93,7 @@ export const handleDrop = async ({ ...params }) => {
     }
   }
 
-  console.log(presigned);
+  console.log(presigned, "B");
 
   // // send s3 request and upload images
   try {
@@ -100,6 +101,7 @@ export const handleDrop = async ({ ...params }) => {
       fetch(presigned[0], { method: "PUT", body: params.file }),
       fetch(presigned[1], { method: "PUT", body: params.fFile }),
     ]);
+    console.log(response1, response2, "C");
 
     if (response1.status === 200 && response2.status === 200) {
       // update images locked into order
