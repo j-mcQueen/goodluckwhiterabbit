@@ -5,14 +5,21 @@ import Login from "./components/admin/login/Login";
 import AdminDashboard from "./components/admin/dashboard/Dashboard";
 import UserLogin from "./components/user/login/UserLogin";
 import UserDashboard from "./components/user/dashboard/UserDashboard";
+import Preview from "./components/portfolio/preview/Preview";
+import Error from "./components/global/Error";
 
 function App() {
   const router = createBrowserRouter([
-    { path: "/", element: <Entry />, errorElement: "" },
-    { path: "/photo", element: <Photo />, errorElement: "" },
-    { path: "/admin", element: <Login />, errorElement: "" },
-    { path: "/admin/dashboard", element: <AdminDashboard />, errorElement: "" },
-    { path: "/portal", element: <UserLogin />, errorElement: "" },
+    { path: "/", element: <Entry />, errorElement: <Error /> },
+    { path: "/photo", element: <Photo />, errorElement: <Error /> },
+    { path: "/portfolio", element: <Preview />, errorElement: <Error /> },
+    { path: "/admin", element: <Login />, errorElement: <Error /> },
+    {
+      path: "/admin/dashboard",
+      element: <AdminDashboard />,
+      errorElement: <Error />,
+    },
+    { path: "/portal", element: <UserLogin />, errorElement: <Error /> },
     {
       path: "/user/:id/dashboard/",
       element: <UserDashboard />,
