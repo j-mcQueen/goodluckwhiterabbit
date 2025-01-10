@@ -67,7 +67,7 @@ export default function Login() {
                 if (authError) setAuthError(false);
               }}
               required
-              className="font-liquid bg-black border border-solid focus:border-red xl:transition-all border-white text-rd h-10 pl-2 mt-2 outline-none"
+              className="font-vt bg-black border border-solid focus:border-red xl:transition-all border-white text-rd h-10 pl-2 mt-2 outline-none"
             />
           </label>
 
@@ -81,7 +81,7 @@ export default function Login() {
                 if (authError) setAuthError(false);
               }}
               required
-              className="font-liquid bg-black border border-solid border-white focus:border-red text-rd h-10 pl-2 mt-2 outline-none"
+              className="font-vt bg-black border border-solid border-white focus:border-red text-rd h-10 pl-2 mt-2 outline-none"
             />
           </label>
 
