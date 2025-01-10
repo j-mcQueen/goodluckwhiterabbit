@@ -2,6 +2,7 @@ import { v4 as uuidv4 } from "uuid";
 import { dashboard_btns, icons } from "./styles/styles";
 import { dashboard_client } from "./types/types";
 import { handleActionClick } from "./utils/handlers/dashboard/handleActionClick";
+import { handleCopy } from "./utils/handlers/dashboard/handleCopy";
 
 import Copy from "../../../assets/media/icons/Copy";
 import Edit from "../../../assets/media/icons/Edit";
@@ -18,28 +19,6 @@ export default function AllClients({ ...props }) {
     setTargetClient,
     setDeleteModalToggle,
   } = props;
-
-  const handleCopy = async (code: string) => {
-    try {
-      await navigator.clipboard.writeText(code);
-      const copied = await navigator.clipboard.readText();
-
-      if (copied === code) {
-        setNotice({
-          status: true,
-          message: "The code has been copied to the clipboard! (say it fast)",
-          logout: { status: false, path: null },
-        });
-      }
-    } catch (err) {
-      setNotice({
-        status: true,
-        message:
-          "Whoops! Something went wrong. The code has not been copied to the clipboard. Please refresh the page and try again.",
-        logout: { status: false, path: null },
-      });
-    }
-  };
 
   return (
     <table className="w-full mt-5 border-collapse ">
@@ -115,7 +94,7 @@ export default function AllClients({ ...props }) {
               <td className="align-middle">
                 <button
                   disabled={notice.status}
-                  onClick={() => handleCopy(client.code)}
+                  onClick={() => handleCopy(client.code, setNotice)}
                   type="button"
                   className={dashboard_btns}
                 >
