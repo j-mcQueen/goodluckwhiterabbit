@@ -47,9 +47,14 @@ export default {
         blink: {
           "0%": { opacity: 1 },
         },
+        typing: {
+          from: { width: 0 },
+          to: { width: "100%" },
+        },
       },
       animation: {
         blink: "blink 1.5s steps(2) infinite",
+        typing: "typing 2s steps(80, end)",
       },
     },
   },
