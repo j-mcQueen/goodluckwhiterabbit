@@ -140,7 +140,6 @@ export default function UserDashboard() {
     >
       {mobile ? (
         <MobileHeader
-          host={host}
           logout={true}
           data={userDashboardHeaderItems}
           activeTab={activeTab}
@@ -154,7 +153,6 @@ export default function UserDashboard() {
         />
       ) : (
         <Header
-          host={host}
           logout={true}
           data={userDashboardHeaderItems}
           activeTab={activeTab}

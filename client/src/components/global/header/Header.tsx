@@ -1,5 +1,6 @@
 import { v4 as uuidv4 } from "uuid";
 import { useNavigate } from "react-router-dom";
+import { determineHost as host } from "../utils/determineHost";
 
 import rabbit from "../../../assets/media/gifs/glwr-lenticular.gif";
 import Instagram from "../../../assets/media/icons/Instagram";
@@ -7,7 +8,7 @@ import Eject from "../../../assets/media/icons/Eject";
 import Next from "../../../assets/media/icons/Next";
 
 export default function Header({ ...props }) {
-  const { logout, data, activeTab, setActiveTab, host, dashboard } = props;
+  const { logout, data, activeTab, setActiveTab, dashboard } = props;
   const navigate = useNavigate();
 
   const listItemVariants = {
@@ -88,7 +89,7 @@ export default function Header({ ...props }) {
             href="https://www.instagram.com/goodluckwhiterabbit/"
             className={`${activeTab === data.length - 1 ? "border-l" : ""} px-5 flex items-center justify-center border-b border-solid`}
           >
-            <Instagram mobile={false} />
+            <Instagram />
           </a>
         )}
       </nav>
