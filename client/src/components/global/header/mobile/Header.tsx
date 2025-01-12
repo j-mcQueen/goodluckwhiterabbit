@@ -77,13 +77,13 @@ export default function MobileHeader({ ...props }) {
             animate={{ x: 0, opacity: 1, visibility: "visible" }}
             exit={{ x: -100, opacity: 0 }}
             transition={{ type: "spring", bounce: 0, duration: 0.4 }}
-            className="absolute text-white w-[calc(100dvw-1.5rem-2px)] h-[calc(100dvh-1.5rem-52px)] translate-y-[51px] flex flex-col items-center"
+            className="absolute text-white w-[calc(100dvw-1.5rem-2px)] h-[calc(100dvh-1.5rem-52px)] translate-y-[51px] flex flex-col items-center z-50"
           >
-            <ul className="w-full h-full flex flex-col justify-evenly">
+            <ul className="w-full h-full flex flex-col justify-evenly z-10">
               {data.map((tab: string, index: number) => {
                 return (
                   <li
-                    className={`${activeTab === index ? listItemVariants.active : listItemVariants.std} ${index === data.length - 1 ? "border-b" : ""} border-solid border-white flex h-full`}
+                    className={`${activeTab === index ? listItemVariants.active : listItemVariants.std} ${index === data.length - 1 ? "border-b" : ""} border-solid border-white flex h-full bg-black`}
                     key={uuidv4()}
                   >
                     <button
@@ -110,10 +110,10 @@ export default function MobileHeader({ ...props }) {
                 EXIT
               </button>
             ) : (
-              <div className="flex justify-between w-full min-h-[50px] border-b border-solid border-white">
+              <div className="flex justify-between w-full min-h-[50px] border-b border-solid border-white bg-black">
                 <div className="min-w-[50px] flex items-center justify-center border-r border-solid border-white">
                   <a href="https://www.instagram.com/goodluckwhiterabbit/">
-                    <Instagram mobile={true} />
+                    <Instagram />
                   </a>
                 </div>
 

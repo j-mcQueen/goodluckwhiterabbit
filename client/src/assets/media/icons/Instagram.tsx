@@ -1,10 +1,10 @@
-export default function Instagram({ mobile }: { mobile: boolean }) {
+export default function Instagram() {
   return (
     <svg
       role="img"
       viewBox="0 0 24 24"
       fill="currentColor"
-      color={mobile ? "#fff" : "#000"}
+      color="#fff"
       xmlns="http://www.w3.org/2000/svg"
       className="min-w-[18px] min-h-[18px] xl:w-[18px] xl:h-[18px] overflow-visible"
     >
