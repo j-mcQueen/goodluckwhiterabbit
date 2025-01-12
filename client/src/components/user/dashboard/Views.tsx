@@ -61,28 +61,22 @@ export default function Views({ ...props }) {
             / {user.fileCounts[activeImageset]}
           </p>
 
-          {user.fileCounts[activeImageset] ===
-          imageset.filter((item: object) => item instanceof File === true)
-            .length ? (
-            // encourages user to look through all their files first before downloading
-            // hugely resource intensive operation if immediately available
-            <button
-              type="button"
-              className="border border-solid border-white text-lg text-white py-1 px-3 xl:hover:border-rd xl:hover:text-rd xl:hover:drop-shadow-red xl:focus:drop-shadow-red xl:focus:text-rd xl:focus:border-rd transition-colors mt-5"
-              onClick={() => {
-                const args = {
-                  activeImageset,
-                  link: user.links[activeImageset],
-                  name: user.name,
-                  setRetrieving,
-                };
+          <button
+            type="button"
+            className="border border-solid border-white text-lg text-white py-1 px-3 xl:hover:border-rd xl:hover:text-rd xl:hover:drop-shadow-red xl:focus:drop-shadow-red xl:focus:text-rd xl:focus:border-rd transition-colors mt-5"
+            onClick={() => {
+              const args = {
+                activeImageset,
+                link: user.links[activeImageset],
+                name: user.name,
+                setRetrieving,
+              };
 
-                handleDownloadAll(args);
-              }}
-            >
-              DOWNLOAD: ALL
-            </button>
-          ) : null}
+              handleDownloadAll(args);
+            }}
+          >
+            DOWNLOAD: ALL
+          </button>
 
           {retrieving ? (
             <p className="text-yellow-400 max-w-[245px] px-5 pt-5">
