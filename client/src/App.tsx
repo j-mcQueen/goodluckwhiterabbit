@@ -5,7 +5,7 @@ import Login from "./components/admin/login/Login";
 import AdminDashboard from "./components/admin/dashboard/Dashboard";
 import UserLogin from "./components/user/login/UserLogin";
 import UserDashboard from "./components/user/dashboard/UserDashboard";
-import Preview from "./components/portfolio/preview/Preview";
+// import Preview from "./components/portfolio/preview/Preview";
 import Error from "./components/global/Error";
 import UnderConstruction from "./components/landing/UnderConstruction";
 
@@ -13,7 +13,7 @@ function App() {
   const router = createBrowserRouter([
     { path: "/", element: <UnderConstruction />, errorElement: <Error /> },
     { path: "/photo", element: <Photo />, errorElement: <Error /> },
-    { path: "/portfolio", element: <Preview />, errorElement: <Error /> },
+    // { path: "/portfolio", element: <Preview />, errorElement: <Error /> },
     { path: "/admin", element: <Login />, errorElement: <Error /> },
     {
       path: "/admin/dashboard",
