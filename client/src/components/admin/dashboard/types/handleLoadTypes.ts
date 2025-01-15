@@ -5,8 +5,11 @@ export interface handleLoadTypes {
   host: string;
   order: (object | File)[];
   renderCount: number;
+  staticKeys: string[];
   setOrder: Dispatch<SetStateAction<object | File[]>>;
+  setRenderCount: Dispatch<SetStateAction<number>>;
   setSpinner: Dispatch<SetStateAction<boolean>>;
+  setStaticKeys: Dispatch<SetStateAction<string[]>>;
   targetClient: {
     _id: string;
     fileCounts: {

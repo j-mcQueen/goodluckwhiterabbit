@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { v4 as uuidv4 } from "uuid";
+// import { v4 as uuidv4 } from "uuid";
 import { handleDragStart } from "./utils/handlers/handleDragStart";
 import { handleDelete } from "./utils/handlers/ordering/handleDelete";
 import { handleDeleteTypes } from "./types/handleDeleteTypes";
@@ -9,6 +9,7 @@ import { handleDrop } from "./utils/handlers/ordering/handleDrop";
 import { handleDropTypes } from "./types/handleDropTypes";
 
 import Close from "../../../assets/media/icons/Close";
+import { generateKeys } from "../../global/utils/generateKeys";
 
 export default function ImageOrder({ ...props }) {
   const {
@@ -26,15 +27,16 @@ export default function ImageOrder({ ...props }) {
   } = props;
 
   const [order, setOrder] = useState(orderedImageset);
+  const [staticKeys, setStaticKeys] = useState(generateKeys);
 
   return (
     <div className="flex items-start">
       <div className="text-white p-3 min-w-[40vw] flex flex-col items-center justify-center">
-        <div className="flex flex-col items-center ">
+        <div className="flex flex-col items-center">
           <div className="flex flex-wrap justify-center max-w-[60dvw] gap-5 px-5 overflow-scroll h-[1200px] relative">
-            {order.map((file: File | object, index: number) => {
+            {order.map((file: File | string, index: number) => {
               return (
-                <div key={uuidv4()}>
+                <div key={staticKeys[index]}>
                   {file instanceof File ? (
                     <button
                       onClick={() => {
@@ -120,8 +122,11 @@ export default function ImageOrder({ ...props }) {
                 host,
                 order,
                 renderCount,
+                staticKeys,
                 setOrder,
+                setRenderCount,
                 setSpinner,
+                setStaticKeys,
                 targetClient,
                 targetImageset,
               };

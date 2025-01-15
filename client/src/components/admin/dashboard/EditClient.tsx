@@ -24,6 +24,7 @@ export default function EditClient({ ...props }) {
     previews: Array(10).fill({}),
     full: Array(10).fill({}),
     socials: Array(10).fill({}),
+    snips: Array(10).fill({}),
   });
 
   const [queuedImages, setQueuedImages] = useState(() => {

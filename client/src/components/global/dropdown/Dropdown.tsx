@@ -1,5 +1,4 @@
 import { Fragment, useState } from "react";
-import { v4 as uuidv4 } from "uuid";
 import { motion } from "framer-motion";
 import Up from "../../../assets/media/icons/Up";
 
@@ -24,7 +23,7 @@ export default function Dropdown({ ...props }) {
       <button
         type="button"
         onClick={() => setOpen(!open)}
-        className="bg-black text-white border border-solid border-blu p-3 flex justify-center gap-2"
+        className="bg-black text-white border border-solid border-blu p-3 flex justify-center gap-2 z-10"
       >
         PROJECTS
         <Up active={open} />
@@ -37,7 +36,7 @@ export default function Dropdown({ ...props }) {
           {categoryData.map(
             (category: { title: string; links: [] }, index: number) => {
               return (
-                <Fragment key={uuidv4()}>
+                <Fragment key={category.title}>
                   <motion.li
                     variants={animationVariants}
                     initial="initial"
@@ -61,7 +60,7 @@ export default function Dropdown({ ...props }) {
                           j: number
                         ) => {
                           return (
-                            <li key={uuidv4()}>
+                            <li key={link.subject}>
                               <motion.button
                                 variants={animationVariants}
                                 initial="initial"

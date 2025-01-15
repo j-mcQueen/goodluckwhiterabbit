@@ -1,5 +1,4 @@
 import { memo, useRef, useState } from "react";
-import { v4 as uuidv4 } from "uuid";
 import { handleDragStart } from "./utils/handlers/handleDragStart";
 import { handleDragEnd } from "./utils/handlers/handleDragEnd";
 import { handleChange } from "./utils/handlers/queueing/handleChange";
@@ -39,7 +38,7 @@ const ImageQueue = memo(function ImageQueue() {
         <div className="grid grid-cols-3 gap-5 overflow-scroll h-[1200px] p-3">
           {queue.map((file: File, index: number) => {
             return (
-              <div key={uuidv4()}>
+              <div key={file.name}>
                 <button
                   onClick={() =>
                     handleDelete(

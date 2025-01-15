@@ -1,4 +1,3 @@
-import { v4 as uuidv4 } from "uuid";
 import { dashboard_btns, icons } from "./styles/styles";
 import { dashboard_client } from "./types/types";
 import { handleActionClick } from "./utils/handlers/dashboard/handleActionClick";
@@ -40,7 +39,7 @@ export default function AllClients({ ...props }) {
         {clients.map((client: dashboard_client, index: number) => {
           return (
             <tr
-              key={uuidv4()}
+              key={client.code}
               className={`text-white border-t-[1px] ${index < clients.length - 1 ? "border-b-[1px]" : ""} border-solid border-white`}
             >
               <td className="align-middle pl-3 tracking-wider">

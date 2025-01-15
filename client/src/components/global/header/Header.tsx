@@ -1,4 +1,3 @@
-import { v4 as uuidv4 } from "uuid";
 import { useNavigate } from "react-router-dom";
 import { determineHost as host } from "../utils/determineHost";
 
@@ -49,7 +48,7 @@ export default function Header({ ...props }) {
             return (
               <li
                 className={`${activeTab === index ? listItemVariants.active : listItemVariants.std} ${dashboard && dashboard[index] === 0 && index !== data.length - 1 ? "border-r-white inline" : ""} border-r border-b border-solid border-white w-full flex items-center justify-center relative`}
-                key={uuidv4()}
+                key={tab}
               >
                 <button
                   disabled={dashboard && dashboard[index] === 0 ? true : false}

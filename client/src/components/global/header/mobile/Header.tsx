@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { v4 as uuidv4 } from "uuid";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
 
@@ -84,7 +83,7 @@ export default function MobileHeader({ ...props }) {
                 return (
                   <li
                     className={`${activeTab === index ? listItemVariants.active : listItemVariants.std} ${index === data.length - 1 ? "border-b" : ""} border-solid border-white flex h-full bg-black`}
-                    key={uuidv4()}
+                    key={tab}
                   >
                     <button
                       type="button"

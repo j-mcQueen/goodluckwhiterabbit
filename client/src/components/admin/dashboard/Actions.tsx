@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { v4 as uuidv4 } from "uuid";
 import { icons } from "./styles/styles";
 
 import Add from "../../../assets/media/icons/Add";
@@ -73,7 +72,7 @@ export default function Actions({ ...props }) {
             {sortTabs.map((item, index) => {
               return (
                 <SortTab
-                  key={uuidv4()}
+                  key={item.name}
                   index={index}
                   text={item.name}
                   pattern={item.pattern}

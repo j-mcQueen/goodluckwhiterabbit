@@ -1,4 +1,3 @@
-import { v4 as uuidv4 } from "uuid";
 import { useState } from "react";
 
 import Category from "../../portfolio/photo/Category";
@@ -29,7 +28,7 @@ export default function Sidebar({ ...props }) {
           (category: { title: string; links: [] }, index: number) => {
             return (
               <Category
-                key={uuidv4()}
+                key={category.title}
                 category={category}
                 target={index}
                 active={activeCtgs}

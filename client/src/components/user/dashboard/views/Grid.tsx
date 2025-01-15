@@ -1,27 +1,35 @@
-import { v4 as uuidv4 } from "uuid";
+import { useState } from "react";
 import { Fragment } from "react/jsx-runtime";
+import { generateKeys } from "../../../global/utils/generateKeys";
+import { handleLoad } from "../utils/handlers/handleLoad";
+import { handleLoadTypes } from "../types/handleLoadTypes";
 
 import Image from "../Image";
 
 export default function Grid({ ...props }) {
   const {
+    images,
     imageset,
     activeImageset,
     userId,
     fileCounts,
     disabled,
-    handleClick,
     spinner,
+    setSpinner,
+    setDisabled,
+    setImages,
   } = props;
+
+  const [staticKeys, setStaticKeys] = useState(generateKeys);
 
   return (
     <section className="flex flex-col justify-center basis-[80dvw] pb-10">
       <div className="flex flex-wrap justify-center gap-x-24 gap-y-12 relative overflow-hidden px-10">
         {imageset
           .filter((image: object) => image instanceof File === true)
-          .map((image: object) => {
+          .map((image: object, index: number) => {
             return (
-              <Fragment key={uuidv4()}>
+              <Fragment key={staticKeys[index]}>
                 <Image
                   activeImageset={activeImageset}
                   userId={userId}
@@ -44,7 +52,22 @@ export default function Grid({ ...props }) {
             type="button"
             disabled={disabled}
             className="font-tnrBI tracking-widest opacity-80 drop-shadow-glo border border-solid border-white text-sm text-white pt-2 pb-1 px-3 xl:hover:border-rd xl:hover:text-rd xl:hover:drop-shadow-red xl:focus:drop-shadow-red xl:focus:text-rd xl:focus:border-rd transition-colors mt-2"
-            onClick={handleClick}
+            onClick={() => {
+              const args: handleLoadTypes = {
+                // TODO add types
+                activeImageset,
+                images,
+                imageset,
+                setDisabled,
+                setImages,
+                setSpinner,
+                setStaticKeys,
+                staticKeys,
+                userId,
+              };
+
+              return handleLoad(args);
+            }}
           >
             SEE MORE
           </button>

@@ -1,11 +1,12 @@
 import { executeGenerationChain } from "../../../../../global/utils/executeGenerationChain";
+import { generateKeys } from "../../../../../global/utils/generateKeys";
 
 export const handleLoad = async ({ ...params }) => {
   if (
     params.renderCount === params.targetClient.fileCounts[params.targetImageset]
   ) {
     const nextOrder = [...params.order, ...Array(10).fill({})];
-    return params.setOrder(nextOrder);
+    params.setOrder(nextOrder);
   } else if (
     params.renderCount < params.targetClient.fileCounts[params.targetImageset]
   ) {
@@ -60,6 +61,9 @@ export const handleLoad = async ({ ...params }) => {
     params.setRenderCount(rendered);
 
     params.setSpinner(false);
-    return;
   }
+
+  const generatedKeys = generateKeys();
+  const nextKeys = [...params.staticKeys, ...generatedKeys];
+  return params.setStaticKeys(nextKeys);
 };

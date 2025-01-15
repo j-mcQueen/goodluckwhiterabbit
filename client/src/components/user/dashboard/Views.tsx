@@ -1,5 +1,4 @@
-import { useEffect, useState } from "react";
-import { executeGenerationChain } from "../../global/utils/executeGenerationChain";
+import { useState } from "react";
 import { handleDownloadAll } from "./utils/handleDownloadAll";
 
 import Carousel from "./views/Carousel";
@@ -17,32 +16,8 @@ export default function Views({ ...props }) {
     setSpinner,
     spinner,
   } = props;
-  const [loaded, setLoaded] = useState(imageset.length);
   const [disabled, setDisabled] = useState(false);
   const [retrieving, setRetrieving] = useState(false);
-
-  const handleClick = async () => {
-    setSpinner(true);
-    setDisabled(true);
-
-    const data = await executeGenerationChain(
-      imageset,
-      activeImageset,
-      setNotice,
-      loaded,
-      loaded + 10,
-      user._id
-    );
-
-    setImages({ ...images, [activeImageset]: data.files });
-    setLoaded((prevLoaded: number) => prevLoaded + 10);
-    setDisabled(false);
-    setSpinner(false);
-  };
-
-  useEffect(() => {
-    setLoaded(imageset.length);
-  }, [imageset]);
 
   return (
     <div className="flex">
@@ -106,12 +81,16 @@ export default function Views({ ...props }) {
 
         <Grid
           spinner={spinner}
+          images={images}
+          setImages={setImages}
+          setNotice={setNotice}
+          setDisabled={setDisabled}
+          setSpinner={setSpinner}
           imageset={imageset}
           userId={user._id}
           activeImageset={activeImageset}
           fileCounts={user.fileCounts[activeImageset]}
           disabled={disabled}
-          handleClick={handleClick}
         />
       </div>
     </div>

@@ -1,4 +1,3 @@
-import { v4 as uuidv4 } from "uuid";
 import { AnimatePresence, motion } from "framer-motion";
 
 import Up from "../../../assets/media/icons/Up";
@@ -35,7 +34,7 @@ export default function Category({ ...props }) {
                 category: string;
               }) => {
                 return (
-                  <li key={uuidv4()} className="text-gray-400">
+                  <li key={project.subject} className="text-gray-400">
                     <button
                       type="button"
                       onClick={() =>
