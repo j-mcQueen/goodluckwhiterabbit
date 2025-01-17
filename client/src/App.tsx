@@ -8,11 +8,13 @@ import UserDashboard from "./components/user/dashboard/UserDashboard";
 // import Preview from "./components/portfolio/preview/Preview";
 import Error from "./components/global/Error";
 import UnderConstruction from "./components/landing/UnderConstruction";
+import Art from "./components/portfolio/art/Art";
 
 function App() {
   const router = createBrowserRouter([
     { path: "/", element: <UnderConstruction />, errorElement: <Error /> },
     { path: "/photo", element: <Photo />, errorElement: <Error /> },
+    { path: "/art", element: <Art />, errorElement: <Error /> },
     // { path: "/portfolio", element: <Preview />, errorElement: <Error /> },
     { path: "/admin", element: <Login />, errorElement: <Error /> },
     {

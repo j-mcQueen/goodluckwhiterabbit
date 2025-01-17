@@ -12,6 +12,7 @@ export default {
       },
       gridTemplateColumns: {
         imageQueue: "repeat(auto-fit, minmax(100px, 200px))",
+        full: "repeat(auto-fit, minmax(100dvh, 100dvw)",
       },
       dropShadow: {
         cyn: "2px 2px 2px #08FF09",
