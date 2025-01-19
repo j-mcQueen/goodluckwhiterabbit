@@ -1,13 +1,13 @@
-import DREAMS from "./WHEREDREAMSARE_TIMEISNEVERPLANNED.SB_.png";
-import FLOWING from "./STUDY_forMargaret.SB.W.png";
-import TIME from "./TIMEISNEVERPLANNED_W.png";
-import POWER from "./THEPOWEROFCREATION.SB..png";
-import SPIRITED from "./STUDY_THE.SPIRITED.SOFTNESS.OF.SUNSHINE_forAnn.png";
-import CHANCE from "./THEPULLOFCHANCE_.png";
-import FIRE from "./THE.TRIAL.OF.FIRE.SB.W.png";
-import HALF from "./THEHALFOFWHOLE.SB.png";
-import PURSUIT from "./THEPURSUITOFBALANCE.TRIPTYCH.png";
-import NATURAL from "./STUDY.THENATURALPASSAGEOFTIME_forEve_SB..png";
+import DREAMS from "./WHEREDREAMSARE_TIMEISNEVERPLANNED.SB_.webp";
+import FLOWING from "./STUDY_forMargaret.SB.W.webp";
+import TIME from "./TIMEISNEVERPLANNED_W.webp";
+import POWER from "./THEPOWEROFCREATION.SB..webp";
+import SPIRITED from "./STUDY_THE.SPIRITED.SOFTNESS.OF.SUNSHINE_forAnn.webp";
+import CHANCE from "./THEPULLOFCHANCE_.webp";
+import FIRE from "./THE.TRIAL.OF.FIRE.SB.W.webp";
+import HALF from "./THEHALFOFWHOLE.SB.webp";
+import PURSUIT from "./THEPURSUITOFBALANCE.TRIPTYCH.webp";
+import NATURAL from "./STUDY.THENATURALPASSAGEOFTIME_forEve_SB..webp";
 
 export const art_data = [
   {
