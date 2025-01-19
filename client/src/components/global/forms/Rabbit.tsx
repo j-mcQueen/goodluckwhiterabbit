@@ -4,7 +4,7 @@ export default function Rabbit() {
     <div className="flex justify-center">
       <img
         src={glwr}
-        alt="Image goes here"
+        alt="Good Luck White Rabbit"
         className="max-h-[25dvw] xl:max-h-[5dvw]"
       />
     </div>

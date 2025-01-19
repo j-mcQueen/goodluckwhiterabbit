@@ -11,10 +11,12 @@ export default function UnderConstruction() {
             alt="A white rabbit against a black background shimmering from left to right"
           />
         </div>
-        <h1 className="font-liquid drop-shadow-glo opacity-80 text-white text-2xl xl:text-4xl xl:pt-0 tracking-widest text-center xl:px-0 z-10">
-          welcome to my world
+
+        <h1 className="font-tnrBI whitespace-nowrap overflow-hidden animate-typing drop-shadow-glo opacity-80 text-white text-2xl xl:text-4xl xl:pt-0 tracking-widest text-center xl:px-0 z-10">
+          WELCOME TO MY WORLD
         </h1>
-        <div className="font-inter text-white text-[12px] xl:text-lg tracking-widest text-center">
+
+        <div className="text-white text-[12px] xl:text-lg tracking-widest text-center">
           <p className="text-center px-3 xl:px-0 drop-shadow-[1px_1px_1px_rgba(255,245,0,0.5)]">
             THE DIGITAL EXPERIENCE IS ARRIVING FORTHWITH !
           </p>
