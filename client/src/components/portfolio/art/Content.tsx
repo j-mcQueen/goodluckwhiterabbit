@@ -25,13 +25,13 @@ export default function Content() {
     <section className="flex justify-center">
       <div
         style={{ scrollbarWidth: "none" }}
-        className="grid grid-cols-1 grid-rows-full gap-10 items-center justify-center overflow-y-scroll h-[calc(100dvh-1.5rem-114px)] snap-y snap-mandatory"
+        className="grid grid-cols-1 grid-rows-full gap-10 items-center justify-center overflow-y-scroll xl:h-[calc(100dvh-1.5rem-5dvw)] h-[calc(100dvh-1.5rem-25dvw)] snap-y snap-mandatory"
       >
         {art_data.map((item, index: number) => {
           return (
             <div
               key={item.title}
-              className="flex flex-col justify-center items-center text-white snap-start h-[calc(100dvh-1.5rem-114px)]"
+              className="flex flex-col justify-center items-center text-white snap-start xl:h-[calc(100dvh-1.5rem-5dvw)] h-[calc(100dvh-1.5rem-25dvw)]"
             >
               <motion.img
                 variants={img_variants}
@@ -40,14 +40,14 @@ export default function Content() {
                 loading="lazy"
                 src={item.src}
                 alt={item.title}
-                className={`${index > 6 ? "xl:max-h-[35dvh]" : "xl:max-h-[60dvh]"} xl:max-w-[45dvw] max-w-[90dvw]`}
+                className={`${index > 6 ? "xl:max-h-[35dvh]" : "xl:max-h-[60dvh]"} xl:max-w-[45dvw] max-w-[90dvw] max-h-[50dvh]`}
               />
 
               <motion.ul
                 variants={list_variants}
                 initial="initial"
                 whileInView="animate"
-                className="flex flex-col justify-center gap-1 pt-10 text-center text-lg"
+                className="flex flex-col justify-center gap-1 pt-5 xl:pt-10 text-center tetx-md xl:text-lg"
               >
                 <li>
                   <span className="italic">{item.title},&nbsp;</span>

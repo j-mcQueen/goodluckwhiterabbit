@@ -8,13 +8,13 @@ export default function Welcome() {
     <main className="w-[calc(100dvw-1.5rem)] h-[calc(100dvh-1.5rem)] flex items-center justify-center">
       <section className="flex flex-col items-center justify-center h-dvh">
         <img
-          className="max-w-[350px]"
+          className="max-w-[200px]"
           src={rabbit}
           alt="A white rabbit against a black background shimmering from left to right"
         />
 
         <div>
-          <h1 className="font-tnrBI whitespace-nowrap overflow-hidden animate-typing text-white py-6 xl:py-10 text-xl xl:text-4xl tracking-widest opacity-80 drop-shadow-glo">
+          <h1 className="font-tnrBI whitespace-nowrap overflow-hidden animate-typing text-white pt-4 pb-6 xl:py-10 text-xl xl:text-4xl tracking-widest opacity-80 drop-shadow-glo">
             WELCOME TO MY WORLD
           </h1>
         </div>
@@ -26,7 +26,7 @@ export default function Welcome() {
             y: 0,
             transition: { duration: 0.5, delay: 2.1 },
           }}
-          className="mt-20"
+          className="mt-9"
         >
           <Link
             to={"/art"}
