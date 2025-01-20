@@ -23,12 +23,15 @@ export default function Content() {
 
   return (
     <section className="flex justify-center">
-      <div className="grid grid-cols-1 grid-rows-full gap-5 items-center justify-center">
+      <div
+        style={{ scrollbarWidth: "none" }}
+        className="grid grid-cols-1 grid-rows-full gap-10 items-center justify-center overflow-y-scroll h-[calc(100dvh-1.5rem-114px)] snap-y snap-mandatory"
+      >
         {art_data.map((item, index: number) => {
           return (
             <div
               key={item.title}
-              className="flex flex-col items-center text-white min-h-dvh"
+              className="flex flex-col justify-center items-center text-white snap-start h-[calc(100dvh-1.5rem-114px)]"
             >
               <motion.img
                 variants={img_variants}
@@ -37,14 +40,14 @@ export default function Content() {
                 loading="lazy"
                 src={item.src}
                 alt={item.title}
-                className={`${index > 6 ? "xl:max-h-[35dvh]" : "xl:max-h-[60dvh]"} xl:max-w-[45dvw] max-w-[85dvw]`}
+                className={`${index > 6 ? "xl:max-h-[35dvh]" : "xl:max-h-[60dvh]"} xl:max-w-[45dvw] max-w-[90dvw]`}
               />
 
               <motion.ul
                 variants={list_variants}
                 initial="initial"
                 whileInView="animate"
-                className="flex flex-col justify-center gap-1 pt-16 text-center text-lg"
+                className="flex flex-col justify-center gap-1 pt-10 text-center text-lg"
               >
                 <li>
                   <span className="italic">{item.title},&nbsp;</span>

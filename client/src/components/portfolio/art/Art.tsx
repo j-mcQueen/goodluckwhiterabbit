@@ -4,18 +4,19 @@ import Content from "./Content";
 export default function Art() {
   return (
     <>
-      <main className="w-outer h-outer overflow-scroll">
+      <main className="w-outer h-outer">
         <header>
           <Rabbit />
+          <hgroup>
+            <h1></h1>
+
+            <p></p>
+          </hgroup>
         </header>
 
         <section>
           <Content />
         </section>
-
-        <footer>
-          <Rabbit />
-        </footer>
       </main>
     </>
   );

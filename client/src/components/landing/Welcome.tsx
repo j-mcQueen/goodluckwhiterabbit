@@ -1,5 +1,7 @@
 import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
 import rabbit from "../../assets/media/gifs/glwr-lenticular.gif";
+import SAILOR from "../../assets/media/sounds/CLOUD.DOMAIN.SLF..wav";
 
 export default function Welcome() {
   return (
@@ -17,12 +19,23 @@ export default function Welcome() {
           </h1>
         </div>
 
-        <Link
-          to={"/art"}
-          className="font-tnrBI border border-solid border-white xl:hover:border-red xl:hover:text-rd xl:focus:text-rd xl:hover:drop-shadow-red focus:drop-shadow-red text-xl text-white drop-shadow-glo tracking-widest opacity-80 pt-1 px-5 xl:hover:bg-red-600 xl:transition-colors"
+        <motion.div
+          initial={{ opacity: 0, y: 25 }}
+          animate={{
+            opacity: 1,
+            y: 0,
+            transition: { duration: 0.5, delay: 2.1 },
+          }}
+          className="mt-20"
         >
-          ENTER
-        </Link>
+          <Link
+            to={"/art"}
+            onClick={() => new Audio(SAILOR).play()}
+            className="font-vt border border-solid border-white xl:hover:border-red xl:hover:text-rd xl:focus:text-rd xl:hover:drop-shadow-red focus:drop-shadow-red text-xl focus:outline-none xl:focus:border-rd text-white drop-shadow-glo opacity-80 py-1 px-2 xl:hover:bg-red-600 xl:transition-colors"
+          >
+            ENTER
+          </Link>
+        </motion.div>
       </section>
     </main>
   );
