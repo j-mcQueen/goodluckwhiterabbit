@@ -91,17 +91,17 @@ export default function Content() {
                 </li>
 
                 <li
-                  className={`${item.available ? "pt-4" : ""} font-tnrI tracking-wider`}
+                  className={`${item.available ? "pt-4" : ""} font-vt tracking-wider`}
                 >
                   {item.available ? (
                     <a
                       href="mailto:goodluckwhiterabbit@gmail.com"
-                      className="font-tnrI border border-solid border-white px-2 py-1 pt-2 xl:hover:text-rd xl:focus:text-rd group xl:transition-colors text-sm xl:hover:drop-shadow-red xl:focus:drop-shadow-red xl:hover:border-rd xl:focus:border-rd "
+                      className="border border-solid border-white px-2 py-1 xl:hover:text-rd xl:focus:text-rd group xl:transition-colors xl:hover:drop-shadow-red xl:focus:drop-shadow-red xl:hover:border-rd xl:focus:border-rd drop-shadow-glo opacity-80"
                     >
                       INQUIRE
                     </a>
                   ) : (
-                    <div className="drop-shadow-red text-rd text-sm pt-4">
+                    <div className="drop-shadow-red text-rd pt-4">
                       <p>~ COLLECTED ~</p>
                     </div>
                   )}
