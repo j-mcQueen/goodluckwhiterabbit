@@ -29,6 +29,13 @@
 }
 
 @font-face {
+  font-family: "Times New Roman Italic";
+  src:
+    local("Times New Roman Italic"),
+    url("/fonts/tnr/TimesNewRomanMTStd-Italic.woff2") format("woff2");
+}
+
+@font-face {
   font-family: "Times New Roman Bold Italic";
   src:
     local("Times New Roman Bold Italic"),

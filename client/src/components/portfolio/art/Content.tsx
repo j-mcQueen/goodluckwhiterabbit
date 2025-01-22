@@ -21,6 +21,11 @@ export default function Content() {
     animate: { opacity: 1, transition: { duration: 1, delay: 0.5 } },
   };
 
+  const statement_variants = {
+    initial: { opacity: 0 },
+    animate: { opacity: 1, transition: { duration: 1 } },
+  };
+
   return (
     <section className="flex justify-center">
       <div
@@ -28,7 +33,28 @@ export default function Content() {
         className="grid grid-cols-1 grid-rows-full gap-10 items-center justify-center overflow-y-scroll xl:h-[calc(100dvh-1.5rem-5dvw)] h-[calc(100dvh-1.5rem-25dvw)] snap-y snap-mandatory"
       >
         {art_data.map((item, index: number) => {
-          return (
+          return index === 0 ? (
+            <motion.div
+              key="statement"
+              variants={statement_variants}
+              initial={"initial"}
+              whileInView={"animate"}
+              className="flex items-center justify-center snap-start xl:h-[calc(100dvh-1.5rem-5dvw)] h-[calc(100dvh-1.5rem-25dvw)] text-white text-center"
+            >
+              <div className="font-tnrI tracking-wide text-sm xl:text-2xl text-justify xl:text-center px-7">
+                <p>Experience the here and now; revel in what is ~</p>
+
+                <p className="py-5 xl:py-10">
+                  Observe the continuum of shifting constants, find freedom in
+                  fleeting chance,
+                </p>
+
+                <p>Reflect on the endless possibilities that exist...</p>
+
+                <p className="py-5 xl:pt-10">This way up.</p>
+              </div>
+            </motion.div>
+          ) : (
             <div
               key={item.title}
               className="flex flex-col justify-center items-center text-white snap-start xl:h-[calc(100dvh-1.5rem-5dvw)] h-[calc(100dvh-1.5rem-25dvw)]"
@@ -40,7 +66,7 @@ export default function Content() {
                 loading="lazy"
                 src={item.src}
                 alt={item.title}
-                className={`${index > 6 ? "xl:max-h-[35dvh]" : "xl:max-h-[60dvh]"} xl:max-w-[45dvw] max-w-[90dvw] max-h-[50dvh]`}
+                className={`${index > 7 ? "xl:max-h-[35dvh]" : "xl:max-h-[60dvh]"} xl:max-w-[45dvw] max-w-[90dvw] max-h-[50dvh]`}
               />
 
               <motion.ul
@@ -64,16 +90,18 @@ export default function Content() {
                   {item.edition === 1 ? "Unique" : `Edition of ${item.edition}`}
                 </li>
 
-                <li className={`${item.available ? "pt-4" : ""}`}>
+                <li
+                  className={`${item.available ? "pt-4" : ""} font-tnrI tracking-wider`}
+                >
                   {item.available ? (
                     <a
                       href="mailto:goodluckwhiterabbit@gmail.com"
-                      className="border border-solid border-white px-2 py-1 xl:hover:text-rd xl:focus:text-rd group xl:transition-colors drop-shadow-glo xl:hover:drop-shadow-red xl:focus:drop-shadow-red xl:hover:border-rd xl:focus:border-rd opacity-80"
+                      className="font-tnrI border border-solid border-white px-2 py-1 pt-2 xl:hover:text-rd xl:focus:text-rd group xl:transition-colors text-sm xl:hover:drop-shadow-red xl:focus:drop-shadow-red xl:hover:border-rd xl:focus:border-rd "
                     >
                       INQUIRE
                     </a>
                   ) : (
-                    <div className="drop-shadow-red text-rd opacity-80 pt-4">
+                    <div className="drop-shadow-red text-rd text-sm pt-4">
                       <p>~ COLLECTED ~</p>
                     </div>
                   )}

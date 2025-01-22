@@ -7,6 +7,7 @@ export default {
         liquid: ["Liquid Crystal", "sans-serif"],
         liquidB: ["Liquid Crystal Bold", "sans-serif"],
         liquidL: ["Liquid Crystal Light", "sans-serif"],
+        tnrI: ["Times New Roman Italic", "serif"],
         tnrBI: ["Times New Roman Bold Italic", "serif"],
         vt: ["VT323", "sans-serif"],
       },

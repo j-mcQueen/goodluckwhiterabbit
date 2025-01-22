@@ -10,6 +10,7 @@ import PURSUIT from "./THEPURSUITOFBALANCE.TRIPTYCH.webp";
 import NATURAL from "./STUDY.THENATURALPASSAGEOFTIME_forEve_SB..webp";
 
 export const art_data = [
+  {},
   {
     src: DREAMS,
     title: "WHERE DREAMS ARE BORN",
@@ -82,7 +83,7 @@ export const art_data = [
   },
   {
     src: FLOWING,
-    title: "THE FLOWING CONSTANT OF CHANGE",
+    title: "THE FLOWING",
     date: "2024",
     dims: "5 x 7 in. | 13 x 18 cm",
     medium: "Oil on paper",
@@ -92,7 +93,7 @@ export const art_data = [
   },
   {
     src: NATURAL,
-    title: "THE NATURAL PASSAGE OF TIME",
+    title: "THE NATURAL",
     date: "2024",
     dims: "5 x 7 in. | 13 x 18 cm",
     medium: "Oil on paper",
@@ -102,7 +103,7 @@ export const art_data = [
   },
   {
     src: SPIRITED,
-    title: "THE SPIRITED SOFTNESS OF SUNSHINE",
+    title: "THE SPIRITED",
     date: "2024",
     dims: "5 x 7 in. | 13 x 18 cm",
     medium: "Oil on paper",
