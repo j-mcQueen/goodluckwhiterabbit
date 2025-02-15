@@ -111,5 +111,4 @@ export const art_data = [
     edition: 1,
     available: false,
   },
-  {},
 ];

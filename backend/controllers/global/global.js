@@ -47,7 +47,6 @@ exports.generatePutPresigned = async (req, res, next) => {
       ]);
 
       if (url1 && url2) {
-        console.log(url1, url2, "success");
         return res.status(200).json([url1, url2]);
       }
     } catch (error) {

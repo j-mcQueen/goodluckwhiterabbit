@@ -7,11 +7,6 @@ export default function Art() {
       <main className="w-outer h-outer">
         <header>
           <Rabbit />
-          <hgroup>
-            <h1></h1>
-
-            <p></p>
-          </hgroup>
         </header>
 
         <section>

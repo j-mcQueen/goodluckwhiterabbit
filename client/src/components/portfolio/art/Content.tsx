@@ -1,7 +1,10 @@
+// import { useState } from "react";
 import { art_data } from "../../../assets/media/images/art/art_data";
 import { motion } from "framer-motion";
 
 export default function Content() {
+  // const [statement, setStatement] = useState(true);
+
   const img_variants = {
     initial: {
       y: 25,
@@ -18,13 +21,31 @@ export default function Content() {
 
   const list_variants = {
     initial: { opacity: 0 },
-    animate: { opacity: 1, transition: { duration: 1, delay: 0.5 } },
+    animate: {
+      opacity: 1,
+      transition: { duration: 1, staggerChildren: 0.5 },
+    },
   };
 
   const statement_variants = {
     initial: { opacity: 0 },
-    animate: { opacity: 1, transition: { duration: 1 } },
+    animate: (j: number) => ({
+      opacity: 1,
+      transition: { duration: 1, delay: j * 2 },
+    }),
   };
+
+  const statement = [
+    "Experience the here and now; revel in what is ~",
+    "Observe the continuum in shifting constants, find freedom in fleeting chance,",
+    "Reflect on the endless possibilities that exist...",
+    "This way up.",
+  ];
+
+  // WHEN PAGE RENDERS, LOAD STATEMENT -> USE STATE TO CONTROL THIS
+  // EXECUTE ANIMATIONS, THEN AFTER FULL ANIMATION COMPLETES,
+  // FADE OUT STATEMENT AND REMOVE FROM DOM, USE STATE TO TRIGGER ARTWORK APPEARANCES
+  // PLAY SOUND, FADE UP FIRST ARTWORK
 
   return (
     <section className="flex justify-center">
@@ -34,26 +55,25 @@ export default function Content() {
       >
         {art_data.map((item, index: number) => {
           return index === 0 ? (
-            <motion.div
+            <div
               key="statement"
-              variants={statement_variants}
-              initial={"initial"}
-              whileInView={"animate"}
-              className="flex items-center justify-center snap-start xl:h-[calc(100dvh-1.5rem-5dvw)] h-[calc(100dvh-1.5rem-25dvw)] text-white text-center"
+              className="flex flex-col items-center justify-center gap-10 snap-start xl:h-[calc(100dvh-1.5rem-5dvw)] h-[calc(100dvh-1.5rem-25dvw)] text-white font-tnrI tracking-wide text-sm xl:text-2xl xl:text-center px-7"
             >
-              <div className="font-tnrI tracking-wide text-sm xl:text-2xl text-justify xl:text-center px-7">
-                <p>Experience the here and now; revel in what is ~</p>
-
-                <p className="py-5 xl:py-10">
-                  Observe the continuum of shifting constants, find freedom in
-                  fleeting chance,
-                </p>
-
-                <p>Reflect on the endless possibilities that exist...</p>
-
-                <p className="py-5 xl:pt-10">This way up.</p>
-              </div>
-            </motion.div>
+              {statement.map((line, j) => {
+                return (
+                  <motion.div
+                    key={line}
+                    custom={j}
+                    variants={statement_variants}
+                    initial={"initial"}
+                    animate={"animate"}
+                    className="flex whitespace-pre"
+                  >
+                    <p>{line}</p>
+                  </motion.div>
+                );
+              })}
+            </div>
           ) : (
             <div
               key={item.title}
