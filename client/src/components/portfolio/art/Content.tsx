@@ -37,7 +37,8 @@ export default function Content() {
 
   const statement = [
     "Experience the here and now; revel in what is ~",
-    "Observe the continuum in shifting constants, find freedom in fleeting chance,",
+    "Observe the continuum in shifting constants,",
+    "Find freedom in fleeting chance,",
     "Reflect on the endless possibilities that exist...",
     "This way up.",
   ];
