@@ -1,10 +1,7 @@
-// import { useState } from "react";
 import { art_data } from "../../../assets/media/images/art/art_data";
 import { motion } from "framer-motion";
 
 export default function Content() {
-  // const [statement, setStatement] = useState(true);
-
   const img_variants = {
     initial: {
       y: 25,
@@ -39,14 +36,8 @@ export default function Content() {
     "Experience the here and now; revel in what is ~",
     "Observe the continuum in shifting constants,",
     "Find freedom in fleeting chance,",
-    "Reflect on the endless possibilities that exist...",
     "This way up.",
   ];
-
-  // WHEN PAGE RENDERS, LOAD STATEMENT -> USE STATE TO CONTROL THIS
-  // EXECUTE ANIMATIONS, THEN AFTER FULL ANIMATION COMPLETES,
-  // FADE OUT STATEMENT AND REMOVE FROM DOM, USE STATE TO TRIGGER ARTWORK APPEARANCES
-  // PLAY SOUND, FADE UP FIRST ARTWORK
 
   return (
     <section className="flex justify-center">

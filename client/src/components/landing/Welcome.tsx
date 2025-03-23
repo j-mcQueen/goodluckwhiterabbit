@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import rabbit from "../../assets/media/gifs/glwr-lenticular.gif";
-import SAILOR from "../../assets/media/sounds/CLOUD.DOMAIN.SLF..wav";
+import SAILOR from "../../assets/media/sounds/CLOUD.DOMAIN.SLF2..wav";
 
 export default function Welcome() {
   return (
