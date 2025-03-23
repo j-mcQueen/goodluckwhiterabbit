@@ -21,7 +21,7 @@ export default function Views({ ...props }) {
 
   return (
     <div className="flex">
-      <aside className="flex flex-col gap-5 min-w-[245px] max-h-[calc(100dvh-57px-1.5rem)] border-r border-solid border-white">
+      <aside className="flex flex-col gap-5 min-w-[245px] max-w-[245px] max-h-[calc(100dvh-57px-1.5rem)] border-r border-solid border-white">
         <h1 className="text-white text-center xl:text-2xl pt-5">
           {user.name.toUpperCase()}
         </h1>
