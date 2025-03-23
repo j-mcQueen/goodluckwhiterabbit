@@ -109,7 +109,28 @@ export default function UserDashboard() {
     getUser();
   }, []);
 
+  const updateActiveTab = (targetImageset: string) => {
+    switch (targetImageset) {
+      case "previews":
+        setActiveTab(0);
+        break;
+
+      case "full":
+        setActiveTab(1);
+        break;
+
+      case "socials":
+        setActiveTab(2);
+        break;
+
+      case "snips":
+        setActiveTab(3);
+        break;
+    }
+  };
+
   const handleSelect = async (targetImageset: string) => {
+    updateActiveTab(targetImageset);
     setInitialized(true);
     setActiveImageset(targetImageset);
     setSpinner(true);
