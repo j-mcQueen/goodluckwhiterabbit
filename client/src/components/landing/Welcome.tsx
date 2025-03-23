@@ -30,11 +30,7 @@ export default function Welcome() {
         >
           <Link
             to={"/art"}
-            onClick={() => {
-              setTimeout(() => {
-                new Audio(SAILOR).play();
-              }, 200);
-            }}
+            onClick={() => new Audio(SAILOR).play()}
             className="font-vt border border-solid border-white xl:hover:border-red xl:hover:text-rd xl:focus:text-rd xl:hover:drop-shadow-red focus:drop-shadow-red text-xl focus:outline-none xl:focus:border-rd text-white drop-shadow-glo opacity-80 py-1 px-2 xl:hover:bg-red-600 xl:transition-colors"
           >
             ENTER

@@ -85,7 +85,7 @@ export default function Content() {
                 variants={list_variants}
                 initial="initial"
                 whileInView="animate"
-                className="flex flex-col justify-center gap-1 pt-5 xl:pt-10 text-center tetx-md xl:text-lg"
+                className="flex flex-col justify-center gap-1 pt-5 xl:pt-3 text-center tetx-md xl:text-lg"
               >
                 <li>
                   <span className="italic">{item.title},&nbsp;</span>
