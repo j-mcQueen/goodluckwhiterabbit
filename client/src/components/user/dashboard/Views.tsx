@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { handleDownloadAll } from "./utils/handleDownloadAll";
+import { AnimatePresence, motion } from "framer-motion";
 
 import Carousel from "./views/Carousel";
 import Grid from "./views/Grid";
@@ -53,12 +54,25 @@ export default function Views({ ...props }) {
             DOWNLOAD: ALL
           </button>
 
-          {retrieving ? (
-            <p className="text-yellow-400 max-w-[245px] px-5 pt-5">
-              Please keep portal open while your zip file downloads... Slow and
-              steady wins the race!
-            </p>
-          ) : null}
+          <AnimatePresence mode="wait">
+            {retrieving && (
+              <motion.p
+                key={"notice"}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                onAnimationComplete={() => {
+                  setTimeout(() => {
+                    setRetrieving(false);
+                  }, 4000);
+                }}
+                className="text-yellow-400 min-w-[245px] max-w-[245px] px-5 pt-5"
+              >
+                Please keep portal open while your zip file downloads... Slow
+                and steady wins the race!
+              </motion.p>
+            )}
+          </AnimatePresence>
 
           {spinner ? (
             <div className="pt-5">

@@ -54,7 +54,6 @@ export default function Grid({ ...props }) {
             className="font-tnrBI tracking-widest opacity-80 drop-shadow-glo border border-solid border-white text-sm text-white pt-2 pb-1 px-3 xl:hover:border-rd xl:hover:text-rd xl:hover:drop-shadow-red xl:focus:drop-shadow-red xl:focus:text-rd xl:focus:border-rd transition-colors mt-2"
             onClick={() => {
               const args: handleLoadTypes = {
-                // TODO add types
                 activeImageset,
                 images,
                 imageset,
