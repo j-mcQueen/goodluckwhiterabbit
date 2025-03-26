@@ -1,8 +1,7 @@
 import { useState } from "react";
 
-import Prev from "../../../../assets/media/icons/Prev";
-import Next from "../../../../assets/media/icons/Next";
 import Image from "../Image";
+import Shift from "../../../../assets/media/icons/Shift";
 
 export default function Carousel({ ...props }) {
   const { userId, activeImageset, imageset } = props;
@@ -14,13 +13,13 @@ export default function Carousel({ ...props }) {
         {activeImage > 0 ? (
           <button
             type="button"
-            className="group"
+            className="group border border-solid border-white p-1 xl:hover:border-red xl:focus:border-red focus:outline-none transition-colors "
             onClick={() => setActiveImage(activeImage - 1)}
           >
-            <Prev className="w-10 h-10 xl:group-hover:fill-rd xl:group-hover:drop-shadow-red xl:group-focus:fill-rd transition-all" />
+            <Shift className="w-5 h-5 -rotate-90 xl:group-hover:fill-rd xl:group-hover:drop-shadow-red xl:group-focus:fill-rd transition-all" />
           </button>
         ) : (
-          <div className="w-10 h-10"></div>
+          <div className="w-5 h-5"></div>
         )}
 
         <div className="relative flex flex-col basis-[80dvw] items-center overflow-hidden">
@@ -39,13 +38,13 @@ export default function Carousel({ ...props }) {
           1 ? (
           <button
             type="button"
-            className="group"
+            className="group border border-solid border-white p-1 xl:hover:border-red xl:focus:border-red focus:outline-none transition-colors "
             onClick={() => setActiveImage(activeImage + 1)}
           >
-            <Next className="w-10 h-10 xl:group-hover:fill-rd xl:group-hover:drop-shadow-red xl:group-focus:fill-rd transition-all" />
+            <Shift className="w-5 h-5 rotate-90 xl:group-hover:fill-rd xl:group-hover:drop-shadow-red xl:group-focus:fill-rd transition-all" />
           </button>
         ) : (
-          <div className="w-10 h-10"></div>
+          <div className="w-5 h-5"></div>
         )}
       </div>
     </section>
