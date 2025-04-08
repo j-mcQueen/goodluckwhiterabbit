@@ -87,6 +87,7 @@ export default function Views({ ...props }) {
           userId={user._id}
           activeImageset={activeImageset}
           imageset={imageset}
+          setNotice={setNotice}
         />
 
         <div className="text-rd text-lg text-center py-20">

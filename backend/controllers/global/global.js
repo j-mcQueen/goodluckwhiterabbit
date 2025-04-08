@@ -135,6 +135,32 @@ exports.generateGetPresigned = async (req, res, next) => {
   }
 };
 
+exports.generateGetOnePresigned = async (req, res, next) => {
+  const verified = await verifyTokens(req, res);
+
+  if (verified) {
+    const cmd = new GetObjectCommand({
+      Bucket: process.env.AWS_PRIMARY_BUCKET,
+      Key: `${req.params.id}/${req.params.imageset}/originals/${req.params.index}/${req.params.name}`,
+    });
+
+    let url = "";
+    try {
+      url = await getSignedUrl(s3, cmd, { expiresIn: 600 });
+      if (!url) throw new Error("500");
+    } catch (error) {
+      return res.status(500).json({
+        status: true,
+        message:
+          "There was an error authorizing your request. Please refresh the page and try again.",
+        logout: { status: false, path: null },
+      });
+    }
+
+    return res.status(200).json(url);
+  }
+};
+
 exports.countImagesetItems = async (req, res, next) => {
   const verified = await verifyTokens(req, res);
 
