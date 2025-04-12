@@ -24,7 +24,7 @@ export default function Grid({ ...props }) {
 
   return (
     <section className="flex flex-col justify-center basis-[80dvw] pb-10">
-      <div className="flex flex-wrap justify-center gap-x-24 gap-y-12 relative overflow-hidden px-10">
+      <div className="flex flex-wrap justify-center items-center gap-x-24 gap-y-12 relative overflow-hidden px-10">
         {imageset
           .filter((image: object) => image instanceof File === true)
           .map((image: object, index: number) => {

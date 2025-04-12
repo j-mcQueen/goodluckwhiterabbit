@@ -11,7 +11,13 @@ export const handleChange = async (
   if (e.target.files) {
     // resize all files
     for (let i = 0; i < e.target.files.length; i++) {
-      const resized = await resize(e.target.files[i], e.target.files[i].type);
+      const resized = await resize(
+        e.target.files[i],
+        e.target.files[i].type,
+        0.1,
+        0.5,
+        0.9
+      );
       const filename = `c_${e.target.files[i].name}`;
       const converted = convertToFile(
         resized,
