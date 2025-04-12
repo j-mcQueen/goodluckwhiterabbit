@@ -1,4 +1,10 @@
-export const resize = async (file: File, type: string) => {
+export const resize = async (
+  file: File,
+  type: string,
+  scalarI: number,
+  scalarJ: number,
+  scalarK: number
+) => {
   const canvas = document.createElement("canvas");
   const ctx = canvas.getContext("2d", { alpha: false });
 
@@ -12,12 +18,12 @@ export const resize = async (file: File, type: string) => {
       const oc = document.createElement("canvas");
       const octx = oc.getContext("2d", { alpha: false });
 
-      canvas.width = img.width * (1 / 10); // target width -> determines size of final image
+      canvas.width = img.width * scalarI; // target width -> determines size of final image
       canvas.height = canvas.width * (img.height / img.width);
 
       let cur = {
-        width: Math.floor(img.width * 0.5),
-        height: Math.floor(img.height * 0.5),
+        width: Math.floor(img.width * scalarJ),
+        height: Math.floor(img.height * scalarJ),
       };
 
       oc.width = cur.width;
@@ -25,11 +31,11 @@ export const resize = async (file: File, type: string) => {
 
       octx?.drawImage(img, 0, 0, cur.width, cur.height);
 
-      while (cur.width * 0.5 > img.width * (1 / 10)) {
+      while (cur.width * scalarJ > img.width * scalarI) {
         // ensure right operand in conditional matches target width above
         cur = {
-          width: Math.floor(cur.width * 0.5),
-          height: Math.floor(cur.height * 0.5),
+          width: Math.floor(cur.width * scalarJ),
+          height: Math.floor(cur.height * scalarJ),
         };
         octx?.drawImage(
           oc,
@@ -61,7 +67,7 @@ export const resize = async (file: File, type: string) => {
     img.onerror = reject;
     if (typeof imageUrl === "string") img.src = imageUrl;
   });
-  const url = canvas.toDataURL(type, 0.9);
+  const url = canvas.toDataURL(type, scalarK);
   canvas.remove();
   return url;
 };
