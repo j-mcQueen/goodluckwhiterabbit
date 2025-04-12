@@ -12,7 +12,6 @@ const upload = multer(); // enable form data to be unpacked
 
 // GET
 router.get("/users/:id/:imageset/:start/:end", generateGetPresigned);
-router.get("/users/:id/:imageset/:index/:filename", generateGetOnePresigned);
 router.get("/users/:id/getImagesetTotals", countImagesetItems);
 
 // POST
