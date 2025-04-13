@@ -37,20 +37,13 @@ export default function ArtItem({ ...props }) {
     >
       <motion.img
         initial={{ y: 25, opacity: 0 }}
-        // variants={img_variants}
-        // initial="initial"
-        // whileInView={"animate"}
         animate={imgControls}
-        loading="lazy"
         src={item.src}
         alt={item.title}
         className={`${index > 7 ? "xl:max-h-[35dvh]" : "xl:max-h-[60dvh]"} xl:max-w-[45dvw] max-w-[90dvw] max-h-[50dvh]`}
       />
 
       <motion.ul
-        // variants={list_variants}
-        // initial="initial"
-        // whileInView="animate"
         initial={{ opacity: 0 }}
         animate={listControls}
         className="flex flex-col justify-center gap-1 pt-5 xl:pt-3 text-center tetx-md xl:text-lg"
