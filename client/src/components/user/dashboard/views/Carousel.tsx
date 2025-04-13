@@ -4,7 +4,7 @@ import Image from "../Image";
 import Shift from "../../../../assets/media/icons/Shift";
 
 export default function Carousel({ ...props }) {
-  const { userId, activeImageset, imageset, setNotice } = props;
+  const { userId, activeImageset, imageset } = props;
   const [activeImage, setActiveImage] = useState(0);
 
   return (
