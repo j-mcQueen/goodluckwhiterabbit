@@ -5,6 +5,7 @@ import ImageOrder from "./ImageOrder";
 const OrderContainer = ({ ...props }) => {
   const {
     clients,
+    dragTarget,
     host,
     orderedImagesets,
     setClients,
@@ -38,6 +39,7 @@ const OrderContainer = ({ ...props }) => {
       <ImageOrder
         host={host}
         clients={clients}
+        dragTarget={dragTarget}
         setClients={setClients}
         renderCount={renderCount}
         setRenderCount={setRenderCount}

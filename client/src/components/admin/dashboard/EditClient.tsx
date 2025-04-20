@@ -19,6 +19,7 @@ export default function EditClient({ ...props }) {
   const [targetImageset, setTargetImageset] = useState("");
   const [started, setStarted] = useState(false);
   const [spinner, setSpinner] = useState(false);
+  const [dragTarget, setDragTarget] = useState({});
 
   const [orderedImagesets, setOrderedImagesets] = useState({
     previews: Array(10).fill({}),
@@ -188,10 +189,12 @@ export default function EditClient({ ...props }) {
               <OrderContainer
                 host={host}
                 clients={clients}
+                dragTarget={dragTarget}
                 queuedImages={queuedImages}
                 targetClient={targetClient}
                 targetImageset={targetImageset}
                 setClients={setClients}
+                setDragTarget={setDragTarget}
                 setNotice={setNotice}
                 setTargetClient={setTargetClient}
                 orderedImagesets={orderedImagesets}
@@ -200,7 +203,7 @@ export default function EditClient({ ...props }) {
                 setSpinner={setSpinner}
               />
 
-              <ImageQueue />
+              <ImageQueue setDragTarget={setDragTarget} />
             </motion.div>
           )}
         </AnimatePresence>

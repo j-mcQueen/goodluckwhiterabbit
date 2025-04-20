@@ -1,5 +1,4 @@
 import { useState } from "react";
-// import { v4 as uuidv4 } from "uuid";
 import { handleDragStart } from "./utils/handlers/handleDragStart";
 import { handleDelete } from "./utils/handlers/ordering/handleDelete";
 import { handleDeleteTypes } from "./types/handleDeleteTypes";
@@ -7,14 +6,15 @@ import { handleLoad } from "./utils/handlers/ordering/handleLoad";
 import { handleLoadTypes } from "./types/handleLoadTypes";
 import { handleDrop } from "./utils/handlers/ordering/handleDrop";
 import { handleDropTypes } from "./types/handleDropTypes";
+import { generateKeys } from "../../global/utils/generateKeys";
 
 import Close from "../../../assets/media/icons/Close";
-import { generateKeys } from "../../global/utils/generateKeys";
 
 export default function ImageOrder({ ...props }) {
   const {
     host,
     clients,
+    dragTarget,
     setClients,
     setNotice,
     renderCount,
@@ -34,9 +34,60 @@ export default function ImageOrder({ ...props }) {
       <div className="text-white p-3 min-w-[40vw] flex flex-col items-center justify-center">
         <div className="flex flex-col items-center">
           <div className="flex flex-wrap justify-center max-w-[60dvw] gap-5 px-5 overflow-scroll h-[1200px] relative">
-            {order.map((file: File | string, index: number) => {
+            {order.map((file: Blob | string, index: number) => {
               return (
-                <div key={staticKeys[index]}>
+                <div
+                  key={staticKeys[index]}
+                  className={`${file instanceof Blob === false ? "h-[300px] w-[200px] min-h-[300px]" : "min-h-[300px] max-h-[350px]"} border border-solid`}
+                  onDragStart={(e) =>
+                    file instanceof Blob
+                      ? // ? handleDragStart(e, file, "order", index)
+                        handleDragStart(e, "order", index)
+                      : null
+                  }
+                  onDrop={async (e) => {
+                    const draggedIndex = Number(
+                      e.dataTransfer.getData("text/index")
+                    );
+                    const source = e.dataTransfer.getData("text/source");
+                    // const file = e.dataTransfer.files[0]; // compressed file
+                    // const file = e.dataTransfer.files[0]; // full res file
+
+                    const args: handleDropTypes = {
+                      clients,
+                      draggedIndex,
+                      // fFile,
+                      dragTarget,
+                      host,
+                      index,
+                      order,
+                      setClients,
+                      setNotice,
+                      setOrder,
+                      setTargetClient,
+                      source,
+                      targetClient,
+                      targetImageset,
+                    };
+
+                    const blob = await handleDrop(args);
+
+                    console.log(blob);
+
+                    const updatedOrder = [...order];
+                    updatedOrder[index] = blob;
+
+                    setOrder(updatedOrder);
+
+                    // const nextLoaded = renderCount + 1;
+                    // const updatedOrder = [...order];
+                    // updatedOrder[index] = file;
+
+                    // setRenderCount(nextLoaded);
+                    // setOrder(updatedOrder);
+                  }}
+                  onDragOver={(e) => e.preventDefault()}
+                >
                   {file instanceof File ? (
                     <button
                       onClick={() => {
@@ -67,48 +118,9 @@ export default function ImageOrder({ ...props }) {
                   <img
                     loading="lazy"
                     draggable={true}
-                    onDragStart={(e) =>
-                      file instanceof File
-                        ? handleDragStart(e, file, "order", index)
-                        : null
-                    }
-                    onDrop={async (e) => {
-                      const draggedIndex = Number(
-                        e.dataTransfer.getData("text/index")
-                      );
-                      const source = e.dataTransfer.getData("text/source");
-                      const file = e.dataTransfer.files[0];
-                      const fFile = e.dataTransfer.files[1]; // full res file
-
-                      const args: handleDropTypes = {
-                        clients,
-                        draggedIndex,
-                        fFile,
-                        file,
-                        host,
-                        index,
-                        order,
-                        setClients,
-                        setNotice,
-                        setOrder,
-                        setTargetClient,
-                        source,
-                        targetClient,
-                        targetImageset,
-                      };
-
-                      handleDrop(args);
-
-                      const nextLoaded = renderCount + 1;
-                      const updatedOrder = [...order];
-                      updatedOrder[index] = file;
-
-                      setRenderCount(nextLoaded);
-                      setOrder(updatedOrder);
-                    }}
-                    onDragOver={(e) => e.preventDefault()}
-                    className={`${file instanceof File === false ? "h-[300px] w-[200px] min-h-[300px]" : "min-h-[300px] max-h-[350px]"} border border-solid`}
-                    src={file instanceof File ? URL.createObjectURL(file) : ""}
+                    className={`${file instanceof Blob === false ? "hidden" : "block object-cover min-h-[300px] max-h-[350px]"}`}
+                    // src={file instanceof File ? URL.createObjectURL(file) : ""}
+                    src={file instanceof Blob ? URL.createObjectURL(file) : ""}
                   />
                 </div>
               );

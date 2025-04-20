@@ -2,6 +2,7 @@ require("dotenv").config();
 const passport = require("passport");
 const jwt = require("jsonwebtoken");
 const User = require("../models/user");
+const sharp = require("sharp");
 
 const { body, validationResult } = require("express-validator");
 const { returnClients } = require("./utils/returnClients");
@@ -406,5 +407,32 @@ exports.adminAddDriveLinks = async (req, res, next) => {
     );
 
     return res.status(200).json(updatedUser.links);
+  }
+};
+
+exports.uploadFile = async (req, res, next) => {
+  const verified = await verifyTokens(req, res);
+
+  if (verified) {
+    // TODO
+    // upload original to S3
+
+    const large = await sharp(req.files[0].buffer)
+      .resize(1440, null)
+      .toFormat("webp")
+      .toBuffer();
+
+    const medium = await sharp(req.files[0].buffer)
+      .resize(1080, null)
+      .toFormat("webp")
+      .toBuffer();
+
+    const small = await sharp(req.files[0].buffer)
+      .resize(768, null)
+      .toFormat("webp")
+      .toBuffer();
+
+    res.set("Content-Type", "image/webp");
+    return res.status(200).send(small);
   }
 };
