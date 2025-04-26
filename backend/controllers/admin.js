@@ -120,6 +120,15 @@ exports.adminAddClient = [
     if (verified) {
       const loginCode = createCode();
 
+      const formattedDate = () => {
+        const date = new Date();
+        const day = String(date.getDate()).padStart(2, "0");
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const year = String(date.getFullYear()).slice(-2);
+
+        return `${month}/${day}/${year}`;
+      };
+
       const user = new User({
         name: req.body.clientname,
         email: req.body.clientemail,
@@ -132,7 +141,7 @@ exports.adminAddClient = [
           snips: 0,
         },
         links: { previews: "", full: "", socials: "", snips: "" },
-        added: new Date(Date.now()).toLocaleString("en-US").split(",")[0], // mm/dd/yyyy format
+        added: formattedDate(),
       });
 
       try {

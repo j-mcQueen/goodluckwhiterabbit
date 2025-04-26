@@ -3,11 +3,9 @@ import { dashboard_client } from "./types/types";
 import { handleActionClick } from "./utils/handlers/dashboard/handleActionClick";
 import { handleCopy } from "./utils/handlers/dashboard/handleCopy";
 
-import Copy from "../../../assets/media/icons/Copy";
 import Edit from "../../../assets/media/icons/Edit";
 import Close from "../../../assets/media/icons/Close";
 import Mail from "../../../assets/media/icons/Mail";
-import Links from "../../../assets/media/icons/Links";
 
 export default function AllClients({ ...props }) {
   const {
@@ -27,8 +25,6 @@ export default function AllClients({ ...props }) {
           <th className="pb-2">DATE</th>
           <th>CODE</th>
           <th>FILES</th>
-          <th>LINKS</th>
-          <th>COPY</th>
           <th>EDIT</th>
           <th>SEND</th>
           <th></th>
@@ -40,7 +36,7 @@ export default function AllClients({ ...props }) {
           return (
             <tr
               key={client.code}
-              className={`text-white border-t-[1px] ${index < clients.length - 1 ? "border-b-[1px]" : ""} border-solid border-white`}
+              className={`text-white border-t-[1px] ${index < clients.length - 1 ? "border-b-[1px]" : ""} border-solid border-white text-xl`}
             >
               <td className="align-middle pl-3 tracking-wider">
                 {client.name.toUpperCase()}
@@ -48,7 +44,16 @@ export default function AllClients({ ...props }) {
 
               <td className="align-middle">{client.added}</td>
 
-              <td className="align-middle">{client.code}</td>
+              <td className="align-middle">
+                <button
+                  disabled={notice.status}
+                  onClick={() => handleCopy(client.code, setNotice)}
+                  type="button"
+                  className={`${dashboard_btns} py-0`}
+                >
+                  {client.code}
+                </button>
+              </td>
 
               <td className="align-middle">
                 <span
@@ -71,34 +76,6 @@ export default function AllClients({ ...props }) {
                 >
                   S: {client.fileCounts.snips}
                 </span>
-              </td>
-
-              <td className="align-middle">
-                <button
-                  onClick={() =>
-                    handleActionClick(
-                      client,
-                      setTargetClient,
-                      "LINKS",
-                      setActivePane
-                    )
-                  }
-                  type="button"
-                  className={dashboard_btns}
-                >
-                  <Links className={icons} />
-                </button>
-              </td>
-
-              <td className="align-middle">
-                <button
-                  disabled={notice.status}
-                  onClick={() => handleCopy(client.code, setNotice)}
-                  type="button"
-                  className={dashboard_btns}
-                >
-                  <Copy className={icons} />
-                </button>
               </td>
 
               <td className="align-middle">
