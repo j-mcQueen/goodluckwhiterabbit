@@ -5,6 +5,7 @@ import ImageOrder from "./ImageOrder";
 const OrderContainer = ({ ...props }) => {
   const {
     clients,
+    dragTarget,
     host,
     orderedImagesets,
     setClients,
@@ -21,7 +22,7 @@ const OrderContainer = ({ ...props }) => {
   useEffect(() => {
     setRenderCount(
       orderedImagesets[targetImageset].filter(
-        (item: object | File) => item instanceof File
+        (item: object | Blob) => item instanceof Blob
       ).length
     );
   }, [orderedImagesets, targetImageset]);
@@ -38,6 +39,7 @@ const OrderContainer = ({ ...props }) => {
       <ImageOrder
         host={host}
         clients={clients}
+        dragTarget={dragTarget}
         setClients={setClients}
         renderCount={renderCount}
         setRenderCount={setRenderCount}

@@ -1,11 +1,13 @@
-import { memo, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { handleDragStart } from "./utils/handlers/handleDragStart";
 import { handleDragEnd } from "./utils/handlers/handleDragEnd";
 import { handleChange } from "./utils/handlers/queueing/handleChange";
 import { handleDelete } from "./utils/handlers/queueing/handleDelete";
 import Close from "../../../assets/media/icons/Close";
 
-const ImageQueue = memo(function ImageQueue() {
+export default function ImageQueue({ ...props }) {
+  const { setDragTarget } = props;
+
   const [queue, setQueue] = useState<File[]>([]);
   const [uploadCount, setUploadCount] = useState(0);
   const fileRef = useRef<HTMLInputElement>(null);
@@ -60,8 +62,9 @@ const ImageQueue = memo(function ImageQueue() {
                   onDragStart={(e) => {
                     e.currentTarget.style.opacity = "0.25";
                     if (fileRef.current?.files) {
-                      const fFile = fileRef.current.files[index];
-                      handleDragStart(e, file, "queue", index, fFile);
+                      const file = fileRef.current.files[index];
+                      setDragTarget(file);
+                      handleDragStart(e, "queue", index);
                     }
                   }}
                   onDragEnd={(e) => handleDragEnd(e)}
@@ -76,5 +79,4 @@ const ImageQueue = memo(function ImageQueue() {
       </div>
     </div>
   );
-});
-export default ImageQueue;
+}

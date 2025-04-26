@@ -1,33 +1,32 @@
-import { updateFileCount } from "../../updateFileCounts";
+import { Dispatch, SetStateAction } from "react";
+import { updateDropState } from "./updateDropState";
 
 export const handleDrop = async ({ ...params }) => {
   if (params.index === params.draggedIndex && params.source !== "queue") return; // user made a mistake
 
-  // generate presigned URL for file upload
-  let presigned;
+  let blob;
   try {
-    // generate the urls used to add each file to S3
-    const response = await fetch(`${params.host}/generatePutPresigned`, {
+    const formData = new FormData();
+    formData.append("_id", params.targetClient._id);
+    formData.append("imageset", params.targetImageset);
+    formData.append("index", params.index);
+    formData.append("file", params.dragTarget);
+
+    const response = await fetch(`${params.host}/admin/uploadFile`, {
       method: "POST",
-      body: JSON.stringify({
-        _id: params.targetClient._id,
-        imageset: params.targetImageset,
-        index: params.index,
-        files: [params.file.name, params.fFile.name],
-      }),
+      body: formData,
       headers: {
         Accept: "application/json",
-        "Content-Type": "application/json",
       },
       credentials: "include",
     });
-    const data = await response.json();
+    const data = await response.blob();
 
     if (data) {
       switch (response.status) {
         case 200:
         case 304:
-          presigned = data;
+          blob = data;
           break;
 
         case 401:
@@ -56,81 +55,24 @@ export const handleDrop = async ({ ...params }) => {
     }
   }
 
-  // TODO can't we just check if there's an existing file at the given index in the order array before executing this request?
-  // verify if there is an existing file and remove from S3 if true
-  try {
-    const response = await fetch(
-      `${params.host}/admin/users/${params.targetClient._id}/getFile/${params.targetImageset}/${params.index}`,
-      {
-        method: "GET",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-      }
-    );
-    const data = await response.json();
+  if (blob instanceof Blob) {
+    const args: {
+      clients: { _id: string }[];
+      targetClient: { _id: string; fileCounts: number };
+      targetImageset: string;
+      setClients: Dispatch<SetStateAction<{ _id: string }[]>>;
+      setTargetClient: Dispatch<
+        SetStateAction<{ _id: string; fileCounts: number }>
+      >;
+    } = {
+      clients: params.clients,
+      targetClient: params.targetClient,
+      targetImageset: params.targetImageset,
+      setClients: params.setClients,
+      setTargetClient: params.setTargetClient,
+    };
 
-    if (data) {
-      switch (response.status) {
-        case 200:
-        case 304:
-          break;
-
-        case 500:
-          throw new TypeError(data.message);
-      }
-    }
-  } catch (error) {
-    if (error instanceof Error) {
-      return params.setNotice({
-        status: true,
-        message: error.message,
-        logout: { status: false, path: null },
-      });
-    }
-  }
-
-  // // send s3 request and upload images
-  try {
-    const [response1, response2] = await Promise.all([
-      fetch(presigned[0], { method: "PUT", body: params.file }),
-      fetch(presigned[1], { method: "PUT", body: params.fFile }),
-    ]);
-
-    if (response1.status === 200 && response2.status === 200) {
-      // update images locked into order
-      const nextImagesetCount =
-        params.targetClient.fileCounts[params.targetImageset] + 1;
-      const newCounts = await updateFileCount(
-        params.host,
-        params.targetClient,
-        params.targetImageset,
-        nextImagesetCount
-      );
-
-      const updatedTargetClient = { ...params.targetClient };
-      updatedTargetClient.fileCounts = newCounts;
-      params.setTargetClient(updatedTargetClient);
-
-      const nextClients = params.clients.map((client: { _id: string }) => {
-        return client._id === params.targetClient._id
-          ? updatedTargetClient
-          : client;
-      });
-      params.setClients(nextClients);
-    } else {
-      throw new Error("Other");
-    }
-  } catch (error) {
-    if (error instanceof Error) {
-      console.log(error);
-      params.setNotice({
-        status: true,
-        message: "We could not upload your images. Please try again.",
-        logout: { status: false, path: null },
-      });
-    }
+    updateDropState(args);
+    return blob;
   }
 };

@@ -3,8 +3,7 @@ import { Dispatch, SetStateAction } from "react";
 export interface handleDropTypes {
   clients: { _id: string }[];
   draggedIndex: number;
-  fFile: File;
-  file: File;
+  dragTarget: File;
   host: string;
   index: number;
   order: (File | object)[];
