@@ -14,6 +14,7 @@ const {
   ListObjectsV2Command,
   DeleteObjectCommand,
   DeleteObjectsCommand,
+  PutObjectCommand,
 } = require("@aws-sdk/client-s3");
 
 exports.adminLogin = [
@@ -414,9 +415,6 @@ exports.uploadFile = async (req, res, next) => {
   const verified = await verifyTokens(req, res);
 
   if (verified) {
-    // TODO
-    // upload original to S3
-
     const large = await sharp(req.files[0].buffer)
       .resize(1440, null)
       .toFormat("webp")
@@ -432,7 +430,64 @@ exports.uploadFile = async (req, res, next) => {
       .toFormat("webp")
       .toBuffer();
 
-    res.set("Content-Type", "image/webp");
+    // upload variations to s3
+    try {
+      const variations = [
+        { item: small, prefix: "sm" },
+        { item: medium, prefix: "md" },
+        { item: large, prefix: "lg" },
+        { item: req.files[0], prefix: "og" },
+      ];
+
+      await Promise.all(
+        variations.map(async ({ item, prefix }) => {
+          const buffer = item.buffer || item;
+          const filename =
+            item.originalname ||
+            `${prefix}_${req.files[0].originalname.split(".jpg")[0]}.webp`;
+          const contentType = item.originalname ? "image/jpeg" : "image/webp";
+
+          const cmd = new PutObjectCommand({
+            Bucket: process.env.AWS_PRIMARY_BUCKET,
+            Key: `${req.body._id}/${req.body.imageset}/${req.body.index}/${prefix}/${filename}`,
+            Body: buffer,
+            ContentType: contentType,
+          });
+
+          await s3.send(cmd);
+        })
+      );
+    } catch (error) {
+      return res
+        .status(500)
+        .json(
+          "There was an error uploading this file and its variations to S3."
+        );
+    }
+
+    // increment user file counts
+    let count = 0;
+    try {
+      const updatedUser = await User.findByIdAndUpdate(
+        req.body._id,
+        {
+          $inc: {
+            [`fileCounts.${req.body.imageset}`]: 1,
+          },
+        },
+        { new: true }
+      );
+
+      count = updatedUser.fileCounts;
+    } catch (error) {
+      console.log("error, fileCount update", error);
+      return res
+        .status(304)
+        .json(
+          "We have uploaded your files, but there was a database error. Your file count may not be accurate"
+        );
+    }
+
     return res.status(200).send(small);
   }
 };

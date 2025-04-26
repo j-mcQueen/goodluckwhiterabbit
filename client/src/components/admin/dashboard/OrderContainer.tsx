@@ -22,7 +22,7 @@ const OrderContainer = ({ ...props }) => {
   useEffect(() => {
     setRenderCount(
       orderedImagesets[targetImageset].filter(
-        (item: object | File) => item instanceof File
+        (item: object | Blob) => item instanceof Blob
       ).length
     );
   }, [orderedImagesets, targetImageset]);

@@ -41,8 +41,7 @@ export default function ImageOrder({ ...props }) {
                   className={`${file instanceof Blob === false ? "h-[300px] w-[200px] min-h-[300px]" : "min-h-[300px] max-h-[350px]"} border border-solid`}
                   onDragStart={(e) =>
                     file instanceof Blob
-                      ? // ? handleDragStart(e, file, "order", index)
-                        handleDragStart(e, "order", index)
+                      ? handleDragStart(e, "order", index)
                       : null
                   }
                   onDrop={async (e) => {
@@ -50,13 +49,10 @@ export default function ImageOrder({ ...props }) {
                       e.dataTransfer.getData("text/index")
                     );
                     const source = e.dataTransfer.getData("text/source");
-                    // const file = e.dataTransfer.files[0]; // compressed file
-                    // const file = e.dataTransfer.files[0]; // full res file
 
                     const args: handleDropTypes = {
                       clients,
                       draggedIndex,
-                      // fFile,
                       dragTarget,
                       host,
                       index,
@@ -72,19 +68,12 @@ export default function ImageOrder({ ...props }) {
 
                     const blob = await handleDrop(args);
 
-                    console.log(blob);
-
                     const updatedOrder = [...order];
                     updatedOrder[index] = blob;
+                    const nextLoaded = renderCount + 1;
 
+                    setRenderCount(nextLoaded);
                     setOrder(updatedOrder);
-
-                    // const nextLoaded = renderCount + 1;
-                    // const updatedOrder = [...order];
-                    // updatedOrder[index] = file;
-
-                    // setRenderCount(nextLoaded);
-                    // setOrder(updatedOrder);
                   }}
                   onDragOver={(e) => e.preventDefault()}
                 >
@@ -119,7 +108,6 @@ export default function ImageOrder({ ...props }) {
                     loading="lazy"
                     draggable={true}
                     className={`${file instanceof Blob === false ? "hidden" : "block object-cover min-h-[300px] max-h-[350px]"}`}
-                    // src={file instanceof File ? URL.createObjectURL(file) : ""}
                     src={file instanceof Blob ? URL.createObjectURL(file) : ""}
                   />
                 </div>
