@@ -86,6 +86,9 @@ export default function Actions({ ...props }) {
                   setClients([...originalClientsList.current]);
                 }
               }}
+              onKeyUp={(e) => {
+                if (e.key === "Enter") handleSearch();
+              }}
               placeholder="SEARCH ARCHIVE"
               className="bg-black border border-solid border-white xl:hover:border-rd focus:border-rd focus:outline-none transition-colors text-white p-[10px] max-h-[40px] flex-grow placeholder:text-white text-lg"
             />
