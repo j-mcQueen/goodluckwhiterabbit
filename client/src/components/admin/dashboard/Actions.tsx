@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { icons } from "./styles/styles";
 
 import Add from "../../../assets/media/icons/Add";
@@ -11,7 +11,15 @@ export default function Actions({ ...props }) {
     { name: "DATE", pattern: "date" },
     { name: "A-Z", pattern: "alphabetical" },
   ];
+  const originalClientsList = useRef(clients);
   const [sortStyle, setSortStyle] = useState(0);
+  const [searchInput, setSearchInput] = useState("");
+
+  useEffect(() => {
+    if (clients.length > 0 && !originalClientsList.current) {
+      originalClientsList.current = [...clients]; // store a copy once
+    }
+  }, [clients]);
 
   const SortTab = ({ ...props }) => {
     const { index, text, pattern } = props;
@@ -50,6 +58,15 @@ export default function Actions({ ...props }) {
     );
   };
 
+  const handleSearch = () => {
+    const filtered = originalClientsList.current.filter(
+      (client: { name: string }) =>
+        client.name.toLowerCase().includes(searchInput.toLowerCase())
+    );
+
+    setClients(filtered);
+  };
+
   return (
     <div className="flex items-start gap-3 p-3">
       <div className="flex flex-grow">
@@ -62,9 +79,15 @@ export default function Actions({ ...props }) {
             <input
               type="search"
               name="search"
-              id=""
+              onChange={(e) => {
+                setSearchInput(e.target.value);
+
+                if (e.target.value === "") {
+                  setClients([...originalClientsList.current]);
+                }
+              }}
               placeholder="SEARCH ARCHIVE"
-              className="bg-black border border-solid border-white xl:hover:border-rd focus:border-rd focus:outline-none transition-colors text-white p-[10px] max-h-[40px] flex-grow placeholder:text-white"
+              className="bg-black border border-solid border-white xl:hover:border-rd focus:border-rd focus:outline-none transition-colors text-white p-[10px] max-h-[40px] flex-grow placeholder:text-white text-lg"
             />
           </label>
 
@@ -81,14 +104,15 @@ export default function Actions({ ...props }) {
             })}
           </div>
         </div>
-
-        <button
-          type="button"
-          className="w-10 h-10 border border-l-0 border-solid flex justify-center p-[10px] focus:border-rd xl:hover:border-rd xl:transition-colors xl:focus:outline-none group"
-        >
-          <Search className={icons} />
-        </button>
       </div>
+
+      <button
+        type="button"
+        onClick={() => handleSearch()}
+        className="w-10 h-10 border border-solid flex justify-center p-[10px] focus:border-rd xl:hover:border-rd xl:transition-colors xl:focus:outline-none group"
+      >
+        <Search className={icons} />
+      </button>
 
       <button
         onClick={() => {
