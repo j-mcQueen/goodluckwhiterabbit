@@ -62,7 +62,12 @@ export default function AdminDashboard() {
           switch (response.status) {
             case 200:
             case 304:
-              return setClients(data);
+              return setClients(
+                data.sort(
+                  (a: { added: string }, b: { added: string }) =>
+                    new Date(b.added).getTime() - new Date(a.added).getTime()
+                )
+              );
 
             case 401:
               setNotice({

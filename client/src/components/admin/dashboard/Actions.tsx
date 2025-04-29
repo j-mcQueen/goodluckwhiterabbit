@@ -25,7 +25,7 @@ export default function Actions({ ...props }) {
         case "date":
           sorted = existingClients.sort(
             (a: { added: string }, b: { added: string }) =>
-              new Date(a.added).getTime() - new Date(b.added).getTime()
+              new Date(b.added).getTime() - new Date(a.added).getTime()
           );
           break;
 
@@ -96,7 +96,7 @@ export default function Actions({ ...props }) {
           new Audio(clicky).play();
         }}
         type="button"
-        className="w-10 h-10 border border-solid flex justify-center items-center focus:border-rd xl:transition-all xl:hover:border-rd xl:focus:outline-none"
+        className="w-10 h-10 border border-solid flex justify-center items-center focus:border-rd xl:transition-all xl:hover:border-rd xl:focus:outline-none group"
       >
         <Add className={icons} />
       </button>
