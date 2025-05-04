@@ -4,9 +4,6 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        liquid: ["Liquid Crystal", "sans-serif"],
-        liquidB: ["Liquid Crystal Bold", "sans-serif"],
-        liquidL: ["Liquid Crystal Light", "sans-serif"],
         tnrI: ["Times New Roman Italic", "serif"],
         tnrBI: ["Times New Roman Bold Italic", "serif"],
         vt: ["VT323", "sans-serif"],
@@ -25,12 +22,8 @@ export default {
         glo: "0px 0px 2px #FFF",
       },
       colors: {
-        blu: "#0075FF",
         ylw: "#FFF500",
         gray: "#818181",
-        mag: "#FF73FF",
-        cyn: "#00FFFF",
-        grn: "#08FF09",
         rd: "#DC2626",
       },
       backgroundColor: {

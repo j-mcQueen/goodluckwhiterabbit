@@ -15,20 +15,6 @@
 }
 
 @font-face {
-  font-family: "Liquid Crystal Bold";
-  src:
-    local("Liquid Crystal Bold"),
-    url("/fonts/lc/LiquidCrystal-Bold.woff2") format("woff2");
-}
-
-@font-face {
-  font-family: "Liquid Crystal Light";
-  src:
-    local("Liquid Crystal Light"),
-    url("/fonts/lc/LiquidCrystal-Light.woff2") format("woff2");
-}
-
-@font-face {
   font-family: "Times New Roman Italic";
   src:
     local("Times New Roman Italic"),
@@ -45,6 +31,10 @@
   font-family: "VT323", serif;
   min-width: 300px;
   overflow-x: hidden;
+}
+
+* {
+  scrollbar-width: none;
 }
 
 /* http://meyerweb.com/eric/tools/css/reset/ 
