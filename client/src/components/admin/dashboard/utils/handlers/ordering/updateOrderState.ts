@@ -1,7 +1,6 @@
-export const updateDropState = async ({ ...params }) => {
+export const updateOrderState = async ({ ...params }) => {
   // update images locked into order
-  const nextImagesetCount =
-    params.targetClient.fileCounts[params.targetImageset] + 1;
+  const nextImagesetCount = params.val;
 
   // ensure active has up-to-date file counts
   const updatedTargetClient = { ...params.targetClient };

@@ -1,5 +1,5 @@
 import { Dispatch, SetStateAction } from "react";
-import { updateDropState } from "./updateDropState";
+import { updateOrderState } from "./updateOrderState";
 
 export const handleDrop = async ({ ...params }) => {
   if (params.index === params.draggedIndex && params.source !== "queue") return; // user made a mistake
@@ -64,15 +64,17 @@ export const handleDrop = async ({ ...params }) => {
       setTargetClient: Dispatch<
         SetStateAction<{ _id: string; fileCounts: number }>
       >;
+      val: number;
     } = {
       clients: params.clients,
       targetClient: params.targetClient,
       targetImageset: params.targetImageset,
       setClients: params.setClients,
       setTargetClient: params.setTargetClient,
+      val: params.targetClient.fileCounts[params.targetImageset] + 1,
     };
 
-    updateDropState(args);
+    updateOrderState(args);
     return blob;
   }
 };

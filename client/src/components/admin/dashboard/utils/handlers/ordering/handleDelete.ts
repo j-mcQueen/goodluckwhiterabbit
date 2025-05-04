@@ -1,9 +1,10 @@
-import { updateFileCount } from "../../updateFileCounts";
+import { Dispatch, SetStateAction } from "react";
+import { updateOrderState } from "./updateOrderState";
 
 export const handleDelete = async ({ ...params }) => {
   try {
     const response = await fetch(
-      `${params.host}/admin/users/${params.targetClient._id}/${params.targetImageset}/${params.index}/${params.filename}/delete`,
+      `${params.host}/admin/users/${params.targetClient._id}/${params.targetImageset}/${params.index}/delete`,
       {
         method: "DELETE",
         headers: {
@@ -16,35 +17,25 @@ export const handleDelete = async ({ ...params }) => {
     const data = await response.json();
 
     if (data && (response.status === 200 || response.status === 304)) {
-      // update imagesetCount
-      const nextImagesetCount =
-        params.targetClient.fileCounts[
-          params.targetImageset as keyof typeof params.targetClient.fileCounts
-        ] - 1;
-      const newCounts = await updateFileCount(
-        params.host,
-        params.targetClient,
-        params.targetImageset,
-        nextImagesetCount
-      );
+      const args: {
+        clients: { _id: string }[];
+        targetClient: { _id: string; fileCounts: number };
+        targetImageset: string;
+        setClients: Dispatch<SetStateAction<{ _id: string }[]>>;
+        setTargetClient: Dispatch<
+          SetStateAction<{ _id: string; fileCounts: number }>
+        >;
+        val: number;
+      } = {
+        clients: params.clients,
+        targetClient: params.targetClient,
+        targetImageset: params.targetImageset,
+        setClients: params.setClients,
+        setTargetClient: params.setTargetClient,
+        val: params.targetClient.fileCounts[params.targetImageset] - 1,
+      };
 
-      const updatedOrder = [...params.order];
-      updatedOrder[params.index] = {};
-      params.setOrder(updatedOrder);
-
-      const updatedTargetClient = { ...params.targetClient };
-      updatedTargetClient.fileCounts = newCounts;
-      params.setTargetClient(updatedTargetClient);
-
-      const nextClients = params.clients.map((client: { _id: string }) => {
-        return client._id === params.targetClient._id
-          ? updatedTargetClient
-          : client;
-      });
-      params.setClients(nextClients);
-
-      const nextLoaded = params.renderCount - 1;
-      params.setRenderCount(nextLoaded);
+      updateOrderState(args);
       return;
     }
   } catch (error) {

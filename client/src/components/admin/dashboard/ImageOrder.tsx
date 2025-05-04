@@ -1,14 +1,9 @@
 import { useState } from "react";
-import { handleDragStart } from "./utils/handlers/handleDragStart";
-import { handleDelete } from "./utils/handlers/ordering/handleDelete";
-import { handleDeleteTypes } from "./types/handleDeleteTypes";
 import { handleLoad } from "./utils/handlers/ordering/handleLoad";
 import { handleLoadTypes } from "./types/handleLoadTypes";
-import { handleDrop } from "./utils/handlers/ordering/handleDrop";
-import { handleDropTypes } from "./types/handleDropTypes";
 import { generateKeys } from "../../global/utils/generateKeys";
 
-import Close from "../../../assets/media/icons/Close";
+import OrderItem from "./OrderItem";
 
 export default function ImageOrder({ ...props }) {
   const {
@@ -36,81 +31,23 @@ export default function ImageOrder({ ...props }) {
           <div className="flex flex-wrap justify-center max-w-[60dvw] gap-5 px-5 overflow-scroll h-[1200px] relative">
             {order.map((file: Blob | string, index: number) => {
               return (
-                <div
+                <OrderItem
                   key={staticKeys[index]}
-                  className={`${file instanceof Blob === false ? "h-[300px] w-[200px] min-h-[300px]" : "min-h-[300px] max-h-[350px]"} border border-solid`}
-                  onDragStart={(e) =>
-                    file instanceof Blob
-                      ? handleDragStart(e, "order", index)
-                      : null
-                  }
-                  onDrop={async (e) => {
-                    const draggedIndex = Number(
-                      e.dataTransfer.getData("text/index")
-                    );
-                    const source = e.dataTransfer.getData("text/source");
-
-                    const args: handleDropTypes = {
-                      clients,
-                      draggedIndex,
-                      dragTarget,
-                      host,
-                      index,
-                      order,
-                      setClients,
-                      setNotice,
-                      setOrder,
-                      setTargetClient,
-                      source,
-                      targetClient,
-                      targetImageset,
-                    };
-
-                    const blob = await handleDrop(args);
-
-                    const updatedOrder = [...order];
-                    updatedOrder[index] = blob;
-                    const nextLoaded = renderCount + 1;
-
-                    setRenderCount(nextLoaded);
-                    setOrder(updatedOrder);
-                  }}
-                  onDragOver={(e) => e.preventDefault()}
-                >
-                  {file instanceof File ? (
-                    <button
-                      onClick={() => {
-                        const args: handleDeleteTypes = {
-                          clients,
-                          filename: file.name,
-                          host,
-                          index,
-                          order,
-                          renderCount,
-                          setClients,
-                          setNotice,
-                          setOrder,
-                          setRenderCount,
-                          setTargetClient,
-                          targetClient,
-                          targetImageset,
-                        };
-
-                        handleDelete(args);
-                      }}
-                      className="absolute bg-black m-1 border border-solid border-rd p-1"
-                    >
-                      <Close className="w-4 h-4" />
-                    </button>
-                  ) : null}
-
-                  <img
-                    loading="lazy"
-                    draggable={true}
-                    className={`${file instanceof Blob === false ? "hidden" : "block object-cover min-h-[300px] max-h-[350px]"}`}
-                    src={file instanceof Blob ? URL.createObjectURL(file) : ""}
-                  />
-                </div>
+                  clients={clients}
+                  dragTarget={dragTarget}
+                  file={file}
+                  host={host}
+                  index={index}
+                  order={order}
+                  renderCount={renderCount}
+                  setClients={setClients}
+                  setNotice={setNotice}
+                  setOrder={setOrder}
+                  setRenderCount={setRenderCount}
+                  setTargetClient={setTargetClient}
+                  targetClient={targetClient}
+                  targetImageset={targetImageset}
+                />
               );
             })}
           </div>

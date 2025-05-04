@@ -2,7 +2,6 @@ import { Dispatch, SetStateAction } from "react";
 
 export interface handleDeleteTypes {
   clients: { _id: string }[];
-  filename: string;
   host: string;
   index: number;
   order: (File | object)[];

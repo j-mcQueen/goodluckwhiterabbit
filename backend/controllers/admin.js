@@ -8,6 +8,7 @@ const { body, validationResult } = require("express-validator");
 const { returnClients } = require("./utils/returnClients");
 const { createCode } = require("./utils/createCode");
 const { verifyTokens } = require("./utils/verifyTokens");
+const { updateCount } = require("./utils/updateCount");
 const { s3 } = require("./config/s3");
 
 const {
@@ -375,25 +376,25 @@ exports.adminDeleteFile = async (req, res, next) => {
 
   if (verified) {
     try {
-      const deleted = await s3.send(
-        new DeleteObjectsCommand({
+      //
+      const deleteTargets = await s3.send(
+        new ListObjectsV2Command({
           Bucket: process.env.AWS_PRIMARY_BUCKET,
-          Delete: {
-            Objects: [
-              {
-                Key: `${req.params.id}/${req.params.imageset}/resized/${req.params.index}/${req.params.filename}`,
-              },
-              {
-                Key: `${req.params.id}/${req.params.imageset}/original/${
-                  req.params.index
-                }/${req.params.filename.slice(2)}`,
-              },
-            ],
-          },
+          Prefix: `${req.params.id}/${req.params.imageset}/${req.params.index}`,
         })
       );
 
-      if (deleted.Deleted.length > 0) return res.status(200).json(deleted);
+      const deleted = await s3.send(
+        new DeleteObjectsCommand({
+          Bucket: process.env.AWS_PRIMARY_BUCKET,
+          Delete: { Objects: deleteTargets.Contents },
+        })
+      );
+
+      if (deleted.Deleted.length > 0) {
+        await updateCount(req.params._id, req.params.imageset, res, User, -1);
+        return res.status(200).json(deleted);
+      }
     } catch (error) {
       console.log(error);
       return res.status(500).json({
@@ -425,12 +426,7 @@ exports.uploadFile = async (req, res, next) => {
 
   if (verified) {
     const large = await sharp(req.files[0].buffer)
-      .resize(1440, null)
-      .toFormat("webp")
-      .toBuffer();
-
-    const medium = await sharp(req.files[0].buffer)
-      .resize(1080, null)
+      .resize(2400, null)
       .toFormat("webp")
       .toBuffer();
 
@@ -443,7 +439,6 @@ exports.uploadFile = async (req, res, next) => {
     try {
       const variations = [
         { item: small, prefix: "sm" },
-        { item: medium, prefix: "md" },
         { item: large, prefix: "lg" },
         { item: req.files[0], prefix: "og" },
       ];
@@ -475,27 +470,7 @@ exports.uploadFile = async (req, res, next) => {
     }
 
     // increment user file counts
-    let count = 0;
-    try {
-      const updatedUser = await User.findByIdAndUpdate(
-        req.body._id,
-        {
-          $inc: {
-            [`fileCounts.${req.body.imageset}`]: 1,
-          },
-        },
-        { new: true }
-      );
-
-      count = updatedUser.fileCounts;
-    } catch (error) {
-      console.log("error, fileCount update", error);
-      return res
-        .status(304)
-        .json(
-          "We have uploaded your files, but there was a database error. Your file count may not be accurate"
-        );
-    }
+    await updateCount(req.body._id, req.body.imageset, res, User, 1);
 
     return res.status(200).send(small);
   }

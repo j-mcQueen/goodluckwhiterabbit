@@ -31,6 +31,6 @@ router.post("/users/:id/addLinks", adminAddDriveLinks);
 router.post("/uploadFile", upload.any(), uploadFile);
 // DELETE
 router.delete("/deleteUser/:id", adminDeleteUser);
-router.delete("/users/:id/:imageset/:index/:filename/delete", adminDeleteFile);
+router.delete("/users/:id/:imageset/:index/delete", adminDeleteFile);
 
 module.exports = router;
