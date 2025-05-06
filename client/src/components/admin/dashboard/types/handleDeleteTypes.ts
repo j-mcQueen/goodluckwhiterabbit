@@ -4,7 +4,7 @@ export interface handleDeleteTypes {
   clients: { _id: string }[];
   host: string;
   index: number;
-  order: (File | object)[];
+  order: (Blob | object)[];
   renderCount: number;
   setClients: Dispatch<SetStateAction<{ _id: string }[]>>;
   setNotice: Dispatch<
@@ -14,7 +14,7 @@ export interface handleDeleteTypes {
       logout: { status: boolean; path: null | string };
     }>
   >;
-  setOrder: Dispatch<SetStateAction<(File | object)[]>>;
+  setOrder: Dispatch<SetStateAction<(Blob | object)[]>>;
   setRenderCount: Dispatch<SetStateAction<number>>;
   setTargetClient: Dispatch<SetStateAction<{ _id: string }>>;
   targetClient: {

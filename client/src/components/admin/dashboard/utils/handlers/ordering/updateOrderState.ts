@@ -1,10 +1,7 @@
 export const updateOrderState = async ({ ...params }) => {
-  // update images locked into order
-  const nextImagesetCount = params.val;
-
   // ensure active has up-to-date file counts
   const updatedTargetClient = { ...params.targetClient };
-  updatedTargetClient.fileCounts = nextImagesetCount;
+  updatedTargetClient.fileCounts = params.val;
   params.setTargetClient(updatedTargetClient);
 
   // reflect changes in client list

@@ -376,7 +376,6 @@ exports.adminDeleteFile = async (req, res, next) => {
 
   if (verified) {
     try {
-      //
       const deleteTargets = await s3.send(
         new ListObjectsV2Command({
           Bucket: process.env.AWS_PRIMARY_BUCKET,

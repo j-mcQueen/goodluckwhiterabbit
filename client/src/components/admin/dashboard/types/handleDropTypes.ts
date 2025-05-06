@@ -6,7 +6,7 @@ export interface handleDropTypes {
   dragTarget: File;
   host: string;
   index: number;
-  order: (File | object)[];
+  order: (Blob | object)[];
   setClients: Dispatch<SetStateAction<{ _id: string }[]>>;
   setNotice: Dispatch<
     SetStateAction<{
@@ -15,7 +15,7 @@ export interface handleDropTypes {
       logout: { status: boolean; path: null | string };
     }>
   >;
-  setOrder: Dispatch<SetStateAction<(File | object)[]>>;
+  setOrder: Dispatch<SetStateAction<(Blob | object)[]>>;
   setTargetClient: Dispatch<SetStateAction<{ _id: string }>>;
   source: string;
   targetClient: {
