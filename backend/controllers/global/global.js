@@ -67,11 +67,13 @@ exports.generateGetPresigned = async (req, res, next) => {
       let objects = await s3.send(
         new ListObjectsV2Command({
           Bucket: process.env.AWS_PRIMARY_BUCKET,
-          Prefix: `${req.params.id}/${req.params.imageset}/resized`,
+          Prefix: `${req.params.id}/${req.params.imageset}`,
         })
       );
 
-      const sorted = objects.Contents.sort((a, b) => {
+      const sorted = objects.Contents.filter((item) =>
+        item.Key.includes("/sm/")
+      ).sort((a, b) => {
         const posA = a.Key.match(indexRegex);
         const posB = b.Key.match(indexRegex);
 
@@ -79,6 +81,7 @@ exports.generateGetPresigned = async (req, res, next) => {
         if (Number(posA[1]) > Number(posB[1])) return 1;
         return 0;
       });
+
       objects.Contents = sorted;
       s3Objects = objects;
 
@@ -101,8 +104,6 @@ exports.generateGetPresigned = async (req, res, next) => {
     for (let i = 0; i < s3Objects.Contents.length; i++) {
       const position = s3Objects.Contents[i].Key.match(indexRegex);
       if (
-        // s3Objects.Contents[i].Key.includes(req.params.imageset) &&
-        // s3Objects.Contents[i].Key.includes(req.params.id) &&
         Number(position[1]) >= Number(req.params.start) && // this ensures we will always pick up from where we left off when a new batch has been requested
         Number(position[1]) <= Number(req.params.end) // ensures "out-of-bounds" presigns aren't included
       ) {

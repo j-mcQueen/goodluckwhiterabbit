@@ -1,4 +1,5 @@
 import { Dispatch, SetStateAction } from "react";
+import { determineHost } from "./determineHost";
 
 export const generateImagesetGetUrls = async (
   start: number,
@@ -13,10 +14,7 @@ export const generateImagesetGetUrls = async (
   >,
   userId: string | undefined
 ) => {
-  const host =
-    import.meta.env.VITE_ENV === "production"
-      ? import.meta.env.VITE_API_URL
-      : "http://localhost:3000/api";
+  const host = determineHost;
 
   let presigns;
   try {
