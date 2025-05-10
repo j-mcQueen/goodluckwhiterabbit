@@ -6,7 +6,6 @@ const OrderContainer = ({ ...props }) => {
   const {
     clients,
     dragTarget,
-    host,
     orderedImagesets,
     setClients,
     setNotice,
@@ -37,7 +36,6 @@ const OrderContainer = ({ ...props }) => {
       />
 
       <ImageOrder
-        host={host}
         clients={clients}
         dragTarget={dragTarget}
         setClients={setClients}

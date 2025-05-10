@@ -4,7 +4,6 @@ export interface handleDropTypes {
   clients: { _id: string }[];
   draggedIndex: number;
   dragTarget: File;
-  host: string;
   index: number;
   order: (Blob | object)[];
   setClients: Dispatch<SetStateAction<{ _id: string }[]>>;

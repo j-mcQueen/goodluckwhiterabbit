@@ -1,9 +1,12 @@
+import { determineHost } from "../../../global/utils/determineHost";
+
 export const updateFileCount = async (
-  host: string,
   client: { _id: string },
   imageset: string,
   count: number
 ) => {
+  const host = determineHost;
+
   const response = await fetch(
     `${host}/admin/users/${client._id}/updateFileCount/${imageset}/${count}`,
     {

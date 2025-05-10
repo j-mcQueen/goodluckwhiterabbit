@@ -1,11 +1,11 @@
 import { Dispatch, SetStateAction } from "react";
 import { updateOrderState } from "./updateOrderState";
 import { executeGenerationChain } from "../../../../../global/utils/executeGenerationChain";
+import { determineHost } from "../../../../../global/utils/determineHost";
 
 export const handleFirstLoad = async ({ ...params }) => {
   const {
     clients,
-    host,
     newTargetImageset,
     orderedImagesets,
     setClients,
@@ -17,6 +17,8 @@ export const handleFirstLoad = async ({ ...params }) => {
     setTargetImageset,
     targetClient,
   } = params;
+
+  const host = determineHost;
 
   setTargetImageset(newTargetImageset);
   setStarted(true);

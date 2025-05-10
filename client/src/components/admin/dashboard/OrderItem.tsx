@@ -13,7 +13,6 @@ export default function OrderItem({ ...props }) {
     clients,
     dragTarget,
     file,
-    host,
     index,
     order,
     renderCount,
@@ -44,7 +43,6 @@ export default function OrderItem({ ...props }) {
           clients,
           draggedIndex,
           dragTarget,
-          host,
           index,
           order,
           setClients,
@@ -74,7 +72,6 @@ export default function OrderItem({ ...props }) {
           onClick={async () => {
             const args: handleDeleteTypes = {
               clients,
-              host,
               index,
               order,
               renderCount,

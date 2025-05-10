@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
+import { determineHost } from "../../global/utils/determineHost";
 
 import AllClients from "./AllClients";
 import Header from "./Header";
@@ -19,11 +20,6 @@ export default function AdminDashboard() {
   useEffect(() => {
     document.title = "ADMIN DASHBOARD — GOOD LUCK WHITE RABBIT";
   }, []);
-
-  const host =
-    import.meta.env.VITE_ENV === "production"
-      ? import.meta.env.VITE_API_URL
-      : "http://localhost:3000/api";
 
   const [activePane, setActivePane] = useState("ALL");
   const [clients, setClients] = useState([]);
@@ -49,6 +45,8 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     const getAllClients = async () => {
+      const host = determineHost;
+
       try {
         const response = await fetch(`${host}/admin/users`, {
           method: "GET",
@@ -93,7 +91,7 @@ export default function AdminDashboard() {
     };
 
     if (location.state.login === true) getAllClients(); // if admin has just logged in, fetch clients
-  }, [location, navigate, host]);
+  }, [location, navigate]);
 
   return (
     <main className="w-[calc(100dvw-1.5rem-2px)] h-[calc(100dvh-1.5rem-2px)] overflow-scroll overflow-x-hidden relative">
@@ -117,7 +115,6 @@ export default function AdminDashboard() {
       </AnimatePresence>
 
       <Header
-        host={host}
         edit={activePane === "EDIT" ? true : false}
         setTargetClient={activePane === "EDIT" ? setTargetClient : false}
         setActivePane={activePane === "EDIT" ? setActivePane : false}
@@ -147,7 +144,6 @@ export default function AdminDashboard() {
             </div>
           ) : activePane === "ADD" ? (
             <AddClient
-              host={host}
               clients={clients}
               setClients={setClients}
               setActivePane={setActivePane}
@@ -156,7 +152,6 @@ export default function AdminDashboard() {
             <EditClient
               clients={clients}
               setClients={setClients}
-              host={host}
               setNotice={setNotice}
               targetClient={targetClient}
               setTargetClient={setTargetClient}
@@ -175,7 +170,6 @@ export default function AdminDashboard() {
 
       {deleteModalToggle.active === true ? (
         <DeleteModal
-          host={host}
           clients={clients}
           setClients={setClients}
           deleteModalToggle={deleteModalToggle}

@@ -7,7 +7,6 @@ import OrderItem from "./OrderItem";
 
 export default function ImageOrder({ ...props }) {
   const {
-    host,
     clients,
     dragTarget,
     setClients,
@@ -36,7 +35,6 @@ export default function ImageOrder({ ...props }) {
                   clients={clients}
                   dragTarget={dragTarget}
                   file={file}
-                  host={host}
                   index={index}
                   order={order}
                   renderCount={renderCount}
@@ -56,7 +54,6 @@ export default function ImageOrder({ ...props }) {
             onClick={() => {
               const args: handleLoadTypes = {
                 clients,
-                host,
                 order,
                 renderCount,
                 staticKeys,

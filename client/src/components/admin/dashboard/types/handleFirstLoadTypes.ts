@@ -2,7 +2,6 @@ import { Dispatch, SetStateAction } from "react";
 
 export interface handleFirstLoadTypes {
   clients: { _id: string }[];
-  host: string;
   newTargetImageset: string;
   orderedImagesets: {
     previews: (Blob | object)[];

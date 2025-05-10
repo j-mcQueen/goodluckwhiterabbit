@@ -1,10 +1,13 @@
 import { Dispatch, SetStateAction } from "react";
 import { updateOrderState } from "./updateOrderState";
+import { determineHost } from "../../../../../global/utils/determineHost";
 
 export const handleDelete = async ({ ...params }) => {
+  const host = determineHost;
+
   try {
     const response = await fetch(
-      `${params.host}/admin/users/${params.targetClient._id}/${params.targetImageset}/${params.index}/delete`,
+      `${host}/admin/users/${params.targetClient._id}/${params.targetImageset}/${params.index}/delete`,
       {
         method: "DELETE",
         headers: {

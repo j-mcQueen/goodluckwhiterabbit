@@ -1,5 +1,6 @@
 import { FormEvent, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { determineHost } from "../../global/utils/determineHost";
 import Rabbit from "../../global/forms/Rabbit";
 
 export default function Login() {
@@ -9,12 +10,9 @@ export default function Login() {
     document.title = "ADMIN LOGIN — GOOD LUCK WHITE RABBIT";
   }, []);
   const [authError, setAuthError] = useState(false);
-  const host =
-    import.meta.env.VITE_ENV === "production"
-      ? import.meta.env.VITE_API_URL
-      : "http://localhost:3000/api";
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    const host = determineHost;
     const formData = new FormData(e.currentTarget);
     e.preventDefault();
 

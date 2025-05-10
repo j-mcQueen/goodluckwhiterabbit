@@ -1,8 +1,11 @@
 import { Dispatch, SetStateAction } from "react";
 import { updateOrderState } from "./updateOrderState";
+import { determineHost } from "../../../../../global/utils/determineHost";
 
 export const handleDrop = async ({ ...params }) => {
   if (params.index === params.draggedIndex && params.source !== "queue") return; // user made a mistake
+
+  const host = determineHost;
 
   let blob;
   try {
@@ -12,7 +15,7 @@ export const handleDrop = async ({ ...params }) => {
     formData.append("index", params.index);
     formData.append("file", params.dragTarget);
 
-    const response = await fetch(`${params.host}/admin/uploadFile`, {
+    const response = await fetch(`${host}/admin/uploadFile`, {
       method: "POST",
       body: formData,
       headers: {

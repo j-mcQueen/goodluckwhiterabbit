@@ -2,7 +2,6 @@ import { Dispatch, SetStateAction } from "react";
 
 export interface handleLoadTypes {
   clients: { _id: string }[];
-  host: string;
   order: (object | File)[];
   renderCount: number;
   staticKeys: string[];

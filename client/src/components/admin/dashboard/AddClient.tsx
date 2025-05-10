@@ -1,7 +1,8 @@
 import { FormEvent } from "react";
 import { useState } from "react";
-import PaneHeader from "./PaneHeader";
+import { determineHost } from "../../global/utils/determineHost";
 
+import PaneHeader from "./PaneHeader";
 import Loading from "../../global/Loading";
 
 export default function AddClient({ ...props }) {
@@ -16,11 +17,12 @@ export default function AddClient({ ...props }) {
   });
   const [spinner, setSpinner] = useState(false);
 
-  const { host, clients, setClients, setActivePane } = props;
+  const { clients, setClients, setActivePane } = props;
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setSpinner(true);
+    const host = determineHost;
 
     try {
       const response = await fetch(`${host}/admin/add`, {

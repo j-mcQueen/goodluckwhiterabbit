@@ -1,7 +1,11 @@
+import { determineHost } from "../../../../../global/utils/determineHost";
 import { executeGenerationChain } from "../../../../../global/utils/executeGenerationChain";
 import { generateKeys } from "../../../../../global/utils/generateKeys";
 
 export const handleLoad = async ({ ...params }) => {
+  // TODO reconfigure
+  const host = determineHost;
+
   if (
     params.renderCount === params.targetClient.fileCounts[params.targetImageset]
   ) {
@@ -25,7 +29,7 @@ export const handleLoad = async ({ ...params }) => {
     const count = params.renderCount + data.count;
     if (count > params.targetClient.fileCounts[params.targetImageset]) {
       const response = await fetch(
-        `${params.host}/admin/users/${params.targetClient._id}/updateFileCount/${params.targetImageset}/${count}`,
+        `${host}/admin/users/${params.targetClient._id}/updateFileCount/${params.targetImageset}/${count}`,
         {
           method: "POST",
           headers: {

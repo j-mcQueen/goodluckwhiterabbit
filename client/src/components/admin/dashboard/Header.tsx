@@ -1,16 +1,19 @@
 import { useNavigate } from "react-router-dom";
 import { icons } from "./styles/styles";
 import { handleActionClick } from "./utils/handlers/dashboard/handleActionClick";
+import { determineHost } from "../../global/utils/determineHost";
 
 import rabbit from "../../../assets/media/gifs/glwr-lenticular.gif";
 import Eject from "../../../assets/media/icons/Eject";
 import Prev from "../../../assets/media/icons/Prev";
 
 export default function Header({ ...props }) {
-  const { host, edit, setTargetClient, setActivePane } = props;
+  const { edit, setTargetClient, setActivePane } = props;
   const navigate = useNavigate();
 
   const handleLogout = async () => {
+    const host = determineHost;
+
     const response = await fetch(`${host}/logout`, {
       method: "POST",
       credentials: "include",

@@ -2,19 +2,16 @@ import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { executeGenerationChain } from "../../global/utils/executeGenerationChain";
 import { imageset_select_btns } from "./styles/styles";
+import { determineHost } from "../../global/utils/determineHost";
+// import { handleFirstLoadTypes } from "./types/handleFirstLoadTypes";
+// import { handleFirstLoad } from "./utils/handlers/ordering/handleFirstLoad";
 
 import ImageQueue from "./ImageQueue";
 import OrderContainer from "./OrderContainer";
 
 export default function EditClient({ ...props }) {
-  const {
-    clients,
-    setClients,
-    setNotice,
-    host,
-    targetClient,
-    setTargetClient,
-  } = props;
+  const { clients, setClients, setNotice, targetClient, setTargetClient } =
+    props;
 
   const [targetImageset, setTargetImageset] = useState("");
   const [started, setStarted] = useState(false);
@@ -35,9 +32,12 @@ export default function EditClient({ ...props }) {
   });
 
   const handleClick = async (newTargetImageset: string) => {
+    // TODO extract into handler fn
     setTargetImageset(newTargetImageset);
     setStarted(true);
     setSpinner(true);
+
+    const host = determineHost;
 
     const data = await executeGenerationChain(
       orderedImagesets[newTargetImageset as keyof typeof orderedImagesets],
@@ -60,6 +60,7 @@ export default function EditClient({ ...props }) {
           credentials: "include",
         }
       );
+
       const newCounts = await response.json();
 
       if (newCounts && (response.status === 200 || response.status === 304)) {
@@ -131,6 +132,26 @@ export default function EditClient({ ...props }) {
             <button
               type="button"
               className={`${targetImageset === "previews" ? "text-rd drop-shadow-red" : ""} ${imageset_select_btns} `}
+              // onClick={async () => {
+              //   const args: handleFirstLoadTypes = {
+              //     clients,
+              //     host,
+              //     newTargetImageset: "previews",
+              //     orderedImagesets,
+              //     setClients,
+              //     setNotice,
+              //     setOrderedImagesets,
+              //     setSpinner,
+              //     setStarted,
+              //     setTargetClient,
+              //     setTargetImageset,
+              //     targetClient,
+              //   };
+
+              //   await handleFirstLoad(args);
+
+              //   // handleClick("previews");
+              // }}
               onClick={() => handleClick("previews")}
               disabled={targetImageset === "previews" ? true : false}
             >
@@ -187,7 +208,6 @@ export default function EditClient({ ...props }) {
               className="border border-solid border-white flex"
             >
               <OrderContainer
-                host={host}
                 clients={clients}
                 dragTarget={dragTarget}
                 queuedImages={queuedImages}
