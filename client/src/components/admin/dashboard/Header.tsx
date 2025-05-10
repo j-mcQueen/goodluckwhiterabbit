@@ -26,7 +26,11 @@ export default function Header({ ...props }) {
 
   return (
     <header className="flex justify-between p-3">
-      <img src={rabbit} alt="Sample image" className="xl:max-h-[50px]" />
+      <img
+        src={rabbit}
+        alt="A leaping white rabbit"
+        className="xl:max-h-[50px] xl:scale-[2] translate-x-10"
+      />
 
       <div className="flex gap-5">
         {edit ? (
