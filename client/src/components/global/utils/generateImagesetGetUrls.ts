@@ -35,7 +35,7 @@ export const generateImagesetGetUrls = async (
       case 200:
       case 304:
         if (data.files === false) return data;
-        presigns = data.presigns;
+        presigns = data;
 
         if (data.skipped) {
           const filenames = data.skipped.join(" ");

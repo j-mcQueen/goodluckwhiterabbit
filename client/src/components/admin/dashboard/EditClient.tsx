@@ -1,10 +1,8 @@
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { executeGenerationChain } from "../../global/utils/executeGenerationChain";
 import { imageset_select_btns } from "./styles/styles";
-import { determineHost } from "../../global/utils/determineHost";
-// import { handleFirstLoadTypes } from "./types/handleFirstLoadTypes";
-// import { handleFirstLoad } from "./utils/handlers/ordering/handleFirstLoad";
+import { handleFirstLoadTypes } from "./types/handleFirstLoadTypes";
+import { handleFirstLoad } from "./utils/handlers/ordering/handleFirstLoad";
 
 import ImageQueue from "./ImageQueue";
 import OrderContainer from "./OrderContainer";
@@ -30,66 +28,6 @@ export default function EditClient({ ...props }) {
       return [...targetClient.queue[targetImageset]];
     } else return [];
   });
-
-  const handleClick = async (newTargetImageset: string) => {
-    // TODO extract into handler fn
-    setTargetImageset(newTargetImageset);
-    setStarted(true);
-    setSpinner(true);
-
-    const host = determineHost;
-
-    const data = await executeGenerationChain(
-      orderedImagesets[newTargetImageset as keyof typeof orderedImagesets],
-      newTargetImageset,
-      setNotice,
-      0,
-      10,
-      targetClient._id
-    );
-
-    try {
-      const response = await fetch(
-        `${host}/admin/users/${targetClient._id}/${newTargetImageset}/getCount`,
-        {
-          method: "GET",
-          headers: {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-          },
-          credentials: "include",
-        }
-      );
-
-      const newCounts = await response.json();
-
-      if (newCounts && (response.status === 200 || response.status === 304)) {
-        const nextTargetClient = { ...targetClient };
-        nextTargetClient.fileCounts[newTargetImageset] = newCounts;
-        setTargetClient(nextTargetClient);
-
-        const nextClients = clients.map((client: { _id: string }) => {
-          return client._id === targetClient._id ? nextTargetClient : client;
-        });
-        setClients(nextClients);
-      }
-    } catch (error) {
-      setNotice({
-        status: true,
-        message:
-          "There was an issue updating the number of files your client has in storage. Upon your next addition, the system will correct itself.",
-        logout: { status: false, path: null },
-      });
-    }
-
-    const nextOrderedImagesets = {
-      ...orderedImagesets,
-      [newTargetImageset]: data.files,
-    };
-    setOrderedImagesets(nextOrderedImagesets);
-    setSpinner(false);
-    return;
-  };
 
   return (
     <form
@@ -132,27 +70,23 @@ export default function EditClient({ ...props }) {
             <button
               type="button"
               className={`${targetImageset === "previews" ? "text-rd drop-shadow-red" : ""} ${imageset_select_btns} `}
-              // onClick={async () => {
-              //   const args: handleFirstLoadTypes = {
-              //     clients,
-              //     host,
-              //     newTargetImageset: "previews",
-              //     orderedImagesets,
-              //     setClients,
-              //     setNotice,
-              //     setOrderedImagesets,
-              //     setSpinner,
-              //     setStarted,
-              //     setTargetClient,
-              //     setTargetImageset,
-              //     targetClient,
-              //   };
+              onClick={async () => {
+                const args: handleFirstLoadTypes = {
+                  clients,
+                  newTargetImageset: "previews",
+                  orderedImagesets,
+                  setClients,
+                  setNotice,
+                  setOrderedImagesets,
+                  setSpinner,
+                  setStarted,
+                  setTargetClient,
+                  setTargetImageset,
+                  targetClient,
+                };
 
-              //   await handleFirstLoad(args);
-
-              //   // handleClick("previews");
-              // }}
-              onClick={() => handleClick("previews")}
+                await handleFirstLoad(args);
+              }}
               disabled={targetImageset === "previews" ? true : false}
             >
               SNAPSHOTS
@@ -164,7 +98,23 @@ export default function EditClient({ ...props }) {
             <button
               type="button"
               className={`${targetImageset === "full" ? "text-rd drop-shadow-red" : ""} ${imageset_select_btns}`}
-              onClick={() => handleClick("full")}
+              onClick={async () => {
+                const args: handleFirstLoadTypes = {
+                  clients,
+                  newTargetImageset: "full",
+                  orderedImagesets,
+                  setClients,
+                  setNotice,
+                  setOrderedImagesets,
+                  setSpinner,
+                  setStarted,
+                  setTargetClient,
+                  setTargetImageset,
+                  targetClient,
+                };
+
+                await handleFirstLoad(args);
+              }}
               disabled={targetImageset === "full" ? true : false}
             >
               KEEPSAKE PREVIEW
@@ -176,7 +126,23 @@ export default function EditClient({ ...props }) {
             <button
               type="button"
               className={`${targetImageset === "socials" ? "text-rd drop-shadow-red" : ""} ${imageset_select_btns}`}
-              onClick={() => handleClick("socials")}
+              onClick={async () => {
+                const args: handleFirstLoadTypes = {
+                  clients,
+                  newTargetImageset: "socials",
+                  orderedImagesets,
+                  setClients,
+                  setNotice,
+                  setOrderedImagesets,
+                  setSpinner,
+                  setStarted,
+                  setTargetClient,
+                  setTargetImageset,
+                  targetClient,
+                };
+
+                await handleFirstLoad(args);
+              }}
               disabled={targetImageset === "socials" ? true : false}
             >
               CORE COLLECTION
@@ -188,7 +154,23 @@ export default function EditClient({ ...props }) {
             <button
               type="button"
               className={`${targetImageset === "snips" ? "text-rd drop-shadow-red" : ""} ${imageset_select_btns}`}
-              onClick={() => handleClick("snips")}
+              onClick={async () => {
+                const args: handleFirstLoadTypes = {
+                  clients,
+                  newTargetImageset: "snips",
+                  orderedImagesets,
+                  setClients,
+                  setNotice,
+                  setOrderedImagesets,
+                  setSpinner,
+                  setStarted,
+                  setTargetClient,
+                  setTargetImageset,
+                  targetClient,
+                };
+
+                await handleFirstLoad(args);
+              }}
               disabled={targetImageset === "snips" ? true : false}
             >
               SNIPS

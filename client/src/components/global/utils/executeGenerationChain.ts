@@ -24,13 +24,17 @@ export const executeGenerationChain = async (
     id
   );
 
+  if (urls.files === false) {
+    return { stored: 0, files: false, counter: 0 };
+  }
+
   const newFileData = await generateFileBatch(
     {
-      urls,
+      urls: urls.presigns,
       files,
     },
     counter
   );
 
-  return newFileData;
+  return { ...newFileData, stored: urls.stored };
 };

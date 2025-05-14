@@ -62,7 +62,7 @@ exports.generateGetPresigned = async (req, res, next) => {
   if (verified) {
     // retrieve all S3 objects
     const indexRegex = /\/(\d{1,3})\//;
-    let s3Objects;
+    let s3Data = {};
     try {
       let objects = await s3.send(
         new ListObjectsV2Command({
@@ -83,11 +83,13 @@ exports.generateGetPresigned = async (req, res, next) => {
       });
 
       objects.Contents = sorted;
-      s3Objects = objects;
+      s3Data.results = objects;
+      s3Data.stored = sorted.length;
 
-      if (!s3Objects.Contents) return res.status(200).json({ files: false });
+      if (!s3Data.results.Contents)
+        return res.status(200).json({ files: false });
     } catch (error) {
-      if (typeof s3Objects === "undefined")
+      if (typeof s3Data.results === "undefined")
         return res.status(200).json({ files: false });
 
       return res.status(500).json({
@@ -101,15 +103,15 @@ exports.generateGetPresigned = async (req, res, next) => {
     // loop over S3 objects and generate presigns for matches
     const presigns = [];
     const skipped = [];
-    for (let i = 0; i < s3Objects.Contents.length; i++) {
-      const position = s3Objects.Contents[i].Key.match(indexRegex);
+    for (let i = 0; i < s3Data.results.Contents.length; i++) {
+      const position = s3Data.results.Contents[i].Key.match(indexRegex);
       if (
         Number(position[1]) >= Number(req.params.start) && // this ensures we will always pick up from where we left off when a new batch has been requested
         Number(position[1]) <= Number(req.params.end) // ensures "out-of-bounds" presigns aren't included
       ) {
         const cmd = new GetObjectCommand({
           Bucket: process.env.AWS_PRIMARY_BUCKET,
-          Key: s3Objects.Contents[i].Key,
+          Key: s3Data.results.Contents[i].Key,
         });
 
         let url = "";
@@ -118,7 +120,7 @@ exports.generateGetPresigned = async (req, res, next) => {
           if (!url) throw new Error("500");
         } catch (error) {
           // populate an array to transmit to client if signed url generation fails
-          const constituents = s3Objects.Contents[i].Key.split("/");
+          const constituents = s3Data.results.Contents[i].Key.split("/");
           const filename = constituents.pop();
           skipped.push(filename);
           continue;
@@ -131,8 +133,8 @@ exports.generateGetPresigned = async (req, res, next) => {
     }
 
     return skipped.length > 0
-      ? res.status(200).json({ presigns, skipped })
-      : res.status(200).json({ presigns });
+      ? res.status(200).json({ presigns, skipped, stored: s3Data.stored })
+      : res.status(200).json({ presigns, stored: s3Data.stored });
   }
 };
 

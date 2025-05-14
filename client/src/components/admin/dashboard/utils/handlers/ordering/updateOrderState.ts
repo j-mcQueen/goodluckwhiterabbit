@@ -1,7 +1,7 @@
 export const updateOrderState = async ({ ...params }) => {
   // ensure active has up-to-date file counts
   const updatedTargetClient = { ...params.targetClient };
-  updatedTargetClient.fileCounts = params.val;
+  updatedTargetClient.fileCounts[params.targetImageset] = params.val;
   params.setTargetClient(updatedTargetClient);
 
   // reflect changes in client list
