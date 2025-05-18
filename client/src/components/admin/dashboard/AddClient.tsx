@@ -6,18 +6,29 @@ import PaneHeader from "./PaneHeader";
 import Loading from "../../global/Loading";
 
 export default function AddClient({ ...props }) {
+  const { clients, setClients, setActivePane } = props;
+
+  const checkbox_styles =
+    "h-4 w-4 border border-solid border-white peer-checked:bg-white absolute left-0 -translate-x-7";
+
   const [inputValues, setInputValues] = useState({
     clientname: "",
     clientemail: "",
+    clientsets: {
+      snaps: true,
+      keepsake: false,
+      core: false,
+      snips: false,
+    },
   });
+
   const [errors, setErrors] = useState({
     takenEmail: { state: false, status: 200, message: "" },
     formValidation: { state: false, status: 200, message: "" },
     other: { state: false, status: 200, message: "" },
   });
-  const [spinner, setSpinner] = useState(false);
 
-  const { clients, setClients, setActivePane } = props;
+  const [spinner, setSpinner] = useState(false);
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -100,6 +111,8 @@ export default function AddClient({ ...props }) {
     }
   };
 
+  // TODO checkboxes must have one ticked choice - perhaps we can validate this?
+
   return (
     <div className="text-white border border-solid border-white p-3 w-[40dvw]">
       <PaneHeader setActivePane={setActivePane} paneTitle={"NEW"} />
@@ -120,7 +133,7 @@ export default function AddClient({ ...props }) {
             name="clientname"
             placeholder="E.G. GOOD AND LUCK"
             minLength={4}
-            className="w-full bg-black border border-solid border-white text-white xl:hover:border-rd focus:border-rd p-3 focus:outline-none placeholder:text-white transition-colors"
+            className="w-full mt-1 bg-black border border-solid border-white text-white xl:hover:border-rd focus:border-rd p-3 focus:outline-none placeholder:text-white transition-colors"
             required
           />
         </label>
@@ -139,13 +152,88 @@ export default function AddClient({ ...props }) {
                 });
               setInputValues({ ...inputValues, clientemail: e.target.value });
             }}
-            className="w-full bg-black border border-solid border-white text-white xl:hover:border-rd focus:border-rd p-3 focus:outline-none placeholder:text-white transition-colors"
+            className="w-full mt-1 bg-black border border-solid border-white text-white xl:hover:border-rd focus:border-rd p-3 focus:outline-none placeholder:text-white transition-colors"
             required
           />
           {errors.takenEmail.state === true ? (
             <p className="text-rd pt-3">{errors.takenEmail.message}</p>
           ) : null}
         </label>
+
+        <fieldset>
+          <legend className="text-rd pb-2">IMAGESETS</legend>
+
+          <div className="flex justify-evenly gap-10">
+            <label className="flex xl:hover:cursor-pointer relative">
+              SNAPSHOTS
+              <input
+                type="checkbox"
+                name="snapshots"
+                className="invisible peer"
+                checked
+                readOnly
+              />
+              <span className={checkbox_styles}></span>
+            </label>
+
+            <label className="flex xl:hover:cursor-pointer relative">
+              KEEPSAKE
+              <input
+                type="checkbox"
+                name="keepsake"
+                className="invisible peer"
+                onChange={() =>
+                  setInputValues({
+                    ...inputValues,
+                    clientsets: {
+                      ...inputValues.clientsets,
+                      keepsake: !inputValues.clientsets.keepsake,
+                    },
+                  })
+                }
+              />
+              <span className={checkbox_styles}></span>
+            </label>
+
+            <label className="flex xl:hover:cursor-pointer relative">
+              CORE
+              <input
+                type="checkbox"
+                name="core"
+                className="invisible peer"
+                onChange={() =>
+                  setInputValues({
+                    ...inputValues,
+                    clientsets: {
+                      ...inputValues.clientsets,
+                      core: !inputValues.clientsets.core,
+                    },
+                  })
+                }
+              />
+              <span className={checkbox_styles}></span>
+            </label>
+
+            <label className="flex xl:hover:cursor-pointer relative">
+              SNIPS
+              <input
+                type="checkbox"
+                name="snips"
+                className="invisible peer"
+                onChange={() =>
+                  setInputValues({
+                    ...inputValues,
+                    clientsets: {
+                      ...inputValues.clientsets,
+                      snips: !inputValues.clientsets.snips,
+                    },
+                  })
+                }
+              />
+              <span className={checkbox_styles}></span>
+            </label>
+          </div>
+        </fieldset>
 
         <div className="text-center">
           <button
