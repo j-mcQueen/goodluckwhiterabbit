@@ -1,9 +1,9 @@
-import { FormEvent } from "react";
 import { useState } from "react";
-import { determineHost } from "../../global/utils/determineHost";
+import { handleAdd } from "./utils/handlers/adding/handleAdd";
 
 import PaneHeader from "./PaneHeader";
 import Loading from "../../global/Loading";
+import { handleAddTypes } from "./types/handleAddTypes";
 
 export default function AddClient({ ...props }) {
   const { clients, setClients, setActivePane } = props;
@@ -30,95 +30,25 @@ export default function AddClient({ ...props }) {
 
   const [spinner, setSpinner] = useState(false);
 
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setSpinner(true);
-    const host = determineHost;
-
-    try {
-      const response = await fetch(`${host}/admin/add`, {
-        method: "POST",
-        body: JSON.stringify({ ...inputValues }),
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-      });
-
-      const data = await response.json();
-
-      if (data) {
-        setSpinner(false);
-        switch (response.status) {
-          case 200:
-            // A client has been added
-            setErrors({
-              takenEmail: { state: false, status: 200, message: "" },
-              formValidation: { state: false, status: 200, message: "" }, // this should always be false
-              other: { state: false, status: 200, message: "" },
-            });
-
-            setClients([
-              ...clients,
-              {
-                name: data.name,
-                code: data.code,
-                _id: data._id,
-                fileCounts: data.fileCounts,
-                added: data.added,
-              },
-            ]);
-
-            setActivePane("ALL");
-            break;
-
-          case 401:
-            // form validation errors
-            setErrors({
-              ...errors,
-              formValidation: {
-                state: true,
-                status: data.status,
-                message: data.message,
-              },
-            });
-            break;
-
-          case 409:
-            // Client email already in use
-            setErrors({
-              ...errors,
-              takenEmail: {
-                state: true,
-                status: data.status,
-                message: data.message,
-              },
-            });
-            break;
-
-          default:
-            throw new TypeError(data.message);
-        }
-      }
-    } catch (error) {
-      if (error instanceof Error) {
-        return setErrors({
-          ...errors,
-          other: { state: true, status: 500, message: error.message },
-        });
-      }
-    }
-  };
-
-  // TODO checkboxes must have one ticked choice - perhaps we can validate this?
-
   return (
     <div className="text-white border border-solid border-white p-3 w-[40dvw]">
       <PaneHeader setActivePane={setActivePane} paneTitle={"NEW"} />
 
       <form
-        onSubmit={(e) => handleSubmit(e)}
+        onSubmit={(e) => {
+          const args: handleAddTypes = {
+            clients,
+            e,
+            errors,
+            inputValues,
+            setActivePane,
+            setClients,
+            setErrors,
+            setSpinner,
+          };
+
+          handleAdd(args);
+        }}
         method="post"
         className="flex flex-col gap-5"
         encType="multipart/form-data"
