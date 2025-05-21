@@ -27,7 +27,6 @@ router.post(
   "/users/:id/updateFileCount/:imageset/:count",
   adminUpdateUserImagesetCount
 );
-router.post("/users/:id/addLinks", adminAddDriveLinks);
 router.post("/uploadFile", upload.any(), uploadFile);
 // DELETE
 router.delete("/deleteUser/:id", adminDeleteUser);

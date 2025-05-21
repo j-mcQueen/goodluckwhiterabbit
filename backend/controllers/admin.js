@@ -141,7 +141,6 @@ exports.adminAddClient = [
           socials: 0,
           snips: 0,
         },
-        links: { previews: "", full: "", socials: "", snips: "" },
         added: formattedDate(),
       });
 
@@ -169,6 +168,7 @@ exports.adminAddClient = [
   },
 ];
 
+// TODO needed still?
 exports.adminGetUserImagesetCount = async (req, res, next) => {
   const verified = await verifyTokens(req, res);
 
@@ -401,22 +401,6 @@ exports.adminDeleteFile = async (req, res, next) => {
         message: "We could not delete this file from S3.",
       });
     }
-  }
-};
-
-exports.adminAddDriveLinks = async (req, res, next) => {
-  const verified = await verifyTokens(req, res);
-
-  if (verified) {
-    const updatedUser = await User.findByIdAndUpdate(
-      req.params.id,
-      {
-        links: req.body,
-      },
-      { new: true }
-    );
-
-    return res.status(200).json(updatedUser.links);
   }
 };
 
