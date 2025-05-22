@@ -7,9 +7,9 @@ const UserSchema = new Schema({
   code: String,
   category: String,
   fileCounts: {
-    previews: Number,
-    full: Number,
-    socials: Number,
+    snapshots: Number,
+    keepsake: Number,
+    core: Number,
     snips: Number,
   },
   role: String,

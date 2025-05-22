@@ -4,9 +4,9 @@ export interface handleFirstLoadTypes {
   clients: { _id: string }[];
   newTargetImageset: string;
   orderedImagesets: {
-    previews: (Blob | object)[];
-    full: (Blob | object)[];
-    socials: (Blob | object)[];
+    snapshots: (Blob | object)[];
+    keepsake: (Blob | object)[];
+    core: (Blob | object)[];
     snips: (Blob | object)[];
   };
   setClients: Dispatch<SetStateAction<{ _id: string }[]>>;
@@ -19,9 +19,9 @@ export interface handleFirstLoadTypes {
   >;
   setOrderedImagesets: Dispatch<
     SetStateAction<{
-      previews: (Blob | object)[];
-      full: (Blob | object)[];
-      socials: (Blob | object)[];
+      snapshots: (Blob | object)[];
+      keepsake: (Blob | object)[];
+      core: (Blob | object)[];
       snips: (Blob | object)[];
     }>
   >;

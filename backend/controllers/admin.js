@@ -117,9 +117,9 @@ exports.adminAddClient = [
         category: req.body.clientcategory,
         role: "user",
         fileCounts: {
-          previews: 0,
-          ...(req.body.clientsets.keepsake && { full: 0 }),
-          ...(req.body.clientsets.core && { socials: 0 }),
+          snapshots: 0,
+          ...(req.body.clientsets.keepsake && { keepsake: 0 }),
+          ...(req.body.clientsets.core && { core: 0 }),
           ...(req.body.clientsets.snips && { snips: 0 }),
         },
         added: formattedDate(),
@@ -291,9 +291,9 @@ exports.adminDeleteUser = async (req, res, next) => {
 
     // prevent unnecessary S3 requests
     if (
-      deleted.fileCounts.previews > 0 ||
-      deleted.fileCounts.socials > 0 ||
-      deleted.fileCounts.full > 0 ||
+      deleted.fileCounts.snapshots > 0 ||
+      deleted.fileCounts.keepsake > 0 ||
+      deleted.fileCounts.core > 0 ||
       deleted.fileCounts.snips > 0
     ) {
       // we have images to remove, so grab all files from S3
@@ -324,9 +324,9 @@ exports.adminDeleteUser = async (req, res, next) => {
 
       const deleteTargets = [];
       for (let i = 0; i < objects.Contents.length; i++) {
-        populate(deleteTargets, objects.Contents[i], deleted, "previews");
-        populate(deleteTargets, objects.Contents[i], deleted, "full");
-        populate(deleteTargets, objects.Contents[i], deleted, "socials");
+        populate(deleteTargets, objects.Contents[i], deleted, "snapshots");
+        populate(deleteTargets, objects.Contents[i], deleted, "keepsake");
+        populate(deleteTargets, objects.Contents[i], deleted, "core");
         populate(deleteTargets, objects.Contents[i], deleted, "snips");
       }
 

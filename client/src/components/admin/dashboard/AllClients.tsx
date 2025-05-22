@@ -60,19 +60,19 @@ export default function AllClients({ ...props }) {
 
               <td className="align-middle">
                 <span
-                  className={`${client.fileCounts.previews > 0 ? "text-rd" : "text-white"}`}
+                  className={`${client.fileCounts.snapshots > 0 ? "text-rd" : "text-white"}`}
                 >
-                  S: {client.fileCounts.previews},&nbsp;
+                  S: {client.fileCounts.snapshots},&nbsp;
                 </span>
                 <span
-                  className={`${client.fileCounts.full > 0 ? "text-rd" : "text-white"}`}
+                  className={`${client.fileCounts.keepsake > 0 ? "text-rd" : "text-white"}`}
                 >
-                  K: {client.fileCounts.full},&nbsp;
+                  K: {client.fileCounts.keepsake},&nbsp;
                 </span>
                 <span
-                  className={`${client.fileCounts.socials > 0 ? "text-rd" : "text-white"}`}
+                  className={`${client.fileCounts.core > 0 ? "text-rd" : "text-white"}`}
                 >
-                  C: {client.fileCounts.socials},&nbsp;
+                  C: {client.fileCounts.core},&nbsp;
                 </span>
                 <span
                   className={`${client.fileCounts.snips > 0 ? "text-rd" : "text-white"}`}

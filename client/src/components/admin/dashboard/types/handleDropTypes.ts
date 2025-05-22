@@ -20,9 +20,9 @@ export interface handleDropTypes {
   targetClient: {
     _id: string;
     fileCounts: {
-      previews: number;
-      full: number;
-      socials: number;
+      snapshots: number;
+      keepsake: number;
+      core: number;
       snips: number;
     };
   };

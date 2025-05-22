@@ -12,9 +12,9 @@ export default function EditClient({ ...props }) {
     props;
 
   const nameMap = {
-    previews: "SNAPSHOTS",
-    full: "KEEPSAKE PREVIEW",
-    socials: "CORE COLLECTION",
+    snapshots: "SNAPSHOTS",
+    keepsake: "KEEPSAKE PREVIEW",
+    core: "CORE COLLECTION",
     snips: "SNIPS",
   };
 
@@ -24,9 +24,9 @@ export default function EditClient({ ...props }) {
   const [dragTarget, setDragTarget] = useState({});
 
   const [orderedImagesets, setOrderedImagesets] = useState({
-    previews: Array(10).fill({}),
-    full: Array(10).fill({}),
-    socials: Array(10).fill({}),
+    snapshots: Array(10).fill({}),
+    keepsake: Array(10).fill({}),
+    core: Array(10).fill({}),
     snips: Array(10).fill({}),
   });
 

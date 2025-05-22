@@ -1,8 +1,8 @@
 export const handleDownloadAll = ({ ...params }) => {
   const map = {
-    previews: "SNAPSHOTS",
-    full: "KEEPSAKE",
-    socials: "CORE",
+    snapshots: "SNAPSHOTS",
+    keepsake: "KEEPSAKE",
+    core: "CORE",
     snips: "SNIPS",
   };
 

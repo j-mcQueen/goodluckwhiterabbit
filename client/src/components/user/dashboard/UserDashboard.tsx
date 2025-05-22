@@ -14,7 +14,7 @@ export default function UserDashboard() {
   const mobile = window.matchMedia("(max-width: 1080px)").matches;
   const [user, setUser] = useState({
     _id: "",
-    fileCounts: { previews: 0, full: 0, socials: 0, snips: 0 },
+    fileCounts: { snapshots: 0, keepsake: 0, core: 0, snips: 0 },
   });
   const [activeTab, setActiveTab] = useState(0);
   const [activeImageset, setActiveImageset] = useState("");
@@ -31,9 +31,9 @@ export default function UserDashboard() {
   const [initialized, setInitialized] = useState(false);
 
   const [images, setImages] = useState({
-    previews: [],
-    full: [],
-    socials: [],
+    snapshots: [],
+    keepsake: [],
+    core: [],
   });
 
   useEffect(() => {
@@ -43,15 +43,15 @@ export default function UserDashboard() {
   useEffect(() => {
     switch (activeTab) {
       case 0:
-        setActiveImageset("previews");
+        setActiveImageset("snapshots");
         break;
 
       case 1:
-        setActiveImageset("full");
+        setActiveImageset("keepsake");
         break;
 
       case 2:
-        setActiveImageset("socials");
+        setActiveImageset("core");
         break;
 
       case 3:
@@ -111,15 +111,15 @@ export default function UserDashboard() {
 
   const updateActiveTab = (targetImageset: string) => {
     switch (targetImageset) {
-      case "previews":
+      case "snapshots":
         setActiveTab(0);
         break;
 
-      case "full":
+      case "keepsake":
         setActiveTab(1);
         break;
 
-      case "socials":
+      case "core":
         setActiveTab(2);
         break;
 
@@ -166,9 +166,9 @@ export default function UserDashboard() {
           activeTab={activeTab}
           setActiveTab={setActiveTab}
           dashboard={[
-            user.fileCounts["previews"],
-            user.fileCounts["full"],
-            user.fileCounts["socials"],
+            user.fileCounts["snapshots"],
+            user.fileCounts["keepsake"],
+            user.fileCounts["core"],
             user.fileCounts["snips"],
           ]}
         />
@@ -179,9 +179,9 @@ export default function UserDashboard() {
           activeTab={activeTab}
           setActiveTab={setActiveTab}
           dashboard={[
-            user.fileCounts["previews"],
-            user.fileCounts["full"],
-            user.fileCounts["socials"],
+            user.fileCounts["snapshots"],
+            user.fileCounts["keepsake"],
+            user.fileCounts["core"],
             user.fileCounts["snips"],
           ]}
         />

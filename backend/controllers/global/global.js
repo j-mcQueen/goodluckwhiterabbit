@@ -152,7 +152,7 @@ exports.countImagesetItems = async (req, res, next) => {
       if (!s3Objects.Contents)
         return res
           .status(200)
-          .json({ previews: 0, full: 0, socials: 0, snips: 0 });
+          .json({ snapshots: 0, keepsake: 0, core: 0, snips: 0 });
 
       if (!s3Objects) throw new Error("500");
     } catch (error) {
@@ -164,15 +164,15 @@ exports.countImagesetItems = async (req, res, next) => {
       });
     }
 
-    const totals = { previews: 0, full: 0, socials: 0, snips: 0 };
+    const totals = { snapshots: 0, keepsake: 0, core: 0, snips: 0 };
 
     for (let i = 0; i < s3Objects.Contents.length; i++) {
       if (s3Objects.Contents[i].Key.includes(req.params.id)) {
-        if (s3Objects.Contents[i].Key.includes("previews"))
-          totals["previews"]++;
-        else if (s3Objects.Contents[i].Key.includes("full")) totals["full"];
-        else if (s3Objects.Contents[i].Key.includes("socials"))
-          totals["socials"];
+        if (s3Objects.Contents[i].Key.includes("snapshots"))
+          totals["snapshots"]++;
+        else if (s3Objects.Contents[i].Key.includes("keepsake"))
+          totals["keepsake"];
+        else if (s3Objects.Contents[i].Key.includes("core")) totals["core"];
         else if (s3Objects.Contents[i].Key.includes("snips")) totals["snips"];
       }
     }

@@ -27,36 +27,36 @@ const SelectGallery = ({ ...props }) => {
 
             <div className="flex gap-5 tracking-wider">
               <button
-                disabled={user.fileCounts.previews === 0}
+                disabled={user.fileCounts.snapshots === 0}
                 type="button"
                 className={
-                  user.fileCounts.previews === 0
+                  user.fileCounts.snapshots === 0
                     ? buttonVariants["empty"]
                     : buttonVariants["populated"]
                 }
-                onClick={() => handleSelect("previews")}
+                onClick={() => handleSelect("snapshots")}
               >
                 SNAPSHOTS
               </button>
 
               <button
-                disabled={user.fileCounts.full === 0}
+                disabled={user.fileCounts.keepsake === 0}
                 type="button"
                 className={
-                  user.fileCounts.full === 0
+                  user.fileCounts.keepsake === 0
                     ? buttonVariants["empty"]
                     : buttonVariants["populated"]
                 }
-                onClick={() => handleSelect("full")}
+                onClick={() => handleSelect("keepsake")}
               >
                 KEEPSAKE PREVIEW
               </button>
 
               <button
-                disabled={user.fileCounts.socials === 0}
+                disabled={user.fileCounts.core === 0}
                 type="button"
                 className={
-                  user.fileCounts.socials === 0
+                  user.fileCounts.core === 0
                     ? buttonVariants["empty"]
                     : buttonVariants["populated"]
                 }
@@ -69,7 +69,7 @@ const SelectGallery = ({ ...props }) => {
                 disabled={true}
                 type="button"
                 className={buttonVariants["empty"]}
-                onClick={() => handleSelect("socials")}
+                onClick={() => handleSelect("snips")}
               >
                 SNIPS
               </button>

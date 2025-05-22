@@ -3,7 +3,12 @@ import { Dispatch, SetStateAction } from "react";
 export interface handleLinksSubmitTypes {
   clients: { _id: string }[];
   error: { state: boolean; status: number; message: string };
-  inputVals: { previews: string; full: string; socials: string; snips: string };
+  inputVals: {
+    snapshots: string;
+    keepsake: string;
+    core: string;
+    snips: string;
+  };
   setClients: Dispatch<SetStateAction<{ _id: string }[]>>;
   setActivePane: Dispatch<SetStateAction<string>>;
   setError: Dispatch<
@@ -11,9 +16,9 @@ export interface handleLinksSubmitTypes {
   >;
   setInputVals: Dispatch<
     SetStateAction<{
-      previews: string;
-      full: string;
-      socials: string;
+      snapshots: string;
+      keepsake: string;
+      core: string;
       snips: string;
     }>
   >;

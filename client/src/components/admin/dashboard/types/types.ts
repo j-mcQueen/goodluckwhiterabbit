@@ -4,17 +4,17 @@ export interface dashboard_client {
   category: string;
   code: string;
   fileCounts: {
-    previews: number;
-    full: number;
-    socials: number;
+    snapshots: number;
+    keepsake: number;
+    core: number;
     snips: number;
   };
   _id: string;
 }
 
 export interface file_info_heading {
-  previews: string;
-  full: string;
-  socials: string;
+  snapshots: string;
+  keepsake: string;
+  core: string;
   snips: string;
 }
