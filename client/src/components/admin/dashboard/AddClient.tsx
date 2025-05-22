@@ -14,6 +14,7 @@ export default function AddClient({ ...props }) {
   const [inputValues, setInputValues] = useState({
     clientname: "",
     clientemail: "",
+    clientcategory: "",
     clientsets: {
       snaps: true,
       keepsake: false,
@@ -88,6 +89,23 @@ export default function AddClient({ ...props }) {
           {errors.takenEmail.state === true ? (
             <p className="text-rd pt-3">{errors.takenEmail.message}</p>
           ) : null}
+        </label>
+
+        <label className="text-rd">
+          CATEGORY
+          <input
+            type="text"
+            name="category"
+            placeholder="E.G. MILK WEED"
+            onChange={(e) => {
+              setInputValues({
+                ...inputValues,
+                clientcategory: e.target.value,
+              });
+            }}
+            className="w-full mt-1 bg-black border border-solid border-white text-white xl:hover:border-rd focus:border-rd p-3 focus:outline-none placeholder:text-white transition-colors"
+            required
+          />
         </label>
 
         <fieldset>

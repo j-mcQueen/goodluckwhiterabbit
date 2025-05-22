@@ -85,6 +85,7 @@ exports.adminLogin = [
 exports.adminAddClient = [
   body("clientname").trim().notEmpty().isLength({ min: 4 }),
   body("clientemail").trim().notEmpty().isEmail(),
+  body("clientcategory").trim().notEmpty(),
   (req, res, next) => {
     // validate form
     const errors = validationResult(req);
@@ -113,6 +114,7 @@ exports.adminAddClient = [
         name: req.body.clientname,
         email: req.body.clientemail,
         code: loginCode,
+        category: req.body.clientcategory,
         role: "user",
         fileCounts: {
           previews: 0,
@@ -130,6 +132,7 @@ exports.adminAddClient = [
             _id: savedUser._id,
             name: user.name,
             code: user.code,
+            category: user.category,
             added: user.added,
             fileCounts: user.fileCounts,
           });

@@ -45,6 +45,7 @@ export const handleAdd = async ({ ...params }) => {
             {
               name: data.name,
               code: data.code,
+              category: data.category,
               _id: data._id,
               fileCounts: data.fileCounts,
               added: data.added,

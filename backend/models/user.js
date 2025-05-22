@@ -5,6 +5,7 @@ const UserSchema = new Schema({
   name: String,
   email: String,
   code: String,
+  category: String,
   fileCounts: {
     previews: Number,
     full: Number,

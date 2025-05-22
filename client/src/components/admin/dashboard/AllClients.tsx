@@ -22,6 +22,7 @@ export default function AllClients({ ...props }) {
       <thead>
         <tr className="text-left text-rd">
           <th className="pl-3">NAME</th>
+          <th>CATEGORY</th>
           <th className="pb-2">DATE</th>
           <th>CODE</th>
           <th>FILES</th>
@@ -41,6 +42,8 @@ export default function AllClients({ ...props }) {
               <td className="align-middle pl-3 tracking-wider">
                 {client.name.toUpperCase()}
               </td>
+
+              <td className="align-middle">{client.category}</td>
 
               <td className="align-middle">{client.added}</td>
 
