@@ -11,6 +11,13 @@ export default function EditClient({ ...props }) {
   const { clients, setClients, setNotice, targetClient, setTargetClient } =
     props;
 
+  const nameMap = {
+    previews: "SNAPSHOTS",
+    full: "KEEPSAKE PREVIEW",
+    socials: "CORE COLLECTION",
+    snips: "SNIPS",
+  };
+
   const [targetImageset, setTargetImageset] = useState("");
   const [started, setStarted] = useState(false);
   const [spinner, setSpinner] = useState(false);
@@ -65,119 +72,41 @@ export default function EditClient({ ...props }) {
             animate={{ opacity: 1, translateY: 0 }}
             exit={{ opacity: 0, translateY: -25 }}
             transition={{ duration: 0.25 }}
-            className="flex gap-5 text-center"
+            className="flex justify-center gap-5 text-center"
           >
-            <button
-              type="button"
-              className={`${targetImageset === "previews" ? "text-rd drop-shadow-red" : ""} ${imageset_select_btns} `}
-              onClick={async () => {
-                const args: handleFirstLoadTypes = {
-                  clients,
-                  newTargetImageset: "previews",
-                  orderedImagesets,
-                  setClients,
-                  setNotice,
-                  setOrderedImagesets,
-                  setSpinner,
-                  setStarted,
-                  setTargetClient,
-                  setTargetImageset,
-                  targetClient,
-                };
+            {Object.keys(targetClient.fileCounts).map((name) => {
+              return (
+                <button
+                  key={name}
+                  type="button"
+                  className={`${targetImageset === `${name}` ? "text-rd drop-shadow-red" : ""} ${imageset_select_btns}`}
+                  onClick={async () => {
+                    const args: handleFirstLoadTypes = {
+                      clients,
+                      newTargetImageset: name,
+                      orderedImagesets,
+                      setClients,
+                      setNotice,
+                      setOrderedImagesets,
+                      setSpinner,
+                      setStarted,
+                      setTargetClient,
+                      setTargetImageset,
+                      targetClient,
+                    };
 
-                await handleFirstLoad(args);
-              }}
-              disabled={targetImageset === "previews" ? true : false}
-            >
-              SNAPSHOTS
-              <label className="opacity-0 w-0">
-                <input type="file" name="previews" className="w-0 opacity-0" />
-              </label>
-            </button>
+                    await handleFirstLoad(args);
+                  }}
+                  disabled={targetImageset === name ? true : false}
+                >
+                  {nameMap[name as keyof typeof nameMap]}
 
-            <button
-              type="button"
-              className={`${targetImageset === "full" ? "text-rd drop-shadow-red" : ""} ${imageset_select_btns}`}
-              onClick={async () => {
-                const args: handleFirstLoadTypes = {
-                  clients,
-                  newTargetImageset: "full",
-                  orderedImagesets,
-                  setClients,
-                  setNotice,
-                  setOrderedImagesets,
-                  setSpinner,
-                  setStarted,
-                  setTargetClient,
-                  setTargetImageset,
-                  targetClient,
-                };
-
-                await handleFirstLoad(args);
-              }}
-              disabled={targetImageset === "full" ? true : false}
-            >
-              KEEPSAKE PREVIEW
-              <label className="opacity-0 w-0">
-                <input type="file" name="full" className="w-0 opacity-0" />
-              </label>
-            </button>
-
-            <button
-              type="button"
-              className={`${targetImageset === "socials" ? "text-rd drop-shadow-red" : ""} ${imageset_select_btns}`}
-              onClick={async () => {
-                const args: handleFirstLoadTypes = {
-                  clients,
-                  newTargetImageset: "socials",
-                  orderedImagesets,
-                  setClients,
-                  setNotice,
-                  setOrderedImagesets,
-                  setSpinner,
-                  setStarted,
-                  setTargetClient,
-                  setTargetImageset,
-                  targetClient,
-                };
-
-                await handleFirstLoad(args);
-              }}
-              disabled={targetImageset === "socials" ? true : false}
-            >
-              CORE COLLECTION
-              <label className="opacity-0 w-0">
-                <input type="file" name="socials" className="w-0 opacity-0" />
-              </label>
-            </button>
-
-            <button
-              type="button"
-              className={`${targetImageset === "snips" ? "text-rd drop-shadow-red" : ""} ${imageset_select_btns}`}
-              onClick={async () => {
-                const args: handleFirstLoadTypes = {
-                  clients,
-                  newTargetImageset: "snips",
-                  orderedImagesets,
-                  setClients,
-                  setNotice,
-                  setOrderedImagesets,
-                  setSpinner,
-                  setStarted,
-                  setTargetClient,
-                  setTargetImageset,
-                  targetClient,
-                };
-
-                await handleFirstLoad(args);
-              }}
-              disabled={targetImageset === "snips" ? true : false}
-            >
-              SNIPS
-              <label className="opacity-0 w-0">
-                <input type="file" name="snips" className="w-0 opacity-0" />
-              </label>
-            </button>
+                  <label className="opacity-0 w-0">
+                    <input type="file" name={name} className="w-0 opacity-0" />
+                  </label>
+                </button>
+              );
+            })}
           </motion.div>
         </div>
 
