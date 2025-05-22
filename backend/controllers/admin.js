@@ -94,27 +94,6 @@ exports.adminAddClient = [
     else next();
   },
   async (req, res, next) => {
-    // check for existing email
-    try {
-      const existingEmail = await User.findOne({ email: req.body.clientemail });
-      if (existingEmail) throw new TypeError("Email already in use.");
-      else next();
-    } catch (err) {
-      return err.message === "Email already in use."
-        ? res.status(409).json({
-            state: true,
-            status: 409,
-            message: "Email address already in use.",
-          })
-        : res.status(500).json({
-            state: true,
-            status: 500,
-            message:
-              "There was a database error. Refresh the page and try again.",
-          });
-    }
-  },
-  async (req, res, next) => {
     const verified = await verifyTokens(req, res);
 
     // the below condition will always be true if verifyTokens() doesn't end the request cycle early. Just being explicit that the token is valid at this step
@@ -137,9 +116,9 @@ exports.adminAddClient = [
         role: "user",
         fileCounts: {
           previews: 0,
-          full: 0,
-          socials: 0,
-          snips: 0,
+          ...(req.body.clientsets.keepsake && { full: 0 }),
+          ...(req.body.clientsets.core && { socials: 0 }),
+          ...(req.body.clientsets.snips && { snips: 0 }),
         },
         added: formattedDate(),
       });
@@ -153,7 +132,6 @@ exports.adminAddClient = [
             code: user.code,
             added: user.added,
             fileCounts: user.fileCounts,
-            links: user.links,
           });
         }
       } catch (err) {
