@@ -24,9 +24,7 @@ export const executeGenerationChain = async (
     id
   );
 
-  if (urls.files === false) {
-    return { stored: 0, files: false, counter: 0 };
-  }
+  if (urls.files === false) return { stored: 0, files: false, count: 0 };
 
   const newFileData = await generateFileBatch(
     {

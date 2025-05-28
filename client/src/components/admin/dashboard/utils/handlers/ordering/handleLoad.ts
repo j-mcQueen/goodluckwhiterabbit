@@ -1,35 +1,48 @@
+import { Dispatch, SetStateAction } from "react";
 import { determineHost } from "../../../../../global/utils/determineHost";
 import { executeGenerationChain } from "../../../../../global/utils/executeGenerationChain";
 import { generateKeys } from "../../../../../global/utils/generateKeys";
+import { updateOrderState } from "./updateOrderState";
 
 export const handleLoad = async ({ ...params }) => {
-  // TODO reconfigure
+  const {
+    clients,
+    order,
+    renderCount,
+    setClients,
+    setNotice,
+    setOrder,
+    setRenderCount,
+    setSpinner,
+    setStaticKeys,
+    setTargetClient,
+    staticKeys,
+    targetClient,
+    targetImageset,
+  } = params;
+
   const host = determineHost;
 
-  if (
-    params.renderCount === params.targetClient.fileCounts[params.targetImageset]
-  ) {
-    const nextOrder = [...params.order, ...Array(10).fill({})];
-    params.setOrder(nextOrder);
-  } else if (
-    params.renderCount < params.targetClient.fileCounts[params.targetImageset]
-  ) {
-    params.setSpinner(true);
+  if (renderCount === targetClient.fileCounts[targetImageset]) {
+    const nextOrder = [...order, ...Array(10).fill({})];
+    setOrder(nextOrder);
+  } else if (renderCount < targetClient.fileCounts[targetImageset]) {
+    setSpinner(true);
 
-    const imagesetLength = params.order.length;
+    const imagesetLength = order.length;
     const data = await executeGenerationChain(
-      params.order,
-      params.targetImageset,
-      params.setNotice,
+      order,
+      targetImageset,
+      setNotice,
       imagesetLength,
       imagesetLength + 10,
-      params.targetClient._id
+      targetClient._id
     );
 
-    const count = params.renderCount + data.count;
-    if (count > params.targetClient.fileCounts[params.targetImageset]) {
+    const count = renderCount + data.count;
+    if (count > targetClient.fileCounts[targetImageset]) {
       const response = await fetch(
-        `${host}/admin/users/${params.targetClient._id}/updateFileCount/${params.targetImageset}/${count}`,
+        `${host}/admin/users/${targetClient._id}/updateFileCount/${targetImageset}/${count}`,
         {
           method: "POST",
           headers: {
@@ -42,32 +55,45 @@ export const handleLoad = async ({ ...params }) => {
       const newCounts = await response.json();
 
       if (response.status === 200 || response.status === 304) {
-        const nextTargetClient = { ...params.targetClient };
-        nextTargetClient.fileCounts[params.targetImageset] =
-          newCounts[params.targetImageset];
-        params.setTargetClient(nextTargetClient);
+        // trigger state updates
+        const args: {
+          clients: { _id: string }[];
+          targetClient: { _id: string; fileCounts: { [key: string]: number } };
+          targetImageset: string;
+          setClients: Dispatch<SetStateAction<{ _id: string }[]>>;
+          setTargetClient: Dispatch<
+            SetStateAction<{
+              _id: string;
+              fileCounts: { [key: string]: number };
+            }>
+          >;
+          val: number;
+        } = {
+          clients,
+          targetClient,
+          targetImageset,
+          setClients,
+          setTargetClient,
+          val: newCounts[targetImageset],
+        };
 
-        const nextClients = params.clients.map((client: { _id: string }) => {
-          return client._id === params.targetClient._id
-            ? nextTargetClient
-            : client;
-        });
-        params.setClients(nextClients);
+        updateOrderState(args);
       }
     }
 
     const nextOrder = data.files;
-    params.setOrder(nextOrder);
+    setOrder(nextOrder);
 
-    const rendered = nextOrder.filter(
-      (item: object | File) => item instanceof File
-    ).length;
-    params.setRenderCount(rendered);
+    const rendered =
+      nextOrder instanceof Array
+        ? nextOrder.filter((item: object | File) => item instanceof File).length
+        : 0;
 
-    params.setSpinner(false);
+    setRenderCount(rendered);
+    setSpinner(false);
   }
 
   const generatedKeys = generateKeys();
-  const nextKeys = [...params.staticKeys, ...generatedKeys];
-  return params.setStaticKeys(nextKeys);
+  const nextKeys = [...staticKeys, ...generatedKeys];
+  return setStaticKeys(nextKeys);
 };

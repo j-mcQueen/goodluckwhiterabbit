@@ -13,7 +13,6 @@ const { s3 } = require("./config/s3");
 
 const {
   ListObjectsV2Command,
-  DeleteObjectCommand,
   DeleteObjectsCommand,
   PutObjectCommand,
 } = require("@aws-sdk/client-s3");
@@ -273,7 +272,6 @@ exports.adminGetFileAndDelete = async (req, res, next) => {
   }
 };
 
-// TODO update
 exports.adminDeleteUser = async (req, res, next) => {
   const verified = await verifyTokens(req, res);
 
