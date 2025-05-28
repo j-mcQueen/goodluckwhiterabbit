@@ -17,6 +17,25 @@ export default function AllClients({ ...props }) {
     setDeleteModalToggle,
   } = props;
 
+  const FileCount = ({ ...props }) => {
+    const { count, index, len } = props;
+
+    const nameMap = {
+      0: `SNAP: ${count}`,
+      1: `KEEP: ${count}`,
+      2: `CORE: ${count}`,
+      3: `SNIP: ${count}`,
+    };
+
+    return (
+      <span
+        className={`${count > 0 ? "text-rd" : "text-white"} ${index < len - 1 ? "pr-3" : null}`}
+      >
+        {nameMap[index as keyof typeof nameMap]}
+      </span>
+    );
+  };
+
   return (
     <table className="w-full mt-5 border-collapse ">
       <thead>
@@ -34,6 +53,8 @@ export default function AllClients({ ...props }) {
 
       <tbody>
         {clients.map((client: dashboard_client, index: number) => {
+          const entries = Object.entries(client.fileCounts);
+
           return (
             <tr
               key={client.code}
@@ -59,26 +80,16 @@ export default function AllClients({ ...props }) {
               </td>
 
               <td className="align-middle">
-                <span
-                  className={`${client.fileCounts.snapshots > 0 ? "text-rd" : "text-white"}`}
-                >
-                  S: {client.fileCounts.snapshots},&nbsp;
-                </span>
-                <span
-                  className={`${client.fileCounts.keepsake > 0 ? "text-rd" : "text-white"}`}
-                >
-                  K: {client.fileCounts.keepsake},&nbsp;
-                </span>
-                <span
-                  className={`${client.fileCounts.core > 0 ? "text-rd" : "text-white"}`}
-                >
-                  C: {client.fileCounts.core},&nbsp;
-                </span>
-                <span
-                  className={`${client.fileCounts.snips > 0 ? "text-rd" : "text-white"}`}
-                >
-                  S: {client.fileCounts.snips}
-                </span>
+                {entries.map((item, index) => {
+                  return (
+                    <FileCount
+                      key={item[0]}
+                      count={item[1]}
+                      index={index}
+                      len={entries.length}
+                    />
+                  );
+                })}
               </td>
 
               <td className="align-middle">
