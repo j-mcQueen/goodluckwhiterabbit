@@ -21,17 +21,18 @@ export default function AllClients({ ...props }) {
     const { count, index, len } = props;
 
     const nameMap = {
-      0: `SNAP: ${count}`,
-      1: `KEEP: ${count}`,
-      2: `CORE: ${count}`,
-      3: `SNIP: ${count}`,
+      0: `SNAP: `,
+      1: `KEEP: `,
+      2: `CORE: `,
+      3: `SNIP: `,
     };
 
     return (
-      <span
-        className={`${count > 0 ? "text-rd" : "text-white"} ${index < len - 1 ? "pr-3" : null}`}
-      >
-        {nameMap[index as keyof typeof nameMap]}
+      <span className={`${index < len - 1 ? "pr-3" : null}`}>
+        {nameMap[index as keyof typeof nameMap]}{" "}
+        <span className={`${count > 0 ? "text-rd" : "text-white"}`}>
+          {count}
+        </span>
       </span>
     );
   };
@@ -109,7 +110,7 @@ export default function AllClients({ ...props }) {
                 </button>
               </td>
 
-              <td>
+              <td className="align-middle">
                 <a
                   href={`mailto:${client.email}?subject=You've%20got%20photos!`}
                   className={dashboard_btns}
@@ -118,7 +119,7 @@ export default function AllClients({ ...props }) {
                 </a>
               </td>
 
-              <td>
+              <td className="align-middle">
                 <button
                   onClick={() =>
                     setDeleteModalToggle({
