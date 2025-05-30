@@ -370,7 +370,7 @@ exports.adminDeleteFile = async (req, res, next) => {
       );
 
       if (deleted.Deleted.length > 0) {
-        await updateCount(req.params._id, req.params.imageset, res, User, -1);
+        await updateCount(req.params.id, req.params.imageset, res, User, -1);
         return res.status(200).json(deleted);
       }
     } catch (error) {
