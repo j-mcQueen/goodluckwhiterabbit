@@ -50,7 +50,6 @@ exports.generatePutPresigned = async (req, res, next) => {
         return res.status(200).json([url1, url2]);
       }
     } catch (error) {
-      console.log(error, "URL generation failed");
       return res.status(500).json("URL generation failed");
     }
   }

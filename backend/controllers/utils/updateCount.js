@@ -12,7 +12,6 @@ exports.updateCount = async (_id, imageset, res, User, value) => {
 
     return updated;
   } catch (error) {
-    console.log("error, fileCount update", error);
     return res
       .status(304)
       .json(
