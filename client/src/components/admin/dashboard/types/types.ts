@@ -1,6 +1,7 @@
 export interface dashboard_client {
   name: string;
   added: string;
+  email: string;
   category: string;
   code: string;
   fileCounts: {

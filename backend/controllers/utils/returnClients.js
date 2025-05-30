@@ -4,7 +4,6 @@ exports.returnClients = async (user) => {
       {},
       {
         // exclude this information from the query
-        email: 0,
         role: 0,
         __v: 0,
       }

@@ -110,9 +110,12 @@ export default function AllClients({ ...props }) {
               </td>
 
               <td>
-                <button type="button" className={dashboard_btns}>
+                <a
+                  href={`mailto:${client.email}?subject=You've%20got%20photos!`}
+                  className={dashboard_btns}
+                >
                   <Mail className={icons} />
-                </button>
+                </a>
               </td>
 
               <td>
