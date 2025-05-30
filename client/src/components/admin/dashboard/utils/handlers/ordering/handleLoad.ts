@@ -40,7 +40,8 @@ export const handleLoad = async ({ ...params }) => {
     );
 
     const count = renderCount + data.count;
-    if (count > targetClient.fileCounts[targetImageset]) {
+
+    if (count >= targetClient.fileCounts[targetImageset]) {
       const response = await fetch(
         `${host}/admin/users/${targetClient._id}/updateFileCount/${targetImageset}/${count}`,
         {
@@ -84,12 +85,7 @@ export const handleLoad = async ({ ...params }) => {
     const nextOrder = data.files;
     setOrder(nextOrder);
 
-    const rendered =
-      nextOrder instanceof Array
-        ? nextOrder.filter((item: object | File) => item instanceof File).length
-        : 0;
-
-    setRenderCount(rendered);
+    setRenderCount(count);
     setSpinner(false);
   }
 

@@ -51,20 +51,23 @@ export default function ImageOrder({ ...props }) {
           </div>
 
           <button
-            onClick={() => {
+            onClick={async () => {
               const args: handleLoadTypes = {
                 clients,
                 order,
                 renderCount,
                 staticKeys,
+                setClients,
                 setOrder,
                 setRenderCount,
                 setSpinner,
                 setStaticKeys,
+                setTargetClient,
                 targetClient,
                 targetImageset,
               };
-              handleLoad(args);
+
+              await handleLoad(args);
             }}
             type="button"
             className="font-tnrBI tracking-widest opacity-80 drop-shadow-glo border border-solid px-4 py-2 xl:hover:text-rd xl:hover:drop-shadow-red xl:focus:text-rd xl:focus:drop-shadow-red transition-colors mt-8 mb-5"
