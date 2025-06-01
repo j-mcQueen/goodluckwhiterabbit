@@ -1,4 +1,5 @@
 import { AnimatePresence, motion } from "framer-motion";
+import SelectBtn from "./SelectBtn";
 
 const SelectGallery = ({ ...props }) => {
   const { initialized, handleSelect, user } = props;
@@ -9,6 +10,8 @@ const SelectGallery = ({ ...props }) => {
     empty:
       "border border-solid border-white py-2 px-3 text-lg relative opacity-15",
   };
+
+  const fileCountEntries = Object.entries(user.fileCounts);
 
   return (
     <AnimatePresence>
@@ -26,53 +29,17 @@ const SelectGallery = ({ ...props }) => {
             </hgroup>
 
             <div className="flex gap-5 tracking-wider">
-              <button
-                disabled={user.fileCounts.snapshots === 0}
-                type="button"
-                className={
-                  user.fileCounts.snapshots === 0
-                    ? buttonVariants["empty"]
-                    : buttonVariants["populated"]
-                }
-                onClick={() => handleSelect("snapshots")}
-              >
-                SNAPSHOTS
-              </button>
-
-              <button
-                disabled={user.fileCounts.keepsake === 0}
-                type="button"
-                className={
-                  user.fileCounts.keepsake === 0
-                    ? buttonVariants["empty"]
-                    : buttonVariants["populated"]
-                }
-                onClick={() => handleSelect("keepsake")}
-              >
-                KEEPSAKE PREVIEW
-              </button>
-
-              <button
-                disabled={user.fileCounts.core === 0}
-                type="button"
-                className={
-                  user.fileCounts.core === 0
-                    ? buttonVariants["empty"]
-                    : buttonVariants["populated"]
-                }
-                onClick={() => handleSelect("socials")}
-              >
-                CORE COLLECTION
-              </button>
-
-              <button
-                disabled={true}
-                type="button"
-                className={buttonVariants["empty"]}
-                onClick={() => handleSelect("snips")}
-              >
-                SNIPS
-              </button>
+              {fileCountEntries.map((item) => {
+                return (
+                  <SelectBtn
+                    key={item[0]}
+                    buttonVariants={buttonVariants}
+                    count={item[1]}
+                    handleSelect={handleSelect}
+                    imageset={item[0]}
+                  />
+                );
+              })}
             </div>
           </div>
         </motion.main>
