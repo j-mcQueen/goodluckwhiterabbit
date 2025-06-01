@@ -1,5 +1,5 @@
 import { Dispatch, SetStateAction } from "react";
-import { determineHost } from "../../../../../global/utils/determineHost";
+import { determineHost as host } from "../../../../../global/utils/determineHost";
 import { executeGenerationChain } from "../../../../../global/utils/executeGenerationChain";
 import { generateKeys } from "../../../../../global/utils/generateKeys";
 import { updateOrderState } from "./updateOrderState";
@@ -20,8 +20,6 @@ export const handleLoad = async ({ ...params }) => {
     targetClient,
     targetImageset,
   } = params;
-
-  const host = determineHost;
 
   if (renderCount === targetClient.fileCounts[targetImageset]) {
     const nextOrder = [...order, ...Array(10).fill({})];

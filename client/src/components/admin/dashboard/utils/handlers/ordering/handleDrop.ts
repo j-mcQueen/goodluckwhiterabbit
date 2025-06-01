@@ -1,11 +1,9 @@
 import { Dispatch, SetStateAction } from "react";
 import { updateOrderState } from "./updateOrderState";
-import { determineHost } from "../../../../../global/utils/determineHost";
+import { determineHost as host } from "../../../../../global/utils/determineHost";
 
 export const handleDrop = async ({ ...params }) => {
   if (params.index === params.draggedIndex && params.source !== "queue") return; // user made a mistake
-
-  const host = determineHost;
 
   let blob;
   try {

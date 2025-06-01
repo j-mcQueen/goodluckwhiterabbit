@@ -1,4 +1,4 @@
-import { determineHost } from "../../../../../global/utils/determineHost";
+import { determineHost as host } from "../../../../../global/utils/determineHost";
 
 export const handleAdd = async ({ ...params }) => {
   const {
@@ -14,7 +14,6 @@ export const handleAdd = async ({ ...params }) => {
 
   e.preventDefault();
   setSpinner(true);
-  const host = determineHost;
 
   try {
     const response = await fetch(`${host}/admin/add`, {

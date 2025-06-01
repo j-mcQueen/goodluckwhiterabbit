@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
-import { determineHost } from "../../global/utils/determineHost";
+import { determineHost as host } from "../../global/utils/determineHost";
 
 import AllClients from "./AllClients";
 import Header from "./Header";
@@ -44,8 +44,6 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     const getAllClients = async () => {
-      const host = determineHost;
-
       try {
         const response = await fetch(`${host}/admin/users`, {
           method: "GET",

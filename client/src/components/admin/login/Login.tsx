@@ -1,6 +1,6 @@
 import { FormEvent, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { determineHost } from "../../global/utils/determineHost";
+import { determineHost as host } from "../../global/utils/determineHost";
 import Rabbit from "../../global/forms/Rabbit";
 
 export default function Login() {
@@ -12,7 +12,6 @@ export default function Login() {
   const [authError, setAuthError] = useState(false);
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    const host = determineHost;
     const formData = new FormData(e.currentTarget);
     e.preventDefault();
 
