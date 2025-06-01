@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { userDashboardHeaderItems } from "./data/header/items";
 import { determineHost as host } from "../../global/utils/determineHost";
 import { executeGenerationChain } from "../../global/utils/executeGenerationChain";
+import { determineTabs } from "./utils/determineTabs";
 import { motion } from "framer-motion";
 
 import SelectGallery from "./SelectGallery";
@@ -14,7 +14,7 @@ export default function UserDashboard() {
   const mobile = window.matchMedia("(max-width: 1080px)").matches;
   const [user, setUser] = useState({
     _id: "",
-    fileCounts: { snapshots: 0, keepsake: 0, core: 0, snips: 0 },
+    fileCounts: { snapshots: 0 },
   });
   const [activeTab, setActiveTab] = useState(0);
   const [activeImageset, setActiveImageset] = useState("");
@@ -162,28 +162,18 @@ export default function UserDashboard() {
       {mobile ? (
         <MobileHeader
           logout={true}
-          data={userDashboardHeaderItems}
+          data={determineTabs(Object.keys(user.fileCounts))}
           activeTab={activeTab}
           setActiveTab={setActiveTab}
-          dashboard={[
-            user.fileCounts["snapshots"],
-            user.fileCounts["keepsake"],
-            user.fileCounts["core"],
-            user.fileCounts["snips"],
-          ]}
+          dashboard={Object.values(user.fileCounts)}
         />
       ) : (
         <Header
           logout={true}
-          data={userDashboardHeaderItems}
+          data={determineTabs(Object.keys(user.fileCounts))}
           activeTab={activeTab}
           setActiveTab={setActiveTab}
-          dashboard={[
-            user.fileCounts["snapshots"],
-            user.fileCounts["keepsake"],
-            user.fileCounts["core"],
-            user.fileCounts["snips"],
-          ]}
+          dashboard={Object.values(user.fileCounts)}
         />
       )}
 
