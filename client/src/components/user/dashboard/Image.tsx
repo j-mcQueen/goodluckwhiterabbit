@@ -3,7 +3,8 @@ import ActionBar from "./ActionBar";
 import { useRef } from "react";
 
 export default function Image({ ...props }) {
-  const { activeImage, activeImageset, userId, imageset, carousel } = props;
+  const { activeImage, fileCount, activeImageset, userId, imageset, carousel } =
+    props;
 
   const imgRef = useRef<HTMLImageElement>(null);
 
@@ -27,14 +28,14 @@ export default function Image({ ...props }) {
               ref={imgRef}
               loading="lazy"
               src={
-                activeImage instanceof File
+                activeImage instanceof Blob
                   ? URL.createObjectURL(activeImage)
                   : ""
               }
               alt={activeImage?.name}
               className={
                 carousel
-                  ? "h-[50dvh]"
+                  ? "h-[75dvh]"
                   : imgRef.current
                     ? imgRef.current.width > imgRef.current.height
                       ? variants.gridH
@@ -45,6 +46,7 @@ export default function Image({ ...props }) {
 
             <div className="text-white flex justify-between py-2">
               <ActionBar
+                fileCount={fileCount}
                 userId={userId}
                 activeImage={activeImage}
                 activeImageset={activeImageset}

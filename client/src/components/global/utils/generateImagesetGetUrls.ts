@@ -1,5 +1,5 @@
 import { Dispatch, SetStateAction } from "react";
-import { determineHost } from "./determineHost";
+import { determineHost as host } from "./determineHost";
 
 export const generateImagesetGetUrls = async (
   start: number,
@@ -12,14 +12,13 @@ export const generateImagesetGetUrls = async (
       logout: { status: boolean; path: string | null };
     }>
   >,
-  userId: string | undefined
+  userId: string | undefined,
+  size: string
 ) => {
-  const host = determineHost;
-
   let presigns;
   try {
     const response = await fetch(
-      `${host}/users/${userId}/${activeImageset}/${start}/${end}`,
+      `${host}/users/${userId}/${activeImageset}/${size}/${start}/${end}`,
       {
         method: "GET",
         headers: {

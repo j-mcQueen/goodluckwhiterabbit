@@ -14,14 +14,16 @@ export const executeGenerationChain = async (
   >,
   counter: number,
   endPoint: number,
-  id: string | undefined
+  id: string | undefined,
+  size: string
 ) => {
   const urls = await generateImagesetGetUrls(
     counter,
     endPoint,
     targetImageset,
     setNotice,
-    id
+    id,
+    size
   );
 
   if (urls.files === false) return { stored: 0, files: false, count: 0 };

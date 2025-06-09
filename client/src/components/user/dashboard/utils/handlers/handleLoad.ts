@@ -11,7 +11,8 @@ export const handleLoad = async ({ ...params }) => {
     params.setNotice,
     params.imageset.length,
     params.imageset.length + 10,
-    params.userId
+    params.userId,
+    "sm"
   );
 
   const generatedKeys = generateKeys();

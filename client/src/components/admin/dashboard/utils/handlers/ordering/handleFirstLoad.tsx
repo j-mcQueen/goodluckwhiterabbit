@@ -27,7 +27,8 @@ export const handleFirstLoad = async ({ ...params }) => {
     setNotice,
     0,
     10,
-    targetClient._id
+    targetClient._id,
+    "sm"
   );
 
   if (data.stored > 0 && data.files) {

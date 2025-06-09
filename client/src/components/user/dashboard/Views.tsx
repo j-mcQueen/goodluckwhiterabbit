@@ -3,21 +3,19 @@ import { handleDownloadAll } from "./utils/handleDownloadAll";
 import { AnimatePresence, motion } from "framer-motion";
 
 import Carousel from "./views/Carousel";
-import Grid from "./views/Grid";
 import Loading from "../../global/Loading";
 
 export default function Views({ ...props }) {
   const {
     user,
     images,
-    imageset,
-    setImages,
     activeImageset,
+    setImages,
     setNotice,
     setSpinner,
     spinner,
   } = props;
-  const [disabled, setDisabled] = useState(false);
+
   const [retrieving, setRetrieving] = useState(false);
 
   return (
@@ -31,8 +29,9 @@ export default function Views({ ...props }) {
           <p className="text-white text-center pb-2">
             LOADED:{" "}
             {
-              imageset.filter((item: object) => item instanceof File === true)
-                .length
+              images[activeImageset as keyof typeof images].filter(
+                (img: Blob) => img instanceof Blob === true
+              ).length
             }{" "}
             / {user.fileCounts[activeImageset]}
           </p>
@@ -84,28 +83,17 @@ export default function Views({ ...props }) {
 
       <div className="w-full h-[calc(100dvh-57px-1.5rem)] overflow-y-scroll">
         <Carousel
-          userId={user._id}
+          loaded={
+            images[activeImageset as keyof typeof setImages].filter(
+              (img: Blob) => img instanceof Blob === true
+            ).length
+          }
+          user={user}
           activeImageset={activeImageset}
-          imageset={imageset}
-          setNotice={setNotice}
-        />
-
-        <div className="text-rd text-lg text-center py-20">
-          <p>SCROLL FOR GRID &#8595;</p>
-        </div>
-
-        <Grid
-          spinner={spinner}
           images={images}
           setImages={setImages}
           setNotice={setNotice}
-          setDisabled={setDisabled}
           setSpinner={setSpinner}
-          imageset={imageset}
-          userId={user._id}
-          activeImageset={activeImageset}
-          fileCounts={user.fileCounts[activeImageset]}
-          disabled={disabled}
         />
       </div>
     </div>

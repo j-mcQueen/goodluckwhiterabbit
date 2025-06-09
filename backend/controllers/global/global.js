@@ -71,7 +71,7 @@ exports.generateGetPresigned = async (req, res, next) => {
       );
 
       const sorted = objects.Contents.filter((item) =>
-        item.Key.includes("/sm/")
+        item.Key.includes(`/${req.params.size}/`)
       ).sort((a, b) => {
         const posA = a.Key.match(indexRegex);
         const posB = b.Key.match(indexRegex);

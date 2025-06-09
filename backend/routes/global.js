@@ -11,7 +11,7 @@ const router = express.Router();
 const upload = multer(); // enable form data to be unpacked
 
 // GET
-router.get("/users/:id/:imageset/:start/:end", generateGetPresigned);
+router.get("/users/:id/:imageset/:size/:start/:end", generateGetPresigned);
 router.get("/users/:id/getImagesetTotals", countImagesetItems);
 
 // POST

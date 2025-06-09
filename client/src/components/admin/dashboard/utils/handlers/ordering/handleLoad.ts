@@ -34,7 +34,8 @@ export const handleLoad = async ({ ...params }) => {
       setNotice,
       imagesetLength,
       imagesetLength + 10,
-      targetClient._id
+      targetClient._id,
+      "sm"
     );
 
     const count = renderCount + data.count;

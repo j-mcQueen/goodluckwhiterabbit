@@ -141,7 +141,8 @@ export default function UserDashboard() {
       setNotice,
       0,
       10,
-      user._id
+      user._id,
+      "lg"
     );
     setImages({ ...images, [targetImageset]: data.files });
     if (data.files) setSpinner(false);
@@ -185,7 +186,6 @@ export default function UserDashboard() {
         <Views
           activeImageset={activeImageset}
           images={images}
-          imageset={images[activeImageset as keyof typeof images]}
           setImages={setImages}
           setNotice={setNotice}
           setSpinner={setSpinner}

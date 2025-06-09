@@ -2,7 +2,8 @@ import { handleDownload } from "./utils/handleDownload";
 import Download from "../../../assets/media/icons/Download";
 
 export default function ActionBar({ ...props }) {
-  const { imageset, userId, activeImage, activeImageset, carousel } = props;
+  const { imageset, fileCount, userId, activeImage, activeImageset, carousel } =
+    props;
 
   const numberCount = (n: number) => {
     if (n >= 0 && n < 100) {
@@ -33,12 +34,7 @@ export default function ActionBar({ ...props }) {
 
       <p className="text-2xl">
         {numberCount(imageset.indexOf(activeImage) + 1)}{" "}
-        {carousel
-          ? ` / ${numberCount(
-              imageset.filter((item: object) => item instanceof File === true)
-                .length
-            )}`
-          : null}
+        {carousel ? ` / ${numberCount(fileCount)}` : null}
       </p>
     </>
   );
