@@ -15,6 +15,18 @@ export const handleAdd = async ({ ...params }) => {
   e.preventDefault();
   setSpinner(true);
 
+  if (Object.values(inputValues.clientsets).some(Boolean) === false) {
+    setSpinner(false);
+    return setErrors({
+      ...errors,
+      formValidation: {
+        state: true,
+        status: 403,
+        message: "Please select at least one imageset.",
+      },
+    });
+  }
+
   try {
     const response = await fetch(`${host}/admin/add`, {
       method: "POST",

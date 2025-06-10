@@ -16,7 +16,7 @@ export default function AddClient({ ...props }) {
     clientemail: "",
     clientcategory: "",
     clientsets: {
-      snaps: true,
+      snaps: false,
       keepsake: false,
       core: false,
       snips: false,
@@ -118,8 +118,25 @@ export default function AddClient({ ...props }) {
                 type="checkbox"
                 name="snapshots"
                 className="invisible peer"
-                checked
-                readOnly
+                onChange={() => {
+                  if (errors.formValidation.state === true)
+                    setErrors({
+                      ...errors,
+                      formValidation: {
+                        state: false,
+                        status: 200,
+                        message: "",
+                      },
+                    });
+
+                  setInputValues({
+                    ...inputValues,
+                    clientsets: {
+                      ...inputValues.clientsets,
+                      snaps: !inputValues.clientsets.snaps,
+                    },
+                  });
+                }}
               />
               <span className={checkbox_styles}></span>
             </label>
@@ -130,15 +147,25 @@ export default function AddClient({ ...props }) {
                 type="checkbox"
                 name="keepsake"
                 className="invisible peer"
-                onChange={() =>
+                onChange={() => {
+                  if (errors.formValidation.state === true)
+                    setErrors({
+                      ...errors,
+                      formValidation: {
+                        state: false,
+                        status: 200,
+                        message: "",
+                      },
+                    });
+
                   setInputValues({
                     ...inputValues,
                     clientsets: {
                       ...inputValues.clientsets,
                       keepsake: !inputValues.clientsets.keepsake,
                     },
-                  })
-                }
+                  });
+                }}
               />
               <span className={checkbox_styles}></span>
             </label>
@@ -149,15 +176,25 @@ export default function AddClient({ ...props }) {
                 type="checkbox"
                 name="core"
                 className="invisible peer"
-                onChange={() =>
+                onChange={() => {
+                  if (errors.formValidation.state === true)
+                    setErrors({
+                      ...errors,
+                      formValidation: {
+                        state: false,
+                        status: 200,
+                        message: "",
+                      },
+                    });
+
                   setInputValues({
                     ...inputValues,
                     clientsets: {
                       ...inputValues.clientsets,
                       core: !inputValues.clientsets.core,
                     },
-                  })
-                }
+                  });
+                }}
               />
               <span className={checkbox_styles}></span>
             </label>
@@ -168,15 +205,25 @@ export default function AddClient({ ...props }) {
                 type="checkbox"
                 name="snips"
                 className="invisible peer"
-                onChange={() =>
+                onChange={() => {
+                  if (errors.formValidation.state === true)
+                    setErrors({
+                      ...errors,
+                      formValidation: {
+                        state: false,
+                        status: 200,
+                        message: "",
+                      },
+                    });
+
                   setInputValues({
                     ...inputValues,
                     clientsets: {
                       ...inputValues.clientsets,
                       snips: !inputValues.clientsets.snips,
                     },
-                  })
-                }
+                  });
+                }}
               />
               <span className={checkbox_styles}></span>
             </label>
@@ -195,7 +242,7 @@ export default function AddClient({ ...props }) {
         </div>
 
         {errors.formValidation.state === true || errors.other.state === true ? (
-          <p>
+          <p className="text-rd">
             {errors.formValidation
               ? errors.formValidation.message
               : errors.other.message}
