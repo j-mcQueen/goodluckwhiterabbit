@@ -2,6 +2,7 @@ const {
   login,
   getUser,
   generateOriginalGetPresigned,
+  downloadAll,
 } = require("../controllers/user/user");
 const express = require("express");
 const multer = require("multer");
@@ -10,6 +11,7 @@ const upload = multer();
 
 // GET
 router.get("/:id", getUser);
+router.get("/:id/:imageset/ogs", downloadAll);
 router.get(
   "/:id/:imageset/original/:index/:filename",
   generateOriginalGetPresigned

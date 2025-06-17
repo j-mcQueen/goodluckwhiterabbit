@@ -16,7 +16,10 @@ export default function Views({ ...props }) {
     spinner,
   } = props;
 
-  const [retrieving, setRetrieving] = useState(false);
+  const [retrieving, setRetrieving] = useState({
+    state: false,
+    complete: false,
+  });
 
   return (
     <div className="flex">
@@ -42,8 +45,8 @@ export default function Views({ ...props }) {
             onClick={() => {
               const args = {
                 activeImageset,
-                link: user.links[activeImageset],
-                name: user.name,
+                user,
+                setNotice,
                 setRetrieving,
               };
 
@@ -53,25 +56,31 @@ export default function Views({ ...props }) {
             DOWNLOAD: ALL
           </button>
 
-          <AnimatePresence mode="wait">
-            {retrieving && (
-              <motion.p
-                key={"notice"}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                onAnimationComplete={() => {
-                  setTimeout(() => {
-                    setRetrieving(false);
-                  }, 4000);
-                }}
-                className="text-yellow-400 min-w-[245px] max-w-[245px] px-5 pt-5"
-              >
-                Please keep portal open while your zip file downloads... Slow
-                and steady wins the race!
-              </motion.p>
-            )}
-          </AnimatePresence>
+          {retrieving.state === true ? (
+            <AnimatePresence mode="wait">
+              {retrieving.state && (
+                <motion.p
+                  key={"notice"}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="text-yellow-400 min-w-[245px] max-w-[245px] px-5 pt-5"
+                >
+                  Your download has started. Please keep this page open while it
+                  completes!
+                </motion.p>
+              )}
+            </AnimatePresence>
+          ) : retrieving.complete ? (
+            <motion.p
+              key={"notice"}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="text-green-400 min-w-[245px] max-w-[245px] px-5 pt-5"
+            >
+              Download complete. Enjoy!
+            </motion.p>
+          ) : null}
 
           {spinner ? (
             <div className="pt-5">

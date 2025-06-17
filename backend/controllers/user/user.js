@@ -1,11 +1,15 @@
 require("dotenv").config();
 const jwt = require("jsonwebtoken");
 const User = require("../../models/user");
-const { s3 } = require("../config/s3");
-const { GetObjectCommand } = require("@aws-sdk/client-s3");
+const archiver = require("archiver");
+const {
+  GetObjectCommand,
+  ListObjectsV2Command,
+} = require("@aws-sdk/client-s3");
 const { getSignedUrl } = require("@aws-sdk/s3-request-presigner");
 const { body, validationResult } = require("express-validator");
 const { verifyTokens } = require("../utils/verifyTokens");
+const { s3 } = require("../config/s3");
 
 exports.login = [
   // sanitize received input
@@ -77,6 +81,79 @@ exports.login = [
       .json(req.user._id);
   },
 ];
+
+exports.downloadAll = async (req, res, next) => {
+  const verified = await verifyTokens(req, res);
+
+  if (verified) {
+    const indexRegex = /\/(\d{1,3})\//;
+    let s3Data = {};
+    try {
+      let objects = await s3.send(
+        new ListObjectsV2Command({
+          Bucket: process.env.AWS_PRIMARY_BUCKET,
+          Prefix: `${req.params.id}/${req.params.imageset}`,
+        })
+      );
+
+      const sorted = objects.Contents.filter((item) =>
+        item.Key.includes(`/og/`)
+      ).sort((a, b) => {
+        const posA = a.Key.match(indexRegex);
+        const posB = b.Key.match(indexRegex);
+
+        if (Number(posA[1]) < Number(posB[1])) return -1;
+        if (Number(posA[1]) > Number(posB[1])) return 1;
+        return 0;
+      });
+
+      objects.Contents = sorted;
+      s3Data.results = objects;
+      s3Data.stored = sorted.length;
+
+      if (!s3Data.results.Contents)
+        return res.status(200).json({ files: false });
+    } catch (error) {
+      if (typeof s3Data.results.Contents === "undefined")
+        return res.status(200).json({ files: false });
+
+      return res.status(500).json({
+        status: true,
+        message: "File retrieval error. Please refresh and try again.",
+        logout: { status: false, path: null },
+      });
+    }
+
+    if (s3Data.results.Contents) {
+      const archive = archiver("zip", { zlib: { level: 1 } });
+
+      archive.on("error", (err) => {
+        return res.status(500).send({
+          status: true,
+          message: "Zip creation failed.",
+          logout: { status: false, path: null },
+        });
+      });
+
+      archive.pipe(res);
+      for (const file of s3Data.results.Contents) {
+        const name = file.Key.split("/").pop();
+
+        const cmd = await s3.send(
+          new GetObjectCommand({
+            Bucket: process.env.AWS_PRIMARY_BUCKET,
+            Key: file.Key,
+          })
+        );
+        const body = cmd.Body;
+
+        archive.append(body, { name });
+      }
+
+      await archive.finalize();
+    }
+  }
+};
 
 exports.getUser = async (req, res, next) => {
   const verified = await verifyTokens(req, res);
