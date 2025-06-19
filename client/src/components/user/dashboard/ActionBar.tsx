@@ -2,8 +2,15 @@ import { handleDownload } from "./utils/handleDownload";
 import Download from "../../../assets/media/icons/Download";
 
 export default function ActionBar({ ...props }) {
-  const { imageset, fileCount, userId, activeImage, activeImageset, carousel } =
-    props;
+  const {
+    imageset,
+    fileCount,
+    userId,
+    activeImage,
+    activeImageset,
+    carousel,
+    setNotice,
+  } = props;
 
   const numberCount = (n: number) => {
     if (n >= 0 && n < 100) {
@@ -23,8 +30,7 @@ export default function ActionBar({ ...props }) {
             id: userId,
             index: imageset.indexOf(activeImage),
             imageset: activeImageset,
-            filename: activeImage.name,
-            type: activeImage.type,
+            setNotice,
           };
           handleDownload(args);
         }}

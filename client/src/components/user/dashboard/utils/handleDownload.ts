@@ -1,26 +1,26 @@
 import { determineHost as host } from "../../../global/utils/determineHost";
 
 export const handleDownload = async ({ ...params }) => {
-  let url = "";
+  const { id, imageset, index, setNotice } = params;
+
+  const s3Object = { url: "", name: "" };
   try {
-    const response = await fetch(
-      `${host}/user/${params.id}/${params.imageset}/original/${params.index}/${params.filename.slice(2)}`,
-      {
-        method: "GET",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-      }
-    );
+    const response = await fetch(`${host}/user/${id}/${imageset}/og/${index}`, {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+    });
     const data = await response.json();
 
     switch (response.status) {
       case 200:
       case 304:
         if (data.files === false) return data;
-        url = data;
+        s3Object.url = data.url;
+        s3Object.name = data.name;
         break;
 
       case 500:
@@ -30,17 +30,17 @@ export const handleDownload = async ({ ...params }) => {
         throw new Error("Other");
     }
   } catch (error) {
-    // TODO handle error
+    return setNotice({
+      status: true,
+      message: "Download failed. Please refresh and try again.",
+      logout: { status: false, path: null },
+    });
   }
 
-  if (url.length > 0) {
-    const name = params.filename.slice(2).replace("%2B", "+");
-    const response = await fetch(url, { method: "GET" });
+  if (s3Object.url.length > 0) {
+    const response = await fetch(s3Object.url, { method: "GET" });
     const blob = await response.blob();
-    const file = new File([blob], name, {
-      type: params.type,
-    });
-    const objectUrl = URL.createObjectURL(file);
+    const objectUrl = URL.createObjectURL(blob);
 
     // workaround to handle file downloads without causing visual lag derived from display of data URL
     const anchor = document.createElement("a");
@@ -48,7 +48,7 @@ export const handleDownload = async ({ ...params }) => {
     anchor.setAttribute("style", "display: none");
     // set the necessary attributes for download + attach temporarily to DOM
     anchor.href = objectUrl;
-    anchor.download = name;
+    anchor.download = s3Object.name;
     document.body.appendChild(anchor);
     // trigger download
     anchor.click();

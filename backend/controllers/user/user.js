@@ -185,9 +185,18 @@ exports.generateOriginalGetPresigned = async (req, res, next) => {
   const verified = await verifyTokens(req, res);
 
   if (verified) {
+    const metadata = await s3.send(
+      new ListObjectsV2Command({
+        Bucket: process.env.AWS_PRIMARY_BUCKET,
+        MaxKeys: 1,
+        Prefix: `${req.params.id}/${req.params.imageset}/${req.params.index}/og/`,
+      })
+    );
+    const name = metadata.Contents[0].Key.split("/").pop();
+
     const cmd = new GetObjectCommand({
       Bucket: process.env.AWS_PRIMARY_BUCKET,
-      Key: `${req.params.id}/${req.params.imageset}/original/${req.params.index}/${req.params.filename}`,
+      Key: `${req.params.id}/${req.params.imageset}/${req.params.index}/og/${name}`,
     });
 
     let url = "";
@@ -195,14 +204,13 @@ exports.generateOriginalGetPresigned = async (req, res, next) => {
       url = await getSignedUrl(s3, cmd, { expiresIn: 600 });
       if (!url) throw new Error("500");
     } catch (error) {
-      // TODO write error message
       return res.status(500).json({
         status: true,
-        message: "",
+        message: "Failed to initiate file retrieval process.",
         logout: { status: false, path: null },
       });
     }
 
-    return res.status(200).json(url);
+    return res.status(200).json({ name, url });
   }
 };

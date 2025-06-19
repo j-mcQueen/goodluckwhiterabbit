@@ -61,6 +61,7 @@ export default function Carousel({ ...props }) {
             imageset={images[activeImageset]}
             activeImage={images[activeImageset][activeImage]}
             carousel={true}
+            setNotice={setNotice}
           />
         </div>
 

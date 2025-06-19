@@ -3,8 +3,15 @@ import ActionBar from "./ActionBar";
 import { useRef } from "react";
 
 export default function Image({ ...props }) {
-  const { activeImage, fileCount, activeImageset, userId, imageset, carousel } =
-    props;
+  const {
+    activeImage,
+    fileCount,
+    activeImageset,
+    userId,
+    imageset,
+    carousel,
+    setNotice,
+  } = props;
 
   const imgRef = useRef<HTMLImageElement>(null);
 
@@ -52,6 +59,7 @@ export default function Image({ ...props }) {
                 activeImageset={activeImageset}
                 imageset={imageset}
                 carousel={carousel}
+                setNotice={setNotice}
               />
             </div>
           </motion.div>

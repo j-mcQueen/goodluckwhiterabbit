@@ -12,10 +12,7 @@ const upload = multer();
 // GET
 router.get("/:id", getUser);
 router.get("/:id/:imageset/ogs", downloadAll);
-router.get(
-  "/:id/:imageset/original/:index/:filename",
-  generateOriginalGetPresigned
-);
+router.get("/:id/:imageset/og/:index", generateOriginalGetPresigned);
 
 // POST
 router.post("/login", upload.none(), login);
