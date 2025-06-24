@@ -17,12 +17,12 @@ export default function Image({ ...props }) {
 
   const variants = {
     carousel: "h-[50dvh]",
-    gridV: "max-h-[40dvh]",
-    gridH: "max-w-[20dvw]",
+    scrollerV: "max-h-[70dvh]",
+    scrollerH: "max-w-[20dvw]",
   };
 
   return (
-    <div className="relative z-0 pt-20">
+    <div className="relative z-0 xl:pt-20">
       <AnimatePresence mode="wait">
         {activeImage && (
           <motion.div
@@ -45,8 +45,8 @@ export default function Image({ ...props }) {
                   ? "h-[75dvh]"
                   : imgRef.current
                     ? imgRef.current.width > imgRef.current.height
-                      ? variants.gridH
-                      : variants.gridV
+                      ? variants.scrollerH
+                      : variants.scrollerV
                     : "max-h-[30dvh]"
               }
             />
