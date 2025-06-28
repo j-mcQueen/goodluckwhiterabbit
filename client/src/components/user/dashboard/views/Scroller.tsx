@@ -6,15 +6,15 @@ import Image from "../Image";
 
 export default function Scroller({ ...props }) {
   const {
-    imageset,
     activeImageset,
+    images,
+    imageset,
+    setImages,
+    setNotice,
+    setSpinner,
     user,
-    // disabled,
-    // spinner,
-    // setSpinner,
-    // setDisabled,
-    // setImages,
   } = props;
+
   const [staticKeys, setStaticKeys] = useState(generateKeys);
 
   return (
@@ -26,13 +26,18 @@ export default function Scroller({ ...props }) {
             return (
               <Fragment key={staticKeys[index]}>
                 <Image
-                  activeImageset={activeImageset}
-                  user={user}
                   activeImage={image}
-                  imageset={imageset}
+                  activeImageset={activeImageset}
                   carousel={false}
                   i={index}
+                  images={images}
+                  imageset={imageset}
                   last={staticKeys.length - 1}
+                  setImages={setImages}
+                  setNotice={setNotice}
+                  setSpinner={setSpinner}
+                  setStaticKeys={setStaticKeys}
+                  user={user}
                 />
               </Fragment>
             );

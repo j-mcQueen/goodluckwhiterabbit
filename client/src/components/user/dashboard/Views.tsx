@@ -30,7 +30,7 @@ export default function Views({ ...props }) {
           {user.name.toUpperCase()}
         </h1>
 
-        <div className="text-center flex xl:block items-center justify-between px-5 xl:px-0 py-5 xl:py-0 border-b border-solid border-white">
+        <div className="text-center flex xl:block items-center justify-between px-5 xl:px-0 py-5 xl:py-0 border-b xl:border-none border-solid border-white">
           <p className="text-white text-center xl:pb-2">
             LOADED:{" "}
             {
@@ -96,23 +96,26 @@ export default function Views({ ...props }) {
 
       {!mobile ? (
         <Carousel
+          activeImageset={activeImageset}
+          images={images}
           loaded={
             images[activeImageset as keyof typeof setImages].filter(
               (img: Blob) => img instanceof Blob === true
             ).length
           }
-          user={user}
-          activeImageset={activeImageset}
-          images={images}
           setImages={setImages}
           setNotice={setNotice}
           setSpinner={setSpinner}
+          user={user}
         />
       ) : (
         <Scroller
           activeImageset={activeImageset}
           images={images}
           imageset={images[activeImageset]}
+          setImages={setImages}
+          setNotice={setNotice}
+          setSpinner={setSpinner}
           user={user}
         />
       )}

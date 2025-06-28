@@ -6,13 +6,13 @@ import Shift from "../../../../assets/media/icons/Shift";
 
 export default function Carousel({ ...props }) {
   const {
+    activeImageset,
     images,
     loaded,
-    user,
-    activeImageset,
     setImages,
     setNotice,
     setSpinner,
+    user,
   } = props;
 
   const [activeIndex, setActiveIndex] = useState(0);
@@ -34,13 +34,12 @@ export default function Carousel({ ...props }) {
 
         <div className="relative flex flex-col basis-[80dvw] items-center overflow-hidden">
           <Image
-            activeImageset={activeImageset}
-            fileCount={user.fileCounts[activeImageset]}
-            userId={user._id}
-            imageset={images[activeImageset]}
             activeImage={images[activeImageset][activeIndex]}
+            activeImageset={activeImageset}
             carousel={true}
+            imageset={images[activeImageset]}
             setNotice={setNotice}
+            user={user}
           />
         </div>
 

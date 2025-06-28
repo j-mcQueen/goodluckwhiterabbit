@@ -2,10 +2,10 @@ import { executeGenerationChain } from "../../../global/utils/executeGenerationC
 
 export const loadBatch = async ({ ...params }) => {
   const {
-    activeImage,
+    activeIndex = undefined,
     activeImageset,
     images,
-    setActiveImage,
+    setActiveIndex = undefined,
     setImages,
     setNotice,
     setSpinner,
@@ -27,7 +27,7 @@ export const loadBatch = async ({ ...params }) => {
 
   if (data.stored > 0 && data.files instanceof Array) {
     setImages({ ...images, [activeImageset]: data.files });
-    if (setActiveImage && activeImage) setActiveImage(activeImage + 1);
+    if (setActiveIndex && activeIndex) setActiveIndex(activeIndex + 1);
   }
 
   return setSpinner(false);

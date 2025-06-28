@@ -1,30 +1,51 @@
 import { InView } from "react-intersection-observer";
+import { SharedImageProps } from "./types/SharedImageProps";
+import { ImagePropsFromScroller } from "./types/ImagePropsFromScroller";
+import { handleIntersection } from "./utils/handleIntersection";
+
 import ImageItem from "./ImageItem";
 
-export default function Image({ ...props }) {
+export default function Image({
+  ...props
+}: Partial<SharedImageProps & ImagePropsFromScroller>) {
   const {
-    activeImage,
+    activeImage = {},
     activeImageset,
-    user,
-    imageset,
     carousel,
-    setNotice,
     i,
+    images = {},
+    imageset = [],
     last,
+    setImages,
+    setNotice,
+    setSpinner,
+    setStaticKeys,
+    user = { _id: "", fileCounts: {} },
   } = props;
 
-  const handleIntersection = (inView: boolean) => {
-    // this is where the fun begins!
-    if (inView && last < user.fileCounts[activeImageset]) {
-      // TODO check if there are more images to be loaded
-      console.log("yes!");
-    }
-  };
-
-  return i === last ? (
+  return i === last && carousel === false ? (
     <InView
       as="div"
-      onChange={(inView) => handleIntersection(inView)}
+      onChange={(inView, entry) => {
+        if (entry.intersectionRatio === 1) {
+          // prevent callback from firing immediately on first load
+          return;
+        }
+
+        const args = {
+          activeImageset,
+          images,
+          inView,
+          last,
+          setImages,
+          setNotice,
+          setSpinner,
+          setStaticKeys,
+          user,
+        };
+
+        handleIntersection(args);
+      }}
       className="relative z-0 xl:pt-20"
     >
       <ImageItem
