@@ -1,70 +1,51 @@
-import { AnimatePresence, motion } from "framer-motion";
-import ActionBar from "./ActionBar";
-import { useRef } from "react";
+import { InView } from "react-intersection-observer";
+import ImageItem from "./ImageItem";
 
 export default function Image({ ...props }) {
   const {
     activeImage,
-    fileCount,
     activeImageset,
-    userId,
+    user,
     imageset,
     carousel,
     setNotice,
+    i,
+    last,
   } = props;
 
-  const imgRef = useRef<HTMLImageElement>(null);
-
-  const variants = {
-    carousel: "h-[50dvh]",
-    scrollerV: "max-h-[70dvh]",
-    scrollerH: "max-w-[20dvw]",
+  const handleIntersection = (inView: boolean) => {
+    // this is where the fun begins!
+    if (inView && last < user.fileCounts[activeImageset]) {
+      // TODO check if there are more images to be loaded
+      console.log("yes!");
+    }
   };
 
-  return (
+  return i === last ? (
+    <InView
+      as="div"
+      onChange={(inView) => handleIntersection(inView)}
+      className="relative z-0 xl:pt-20"
+    >
+      <ImageItem
+        activeImage={activeImage}
+        activeImageset={activeImageset}
+        carousel={carousel}
+        imageset={imageset}
+        user={user}
+        setNotice={setNotice}
+      />
+    </InView>
+  ) : (
     <div className="relative z-0 xl:pt-20">
-      <AnimatePresence mode="wait">
-        {activeImage && (
-          <motion.div
-            key={activeImage.name}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-          >
-            <img
-              ref={imgRef}
-              loading="lazy"
-              src={
-                activeImage instanceof Blob
-                  ? URL.createObjectURL(activeImage)
-                  : ""
-              }
-              alt={activeImage?.name}
-              className={
-                carousel
-                  ? "h-[75dvh]"
-                  : imgRef.current
-                    ? imgRef.current.width > imgRef.current.height
-                      ? variants.scrollerH
-                      : variants.scrollerV
-                    : "max-h-[30dvh]"
-              }
-            />
-
-            <div className="text-white flex justify-between py-2">
-              <ActionBar
-                fileCount={fileCount}
-                userId={userId}
-                activeImage={activeImage}
-                activeImageset={activeImageset}
-                imageset={imageset}
-                carousel={carousel}
-                setNotice={setNotice}
-              />
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <ImageItem
+        activeImage={activeImage}
+        activeImageset={activeImageset}
+        carousel={carousel}
+        imageset={imageset}
+        user={user}
+        setNotice={setNotice}
+      />
     </div>
   );
 }

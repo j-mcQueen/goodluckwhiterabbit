@@ -24,7 +24,7 @@ export default function Views({ ...props }) {
   });
 
   return (
-    <div className="flex xl:flex-row flex-col max-h-[calc(100dvh-57px-1.5rem)] xl:">
+    <div className="flex xl:flex-row flex-col max-h-[calc(100dvh-57px-1.5rem)]">
       <aside className="flex flex-col xl:gap-5 xl:min-w-[245px] xl:max-w-[245px] xl:max-h-[calc(100dvh-57px-1.5rem)] xl:border-r border-solid border-white">
         <h1 className="text-white text-center text-2xl pt-5">
           {user.name.toUpperCase()}
@@ -87,38 +87,35 @@ export default function Views({ ...props }) {
           ) : null}
 
           {spinner ? (
-            <div className="pt-5">
+            <div className="pt-5 text-center">
               <Loading />
             </div>
           ) : null}
         </div>
       </aside>
 
-      <div className="w-full xl:h-[calc(100dvh-57px-1.5rem)] overflow-y-scroll pt-2">
-        {!mobile ? (
-          <Carousel
-            loaded={
-              images[activeImageset as keyof typeof setImages].filter(
-                (img: Blob) => img instanceof Blob === true
-              ).length
-            }
-            user={user}
-            activeImageset={activeImageset}
-            images={images}
-            setImages={setImages}
-            setNotice={setNotice}
-            setSpinner={setSpinner}
-          />
-        ) : (
-          <Scroller
-            activeImageset={activeImageset}
-            images={images}
-            imageset={images[activeImageset]}
-            fileCounts={user.fileCounts}
-            userId={user._id}
-          />
-        )}
-      </div>
+      {!mobile ? (
+        <Carousel
+          loaded={
+            images[activeImageset as keyof typeof setImages].filter(
+              (img: Blob) => img instanceof Blob === true
+            ).length
+          }
+          user={user}
+          activeImageset={activeImageset}
+          images={images}
+          setImages={setImages}
+          setNotice={setNotice}
+          setSpinner={setSpinner}
+        />
+      ) : (
+        <Scroller
+          activeImageset={activeImageset}
+          images={images}
+          imageset={images[activeImageset]}
+          user={user}
+        />
+      )}
     </div>
   );
 }

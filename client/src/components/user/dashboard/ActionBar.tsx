@@ -2,15 +2,8 @@ import { handleDownload } from "./utils/handleDownload";
 import Download from "../../../assets/media/icons/Download";
 
 export default function ActionBar({ ...props }) {
-  const {
-    imageset,
-    fileCount,
-    userId,
-    activeImage,
-    activeImageset,
-    carousel,
-    setNotice,
-  } = props;
+  const { imageset, user, activeImage, activeImageset, carousel, setNotice } =
+    props;
 
   const numberCount = (n: number) => {
     if (n >= 0 && n < 100) {
@@ -27,7 +20,7 @@ export default function ActionBar({ ...props }) {
         className="border border-solid border-white p-1 xl:hover:border-red xl:focus:border-red focus:outline-none transition-colors group"
         onClick={() => {
           const args = {
-            id: userId,
+            id: user._id,
             index: imageset.indexOf(activeImage),
             imageset: activeImageset,
             setNotice,
@@ -40,7 +33,7 @@ export default function ActionBar({ ...props }) {
 
       <p className="text-2xl">
         {numberCount(imageset.indexOf(activeImage) + 1)}{" "}
-        {carousel ? ` / ${numberCount(fileCount)}` : null}
+        {carousel ? ` / ${numberCount(user.fileCounts[activeImageset])}` : null}
       </p>
     </>
   );

@@ -14,7 +14,7 @@ export default function UserDashboard() {
   const mobile = window.matchMedia("(max-width: 1080px)").matches;
   const [user, setUser] = useState({
     _id: "",
-    fileCounts: { snapshots: 0 },
+    fileCounts: {},
   });
   const [activeTab, setActiveTab] = useState(0);
   const [activeImageset, setActiveImageset] = useState("");
@@ -164,6 +164,7 @@ export default function UserDashboard() {
         <MobileHeader
           logout={true}
           data={determineTabs(Object.keys(user.fileCounts))}
+          counts={Object.values(user.fileCounts)}
           activeTab={activeTab}
           setActiveTab={setActiveTab}
           dashboard={Object.values(user.fileCounts)}

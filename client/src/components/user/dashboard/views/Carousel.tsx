@@ -39,7 +39,7 @@ export default function Carousel({ ...props }) {
   };
 
   return (
-    <section>
+    <section className="w-full xl:h-[calc(100dvh-57px-1.5rem)] overflow-y-scroll pt-2">
       <div className="flex items-center justify-between px-5">
         {activeImage > 0 ? (
           <button

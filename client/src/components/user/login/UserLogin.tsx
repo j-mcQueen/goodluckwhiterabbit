@@ -8,7 +8,6 @@ export default function UserLogin() {
     document.title = "LOGIN — GOOD LUCK WHITE RABBIT";
   }, []);
   const navigate = useNavigate();
-  const isDesktop = window.matchMedia("(min-width: 1080px)").matches;
 
   const [authError, setAuthError] = useState({ active: false, message: "" });
 
@@ -51,7 +50,7 @@ export default function UserLogin() {
     }
   };
 
-  return isDesktop ? (
+  return (
     <main className="w-[calc(100dvw-1.5rem-2px)] h-[calc(100dvh-1.5rem-2px)] flex items-center justify-center">
       <section className="text-white xl:border xl:border-solid xl:border-white w-[90dvw] h-dvh xl:w-[25dvw] xl:h-[35dvw] pb-6 xl:mx-0 xl:py-0 flex flex-col justify-end">
         <Rabbit />
@@ -105,16 +104,6 @@ export default function UserLogin() {
             </button>
           </div>
         </form>
-      </section>
-    </main>
-  ) : (
-    <main className="w-[calc(100dvw-1.5rem-2px)] h-[calc(100dvh-1.5rem-2px)] flex items-center justify-center">
-      <section>
-        <Rabbit />
-
-        <p className="text-white px-5">
-          FOR BEST RESULTS, PLEASE ACCESS WEBSITE ON DESKTOP
-        </p>
       </section>
     </main>
   );
