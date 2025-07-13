@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { handleLoad } from "./utils/handlers/ordering/handleLoad";
 import { handleLoadTypes } from "./types/handleLoadTypes";
 import { generateKeys } from "../../global/utils/generateKeys";
@@ -23,12 +23,16 @@ export default function ImageOrder({ ...props }) {
   const [order, setOrder] = useState(orderedImageset);
   const [staticKeys, setStaticKeys] = useState(generateKeys);
 
+  useEffect(() => {
+    setOrder(orderedImageset);
+  }, [orderedImageset]);
+
   return (
     <div className="flex items-start">
       <div className="text-white p-3 min-w-[40vw] flex flex-col items-center justify-center">
         <div className="flex flex-col items-center">
           <div className="flex flex-wrap justify-center max-w-[60dvw] gap-5 px-5 overflow-scroll h-[1200px] relative">
-            {order.map((file: Blob | string, index: number) => {
+            {order.map((file: Blob | object, index: number) => {
               return (
                 <OrderItem
                   key={staticKeys[index]}

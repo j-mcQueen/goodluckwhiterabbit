@@ -18,6 +18,15 @@ export const handleFirstLoad = async ({ ...params }) => {
   } = params;
 
   setTargetImageset(newTargetImageset);
+
+  if (
+    orderedImagesets[newTargetImageset].some(
+      (item: Blob | object) => item instanceof Blob
+    )
+  ) {
+    return;
+  }
+
   setStarted(true);
   setSpinner(true);
 
