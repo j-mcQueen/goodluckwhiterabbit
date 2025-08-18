@@ -8,7 +8,7 @@ import AdminDashboard from "./components/admin/dashboard/Dashboard";
 import UserLogin from "./components/user/login/UserLogin";
 import UserDashboard from "./components/user/dashboard/UserDashboard";
 import Error from "./components/global/Error";
-import Portfolio from "./components/portfolio/Portfolio";
+// import Portfolio from "./components/portfolio/Portfolio";
 
 import SAILOR from "./assets/media/sounds/CLOUD.DOMAIN.SLF..wav";
 
@@ -21,12 +21,12 @@ export default function App() {
     }
   }, []);
 
-  const portfolioPaths = ["/photo", "/art", "/design"];
-  const portfolioRoutes = portfolioPaths.map((path) => ({
-    path,
-    element: <Portfolio route={path} index={portfolioPaths.indexOf(path)} />,
-    errorElement: <Error />,
-  }));
+  // const portfolioPaths = ["/photo", "/art", "/design"];
+  // const portfolioRoutes = portfolioPaths.map((path) => ({
+  //   path,
+  //   element: <Portfolio route={path} index={portfolioPaths.indexOf(path)} />,
+  //   errorElement: <Error />,
+  // }));
 
   const router = createBrowserRouter([
     { path: "/", element: <Welcome />, errorElement: <Error /> },
@@ -42,7 +42,7 @@ export default function App() {
       element: <UserDashboard />,
       errorElement: "",
     },
-    ...portfolioRoutes,
+    // ...portfolioRoutes,
   ]);
 
   return (

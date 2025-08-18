@@ -1,42 +1,53 @@
-import { Link } from "react-router-dom";
+import { useState } from "react";
 import { motion } from "framer-motion";
+import { playSound } from "../global/utils/sound";
+
 import rabbit from "../../assets/media/gifs/glwr-lenticular.gif";
-import SAILOR from "../../assets/media/sounds/CLOUD.DOMAIN.SLF..wav";
+// import Fork from "./Fork";
+import Art from "../portfolio/art/Art";
 
 export default function Welcome() {
+  const [entered, setEntered] = useState(false);
+
   return (
     <main className="w-[calc(100dvw-1.5rem)] h-[calc(100dvh-1.5rem)] flex items-center justify-center">
-      <section className="flex flex-col items-center justify-center h-dvh">
-        <img
-          className="max-w-[200px]"
-          src={rabbit}
-          alt="A white rabbit against a black background shimmering from left to right"
-        />
+      {entered ? (
+        <Art />
+      ) : (
+        <section className="flex flex-col items-center justify-center h-dvh">
+          <img
+            className="max-w-[200px]"
+            src={rabbit}
+            alt="A white rabbit against a black background shimmering from left to right"
+          />
 
-        <div>
-          <h1 className="font-tnrBI whitespace-nowrap overflow-hidden animate-typing text-white pt-4 pb-6 xl:py-10 text-xl xl:text-4xl tracking-widest opacity-80 drop-shadow-glo">
-            WELCOME TO MY WORLD
-          </h1>
-        </div>
+          <div>
+            <h1 className="font-tnrBI whitespace-nowrap overflow-hidden animate-typing text-white pt-4 pb-6 xl:py-10 text-xl xl:text-4xl tracking-widest opacity-80 drop-shadow-glo">
+              WELCOME TO MY WORLD
+            </h1>
+          </div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 25 }}
-          animate={{
-            opacity: 1,
-            y: 0,
-            transition: { duration: 0.5, delay: 2.1 },
-          }}
-          className="mt-9"
-        >
-          <Link
-            to={"/art"}
-            onClick={() => new Audio(SAILOR).play()}
-            className="font-vt border border-solid border-white xl:hover:border-red xl:hover:text-rd xl:focus:text-rd xl:hover:drop-shadow-red focus:drop-shadow-red text-xl focus:outline-none xl:focus:border-rd text-white drop-shadow-glo opacity-80 py-1 px-2 xl:hover:bg-red-600 xl:transition-colors"
+          <motion.div
+            initial={{ opacity: 0, y: 25 }}
+            animate={{
+              opacity: 1,
+              y: 0,
+              transition: { duration: 0.5, delay: 2.1 },
+            }}
+            className="mt-9"
           >
-            ENTER
-          </Link>
-        </motion.div>
-      </section>
+            <button
+              onClick={() => {
+                playSound();
+                setEntered(true);
+              }}
+              className="font-vt border border-solid border-white xl:hover:border-red xl:hover:text-rd xl:focus:text-rd xl:hover:drop-shadow-red focus:drop-shadow-red text-xl focus:outline-none xl:focus:border-rd text-white drop-shadow-glo opacity-80 py-1 px-2 xl:hover:bg-red-600 xl:transition-colors"
+            >
+              ENTER
+            </button>
+          </motion.div>
+        </section>
+      )}
     </main>
   );
 }
