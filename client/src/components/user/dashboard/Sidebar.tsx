@@ -19,8 +19,12 @@ export default function Sidebar({ ...props }) {
         {user.name.toUpperCase()}
       </h1>
 
+      <div className="text-white text-center text-2xl pb-2">
+        <p>{user.category}</p>
+      </div>
+
       <div className="text-center flex xl:block items-center justify-between px-5 xl:px-0 py-5 xl:py-0 border-b xl:border-none border-solid border-white">
-        <p className="text-white text-center xl:pb-2">
+        <p className="text-center xl:pb-2 text-rd">
           LOADED:{" "}
           {
             images[activeImageset as keyof typeof images].filter(

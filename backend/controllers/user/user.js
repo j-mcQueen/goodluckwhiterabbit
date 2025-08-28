@@ -168,6 +168,7 @@ exports.getUser = async (req, res, next) => {
           name: user.name,
           fileCounts: user.fileCounts,
           links: user.links,
+          category: user.category,
         });
     } catch (error) {
       return res.status(500).json({
