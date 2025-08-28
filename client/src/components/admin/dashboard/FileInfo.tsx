@@ -5,10 +5,10 @@ const FileInfo = ({ ...props }) => {
   const { spinner, renderCount, targetClient, targetImageset } = props;
 
   const headingText: file_info_heading = {
-    snapshots: "PREVIEWS",
-    keepsake: "GALLERY",
-    core: "SOCIAL",
-    snips: "SNIPS",
+    snapshots: "SNAPSHOTS",
+    keepsake: "KEEPSAKE",
+    core: "CORE",
+    snips: "SOCIAL",
   };
 
   return (

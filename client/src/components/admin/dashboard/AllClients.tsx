@@ -18,18 +18,18 @@ export default function AllClients({ ...props }) {
   } = props;
 
   const FileCount = ({ ...props }) => {
-    const { count, index, len } = props;
+    const { name, count, index, len } = props;
 
     const nameMap = {
-      0: `SNAP: `,
-      1: `KEEP: `,
-      2: `CORE: `,
-      3: `SNIP: `,
+      snapshots: `SNAP: `,
+      keepsake: `KEEP: `,
+      core: `CORE: `,
+      snips: `SNIP: `,
     };
 
     return (
       <span className={`${index < len - 1 ? "pr-3" : null}`}>
-        {nameMap[index as keyof typeof nameMap]}{" "}
+        {nameMap[name as keyof typeof nameMap]}{" "}
         <span className={`${count > 0 ? "text-rd" : "text-white"}`}>
           {count}
         </span>
@@ -85,6 +85,7 @@ export default function AllClients({ ...props }) {
                   return (
                     <FileCount
                       key={item[0]}
+                      name={item[0]}
                       count={item[1]}
                       index={index}
                       len={entries.length}
