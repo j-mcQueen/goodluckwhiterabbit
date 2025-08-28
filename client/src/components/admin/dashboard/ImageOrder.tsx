@@ -31,7 +31,7 @@ export default function ImageOrder({ ...props }) {
     <div className="flex items-start">
       <div className="text-white p-3 min-w-[40vw] flex flex-col items-center justify-center">
         <div className="flex flex-col items-center">
-          <div className="flex flex-wrap justify-center max-w-[60dvw] gap-5 px-5 overflow-scroll h-[1200px] relative">
+          <div className="flex flex-wrap justify-center max-w-[60dvw] gap-5 px-5 overflow-scroll h-[700px] relative">
             {order.map((file: Blob | object, index: number) => {
               return (
                 <OrderItem

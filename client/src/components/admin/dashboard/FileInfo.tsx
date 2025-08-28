@@ -8,7 +8,7 @@ const FileInfo = ({ ...props }) => {
     snapshots: "SNAPSHOTS",
     keepsake: "KEEPSAKE",
     core: "CORE",
-    snips: "SOCIAL",
+    snips: "SNIPS",
   };
 
   return (

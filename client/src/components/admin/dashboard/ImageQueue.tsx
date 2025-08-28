@@ -37,7 +37,7 @@ export default function ImageQueue({ ...props }) {
           </label>
         </div>
 
-        <div className="grid grid-cols-3 gap-5 overflow-scroll h-[1200px] p-3">
+        <div className="grid grid-cols-3 gap-5 overflow-scroll h-full max-h-[800px] p-3">
           {queue.map((file: File, index: number) => {
             return (
               <div key={file.name}>
