@@ -1,14 +1,33 @@
-import { useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
+import { determineHost as host } from "../../utils/determineHost";
 
 import rabbit from "../../../../assets/media/gifs/glwr-lenticular.gif";
 import Instagram from "../../../../assets/media/icons/Instagram";
 import Next from "../../../../assets/media/icons/Next";
 import Eject from "../../../../assets/media/icons/Eject";
 
-export default function MobileHeader({ ...props }) {
-  const { logout, data, activeTab, setActiveTab, host, counts } = props;
+export default function MobileHeader({
+  ...props
+}: {
+  logout: boolean;
+  data: string[];
+  activeTab: number;
+  setActiveTab: Dispatch<SetStateAction<number>>;
+  counts: boolean | number[];
+  handleSelect?: ([key]: string) => void;
+  images?: { [key: string]: Blob[] };
+}) {
+  const {
+    logout,
+    data,
+    activeTab,
+    setActiveTab,
+    counts,
+    handleSelect,
+    images,
+  } = props;
   const navigate = useNavigate();
 
   const listItemVariants = {
@@ -90,25 +109,47 @@ export default function MobileHeader({ ...props }) {
               {data.map((tab: string, index: number) => {
                 return (
                   <li
-                    className={`${activeTab === index ? listItemVariants.active : listItemVariants.std} ${index === data.length - 1 ? "border-b" : ""} border-solid border-white flex relative h-full bg-black`}
+                    className={`${activeTab === index ? listItemVariants.active : listItemVariants.std} border-b border-solid border-white flex relative h-full bg-black`}
                     key={tab}
                   >
                     <button
                       type="button"
-                      disabled={counts && counts[index] === 0}
+                      disabled={
+                        counts && counts[index as keyof typeof counts] === 0
+                      }
                       className={
-                        counts && counts[index] === 0
+                        counts && counts[index as keyof typeof counts] === 0
                           ? buttonVariants.disabled
                           : buttonVariants.regular
                       }
                       onClick={() => {
                         setActiveTab(index);
                         setActive(false);
+
+                        if (logout === true) {
+                          const map = {
+                            SNIPS: "snips",
+                            "KEEPSAKE PREVIEW": "keepsake",
+                            "CORE COLLECTION": "core",
+                            SNAPSHOTS: "snapshots",
+                          };
+
+                          if (
+                            images &&
+                            images[
+                              map[
+                                tab as keyof typeof map
+                              ] as keyof typeof images
+                            ].length === 0
+                          ) {
+                            handleSelect?.(map[tab as keyof typeof map]);
+                          }
+                        }
                       }}
                     >
                       {tab}
 
-                      {counts && counts[index] === 0 ? (
+                      {counts && counts[index as keyof typeof counts] === 0 ? (
                         <span className="absolute -translate-y-1">
                           <span className="font-vt text-sm tracking-widest flex items-center gap-1">
                             <Next className="w-4 h-4" />{" "}

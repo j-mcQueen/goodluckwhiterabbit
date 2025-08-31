@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { determineHost as host } from "../../global/utils/determineHost";
 import { executeGenerationChain } from "../../global/utils/executeGenerationChain";
 import { determineTabs } from "./utils/determineTabs";
+import { updateActiveTab } from "./utils/updateActiveTab";
 import { motion } from "framer-motion";
 
 import SelectGallery from "./SelectGallery";
@@ -34,6 +35,7 @@ export default function UserDashboard() {
     snapshots: [],
     keepsake: [],
     core: [],
+    snips: [],
   });
 
   useEffect(() => {
@@ -41,24 +43,9 @@ export default function UserDashboard() {
   }, []);
 
   useEffect(() => {
-    switch (activeTab) {
-      case 0:
-        setActiveImageset("snapshots");
-        break;
-
-      case 1:
-        setActiveImageset("keepsake");
-        break;
-
-      case 2:
-        setActiveImageset("core");
-        break;
-
-      case 3:
-        setActiveImageset("snips");
-        break;
-    }
-  }, [activeTab]);
+    const keys = Object.keys(user.fileCounts);
+    setActiveImageset(keys[activeTab]);
+  }, [activeTab, user]);
 
   useEffect(() => {
     const getUser = async () => {
@@ -109,28 +96,8 @@ export default function UserDashboard() {
     getUser();
   }, []);
 
-  const updateActiveTab = (targetImageset: string) => {
-    switch (targetImageset) {
-      case "snapshots":
-        setActiveTab(0);
-        break;
-
-      case "keepsake":
-        setActiveTab(1);
-        break;
-
-      case "core":
-        setActiveTab(2);
-        break;
-
-      case "snips":
-        setActiveTab(3);
-        break;
-    }
-  };
-
   const handleSelect = async (targetImageset: string) => {
-    updateActiveTab(targetImageset);
+    updateActiveTab({ targetImageset, setActiveTab, user });
     setInitialized(true);
     setActiveImageset(targetImageset);
     setSpinner(true);
@@ -167,7 +134,8 @@ export default function UserDashboard() {
           counts={Object.values(user.fileCounts)}
           activeTab={activeTab}
           setActiveTab={setActiveTab}
-          dashboard={Object.values(user.fileCounts)}
+          handleSelect={handleSelect}
+          images={images}
         />
       ) : (
         <Header
@@ -175,6 +143,8 @@ export default function UserDashboard() {
           data={determineTabs(Object.keys(user.fileCounts))}
           activeTab={activeTab}
           setActiveTab={setActiveTab}
+          handleSelect={handleSelect}
+          images={images}
           dashboard={Object.values(user.fileCounts)}
         />
       )}

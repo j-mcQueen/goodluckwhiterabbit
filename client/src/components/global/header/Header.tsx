@@ -1,13 +1,32 @@
 import { useNavigate } from "react-router-dom";
 import { determineHost as host } from "../utils/determineHost";
+import { Dispatch, SetStateAction } from "react";
 
 import rabbit from "../../../assets/media/gifs/glwr-lenticular.gif";
 import Instagram from "../../../assets/media/icons/Instagram";
 import Eject from "../../../assets/media/icons/Eject";
 import Next from "../../../assets/media/icons/Next";
 
-export default function Header({ ...props }) {
-  const { logout, data, activeTab, setActiveTab, dashboard } = props;
+export default function Header({
+  ...props
+}: {
+  activeTab: number;
+  dashboard: boolean | string[];
+  data: string[];
+  logout: boolean;
+  handleSelect?: ([key]: string) => void;
+  setActiveTab: Dispatch<SetStateAction<number>>;
+  images?: { [key: string]: Blob[] };
+}) {
+  const {
+    logout,
+    data,
+    activeTab,
+    setActiveTab,
+    dashboard,
+    handleSelect,
+    images,
+  } = props;
   const navigate = useNavigate();
 
   const listItemVariants = {
@@ -47,22 +66,48 @@ export default function Header({ ...props }) {
           {data.map((tab: string, index: number) => {
             return (
               <li
-                className={`${activeTab === index ? listItemVariants.active : listItemVariants.std} ${dashboard && dashboard[index] === 0 && index !== data.length - 1 ? "border-r-white inline" : ""} border-r border-b border-solid border-white w-full flex items-center justify-center relative`}
+                className={`${activeTab === index ? listItemVariants.active : listItemVariants.std} ${dashboard && dashboard[index as keyof typeof dashboard] === 0 && index !== data.length - 1 ? "border-r-white inline" : ""} border-r border-b border-solid border-white w-full flex items-center justify-center relative`}
                 key={tab}
               >
                 <button
-                  disabled={dashboard && dashboard[index] === 0 ? true : false}
+                  disabled={
+                    dashboard &&
+                    dashboard[index as keyof typeof dashboard] === 0
+                      ? true
+                      : false
+                  }
                   type="button"
                   className={
-                    dashboard && dashboard[index] === 0
+                    dashboard &&
+                    dashboard[index as keyof typeof dashboard] === 0
                       ? buttonVariants.disabled
                       : buttonVariants.regular
                   }
-                  onClick={() => setActiveTab(index)}
+                  onClick={() => {
+                    setActiveTab(index);
+                    if (logout === true) {
+                      const map = {
+                        SNIPS: "snips",
+                        "KEEPSAKE PREVIEW": "keepsake",
+                        "CORE COLLECTION": "core",
+                        SNAPSHOTS: "snapshots",
+                      };
+
+                      if (
+                        images &&
+                        images[
+                          map[tab as keyof typeof map] as keyof typeof images
+                        ].length === 0
+                      ) {
+                        handleSelect?.(map[tab as keyof typeof map]);
+                      }
+                    }
+                  }}
                 >
                   {tab}
 
-                  {dashboard && dashboard[index] === 0 ? (
+                  {dashboard &&
+                  dashboard[index as keyof typeof dashboard] === 0 ? (
                     <span className="absolute -translate-y-1">
                       <span className="font-vt text-sm tracking-normal flex items-center gap-1">
                         <Next className="w-4 h-4" /> <span>COMING SOON</span>
