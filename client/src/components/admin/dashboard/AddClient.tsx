@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { handleAdd } from "./utils/handlers/adding/handleAdd";
+import { handleAddTypes } from "./types/handleAddTypes";
 
 import PaneHeader from "./PaneHeader";
 import Loading from "../../global/Loading";
-import { handleAddTypes } from "./types/handleAddTypes";
 
 export default function AddClient({ ...props }) {
   const { clients, setClients, setActivePane } = props;

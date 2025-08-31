@@ -116,7 +116,7 @@ exports.adminAddClient = [
         category: req.body.clientcategory,
         role: "user",
         fileCounts: {
-          snapshots: 0,
+          ...(req.body.clientsets.snapshots && { snapshots: 0 }),
           ...(req.body.clientsets.keepsake && { keepsake: 0 }),
           ...(req.body.clientsets.core && { core: 0 }),
           ...(req.body.clientsets.snips && { snips: 0 }),
