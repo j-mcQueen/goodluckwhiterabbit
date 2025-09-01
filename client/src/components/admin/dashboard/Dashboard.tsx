@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { determineHost as host } from "../../global/utils/determineHost";
+import { mobile } from "../../global/utils/determineViewport";
 
 import AllClients from "./AllClients";
 import Header from "./Header";
@@ -120,9 +121,10 @@ export default function AdminDashboard() {
       <section className="flex justify-center items-center text-white">
         <>
           {activePane === "ALL" ? (
-            <div className="text-white border border-solid border-white w-[60dvw]">
+            <div className="text-white border border-solid border-white w-[85dvw] xl:w-[60dvw]">
               <Actions
                 clients={clients}
+                mobile={mobile}
                 setClients={setClients}
                 setClientFilterResult={setClientFilterResult}
                 setActivePane={setActivePane}
@@ -132,6 +134,7 @@ export default function AdminDashboard() {
                 clients={
                   clientFilterResult.length > 0 ? clientFilterResult : clients
                 }
+                mobile={mobile}
                 notice={notice}
                 setNotice={setNotice}
                 setActivePane={setActivePane}

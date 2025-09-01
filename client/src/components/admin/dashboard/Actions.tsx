@@ -6,7 +6,7 @@ import Search from "../../../assets/media/icons/Search";
 import clicky from "../../../assets/media/sounds/CLICKY_.wav";
 
 export default function Actions({ ...props }) {
-  const { clients, setClients, setActivePane } = props;
+  const { clients, setClients, setActivePane, mobile } = props;
   const sortTabs = [
     { name: "DATE", pattern: "date" },
     { name: "A-Z", pattern: "alphabetical" },
@@ -50,7 +50,7 @@ export default function Actions({ ...props }) {
     return (
       <button
         type="button"
-        className={`${sortStyle === index ? "bg-white text-black" : "bg-black text-white"} py-1 px-2 border border-solid border-white xl:hover:bg-white xl:hover:text-black focus:text-rd focus:outline-none transition-colors`}
+        className={`${sortStyle === index ? "bg-white text-black" : "bg-black text-white"} xl:py-1 xl:px-2 py-2 px-3 border border-solid border-white xl:hover:bg-white xl:hover:text-black focus:text-rd focus:outline-none transition-colors w-full xl:w-auto`}
         onClick={() => handleClick(index, pattern)}
       >
         {text}
@@ -68,10 +68,10 @@ export default function Actions({ ...props }) {
   };
 
   return (
-    <div className="flex items-start gap-3 p-3">
-      <div className="flex flex-grow">
+    <div className="flex flex-col items-start gap-3 p-3">
+      <div className="flex flex-grow gap-3 w-full">
         <div className="w-full">
-          <label className="flex pb-2">
+          <label className="flex">
             <span className="h-[1px] w-[1px] m-[-1px] absolute overflow-hidden">
               SEARCH CLIENTS
             </span>
@@ -93,40 +93,42 @@ export default function Actions({ ...props }) {
               className="bg-black border border-solid border-white xl:hover:border-rd focus:border-rd focus:outline-none transition-colors text-white p-[10px] max-h-[40px] flex-grow placeholder:text-white text-lg"
             />
           </label>
-
-          <div className="flex gap-2">
-            {sortTabs.map((item, index) => {
-              return (
-                <SortTab
-                  key={item.name}
-                  index={index}
-                  text={item.name}
-                  pattern={item.pattern}
-                />
-              );
-            })}
-          </div>
         </div>
+
+        <button
+          type="button"
+          onClick={() => handleSearch()}
+          className="w-10 h-10 border border-solid flex justify-center p-[10px] focus:border-rd xl:hover:border-rd xl:transition-colors xl:focus:outline-none group"
+        >
+          <Search className={icons} />
+        </button>
+
+        {!mobile ? (
+          <button
+            onClick={() => {
+              setActivePane("ADD");
+              new Audio(clicky).play();
+            }}
+            type="button"
+            className="w-10 h-10 border border-solid flex justify-center items-center focus:border-rd xl:transition-all xl:hover:border-rd xl:focus:outline-none group"
+          >
+            <Add className={icons} />
+          </button>
+        ) : null}
       </div>
 
-      <button
-        type="button"
-        onClick={() => handleSearch()}
-        className="w-10 h-10 border border-solid flex justify-center p-[10px] focus:border-rd xl:hover:border-rd xl:transition-colors xl:focus:outline-none group"
-      >
-        <Search className={icons} />
-      </button>
-
-      <button
-        onClick={() => {
-          setActivePane("ADD");
-          new Audio(clicky).play();
-        }}
-        type="button"
-        className="w-10 h-10 border border-solid flex justify-center items-center focus:border-rd xl:transition-all xl:hover:border-rd xl:focus:outline-none group"
-      >
-        <Add className={icons} />
-      </button>
+      <div className="flex gap-3 xl:gap-2 w-full">
+        {sortTabs.map((item, index) => {
+          return (
+            <SortTab
+              key={item.name}
+              index={index}
+              text={item.name}
+              pattern={item.pattern}
+            />
+          );
+        })}
+      </div>
     </div>
   );
 }
