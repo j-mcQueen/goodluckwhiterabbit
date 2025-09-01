@@ -15,7 +15,7 @@ export default function EditClient({ ...props }) {
     snapshots: "SNAPSHOTS",
     keepsake: "KEEPSAKE PREVIEW",
     core: "CORE COLLECTION",
-    snips: "SNIPS",
+    snips: "SOCIALS",
   };
 
   const [targetImageset, setTargetImageset] = useState("");

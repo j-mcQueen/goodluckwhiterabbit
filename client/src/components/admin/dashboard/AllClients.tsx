@@ -28,7 +28,7 @@ export default function AllClients({ ...props }) {
       snapshots: `SNAP: `,
       keepsake: `KEEP: `,
       core: `CORE: `,
-      snips: `SNIP: `,
+      snips: `SOCIAL: `,
     };
 
     return (

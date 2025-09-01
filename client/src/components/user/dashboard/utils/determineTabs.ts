@@ -3,7 +3,7 @@ export const determineTabs = (data: string[]) => {
     snapshots: "SNAPSHOTS",
     keepsake: "KEEPSAKE PREVIEW",
     core: "CORE COLLECTION",
-    snips: "SNIPS",
+    snips: "SOCIALS",
   };
 
   return data.map((item: string) => nameMap[item as keyof typeof nameMap]);
