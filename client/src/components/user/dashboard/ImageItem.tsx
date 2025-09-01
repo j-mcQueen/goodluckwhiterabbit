@@ -41,7 +41,7 @@ export default function ImageItem({ ...props }) {
                     ? variants.scrollerH
                     : variants.scrollerV
                   : mobile
-                    ? "max-h-[50dvh]"
+                    ? "max-h-[70dvh]"
                     : "max-h-[30dvh]"
             }
           />
