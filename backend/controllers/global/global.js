@@ -172,7 +172,8 @@ exports.countImagesetItems = async (req, res, next) => {
         else if (s3Objects.Contents[i].Key.includes("keepsake"))
           totals["keepsake"];
         else if (s3Objects.Contents[i].Key.includes("core")) totals["core"];
-        else if (s3Objects.Contents[i].Key.includes("snips")) totals["snips"];
+        else if (s3Objects.Contents[i].Key.includes("socials"))
+          totals["socials"];
       }
     }
     return res.status(200).json(totals);

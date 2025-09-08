@@ -87,7 +87,7 @@ export default function Header({
                     setActiveTab(index);
                     if (logout === true) {
                       const map = {
-                        SNIPS: "snips",
+                        SOCIALS: "socials",
                         "KEEPSAKE PREVIEW": "keepsake",
                         "CORE COLLECTION": "core",
                         SNAPSHOTS: "snapshots",

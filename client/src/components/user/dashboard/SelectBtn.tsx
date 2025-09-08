@@ -5,7 +5,7 @@ export default function SelectBtn({ ...props }) {
     snapshots: "SNAPSHOTS",
     keepsake: "KEEPSAKE PREVIEW",
     core: "CORE COLLECTION",
-    snips: "SOCIALS",
+    socials: "SOCIALS",
   };
 
   return (

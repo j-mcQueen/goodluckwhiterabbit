@@ -12,7 +12,6 @@ const SelectGallery = ({ ...props }) => {
   };
 
   const fileCountEntries = Object.entries(user.fileCounts);
-
   return (
     <AnimatePresence>
       {!initialized && (

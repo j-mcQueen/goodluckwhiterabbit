@@ -35,7 +35,7 @@ export default function UserDashboard() {
     snapshots: [],
     keepsake: [],
     core: [],
-    snips: [],
+    socials: [],
   });
 
   useEffect(() => {
