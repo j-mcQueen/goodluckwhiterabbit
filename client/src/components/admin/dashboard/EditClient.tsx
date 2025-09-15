@@ -15,7 +15,7 @@ export default function EditClient({ ...props }) {
     snapshots: "SNAPSHOTS",
     keepsake: "KEEPSAKE PREVIEW",
     core: "CORE COLLECTION",
-    snips: "SOCIALS",
+    socials: "SOCIALS",
   };
 
   const [targetImageset, setTargetImageset] = useState("");
@@ -27,7 +27,7 @@ export default function EditClient({ ...props }) {
     snapshots: Array(10).fill({}),
     keepsake: Array(10).fill({}),
     core: Array(10).fill({}),
-    snips: Array(10).fill({}),
+    socials: Array(10).fill({}),
   });
 
   const [queuedImages, setQueuedImages] = useState(() => {

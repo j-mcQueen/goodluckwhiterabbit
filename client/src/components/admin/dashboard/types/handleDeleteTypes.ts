@@ -22,7 +22,7 @@ export interface handleDeleteTypes {
       snapshots: number;
       keepsake: number;
       core: number;
-      snips: number;
+      socials: number;
     };
   };
   targetImageset: string;

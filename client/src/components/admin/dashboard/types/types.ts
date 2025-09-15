@@ -8,7 +8,7 @@ export interface dashboard_client {
     snapshots: number;
     keepsake: number;
     core: number;
-    snips: number;
+    socials: number;
   };
   _id: string;
 }
@@ -17,5 +17,5 @@ export interface file_info_heading {
   snapshots: string;
   keepsake: string;
   core: string;
-  snips: string;
+  socials: string;
 }

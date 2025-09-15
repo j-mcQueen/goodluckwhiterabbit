@@ -7,7 +7,7 @@ export interface handleFirstLoadTypes {
     snapshots: (Blob | object)[];
     keepsake: (Blob | object)[];
     core: (Blob | object)[];
-    snips: (Blob | object)[];
+    socials: (Blob | object)[];
   };
   setClients: Dispatch<SetStateAction<{ _id: string }[]>>;
   setNotice: Dispatch<
@@ -22,7 +22,7 @@ export interface handleFirstLoadTypes {
       snapshots: (Blob | object)[];
       keepsake: (Blob | object)[];
       core: (Blob | object)[];
-      snips: (Blob | object)[];
+      socials: (Blob | object)[];
     }>
   >;
   setSpinner: Dispatch<SetStateAction<boolean>>;

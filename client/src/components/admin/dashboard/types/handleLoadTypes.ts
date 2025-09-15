@@ -17,7 +17,7 @@ export interface handleLoadTypes {
         snapshots: number;
         keepsake: number;
         core: number;
-        snips: number;
+        socials: number;
       };
     }>
   >;
@@ -27,7 +27,7 @@ export interface handleLoadTypes {
       snapshots: number;
       keepsake: number;
       core: number;
-      snips: number;
+      socials: number;
     };
   };
   targetImageset: string;
