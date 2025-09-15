@@ -60,7 +60,7 @@ export default function UserLogin() {
             MEMORIES AWAIT
           </h1>
 
-          <p className="text-lg">ENTER LOGIN CODE TO ACCESS PORTAL</p>
+          <p className="text-lg">ENTER PASSKEY TO ACCESS PORTAL</p>
         </hgroup>
 
         <form
