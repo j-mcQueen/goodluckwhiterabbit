@@ -19,7 +19,7 @@ export default function AddClient({ ...props }) {
       snaps: false,
       keepsake: false,
       core: false,
-      snips: false,
+      socials: false,
     },
   });
 
@@ -200,10 +200,10 @@ export default function AddClient({ ...props }) {
             </label>
 
             <label className="flex xl:hover:cursor-pointer relative">
-              SNIPS
+              SOCIALS
               <input
                 type="checkbox"
-                name="snips"
+                name="socials"
                 className="invisible peer"
                 onChange={() => {
                   if (errors.formValidation.state === true)
@@ -220,7 +220,7 @@ export default function AddClient({ ...props }) {
                     ...inputValues,
                     clientsets: {
                       ...inputValues.clientsets,
-                      snips: !inputValues.clientsets.snips,
+                      socials: !inputValues.clientsets.socials,
                     },
                   });
                 }}

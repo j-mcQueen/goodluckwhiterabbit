@@ -10,7 +10,7 @@ const UserSchema = new Schema({
     snapshots: Number,
     keepsake: Number,
     core: Number,
-    snips: Number,
+    socials: Number,
   },
   role: String,
   added: String,

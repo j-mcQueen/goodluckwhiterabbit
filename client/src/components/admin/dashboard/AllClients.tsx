@@ -2,11 +2,12 @@ import { dashboard_btns, icons } from "./styles/styles";
 import { dashboard_client } from "./types/types";
 import { handleActionClick } from "./utils/handlers/dashboard/handleActionClick";
 import { handleCopy } from "./utils/handlers/dashboard/handleCopy";
+import { useNavigate } from "react-router-dom";
+import { generateKeys } from "../../global/utils/generateKeys";
 
 import Edit from "../../../assets/media/icons/Edit";
 import Close from "../../../assets/media/icons/Close";
 import Mail from "../../../assets/media/icons/Mail";
-import { useNavigate } from "react-router-dom";
 
 export default function AllClients({ ...props }) {
   const {
@@ -20,6 +21,7 @@ export default function AllClients({ ...props }) {
   } = props;
 
   const navigate = useNavigate();
+  const keys = generateKeys();
 
   const FileCount = ({ ...props }) => {
     const { name, count, index, len } = props;
@@ -28,7 +30,7 @@ export default function AllClients({ ...props }) {
       snapshots: `SNAP: `,
       keepsake: `KEEP: `,
       core: `CORE: `,
-      snips: `SOCIAL: `,
+      socials: `SOCIAL: `,
     };
 
     return (
@@ -69,6 +71,7 @@ export default function AllClients({ ...props }) {
 
   const TableRow = ({ ...props }) => {
     const { client, entries, index } = props;
+    const keys = generateKeys();
 
     return mobile ? (
       <tr
@@ -123,7 +126,7 @@ export default function AllClients({ ...props }) {
           {entries.map((item: (string | number)[], index: number) => {
             return (
               <FileCount
-                key={item[0]}
+                key={keys[index]}
                 name={item[0]}
                 count={item[1]}
                 index={index}
@@ -179,12 +182,11 @@ export default function AllClients({ ...props }) {
 
       <tbody>
         {clients.map((client: dashboard_client, index: number) => {
-          const entries = Object.entries(client.fileCounts);
           return (
             <TableRow
-              key={client.name}
+              key={keys[index]}
               client={client}
-              entries={entries}
+              entries={Object.entries(client.fileCounts)}
               index={index}
             />
           );
