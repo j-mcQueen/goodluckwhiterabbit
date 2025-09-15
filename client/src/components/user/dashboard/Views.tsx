@@ -9,7 +9,9 @@ export default function Views({ ...props }) {
   const {
     user,
     images,
+    activeIndex,
     activeImageset,
+    setActiveIndex,
     setImages,
     setNotice,
     setSpinner,
@@ -36,12 +38,14 @@ export default function Views({ ...props }) {
       {!mobile ? (
         <Carousel
           activeImageset={activeImageset}
+          activeIndex={activeIndex}
           images={images}
           loaded={
             images[activeImageset as keyof typeof setImages].filter(
               (img: Blob) => img instanceof Blob === true
             ).length
           }
+          setActiveIndex={setActiveIndex}
           setImages={setImages}
           setNotice={setNotice}
           setSpinner={setSpinner}

@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { loadBatch } from "../utils/loadBatch";
 
 import Image from "../Image";
@@ -7,15 +6,15 @@ import Shift from "../../../../assets/media/icons/Shift";
 export default function Carousel({ ...props }) {
   const {
     activeImageset,
+    activeIndex,
     images,
     loaded,
+    setActiveIndex,
     setImages,
     setNotice,
     setSpinner,
     user,
   } = props;
-
-  const [activeIndex, setActiveIndex] = useState(0);
 
   return (
     <section className="w-full xl:h-[calc(100dvh-57px-1.5rem)] overflow-y-scroll pt-2">

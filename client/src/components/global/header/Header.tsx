@@ -15,12 +15,14 @@ export default function Header({
   data: string[];
   logout: boolean;
   handleSelect?: ([key]: string) => void;
+  setActiveIndex: Dispatch<SetStateAction<number>>;
   setActiveTab: Dispatch<SetStateAction<number>>;
   images?: { [key: string]: Blob[] };
 }) {
   const {
     logout,
     data,
+    setActiveIndex,
     activeTab,
     setActiveTab,
     dashboard,
@@ -101,6 +103,8 @@ export default function Header({
                       ) {
                         handleSelect?.(map[tab as keyof typeof map]);
                       }
+
+                      if (setActiveIndex) setActiveIndex(0);
                     }
                   }}
                 >

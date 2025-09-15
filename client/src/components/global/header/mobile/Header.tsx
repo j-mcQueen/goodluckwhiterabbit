@@ -14,6 +14,7 @@ export default function MobileHeader({
   logout: boolean;
   data: string[];
   activeTab: number;
+  setActiveIndex: Dispatch<SetStateAction<number>>;
   setActiveTab: Dispatch<SetStateAction<number>>;
   counts: boolean | number[];
   handleSelect?: ([key]: string) => void;
@@ -23,6 +24,7 @@ export default function MobileHeader({
     logout,
     data,
     activeTab,
+    setActiveIndex,
     setActiveTab,
     counts,
     handleSelect,
@@ -144,6 +146,8 @@ export default function MobileHeader({
                           ) {
                             handleSelect?.(map[tab as keyof typeof map]);
                           }
+
+                          if (setActiveIndex) setActiveIndex(0);
                         }
                       }}
                     >

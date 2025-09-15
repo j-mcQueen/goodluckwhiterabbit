@@ -18,6 +18,7 @@ export default function UserDashboard() {
     fileCounts: {},
   });
   const [activeTab, setActiveTab] = useState(0);
+  const [activeIndex, setActiveIndex] = useState(0);
   const [activeImageset, setActiveImageset] = useState("");
   const [spinner, setSpinner] = useState(false);
   const [notice, setNotice] = useState<{
@@ -98,6 +99,7 @@ export default function UserDashboard() {
 
   const handleSelect = async (targetImageset: string) => {
     updateActiveTab({ targetImageset, setActiveTab, user });
+    setActiveIndex(0);
     setInitialized(true);
     setActiveImageset(targetImageset);
     setSpinner(true);
@@ -133,6 +135,7 @@ export default function UserDashboard() {
           data={determineTabs(Object.keys(user.fileCounts))}
           counts={Object.values(user.fileCounts)}
           activeTab={activeTab}
+          setActiveIndex={setActiveIndex}
           setActiveTab={setActiveTab}
           handleSelect={handleSelect}
           images={images}
@@ -142,6 +145,7 @@ export default function UserDashboard() {
           logout={true}
           data={determineTabs(Object.keys(user.fileCounts))}
           activeTab={activeTab}
+          setActiveIndex={setActiveIndex}
           setActiveTab={setActiveTab}
           handleSelect={handleSelect}
           images={images}
@@ -156,7 +160,9 @@ export default function UserDashboard() {
       <main>
         <Views
           activeImageset={activeImageset}
+          activeIndex={activeIndex}
           images={images}
+          setActiveIndex={setActiveIndex}
           setImages={setImages}
           setNotice={setNotice}
           setSpinner={setSpinner}
