@@ -18,7 +18,6 @@ export const handleDelete = async ({ ...params }) => {
     const data = await response.json();
 
     if (data && (response.status === 200 || response.status === 304)) {
-      console.log(params.targetClient.fileCounts[params.targetImageset] - 1);
       const args: {
         clients: { _id: string }[];
         targetClient: { _id: string; fileCounts: number };

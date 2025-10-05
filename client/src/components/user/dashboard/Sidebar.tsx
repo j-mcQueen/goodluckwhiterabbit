@@ -14,43 +14,41 @@ export default function Sidebar({ ...props }) {
   } = props;
 
   return (
-    <aside className="flex flex-col xl:gap-5 xl:min-w-[245px] xl:max-w-[245px] xl:max-h-[calc(100dvh-57px-1.5rem)] xl:border-r border-solid border-white">
-      <h1 className="text-white text-center text-2xl pt-5">
+    <aside className="grid items-center xl:flex xl:flex-col gap-2 xl:gap-5 xl:min-w-[245px] xl:max-w-[245px] xl:max-h-[calc(100dvh-57px-1.5rem)] xl:border-r border-solid border-white border-b-[1px] py-3">
+      <h1 className="text-white text-left xl:text-center text-3xl max-xl:col-start-1 max-xl:col-end-1 max-xl:pl-3">
         {user.name.toUpperCase()}
       </h1>
 
-      <div className="text-white text-center text-2xl pb-2">
+      <div className="text-white text-left xl:text-center text-xl max-xl:row-start-2 max-xl:row-end-2 max-xl:col-start-1 max-xl:col-end-1 max-xl:pl-3">
         <p>{user.category}</p>
       </div>
 
-      <div className="text-center flex xl:block items-center justify-between px-5 xl:px-0 py-5 xl:py-0 border-b xl:border-none border-solid border-white">
-        <p className="text-center xl:pb-2 text-rd">
-          LOADED:{" "}
-          {
-            images[activeImageset as keyof typeof images].filter(
-              (img: Blob) => img instanceof Blob === true
-            ).length
-          }{" "}
-          / {user.fileCounts[activeImageset]}
-        </p>
+      <p className="text-right xl:pb-2 text-rd max-xl:row-start-1 max-xl:row-end-1 max-xl:col-start-2 max-xl:col-end-2 max-xl:pr-3">
+        LOADED:{" "}
+        {
+          images[activeImageset as keyof typeof images].filter(
+            (img: Blob) => img instanceof Blob === true
+          ).length
+        }{" "}
+        / {user.fileCounts[activeImageset]}
+      </p>
 
-        <button
-          type="button"
-          className="border border-solid border-white text-lg text-white py-1 px-3 xl:hover:border-rd xl:hover:text-rd xl:hover:drop-shadow-red xl:focus:drop-shadow-red xl:focus:text-rd xl:focus:border-rd transition-colors xl:mt-5"
-          onClick={() => {
-            const args = {
-              activeImageset,
-              setNotice,
-              setRetrieving,
-              user,
-            };
+      <button
+        type="button"
+        className="border border-solid border-white text-lg text-white py-1 px-3 xl:hover:border-rd xl:hover:text-rd xl:hover:drop-shadow-red xl:focus:drop-shadow-red xl:focus:text-rd xl:focus:border-rd transition-colors max-xl:row-start-2 max-xl:row-end-2 max-xl:col-start-2 max-xl:col-end-2 max-xl:mr-3"
+        onClick={() => {
+          const args = {
+            activeImageset,
+            setNotice,
+            setRetrieving,
+            user,
+          };
 
-            handleDownloadAll(args);
-          }}
-        >
-          DOWNLOAD: ALL
-        </button>
-      </div>
+          handleDownloadAll(args);
+        }}
+      >
+        DOWNLOAD: ALL
+      </button>
 
       <div>
         {retrieving.state === true ? (
