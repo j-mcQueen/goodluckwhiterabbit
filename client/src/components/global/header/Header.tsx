@@ -15,7 +15,7 @@ export default function Header({
   data: string[];
   logout: boolean;
   handleSelect?: ([key]: string) => void;
-  setActiveIndex: Dispatch<SetStateAction<number>>;
+  setActiveIndex?: Dispatch<SetStateAction<number>>;
   setActiveTab: Dispatch<SetStateAction<number>>;
   images?: { [key: string]: Blob[] };
 }) {
