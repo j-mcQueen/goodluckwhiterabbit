@@ -68,7 +68,7 @@ export default function Header({
           {data.map((tab: string, index: number) => {
             return (
               <li
-                className={`${activeTab === index ? listItemVariants.active : listItemVariants.std} ${dashboard && dashboard[index as keyof typeof dashboard] === 0 && index !== data.length - 1 ? "border-r-white inline" : ""} border-r border-b border-solid border-white w-full flex items-center justify-center relative`}
+                className={`${activeTab === index ? listItemVariants.active : listItemVariants.std} ${dashboard && dashboard[index as keyof typeof dashboard] === 0 && index !== data.length - 1 ? "border-r-white inline" : ""}  border-r border-b border-solid border-white w-full flex items-center justify-center relative`}
                 key={tab}
               >
                 <button
@@ -87,6 +87,7 @@ export default function Header({
                   }
                   onClick={() => {
                     setActiveTab(index);
+
                     if (logout === true) {
                       const map = {
                         SOCIALS: "socials",
@@ -105,6 +106,14 @@ export default function Header({
                       }
 
                       if (setActiveIndex) setActiveIndex(0);
+                    } else {
+                      const newRoute = {
+                        0: "/photo",
+                        1: "/art",
+                        2: "/design",
+                      };
+
+                      return navigate(newRoute[index as keyof typeof newRoute]);
                     }
                   }}
                 >
@@ -135,7 +144,7 @@ export default function Header({
         ) : (
           <a
             href="https://www.instagram.com/goodluckwhiterabbit/"
-            className={`${activeTab === data.length - 1 ? "border-l" : ""} px-5 flex items-center justify-center border-b border-solid`}
+            className={`px-5 flex items-center justify-center border-b border-solid`}
           >
             <Instagram />
           </a>
