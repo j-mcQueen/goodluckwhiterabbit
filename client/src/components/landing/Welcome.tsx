@@ -1,10 +1,8 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { playSound } from "../global/utils/sound";
 
 import rabbit from "../../assets/media/gifs/glwr-lenticular.gif";
-// import Fork from "./Fork";
-import Art from "../portfolio/art/Art";
+import Fork from "./Fork";
 
 export default function Welcome() {
   const [entered, setEntered] = useState(false);
@@ -12,7 +10,7 @@ export default function Welcome() {
   return (
     <main className="w-[calc(100dvw-1.5rem)] h-[calc(100dvh-1.5rem)] flex items-center justify-center">
       {entered ? (
-        <Art />
+        <Fork />
       ) : (
         <section className="flex flex-col items-center justify-center h-dvh">
           <img
@@ -38,7 +36,7 @@ export default function Welcome() {
           >
             <button
               onClick={() => {
-                playSound();
+                // playSound();
                 setEntered(true);
               }}
               className="font-vt border border-solid border-white xl:hover:border-red xl:hover:text-rd xl:focus:text-rd xl:hover:drop-shadow-red focus:drop-shadow-red text-xl focus:outline-none xl:focus:border-rd text-white drop-shadow-glo opacity-80 py-1 px-2 xl:hover:bg-red-600 xl:transition-colors"
