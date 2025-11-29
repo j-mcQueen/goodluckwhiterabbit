@@ -13,7 +13,6 @@ export default {
         full: "repeat(auto-fit, minmax(100dvh, 100dvw)",
       },
       dropShadow: {
-        cyn: "2px 2px 2px #08FF09",
         blu: "2px 2px 2px #0075FF",
         mag: "2px 2px 2px #FF73FF",
         red: "2px 2px 2px #DC2626",
