@@ -43,10 +43,11 @@ export default function Portfolio({ ...props }) {
         />
       )}
 
-      <main className="flex">
+      <main className="flex flex-col xl:flex-row">
         <Sidebar
           activeTab={activeTab}
           category={headerItems[index]}
+          mobile={mobile}
           route={route}
         />
 

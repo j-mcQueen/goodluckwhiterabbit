@@ -1,32 +1,19 @@
 import { Fragment } from "react/jsx-runtime";
-import { motion } from "framer-motion";
-import { useState } from "react";
+
+import SubcategoryButton from "./menu/SubcategoryButton";
+import MenuItem from "./menu/MenuItem";
+import GroupList from "./menu/GroupList";
 
 export default function Menu({ ...props }) {
-  const { data } = props;
-
-  const [activeSub, setActiveSub] = useState(0); // updates when sidebar items are clicked
-  const [activeGroup, setActiveGroup] = useState(0); // updates when we have pulled images in the next group
-
-  const animationVariants = {
-    initial: {
-      x: -20,
-      opacity: 0,
-    },
-    animate: (index: number) => ({
-      x: 0,
-      opacity: 1,
-      transition: { delay: 0.05 * index },
-    }),
-  };
-
-  const subcategories = [
-    "WEDDINGS",
-    "EVENTS",
-    "FILM",
-    "COMMERCIAL",
-    "EDITORIAL",
-  ];
+  const {
+    activeGroup,
+    activeSub,
+    animationVariants,
+    data,
+    setActiveGroup,
+    setActiveSub,
+    subcategories,
+  } = props;
 
   // 4 scenarios need accounted for:
   // 1. User loads into page and views first set of images on photography + weddings page
@@ -36,66 +23,40 @@ export default function Menu({ ...props }) {
 
   return (
     <ul className="flex flex-row-reverse h-full [writing-mode:sideways-lr]">
-      {data.map(
-        (
-          category: {
-            title: string;
-            projects: [];
-          },
-          index: number
-        ) => {
-          return (
-            <Fragment key={category.title}>
-              <motion.li
-                variants={animationVariants}
-                initial="initial"
-                whileInView="animate"
-                viewport={{
-                  once: true,
-                }}
-                custom={index}
-                className={`tracking-widest leading-none h-full -my-[0.5px]`}
+      {data.map((sub: object, index: number) => {
+        return (
+          <Fragment key={subcategories[index]}>
+            <MenuItem
+              animationVariants={animationVariants}
+              index={index}
+              className="tracking-widest leading-none h-full -my-[0.5px]"
+            >
+              <div
+                className={`${activeSub === index ? "" : "invisible"} overflow-x-scroll max-w-[189px]`}
               >
-                <ul
-                  className={`${activeSub !== index ? "invisible" : ""} overflow-x-scroll max-w-[189px] [writing-mode:vertical-rl]`}
-                >
-                  {Object.keys(data[index]).map(
-                    (project: string, j: number) => {
-                      return (
-                        <li
-                          key={project}
-                          className={`${j === 17 ? "border-l-0" : ""} border border-solid border-white -mx-[1px] w-[56px] flex items-center justify-center xl:transition-colors`}
-                        >
-                          <button
-                            type="button"
-                            onClick={() => setActiveGroup(j)}
-                            className={`${j === activeGroup && activeSub === index ? "text-cyan-400" : null} xl:hover:text-cyan-400 xl:transition-colors`}
-                          >
-                            {project}
-                          </button>
-                        </li>
-                      );
-                    }
-                  )}
-                </ul>
+                <GroupList
+                  groups={Object.keys(sub)}
+                  activeGroup={activeGroup}
+                  onSelect={setActiveGroup}
+                />
+              </div>
 
-                <div className="h-full flex items-end">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setActiveGroup(0);
-                      setActiveSub(index);
-                    }}
-                    className={`border border-white border-solid p-3 py-5 w-[56px] h-full ${index === data.length - 1 ? "border-b-0" : null} ${index === activeSub ? "border-r-black text-ylw " : null} xl:hover:text-ylw xl:hover:transition-colors [writing-mode:vertical-rl]`}
-                  >
-                    {subcategories[index]}
-                  </button>
-                </div>
-              </motion.li>
-            </Fragment>
-          );
-        }
-      )}
+              <div className="h-full flex items-end">
+                <SubcategoryButton
+                  label={subcategories[index]}
+                  className={`${index === data.length - 1 ? "border-b-0" : null} ${index === activeSub ? "border-r-black" : null} border border-white border-solid w-[56px]`}
+                  disabled={index !== 0}
+                  isActive={activeSub === index}
+                  onClick={() => {
+                    setActiveGroup(0);
+                    setActiveSub(index);
+                  }}
+                />
+              </div>
+            </MenuItem>
+          </Fragment>
+        );
+      })}
     </ul>
   );
 }
