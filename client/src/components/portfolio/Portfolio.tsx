@@ -1,15 +1,17 @@
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
+import { mobile } from "../global/utils/determineViewport";
 
 import Header from "../global/header/Header";
 import Sidebar from "./Sidebar";
 import Body from "./Body";
+import MobileHeader from "../global/header/mobile/Header";
 
 export default function Portfolio({ ...props }) {
   const { route, index } = props;
-  const navigate = useNavigate();
   const headerItems = ["PHOTO", "ART", "DESIGN"];
 
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState(index);
 
   useEffect(() => {
@@ -24,16 +26,29 @@ export default function Portfolio({ ...props }) {
 
   return (
     <div className="w-[calc(100dvw-1.5rem-2px)] h-[calc(100dvh-1.5rem)] overflow-scroll overflow-x-hidden relative">
-      <Header
-        logout={false}
-        data={headerItems}
-        activeTab={activeTab}
-        setActiveTab={setActiveTab}
-        dashboard={false}
-      />
+      {mobile ? (
+        <MobileHeader
+          activeTab={activeTab}
+          data={headerItems}
+          logout={false}
+          setActiveTab={setActiveTab}
+        />
+      ) : (
+        <Header
+          logout={false}
+          data={headerItems}
+          activeTab={activeTab}
+          setActiveTab={setActiveTab}
+          dashboard={false}
+        />
+      )}
 
       <main className="flex">
-        <Sidebar activeTab={activeTab} route={route} />
+        <Sidebar
+          activeTab={activeTab}
+          category={headerItems[index]}
+          route={route}
+        />
 
         <Body />
       </main>

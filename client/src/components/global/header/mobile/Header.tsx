@@ -14,9 +14,9 @@ export default function MobileHeader({
   logout: boolean;
   data: string[];
   activeTab: number;
-  setActiveIndex: Dispatch<SetStateAction<number>>;
+  setActiveIndex?: Dispatch<SetStateAction<number>>;
   setActiveTab: Dispatch<SetStateAction<number>>;
-  counts: boolean | number[];
+  counts?: boolean | number[];
   handleSelect?: ([key]: string) => void;
   images?: { [key: string]: Blob[] };
 }) {
@@ -33,14 +33,13 @@ export default function MobileHeader({
   const navigate = useNavigate();
 
   const listItemVariants = {
-    active: "text-rd border-t-0",
-    std: "border-t",
+    active: "text-rd",
+    std: "",
   };
 
   const buttonVariants = {
     disabled: "opacity-25 w-full h-full tracking-widest",
-    regular:
-      "xl:hover:text-rd focus:text-rd transition-colors w-full h-full tracking-widest",
+    regular: "focus:text-rd transition-colors w-full h-full tracking-widest",
   };
 
   const RabbitElem = () => {
@@ -48,7 +47,7 @@ export default function MobileHeader({
       <img
         src={rabbit}
         alt="A white rabbit against a black background shimmering from left to right"
-        className="max-h-[50px]"
+        className="max-h-[48px]"
       />
     );
   };
@@ -73,9 +72,9 @@ export default function MobileHeader({
 
   return (
     <header
-      className={`${active ? "border-white" : "border-white"} flex border-b border-solid transition-colors z-50`}
+      className={`flex border-b border-solid border-white transition-colors z-50`}
     >
-      <div className="flex justify-between w-full">
+      <div className="flex items-center justify-between w-full">
         <div className="w-full">
           {logout ? (
             <RabbitElem />
@@ -101,11 +100,11 @@ export default function MobileHeader({
         {active && (
           <motion.nav
             key="nav"
-            initial={{ x: -100, opacity: 0, visibility: "hidden", y: 51 }}
+            initial={{ x: -100, opacity: 0, visibility: "hidden", y: 52 }}
             animate={{ x: 0, opacity: 1, visibility: "visible" }}
             exit={{ x: -100, opacity: 0 }}
             transition={{ type: "spring", bounce: 0, duration: 0.4 }}
-            className="absolute text-white w-[calc(100dvw-1.5rem-2px)] h-[calc(100dvh-1.5rem-52px)] translate-y-[51px] flex flex-col items-center z-50 bg-black"
+            className="absolute text-white w-[calc(100dvw-1.5rem-2px)] h-[calc(100dvh-1.5rem-52px)] flex flex-col items-center z-50 bg-black"
           >
             <ul className="w-full h-full flex flex-col justify-evenly z-10">
               {data.map((tab: string, index: number) => {
@@ -176,7 +175,7 @@ export default function MobileHeader({
                 <Eject className="w-5 h-5 group-hover:fill-rd group-focus:fill-rd group-hover:drop-shadow-red group-focus:drop-shadow-red transition-colors" />
               </button>
             ) : (
-              <div className="flex justify-between w-full min-h-[50px] border-b border-solid border-white bg-black">
+              <div className="flex justify-between w-full min-h-[50px] bg-black">
                 <div className="min-w-[50px] flex items-center justify-center border-r border-solid border-white">
                   <a href="https://www.instagram.com/goodluckwhiterabbit/">
                     <Instagram />
