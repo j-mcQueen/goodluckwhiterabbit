@@ -191,9 +191,9 @@ exports.generatePortfolioUrls = async (req, res, next) => {
 
       return res.status(500).json({
         status: true,
+        loading: false,
         message:
           "There was an error retrieving your images from S3. Please refresh the page and try again. Let Jack know if the problem persists!",
-        logout: { status: false, path: null },
       });
     }
 
@@ -246,8 +246,8 @@ exports.generatePortfolioUrls = async (req, res, next) => {
     console.log(presigns, "step 4 - populate presigns array");
 
     return skipped.length > 0
-      ? res.status(200).json({ presigns, skipped, stored: s3Data.stored })
-      : res.status(200).json({ presigns, stored: s3Data.stored });
+      ? res.status(200).json({ presigns, keys, skipped, stored: s3Data.stored })
+      : res.status(200).json({ presigns, keys, stored: s3Data.stored });
   }
 };
 
