@@ -17,7 +17,8 @@ export const generatePortfolioBatch = async (data: {
     const blob = await response.blob();
 
     // prepare new image object state value
-    nextFiles[group].push(blob);
+    if (!nextFiles[group]) nextFiles[group] = [blob];
+    else nextFiles[group].push(blob);
   }
 
   return { files: nextFiles };

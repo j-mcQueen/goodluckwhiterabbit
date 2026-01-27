@@ -1,23 +1,32 @@
 const { verifyTokens } = require("../utils/verifyTokens");
 const { s3 } = require("../config/s3");
-
 const {
   PutObjectCommand,
   ListObjectsV2Command,
   GetObjectCommand,
 } = require("@aws-sdk/client-s3");
 const { getSignedUrl } = require("@aws-sdk/s3-request-presigner");
+const { validateParams } = require("../utils/validateParams");
 
-const findFilterSort = async (bucket, prefix, regex, size) => {
-  let objects = await s3.send(
-    new ListObjectsV2Command({
-      Bucket: bucket,
-      Prefix: prefix,
-    })
-  );
+const findFilterSort = async (bucket, group, prefix, regex, size) => {
+  const adjustedGroup = Number(group) - 1;
+  const start = String(adjustedGroup).padStart(3, "0");
+  let objects;
+  try {
+    objects = await s3.send(
+      new ListObjectsV2Command({
+        Bucket: bucket,
+        Prefix: prefix,
+        StartAfter: `${prefix}/${start}/`,
+        MaxKeys: 100,
+      }),
+    );
+  } catch (error) {
+    throw error;
+  }
 
-  let filtered = objects.Contents.filter((item) =>
-    item.Key.includes(`/${size}/`)
+  let filtered = objects.Contents.filter(
+    (item) => item.Key.includes(`/${size}/`) && item.Size > 0,
   );
 
   const sorted = sortBatch(filtered, regex);
@@ -100,7 +109,7 @@ exports.generateGetPresigned = async (req, res, next) => {
         process.env.AWS_PRIMARY_BUCKET,
         `${req.params.id}/${req.params.imageset}`,
         /\/(\d{1,3})\//,
-        req.params.size
+        req.params.size,
       );
       s3Data.results = objects;
       s3Data.stored = stored;
@@ -158,9 +167,16 @@ exports.generateGetPresigned = async (req, res, next) => {
 };
 
 exports.generatePortfolioUrls = async (req, res, next) => {
-  const verified = verifyTokens(req, res);
+  const verified = validateParams(
+    req.params.category,
+    req.params.group,
+    req.params.size,
+    req.params.start,
+  );
 
-  if (verified) {
+  if (verified.error) {
+    return res.status(400).json(verified.error);
+  } else {
     const groupRegex = /\/(\d{3})\//;
     const suffixRegex = `(?<=/${req.params.size}/[^/]+_)\\d{1,3}(?=\\.[^.]+$)`;
 
@@ -169,39 +185,39 @@ exports.generatePortfolioUrls = async (req, res, next) => {
       // find, filter, and sort objects by their group numbers
       const { objects, stored } = await findFilterSort(
         process.env.AWS_SECONDARY_BUCKET,
+        req.params.group,
         `${req.params.category}/${req.params.sub}`,
         groupRegex,
-        req.params.size
+        req.params.size,
       );
 
-      console.log(objects, stored, "step 1 - find, filter, sort by group");
+      // console.log(objects, stored, "step 1 - find, filter, sort by group")
 
-      if (!s3Data.results.Contents)
-        return res.status(200).json({ files: false });
+      if (!objects.Contents) throw new Error({ message: "No files" });
 
       const suffixSorted = sortBatch(objects.Contents, suffixRegex, groupRegex);
 
       s3Data.results = suffixSorted;
       s3Data.stored = stored;
 
-      console.log(s3Data, "step 2 - sort by suffix");
+      // console.log(s3Data, "step 2 - sort by suffix");
     } catch (error) {
-      if (typeof s3Data.results === "undefined")
-        return res.status(200).json({ files: false });
-
-      return res.status(500).json({
-        status: true,
-        loading: false,
-        message:
-          "There was an error retrieving your images from S3. Please refresh the page and try again. Let Jack know if the problem persists!",
-      });
+      console.log("error", error);
+      return error === "No files"
+        ? res.status(200).json({ files: false })
+        : res.status(500).json({
+            status: true,
+            loading: false,
+            message:
+              "There was an error retrieving your images from S3. Please refresh the page and try again. Let Jack know if the problem persists!",
+          });
     }
 
     const keys = [];
-    for (const obj of s3Data.results.Contents) {
+    for (const obj of s3Data.results) {
       const keyGroup = Number(obj.Key.match(groupRegex)[1]);
       const match = obj.Key.match(suffixRegex);
-      const pos = Number(match[1]);
+      const pos = Number(match[0]);
 
       // skip edge cases which indicate incorrect starting point
       if (keyGroup < req.params.group || !match) continue;
@@ -212,7 +228,7 @@ exports.generatePortfolioUrls = async (req, res, next) => {
       if (keys.length === 10) break;
     }
 
-    console.log(keys, "step 3 - get keys to generate presigns for");
+    // console.log(keys, "step 3 - get keys to generate presigns for");
 
     const presignPromises = keys.map(async (key) => {
       const cmd = new GetObjectCommand({
@@ -223,10 +239,11 @@ exports.generatePortfolioUrls = async (req, res, next) => {
       try {
         const url = await getSignedUrl(s3, cmd, { expiresIn: 600 });
         return { status: "fulfilled", key, url };
-      } catch {
+      } catch (error) {
         return { status: "rejected", key };
       }
     });
+
     const results = await Promise.allSettled(presignPromises);
 
     const presigns = [];
@@ -243,7 +260,7 @@ exports.generatePortfolioUrls = async (req, res, next) => {
       }
     }
 
-    console.log(presigns, "step 4 - populate presigns array");
+    // console.log(presigns, "step 4 - populate presigns array");
 
     return skipped.length > 0
       ? res.status(200).json({ presigns, keys, skipped, stored: s3Data.stored })
@@ -259,7 +276,7 @@ exports.countImagesetItems = async (req, res, next) => {
     let s3Objects;
     try {
       s3Objects = await s3.send(
-        new ListObjectsV2Command({ Bucket: process.env.AWS_PRIMARY_BUCKET })
+        new ListObjectsV2Command({ Bucket: process.env.AWS_PRIMARY_BUCKET }),
       );
 
       if (!s3Objects.Contents)

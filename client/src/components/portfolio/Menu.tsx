@@ -1,4 +1,5 @@
 import { Fragment } from "react/jsx-runtime";
+import { triggerBatch } from "./utils/triggerBatch";
 
 import SubcategoryButton from "./menu/SubcategoryButton";
 import MenuItem from "./menu/MenuItem";
@@ -8,18 +9,16 @@ export default function Menu({ ...props }) {
   const {
     activeGroup,
     activeSub,
+    activeTab,
     animationVariants,
     data,
+    images,
     setActiveGroup,
     setActiveSub,
+    setImages,
+    setNotice,
     subcategories,
   } = props;
-
-  // 4 scenarios need accounted for:
-  // 1. User loads into page and views first set of images on photography + weddings page
-  // 2. User scrolls to load next set of images (handleIntersection)
-  // 3. User clicks on a sidebar item to load a different category
-  // 4. What happens to the UI when a user loads enough images to scroll to the next sub-category
 
   return (
     <ul className="flex flex-row-reverse h-full [writing-mode:sideways-lr]">
@@ -28,29 +27,39 @@ export default function Menu({ ...props }) {
           <Fragment key={subcategories[index]}>
             <MenuItem
               animationVariants={animationVariants}
-              index={index}
               className="tracking-widest leading-none h-full -my-[0.5px]"
+              index={index}
             >
               <div
                 className={`${activeSub === index ? "" : "invisible"} overflow-x-scroll max-w-[189px]`}
               >
                 <GroupList
-                  groups={Object.keys(sub)}
                   activeGroup={activeGroup}
-                  onSelect={setActiveGroup}
+                  activeSub={activeSub}
+                  activeTab={activeTab}
+                  groups={Object.keys(sub)}
+                  handleClick={triggerBatch}
+                  images={images}
+                  setActiveGroup={setActiveGroup}
+                  setImages={setImages}
+                  setNotice={setNotice}
                 />
               </div>
 
               <div className="h-full flex items-end">
                 <SubcategoryButton
-                  label={subcategories[index]}
+                  activeSub={activeSub}
+                  activeTab={activeTab}
                   className={`${index === data.length - 1 ? "border-b-0" : null} ${index === activeSub ? "border-r-black" : null} border border-white border-solid w-[56px]`}
                   disabled={index !== 0}
-                  isActive={activeSub === index}
-                  onClick={() => {
-                    setActiveGroup(0);
-                    setActiveSub(index);
-                  }}
+                  handleClick={triggerBatch}
+                  images={images}
+                  index={index}
+                  label={subcategories[index]}
+                  setActiveGroup={setActiveGroup}
+                  setActiveSub={setActiveSub}
+                  setImages={setImages}
+                  setNotice={setNotice}
                 />
               </div>
             </MenuItem>

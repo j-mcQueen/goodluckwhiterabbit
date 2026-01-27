@@ -9,12 +9,12 @@ export const generatePortfolioGetUrls = async (
     SetStateAction<{
       status: boolean;
       loading: boolean;
-      message: string;
+      message: string | null;
     }>
   >,
   size: string,
   start: number,
-  sub: string // e.g. WEDDINGS
+  sub: string, // e.g. WEDDINGS
 ) => {
   let presigns;
   try {
@@ -27,7 +27,7 @@ export const generatePortfolioGetUrls = async (
           "Content-Type": "application/json",
         },
         credentials: "include",
-      }
+      },
     );
 
     const data = await response.json();

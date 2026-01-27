@@ -24,6 +24,7 @@ export default {
         ylw: "#FFF500",
         gray: "#818181",
         rd: "#DC2626",
+        mage: "#FF73FF",
       },
       backgroundColor: {
         red: "#DC2626",

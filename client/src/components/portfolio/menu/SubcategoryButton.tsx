@@ -1,24 +1,40 @@
+import { SubcategoryButton_T } from "../types/SubcategoryButton_T";
+
 export default function SubcategoryButton({
-  label,
-  isActive,
+  activeSub,
+  activeTab,
   className = "",
   disabled,
-  onClick,
-}: {
-  label: string;
-  isActive: boolean;
-  className?: string;
-  disabled?: boolean;
-  onClick: () => void;
-}) {
+  handleClick,
+  images,
+  index,
+  label,
+  setActiveGroup,
+  setActiveSub,
+  setImages,
+  setNotice,
+}: SubcategoryButton_T) {
   return (
     <button
       disabled={disabled}
-      onClick={onClick}
+      onClick={() =>
+        handleClick(
+          activeSub,
+          activeTab,
+          images,
+          0,
+          setActiveGroup,
+          setImages,
+          setNotice,
+          0,
+          index,
+          setActiveSub,
+        )
+      }
       className={`
         [writing-mode:vertical-rl] 
         h-full p-3 py-5
-        ${isActive ? "text-ylw" : ""}
+        ${Number(activeSub) === index ? "text-ylw" : ""}
         ${disabled ? "text-gray" : ""}
         ${className}
       `}

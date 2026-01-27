@@ -1,11 +1,21 @@
-import { useState } from "react";
 import { sidebar_data } from "./data/sidebar/data";
 
 import Menu from "./Menu";
 import MobileMenu from "./MobileMenu";
 
 export default function Sidebar({ ...props }) {
-  const { activeTab, mobile, route } = props;
+  const {
+    activeGroup,
+    activeSub,
+    activeTab,
+    images,
+    mobile,
+    route,
+    setActiveGroup,
+    setImages,
+    setNotice,
+    setActiveSub,
+  } = props;
 
   const categoryData = sidebar_data[route as keyof typeof sidebar_data].menu;
   const subcategories = [
@@ -27,38 +37,35 @@ export default function Sidebar({ ...props }) {
     }),
   };
 
-  const [activeSub, setActiveSub] = useState<number | null>(null); // updates when sidebar items are clicked
-  const [activeGroup, setActiveGroup] = useState(0); // updates when we have pulled images in the next group
-
   return (
     <aside className="flex xl:flex-col xl:min-w-[245px] xl:max-w-[245px] h-[calc(100dvh-57px-1.5rem)] text-white overflow-x-scroll">
-      {/* {!mobile ? (
-        <p
-          className={`${activeTab !== 0 ? "h-full" : null} flex xl:block items-center justify-between px-5 pb-5 pt-3 border-r border-solid border-white text-lg leading-tight`}
-        >
-          {sidebar_data[route as keyof typeof sidebar_data].bio}
-        </p>
-      ) : null} */}
-
       {activeTab === 0 ? (
         mobile ? (
           <MobileMenu
             activeGroup={activeGroup}
             activeSub={activeSub}
+            activeTab={activeTab}
             animationVariants={animationVariants}
             data={categoryData}
+            images={images}
             setActiveGroup={setActiveGroup}
             setActiveSub={setActiveSub}
+            setImages={setImages}
+            setNotice={setNotice}
             subcategories={subcategories}
           />
         ) : (
           <Menu
             activeGroup={activeGroup}
             activeSub={activeSub}
+            activeTab={activeTab}
             animationVariants={animationVariants}
             data={categoryData}
+            images={images}
             setActiveGroup={setActiveGroup}
             setActiveSub={setActiveSub}
+            setImages={setImages}
+            setNotice={setNotice}
             subcategories={subcategories}
           />
         )

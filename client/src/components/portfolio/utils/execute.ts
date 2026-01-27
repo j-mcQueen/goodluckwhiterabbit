@@ -8,11 +8,15 @@ export const execute = async (
   existingFiles: { [key: string]: Blob[] },
   group: string,
   setNotice: Dispatch<
-    SetStateAction<{ status: boolean; loading: boolean; message: string }>
+    SetStateAction<{
+      status: boolean;
+      loading: boolean;
+      message: string | null;
+    }>
   >,
   size: string,
   start: number,
-  sub: string
+  sub: string,
 ) => {
   const data = await generatePortfolioGetUrls(
     category,
@@ -20,14 +24,14 @@ export const execute = async (
     setNotice,
     size,
     start,
-    sub
+    sub,
   );
 
-  if (data.files === false) return { stored: 0, files: false };
-
-  return await generatePortfolioBatch({
-    existingFiles,
-    keys: data.keys,
-    urls: data.urls,
-  });
+  return data.files === false
+    ? { files: {} }
+    : await generatePortfolioBatch({
+        existingFiles,
+        keys: data.keys,
+        urls: data.presigns,
+      });
 };
