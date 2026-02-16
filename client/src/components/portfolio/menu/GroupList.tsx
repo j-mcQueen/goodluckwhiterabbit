@@ -25,18 +25,18 @@ export default function GroupList({
         >
           <button
             className={`${j === activeGroup ? "" : "opacity-40"} drop-shadow-glo text-stone-200`}
-            onClick={() =>
+            onClick={() => {
               handleClick(
                 activeSub,
                 activeTab,
                 images,
                 j + 1,
-                setActiveGroup,
                 setImages,
                 setNotice,
                 0,
-              )
-            }
+              );
+              setActiveGroup(j);
+            }}
           >
             {group}
           </button>

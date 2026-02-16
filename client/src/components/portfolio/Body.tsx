@@ -1,51 +1,45 @@
-// import { useEffect, useState } from "react";
+import { Fragment, useState } from "react";
+import Unit from "./Unit";
 
-export default function Body() {
-  // const { activeCategory, activeProject } = props;
+export default function Body({ ...props }) {
+  const {
+    activeGroup,
+    activeSub,
+    activeTab,
+    images,
+    setActiveGroup,
+    setImages,
+    setNotice,
+  } = props;
 
-  // const [content, setContent] = useState([]);
-
-  // useEffect(() => {
-  //   const fetchImages = async () => {
-  //     // implementation demands that image folder name, file name, and exported variable names containing images all match
-  //     const mobile = window.matchMedia("(max-width: 1080px)").matches;
-  //     const indexMap = {
-  //       category: {
-  //         0: "photo",
-  //         1: "art",
-  //         2: "design",
-  //       },
-  //       project: {
-  //         0: "wedding",
-  //         1: "commercial",
-  //         2: "film",
-  //         3: "events",
-  //       },
-  //     };
-
-  //     let images;
-  //     try {
-  //       images = mobile
-  //         ? await import(
-  //             `../../assets/media/images/portfolio/${indexMap.category[activeCategory.category as keyof typeof indexMap.category]}/${indexMap.project[activeProject as keyof typeof indexMap.project]}/data_m.ts`
-  //           )
-  //         : await import(
-  //             `../../assets/media/images/portfolio/${indexMap.category[activeCategory.project as keyof typeof indexMap.category]}/${indexMap.project[activeProject as keyof typeof indexMap.project]}/data_d.ts`
-  //           );
-
-  //       return setContent(images[activeProject.project]);
-  //     } catch (e) {
-  //       // TODO implement better error catching - what do you want to happen if there's an error?
-  //       console.log(e, "!");
-  //     }
-  //   };
-
-  //   fetchImages();
-  // }, [activeProject, activeCategory]);
+  const [loadedImages, setLoadedImages] = useState([]);
+  const [staticKeys, setStaticKeys] = useState([]);
 
   return (
     <section>
-      <div></div>
+      <div>
+        {loadedImages.map((image: Blob, index: number) => {
+          return (
+            <Fragment key={staticKeys[index]}>
+              <Unit
+                activeGroup={activeGroup}
+                activeSub={activeSub}
+                activeTab={activeTab}
+                existingImages={images}
+                image={image}
+                index={index}
+                lastIndex={loadedImages.length - 1}
+                setActiveGroup={setActiveGroup}
+                setExistingImages={setImages}
+                setLoadedImages={setLoadedImages}
+                setNotice={setNotice}
+                setStaticKeys={setStaticKeys}
+                staticKeys={staticKeys}
+              />
+            </Fragment>
+          );
+        })}
+      </div>
     </section>
   );
 }

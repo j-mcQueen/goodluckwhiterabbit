@@ -1,7 +1,7 @@
-import { mobile } from "../global/utils/determineViewport";
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import { mobile } from "../global/utils/determineViewport";
 
 import Header from "../global/header/Header";
 import Sidebar from "./Sidebar";
@@ -16,7 +16,7 @@ export default function Portfolio({ ...props }) {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState(index);
   const [activeSub, setActiveSub] = useState<number | null>(0);
-  const [activeGroup, setActiveGroup] = useState<number | null>(0);
+  const [activeGroup, setActiveGroup] = useState<number | null>(0); // an index
   const [images, setImages] = useState<{ [key: string]: Blob[] }>({});
   const [notice, setNotice] = useState<{
     status: boolean;
@@ -74,17 +74,24 @@ export default function Portfolio({ ...props }) {
           activeGroup={activeGroup}
           activeSub={activeSub}
           activeTab={activeTab}
-          category={headerItems[index]}
           images={images}
           mobile={mobile}
           route={route}
           setActiveGroup={setActiveGroup}
+          setActiveSub={setActiveSub}
           setImages={setImages}
           setNotice={setNotice}
-          setActiveSub={setActiveSub}
         />
 
-        <Body />
+        <Body
+          activeGroup={activeGroup}
+          activeSub={activeSub}
+          activeTab={activeTab}
+          images={images}
+          setActiveGroup={setActiveGroup}
+          setImages={setImages}
+          setNotice={setNotice}
+        />
       </main>
     </div>
   );

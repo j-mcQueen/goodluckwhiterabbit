@@ -11,7 +11,6 @@ export interface GroupList_T {
     activeTab: number,
     images: { [key: string]: Blob[] },
     nextGroup: number,
-    setActiveGroup: Dispatch<SetStateAction<number>>,
     setImages: Dispatch<SetStateAction<{ [key: string]: Blob[] }>>,
     setNotice: Dispatch<
       SetStateAction<{

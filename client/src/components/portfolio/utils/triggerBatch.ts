@@ -7,7 +7,6 @@ export const triggerBatch = async (
   activeTab: number,
   images: { [key: string]: Blob[] },
   nextGroup: number,
-  setActiveGroup: Dispatch<SetStateAction<number>>,
   setImages: Dispatch<SetStateAction<{ [key: string]: Blob[] }>>,
   setNotice: Dispatch<
     SetStateAction<{
@@ -21,7 +20,6 @@ export const triggerBatch = async (
   setActiveSub?: Dispatch<SetStateAction<number>>,
 ) => {
   setNotice({ status: true, loading: true, message: "LOADING..." });
-  setActiveGroup(nextGroup - 1);
   const group = nextGroup.toString().padStart(3, "0");
   const tabMap = { 0: "PHOTO", 1: "ART", 2: "DESIGN" };
   const size = mobile ? "sm" : "lg";
@@ -38,7 +36,6 @@ export const triggerBatch = async (
     Object.hasOwn(images[group as keyof typeof images], start)
   ) {
     // selected images exist within state
-    setActiveGroup(nextGroup - 1);
     setNotice({ status: false, loading: false, message: null });
     return;
   }
@@ -62,7 +59,7 @@ export const triggerBatch = async (
     // new images have been generated
     setImages(nextImages.files);
     setNotice({ status: false, loading: false, message: null });
-    return;
+    return nextImages.files;
   } else {
     setNotice({
       status: true,

@@ -17,20 +17,20 @@ export default function SubcategoryButton({
   return (
     <button
       disabled={disabled}
-      onClick={() =>
+      onClick={() => {
         handleClick(
           activeSub,
           activeTab,
           images,
           0,
-          setActiveGroup,
           setImages,
           setNotice,
           0,
           index,
           setActiveSub,
-        )
-      }
+        );
+        setActiveGroup(0);
+      }}
       className={`
         [writing-mode:vertical-rl] 
         h-full p-3 py-5

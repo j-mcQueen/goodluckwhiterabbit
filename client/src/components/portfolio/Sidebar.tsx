@@ -12,9 +12,9 @@ export default function Sidebar({ ...props }) {
     mobile,
     route,
     setActiveGroup,
+    setActiveSub,
     setImages,
     setNotice,
-    setActiveSub,
   } = props;
 
   const categoryData = sidebar_data[route as keyof typeof sidebar_data].menu;
