@@ -28,7 +28,7 @@ export const handleIntersection = async ({ ...params }) => {
     loadBatch(args);
 
     // ensure newly generated images have keys when they are rendered
-    const keyBatch = generateKeys();
+    const keyBatch = generateKeys(10);
     setStaticKeys((keys: string[]) => [...keys, ...keyBatch]);
   }
 };

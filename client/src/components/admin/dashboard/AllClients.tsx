@@ -21,7 +21,7 @@ export default function AllClients({ ...props }) {
   } = props;
 
   const navigate = useNavigate();
-  const keys = generateKeys();
+  const keys = generateKeys(10);
 
   const FileCount = ({ ...props }) => {
     const { name, count, index, len } = props;
@@ -71,7 +71,7 @@ export default function AllClients({ ...props }) {
 
   const TableRow = ({ ...props }) => {
     const { client, entries, index } = props;
-    const keys = generateKeys();
+    const keys = generateKeys(10);
 
     return mobile ? (
       <tr

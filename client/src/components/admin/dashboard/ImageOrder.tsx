@@ -21,7 +21,7 @@ export default function ImageOrder({ ...props }) {
   } = props;
 
   const [order, setOrder] = useState(orderedImageset);
-  const [staticKeys, setStaticKeys] = useState(generateKeys);
+  const [staticKeys, setStaticKeys] = useState(generateKeys(10));
 
   useEffect(() => {
     setOrder(orderedImageset);

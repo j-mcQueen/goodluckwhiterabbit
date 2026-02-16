@@ -15,7 +15,7 @@ export default function Scroller({ ...props }) {
     user,
   } = props;
 
-  const [staticKeys, setStaticKeys] = useState(generateKeys);
+  const [staticKeys, setStaticKeys] = useState(generateKeys(10));
 
   return (
     <section className="w-full xl:h-[calc(100dvh-57px-1.5rem)] overflow-y-scroll pt-2">

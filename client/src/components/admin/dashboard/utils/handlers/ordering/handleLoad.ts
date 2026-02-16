@@ -35,7 +35,7 @@ export const handleLoad = async ({ ...params }) => {
       imagesetLength,
       imagesetLength + 10,
       targetClient._id,
-      "sm"
+      "sm",
     );
 
     const count = renderCount + data.count;
@@ -50,7 +50,7 @@ export const handleLoad = async ({ ...params }) => {
             "Content-Type": "application/json",
           },
           credentials: "include",
-        }
+        },
       );
       const newCounts = await response.json();
 
@@ -88,7 +88,7 @@ export const handleLoad = async ({ ...params }) => {
     setSpinner(false);
   }
 
-  const generatedKeys = generateKeys();
+  const generatedKeys = generateKeys(10);
   const nextKeys = [...staticKeys, ...generatedKeys];
   return setStaticKeys(nextKeys);
 };
