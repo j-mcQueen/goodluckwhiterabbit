@@ -31,7 +31,7 @@ export default function Menu({ ...props }) {
               index={index}
             >
               <div
-                className={`${activeSub === index ? "" : "invisible"} overflow-x-scroll max-w-[189px]`}
+                className={`${activeSub === index ? "" : "invisible"} overflow-y-scroll max-w-[189px]`}
               >
                 <GroupList
                   activeGroup={activeGroup}
