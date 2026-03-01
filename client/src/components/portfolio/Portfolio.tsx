@@ -8,12 +8,15 @@ import Sidebar from "./Sidebar";
 import Body from "./Body";
 import MobileHeader from "../global/header/mobile/Header";
 import Notice from "../global/Notice";
+import Mail from "../../assets/media/icons/Mail";
+import Contact from "./Contact";
 
 export default function Portfolio({ ...props }) {
   const { route, index } = props;
   const headerItems = ["PHOTO", "ART", "DESIGN"];
 
   const navigate = useNavigate();
+  const [contactOpen, setContactOpen] = useState(false);
   const [activeTab, setActiveTab] = useState(index);
   const [activeSub, setActiveSub] = useState<number | null>(0);
   const [activeGroup, setActiveGroup] = useState<number | null>(0); // an index
@@ -37,9 +40,24 @@ export default function Portfolio({ ...props }) {
 
     return navigate(newRoute[activeTab.category as keyof typeof newRoute]);
   }, [activeTab, navigate, route]);
-
   return (
-    <div className="w-[calc(100dvw-1.5rem-2px)] h-[calc(100dvh-1.5rem)] overflow-scroll overflow-x-hidden relative">
+    <div className="w-[calc(100dvw-1.5rem-2px)] h-[calc(100dvh-1.5rem)] overflow-hidden relative">
+      <Contact contactOpen={contactOpen} setContactOpen={setContactOpen} />
+
+      <div className="border border-white border-solid absolute bottom-0 right-0 -m-[0.5px]">
+        <button
+          type="button"
+          onClick={() => setContactOpen((prev) => !prev)}
+          className="text-white text-lg xl:hover:text-rd xl:transition-colors group flex items-center"
+        >
+          <Mail
+            className={
+              "w-[18px] h-[18px] xl:group-hover:drop-shadow-red xl:group-hover:fill-rd xl:group-focus:drop-shadow-red xl:group-focus:fill-rd xl:transition-colors m-5"
+            }
+          />
+        </button>
+      </div>
+
       <AnimatePresence>
         {notice.status && (
           <motion.div
@@ -69,7 +87,7 @@ export default function Portfolio({ ...props }) {
         />
       )}
 
-      <main className="flex flex-col xl:flex-row">
+      <main className="flex flex-col xl:flex-row h-[calc(100dvh-56px-1.5rem)]">
         <Sidebar
           activeGroup={activeGroup}
           activeSub={activeSub}
