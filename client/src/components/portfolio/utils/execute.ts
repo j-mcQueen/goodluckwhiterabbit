@@ -5,7 +5,6 @@ import { generatePortfolioGetUrls } from "./generatePortfolioGetUrls";
 
 export const execute = async (
   category: string,
-  existingFiles: { [key: string]: Blob[] },
   group: string,
   setNotice: Dispatch<
     SetStateAction<{
@@ -28,9 +27,8 @@ export const execute = async (
   );
 
   return data.files === false
-    ? { files: {} }
+    ? []
     : await generatePortfolioBatch({
-        existingFiles,
         keys: data.keys,
         urls: data.presigns,
       });

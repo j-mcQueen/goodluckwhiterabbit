@@ -1,75 +1,71 @@
 import { InView } from "react-intersection-observer";
-import { useState } from "react";
+import { useState, useRef } from "react";
+import { handleIntersection } from "./utils/handleIntersection";
 
 import Image from "./Image";
-import { testActiveGroup } from "./utils/testActiveGroup";
-import { handleIntersection } from "./utils/handleIntersection";
 
 export default function Unit({ ...props }) {
   const {
     activeGroup,
     activeSub,
     activeTab,
-    existingImages,
     image,
     index,
     lastIndex,
+    nextStartIndex,
     setActiveGroup,
-    setExistingImages,
-    setLoadedImages,
+    setImages,
+    setNextStartIndex,
     setNotice,
     setStaticKeys,
-    staticKeys,
   } = props;
-  const [nextStartIndex, setNextStartIndex] = useState(lastIndex);
-  const [thresholds, setThresholds] = useState([]);
+  const imgRef = useRef<HTMLImageElement>(null);
+  const [ratio, setRatio] = useState(1);
 
   return index === lastIndex ? (
     <InView
       as="div"
+      style={{ flexGrow: ratio }}
+      className={`flex shrink basis-0 min-w-[600px]`}
       onChange={async (inView, entry) => {
-        if (entry.intersectionRatio === 1) return; // prevent callback from firing immediately on first load
+        if (entry.intersectionRatio === 1 || !entry.isIntersecting) return; // prevent callback from firing immediately on first load
+
+        const imageGroup = Number(image.group) - 1;
+        const diff = imageGroup - activeGroup;
+        if (diff !== 0) setActiveGroup(imageGroup);
 
         const args = {
-          activeGroup,
+          activeGroup: diff !== 0 ? imageGroup + 1 : activeGroup + 1,
           activeSub,
           activeTab,
-          existingImages,
           inView,
           nextStartIndex,
-          setExistingImages,
-          setLoadedImages,
+          setImages,
           setNextStartIndex,
           setNotice,
           setStaticKeys,
-          setThresholds,
-          staticKeys,
-          thresholds,
         };
-        return handleIntersection(args);
+
+        return await handleIntersection(args);
       }}
     >
-      <Image image={image} />
+      <Image image={image} innerRef={imgRef} setRatio={setRatio} />
     </InView>
   ) : (
     <InView
       as="div"
+      style={{ flexGrow: ratio }}
+      className={`flex shrink basis-0 min-w-[600px]`}
       onChange={(inView, entry) => {
         if (entry.intersectionRatio === 1) return; // prevent callback from firing immediately on first load
-
         if (inView) {
-          const args = {
-            activeGroup,
-            index,
-            setActiveGroup,
-            thresholds,
-          };
-
-          return testActiveGroup(args);
+          const imageGroup = Number(image.group) - 1;
+          const diff = imageGroup - activeGroup;
+          if (diff !== 0) setActiveGroup(imageGroup);
         }
       }}
     >
-      <Image image={image} />
+      <Image image={image} innerRef={imgRef} setRatio={setRatio} />
     </InView>
   );
 }

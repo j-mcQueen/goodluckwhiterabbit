@@ -8,7 +8,7 @@ export default function Sidebar({ ...props }) {
     activeGroup,
     activeSub,
     activeTab,
-    images,
+    bodyRef,
     mobile,
     route,
     setActiveGroup,
@@ -38,7 +38,7 @@ export default function Sidebar({ ...props }) {
   };
 
   return (
-    <aside className="flex xl:flex-col xl:min-w-[245px] xl:max-w-[245px] h-[calc(100dvh-57px-1.5rem)] text-white overflow-x-scroll">
+    <aside className="flex xl:flex-col xl:min-w-[245px] xl:max-w-[245px] h-[calc(100dvh-57px-1.5rem)] text-white overflow-x-scroll overflow-y-hidden">
       {activeTab === 0 ? (
         mobile ? (
           <MobileMenu
@@ -46,8 +46,8 @@ export default function Sidebar({ ...props }) {
             activeSub={activeSub}
             activeTab={activeTab}
             animationVariants={animationVariants}
+            bodyRef={bodyRef}
             data={categoryData}
-            images={images}
             setActiveGroup={setActiveGroup}
             setActiveSub={setActiveSub}
             setImages={setImages}
@@ -60,8 +60,8 @@ export default function Sidebar({ ...props }) {
             activeSub={activeSub}
             activeTab={activeTab}
             animationVariants={animationVariants}
+            bodyRef={bodyRef}
             data={categoryData}
-            images={images}
             setActiveGroup={setActiveGroup}
             setActiveSub={setActiveSub}
             setImages={setImages}

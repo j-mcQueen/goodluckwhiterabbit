@@ -191,16 +191,12 @@ exports.generatePortfolioUrls = async (req, res, next) => {
         req.params.size,
       );
 
-      // console.log(objects, stored, "step 1 - find, filter, sort by group")
-
       if (!objects.Contents) throw new Error({ message: "No files" });
 
       const suffixSorted = sortBatch(objects.Contents, suffixRegex, groupRegex);
 
       s3Data.results = suffixSorted;
       s3Data.stored = stored;
-
-      // console.log(s3Data, "step 2 - sort by suffix");
     } catch (error) {
       console.log("error", error);
       return error === "No files"
@@ -214,21 +210,27 @@ exports.generatePortfolioUrls = async (req, res, next) => {
     }
 
     const keys = [];
+    let normalizedGroup = req.params.group;
+    let normalizedStart = req.params.start;
     for (const obj of s3Data.results) {
+      // check for out-of-bounds starts (+ groups with)
       const keyGroup = Number(obj.Key.match(groupRegex)[1]);
+      if (keyGroup > normalizedGroup && normalizedStart > 0) {
+        normalizedGroup = keyGroup;
+        normalizedStart = 0;
+      }
+
       const match = obj.Key.match(suffixRegex);
       const pos = Number(match[0]);
 
       // skip edge cases which indicate incorrect starting point
-      if (keyGroup < req.params.group || !match) continue;
-      if (keyGroup >= req.params.group && pos < req.params.start) continue;
+      if (keyGroup < normalizedGroup || !match) continue;
+      if (keyGroup >= normalizedGroup && pos < normalizedStart) continue;
 
       // get the keys you want to generate presigned urls for from the given starting point
-      if (pos >= Number(req.params.start)) keys.push(obj.Key);
+      if (pos >= Number(normalizedStart)) keys.push(obj.Key);
       if (keys.length === 10) break;
     }
-
-    // console.log(keys, "step 3 - get keys to generate presigns for");
 
     const presignPromises = keys.map(async (key) => {
       const cmd = new GetObjectCommand({
@@ -259,8 +261,6 @@ exports.generatePortfolioUrls = async (req, res, next) => {
         skipped.push(key.split("/").pop());
       }
     }
-
-    // console.log(presigns, "step 4 - populate presigns array");
 
     return skipped.length > 0
       ? res.status(200).json({ presigns, keys, skipped, stored: s3Data.stored })

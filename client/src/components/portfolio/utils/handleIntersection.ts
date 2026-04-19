@@ -1,5 +1,5 @@
 import { generateKeys } from "../../global/utils/generateKeys";
-import { prepIndexing } from "./prepIndexing";
+import { calcNextStart } from "./calcNextStart";
 import { triggerIntersection } from "./triggerIntersection";
 
 export const handleIntersection = async ({ ...params }) => {
@@ -7,17 +7,12 @@ export const handleIntersection = async ({ ...params }) => {
     activeGroup,
     activeSub,
     activeTab,
-    existingImages,
-    nextStartIndex,
     inView,
-    setExistingImages,
-    setLoadedImages,
+    nextStartIndex,
+    setImages,
     setNextStartIndex,
     setNotice,
     setStaticKeys,
-    setThresholds,
-    staticKeys,
-    thresholds,
   } = params;
 
   try {
@@ -25,9 +20,8 @@ export const handleIntersection = async ({ ...params }) => {
       activeGroup,
       activeSub,
       activeTab,
-      existingImages,
       inView,
-      setExistingImages,
+      setImages,
       setNotice,
       nextStartIndex,
     };
@@ -35,26 +29,18 @@ export const handleIntersection = async ({ ...params }) => {
 
     if (!result || "earlyExit" in result) {
       setNotice({ status: false, loading: false, message: null });
-      setNextStartIndex(existingImages[activeGroup].length);
       return;
     }
 
-    const entries: Array<[string, Array<Blob>]> = Object.entries(result);
-    const indexing = prepIndexing({ entries, thresholds });
+    const nextStart = calcNextStart(activeGroup, result, nextStartIndex);
+    setNextStartIndex(nextStart);
 
-    const diff = Math.abs(staticKeys.length - indexing.counter);
-    if (diff > 0) {
-      // only generate the extra keys needed
-      const keyBatch = generateKeys(diff);
-      setStaticKeys((keys: string[]) => [...keys, ...keyBatch]);
-    }
+    // only generate the extra keys needed
+    const keyBatch = generateKeys(result.length);
+    setStaticKeys((keys: string[]) => [...keys, ...keyBatch]);
 
-    setNextStartIndex(result[entries.length - 1].length);
-    setLoadedImages((prev: Blob[]) => [...prev, ...indexing.newBlobs]);
-    setThresholds(indexing.newThresholds);
+    return result;
   } catch (error) {
-    console.log(error, "Intersection trigger error");
-
     return setNotice({
       status: true,
       loading: false,

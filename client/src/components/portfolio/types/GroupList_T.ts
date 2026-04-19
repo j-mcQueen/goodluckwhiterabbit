@@ -4,14 +4,14 @@ export interface GroupList_T {
   activeGroup: number;
   activeSub: string;
   activeTab: number;
+  bodyRef: React.RefObject<HTMLElement> | null;
   className?: string;
   groups: string[];
   handleClick: (
     activeSub: string,
     activeTab: number,
-    images: { [key: string]: Blob[] },
     nextGroup: number,
-    setImages: Dispatch<SetStateAction<{ [key: string]: Blob[] }>>,
+    setImages: Dispatch<SetStateAction<{ blob: Blob; group: string }[]>>,
     setNotice: Dispatch<
       SetStateAction<{
         status: boolean;
@@ -19,11 +19,11 @@ export interface GroupList_T {
         message: string | null;
       }>
     >,
+    sidebar: boolean,
     start: number,
   ) => void;
-  images: { [key: string]: Blob[] };
   setActiveGroup: Dispatch<SetStateAction<number>>;
-  setImages: Dispatch<SetStateAction<{ [key: string]: Blob[] }>>;
+  setImages: Dispatch<SetStateAction<{ blob: Blob; group: string }[]>>;
   setNotice: Dispatch<
     SetStateAction<{
       status: boolean;

@@ -4,10 +4,10 @@ export default function GroupList({
   activeGroup,
   activeSub,
   activeTab,
+  bodyRef,
   className = "",
   groups,
   handleClick,
-  images,
   setActiveGroup,
   setImages,
   setNotice,
@@ -21,14 +21,18 @@ export default function GroupList({
         >
           <button
             className={`${j === activeGroup ? "" : "opacity-40"} drop-shadow-glo text-stone-200`}
-            onClick={() => {
+            onClick={async () => {
+              if (bodyRef) {
+                bodyRef.current?.scrollTo({ top: 0, behavior: "smooth" });
+              }
+
               handleClick(
                 activeSub,
                 activeTab,
-                images,
                 j + 1,
                 setImages,
                 setNotice,
+                true,
                 0,
               );
               setActiveGroup(j);

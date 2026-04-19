@@ -27,10 +27,7 @@ export default function Image({
     <InView
       as="div"
       onChange={(inView, entry) => {
-        if (entry.intersectionRatio === 1) {
-          // prevent callback from firing immediately on first load
-          return;
-        }
+        if (entry.intersectionRatio === 1) return; // prevent callback from firing immediately on first load
 
         const args = {
           activeImageset,

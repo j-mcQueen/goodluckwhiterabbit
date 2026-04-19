@@ -5,9 +5,8 @@ import { mobile } from "../../global/utils/determineViewport";
 export const triggerBatch = async (
   activeSub: string,
   activeTab: number,
-  images: { [key: string]: Blob[] },
   nextGroup: number,
-  setImages: Dispatch<SetStateAction<{ [key: string]: Blob[] }>>,
+  setImages: Dispatch<SetStateAction<{ blob: Blob; group: string }[]>>,
   setNotice: Dispatch<
     SetStateAction<{
       status: boolean;
@@ -15,12 +14,13 @@ export const triggerBatch = async (
       message: string | null;
     }>
   >,
+  sidebar: boolean,
   start: number,
   subIndex?: number,
   setActiveSub?: Dispatch<SetStateAction<number>>,
 ) => {
   setNotice({ status: true, loading: true, message: "LOADING..." });
-  const group = nextGroup.toString().padStart(3, "0");
+  const group = String(nextGroup).padStart(3, "0");
   const tabMap = { 0: "PHOTO", 1: "ART", 2: "DESIGN" };
   const size = mobile ? "sm" : "lg";
   const subs = {
@@ -31,18 +31,8 @@ export const triggerBatch = async (
     "4": "EDITORIAL",
   };
 
-  if (
-    group in images &&
-    Object.hasOwn(images[group as keyof typeof images], start)
-  ) {
-    // selected images exist within state
-    setNotice({ status: false, loading: false, message: null });
-    return;
-  }
-
   const nextImages = await execute(
     tabMap[activeTab as keyof typeof tabMap],
-    images,
     group,
     setNotice,
     size,
@@ -52,14 +42,22 @@ export const triggerBatch = async (
 
   if (setActiveSub && subIndex) setActiveSub(subIndex);
 
-  if (
-    group in nextImages.files &&
-    Object.hasOwn(nextImages.files[group as keyof typeof nextImages], start)
-  ) {
+  const containsGroup = nextImages.some(
+    (image: { blob: Blob; group: string }) => image.group === group,
+  );
+
+  if (containsGroup || Number(nextImages[0].group) === Number(group) + 1) {
+    // edge case coverage where we have old values and a new group at start
     // new images have been generated
-    setImages(nextImages.files);
+
+    setImages((prev) => {
+      // setter fn ensures we don't mistakenly mutate
+      return sidebar ? nextImages : [...prev, ...nextImages];
+    });
+
     setNotice({ status: false, loading: false, message: null });
-    return nextImages.files;
+
+    return nextImages;
   } else {
     setNotice({
       status: true,

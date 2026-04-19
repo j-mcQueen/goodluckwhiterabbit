@@ -12,8 +12,8 @@ export default function MobileMenu({ ...props }) {
     activeSub,
     activeTab,
     animationVariants,
+    bodyRef,
     data,
-    images,
     setActiveGroup,
     setActiveSub,
     setImages,
@@ -35,9 +35,9 @@ export default function MobileMenu({ ...props }) {
                 <SubcategoryButton
                   activeSub={activeSub}
                   activeTab={activeTab}
+                  bodyRef={bodyRef}
                   disabled={index !== 0}
                   handleClick={triggerBatch}
-                  images={images}
                   index={index}
                   label={subcategories[index]}
                   setActiveGroup={setActiveGroup}
@@ -62,10 +62,10 @@ export default function MobileMenu({ ...props }) {
                     activeGroup={activeGroup}
                     activeSub={activeSub}
                     activeTab={activeTab}
+                    bodyRef={bodyRef}
                     className="border-t-0 mx-[-0.5px]"
                     groups={Object.keys(sub)}
                     handleClick={triggerBatch}
-                    images={images}
                     setActiveGroup={setActiveGroup}
                     setImages={setImages}
                     setNotice={setNotice}

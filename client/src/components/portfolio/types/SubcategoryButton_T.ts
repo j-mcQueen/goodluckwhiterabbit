@@ -3,14 +3,14 @@ import { Dispatch, SetStateAction } from "react";
 export interface SubcategoryButton_T {
   activeSub: string;
   activeTab: number;
+  bodyRef: React.RefObject<HTMLElement> | null;
   className?: string;
   disabled?: boolean;
   handleClick: (
     activeSub: string,
     activeTab: number,
-    images: { [key: string]: Blob[] },
     nextGroup: number,
-    setImages: Dispatch<SetStateAction<{ [key: string]: Blob[] }>>,
+    setImages: Dispatch<SetStateAction<{ blob: Blob; group: string }[]>>,
     setNotice: Dispatch<
       SetStateAction<{
         status: boolean;
@@ -18,16 +18,16 @@ export interface SubcategoryButton_T {
         message: string | null;
       }>
     >,
+    sidebar: boolean,
     start: number,
     subIndex?: number,
     setActiveSub?: Dispatch<SetStateAction<number>>,
   ) => void;
-  images: { [key: string]: Blob[] };
   index: number;
   label: string;
   setActiveGroup: Dispatch<SetStateAction<number>>;
   setActiveSub: Dispatch<SetStateAction<number>>;
-  setImages: Dispatch<SetStateAction<{ [key: string]: Blob[] }>>;
+  setImages: Dispatch<SetStateAction<{ blob: Blob; group: string }[]>>;
   setNotice: Dispatch<
     SetStateAction<{
       status: boolean;

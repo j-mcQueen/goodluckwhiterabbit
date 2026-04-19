@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { mobile } from "../global/utils/determineViewport";
 
@@ -16,11 +16,12 @@ export default function Portfolio({ ...props }) {
   const headerItems = ["PHOTO", "ART", "DESIGN"];
 
   const navigate = useNavigate();
-  const [contactOpen, setContactOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState(index);
+  const bodyRef = useRef();
+  const [contactOpen, setContactOpen] = useState<boolean>(false);
+  const [activeTab, setActiveTab] = useState<number>(index);
   const [activeSub, setActiveSub] = useState<number | null>(0);
   const [activeGroup, setActiveGroup] = useState<number | null>(0); // an index
-  const [images, setImages] = useState<{ [key: string]: Blob[] }>({});
+  const [images, setImages] = useState<{ blob: Blob; group: string }[]>([]);
   const [notice, setNotice] = useState<{
     status: boolean;
     loading: boolean;
@@ -38,13 +39,14 @@ export default function Portfolio({ ...props }) {
       2: "/design",
     };
 
-    return navigate(newRoute[activeTab.category as keyof typeof newRoute]);
+    return navigate(newRoute[activeTab as keyof typeof newRoute]);
   }, [activeTab, navigate, route]);
+
   return (
     <div className="w-[calc(100dvw-1.5rem-2px)] h-[calc(100dvh-1.5rem)] overflow-hidden relative">
       <Contact contactOpen={contactOpen} setContactOpen={setContactOpen} />
 
-      <div className="border border-white border-solid absolute bottom-0 right-0 -m-[0.5px]">
+      <div className="border border-white border-solid absolute bottom-0 right-0 -m-[0.5px] bg-black">
         <button
           type="button"
           onClick={() => setContactOpen((prev) => !prev)}
@@ -92,6 +94,7 @@ export default function Portfolio({ ...props }) {
           activeGroup={activeGroup}
           activeSub={activeSub}
           activeTab={activeTab}
+          bodyRef={bodyRef}
           images={images}
           mobile={mobile}
           route={route}
@@ -105,6 +108,7 @@ export default function Portfolio({ ...props }) {
           activeGroup={activeGroup}
           activeSub={activeSub}
           activeTab={activeTab}
+          bodyRef={bodyRef}
           images={images}
           setActiveGroup={setActiveGroup}
           setImages={setImages}

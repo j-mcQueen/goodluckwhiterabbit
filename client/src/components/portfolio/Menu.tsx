@@ -11,8 +11,8 @@ export default function Menu({ ...props }) {
     activeSub,
     activeTab,
     animationVariants,
+    bodyRef,
     data,
-    images,
     setActiveGroup,
     setActiveSub,
     setImages,
@@ -37,9 +37,9 @@ export default function Menu({ ...props }) {
                   activeGroup={activeGroup}
                   activeSub={activeSub}
                   activeTab={activeTab}
+                  bodyRef={bodyRef}
                   groups={Object.keys(sub)}
                   handleClick={triggerBatch}
-                  images={images}
                   setActiveGroup={setActiveGroup}
                   setImages={setImages}
                   setNotice={setNotice}
@@ -50,10 +50,10 @@ export default function Menu({ ...props }) {
                 <SubcategoryButton
                   activeSub={activeSub}
                   activeTab={activeTab}
+                  bodyRef={bodyRef}
                   className={`${index === data.length - 1 ? "border-b-0" : null} ${index === activeSub ? "border-r-black" : null} border border-white border-solid w-[56px]`}
                   disabled={index !== 0}
                   handleClick={triggerBatch}
-                  images={images}
                   index={index}
                   label={subcategories[index]}
                   setActiveGroup={setActiveGroup}

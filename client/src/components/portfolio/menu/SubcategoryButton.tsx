@@ -3,10 +3,10 @@ import { SubcategoryButton_T } from "../types/SubcategoryButton_T";
 export default function SubcategoryButton({
   activeSub,
   activeTab,
+  bodyRef,
   className = "",
   disabled,
   handleClick,
-  images,
   index,
   label,
   setActiveGroup,
@@ -18,13 +18,17 @@ export default function SubcategoryButton({
     <button
       disabled={disabled}
       onClick={() => {
+        if (bodyRef) {
+          bodyRef.current?.scrollTo({ top: 0, behavior: "smooth" });
+        }
+
         handleClick(
           activeSub,
           activeTab,
-          images,
           0,
           setImages,
           setNotice,
+          true,
           0,
           index,
           setActiveSub,

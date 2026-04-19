@@ -5,22 +5,21 @@ export const triggerIntersection = async ({ ...params }) => {
     activeGroup,
     activeSub,
     activeTab,
-    images,
     inView,
     setImages,
     setNotice,
-    start,
+    nextStartIndex,
   } = params;
 
   if (inView) {
     const result = await triggerBatch(
       activeSub,
       activeTab,
-      images,
       activeGroup,
       setImages,
       setNotice,
-      start,
+      false,
+      nextStartIndex,
     );
 
     if (result && result instanceof Object) {

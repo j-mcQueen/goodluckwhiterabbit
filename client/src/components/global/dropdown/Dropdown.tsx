@@ -3,7 +3,14 @@ import { motion } from "framer-motion";
 import Up from "../../../assets/media/icons/Up";
 
 export default function Dropdown({ ...props }) {
-  const { categoryData, activeProject, setActiveProject } = props;
+  const {
+    activeCategory,
+    activeProject,
+    categoryData,
+    setActiveCategory,
+    setActiveProject,
+  } = props;
+
   const [open, setOpen] = useState(false);
 
   const animationVariants = {
@@ -19,22 +26,28 @@ export default function Dropdown({ ...props }) {
   };
 
   return (
-    <div className="flex flex-col text-white py-5">
+    <div className="flex flex-col text-white py-5 tracking-widest">
       <button
         type="button"
         onClick={() => setOpen(!open)}
-        className="bg-black text-white border border-solid border-blu p-3 flex justify-center gap-2 z-10"
+        className="bg-black text-white border border-solid border-white p-3 flex justify-center gap-2 z-10"
       >
-        PROJECTS
+        <span className="text-2xl leading-none">COLLECTIONS</span>
         <Up active={open} />
       </button>
 
       <div className="relative">
         <ul
-          className={`${open ? "block" : "hidden"} absolute top-0 w-full border border-solid border-blu border-t-0 bg-black max-h-[500px] overflow-y-scroll overflow-x-hidden`}
+          className={`${open ? "block" : "hidden"} w-full border border-solid border-blu border-t-0 bg-black max-h-[500px] overflow-y-scroll overflow-x-hidden`}
         >
           {categoryData.map(
-            (category: { title: string; links: [] }, index: number) => {
+            (
+              category: {
+                title: string;
+                projects: [];
+              },
+              index: number
+            ) => {
               return (
                 <Fragment key={category.title}>
                   <motion.li
@@ -45,22 +58,21 @@ export default function Dropdown({ ...props }) {
                       once: true,
                     }}
                     custom={index}
-                    className="p-5 text-lg leading-none"
+                    className="p-5 text-2xl leading-none"
                   >
                     {category.title}
 
                     <ul>
-                      {category.links.map(
+                      {category.projects.map(
                         (
-                          link: {
-                            subject: string;
-                            path: string;
-                            category: string;
+                          project: {
+                            name: string;
+                            key: string;
                           },
                           j: number
                         ) => {
                           return (
-                            <li key={link.subject}>
+                            <li key={project.key}>
                               <motion.button
                                 variants={animationVariants}
                                 initial="initial"
@@ -69,15 +81,13 @@ export default function Dropdown({ ...props }) {
                                   once: true,
                                 }}
                                 custom={j}
-                                onClick={() =>
-                                  setActiveProject({
-                                    project: link.path,
-                                    category: link.category,
-                                  })
-                                }
-                                className={`${activeProject.project === link.path ? "text-blu" : "text-gray"} text-sm font-inter flex flex-col pt-5`}
+                                onClick={() => {
+                                  setActiveCategory(index);
+                                  setActiveProject(j);
+                                }}
+                                className={`${activeCategory === index && activeProject === j ? "text-blu" : "text-gray"} text-lg font-inter flex flex-col pt-5`}
                               >
-                                {link.subject}
+                                {project.name}
                               </motion.button>
                             </li>
                           );

@@ -1,11 +1,10 @@
 // sister to executeGenerationChain
 export const generatePortfolioBatch = async (data: {
-  existingFiles: { [key: string]: Blob[] };
   keys: string[];
   urls: string[];
 }) => {
   // create a shallow copy of existing files to be extended
-  const nextFiles = data.existingFiles;
+  const nextFiles = [];
   const groupRegex = /\/(\d{3})\//;
 
   for (let i = 0; i < data.urls.length; i++) {
@@ -16,10 +15,8 @@ export const generatePortfolioBatch = async (data: {
     const response = await fetch(data.urls[i], { method: "GET" });
     const blob = await response.blob();
 
-    // prepare new image object state value
-    if (!nextFiles[group]) nextFiles[group] = [blob];
-    else nextFiles[group].push(blob);
+    nextFiles.push({ blob, group });
   }
 
-  return { files: nextFiles };
+  return nextFiles;
 };
