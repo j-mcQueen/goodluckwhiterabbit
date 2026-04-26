@@ -18,6 +18,7 @@ export default function Header({
   setActiveIndex?: Dispatch<SetStateAction<number>>;
   setActiveTab: Dispatch<SetStateAction<number>>;
   images?: { [key: string]: Blob[] };
+  loadTrackerRef?: React.MutableRefObject<boolean>;
 }) {
   const {
     logout,
@@ -28,6 +29,7 @@ export default function Header({
     dashboard,
     handleSelect,
     images,
+    loadTrackerRef,
   } = props;
   const navigate = useNavigate();
 
@@ -86,6 +88,7 @@ export default function Header({
                       : buttonVariants.regular
                   }
                   onClick={() => {
+                    if (loadTrackerRef) loadTrackerRef.current = false; // open path for image autoload
                     setActiveTab(index);
 
                     if (logout === true) {

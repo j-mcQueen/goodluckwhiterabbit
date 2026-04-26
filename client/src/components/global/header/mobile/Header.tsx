@@ -11,14 +11,16 @@ import Eject from "../../../../assets/media/icons/Eject";
 export default function MobileHeader({
   ...props
 }: {
+  activeTab: number;
   logout: boolean;
   data: string[];
-  activeTab: number;
+
   setActiveIndex?: Dispatch<SetStateAction<number>>;
   setActiveTab: Dispatch<SetStateAction<number>>;
   counts?: boolean | number[];
   handleSelect?: ([key]: string) => void;
   images?: { [key: string]: Blob[] };
+  loadTrackerRef?: React.MutableRefObject<boolean>;
 }) {
   const {
     logout,
@@ -29,6 +31,7 @@ export default function MobileHeader({
     counts,
     handleSelect,
     images,
+    loadTrackerRef,
   } = props;
   const navigate = useNavigate();
 
@@ -124,6 +127,7 @@ export default function MobileHeader({
                           : buttonVariants.regular
                       }
                       onClick={() => {
+                        if (loadTrackerRef) loadTrackerRef.current = false; // open path for image autoload
                         setActiveTab(index);
                         setActive(false);
 
