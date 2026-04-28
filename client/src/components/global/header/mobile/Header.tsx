@@ -1,12 +1,12 @@
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { determineHost as host } from "../../utils/determineHost";
 
-import rabbit from "../../../../assets/media/gifs/glwr-lenticular.gif";
 import Instagram from "../../../../assets/media/icons/Instagram";
 import Next from "../../../../assets/media/icons/Next";
 import Eject from "../../../../assets/media/icons/Eject";
+import TopBar from "./TopBar";
 
 export default function MobileHeader({
   ...props
@@ -14,7 +14,6 @@ export default function MobileHeader({
   activeTab: number;
   logout: boolean;
   data: string[];
-
   setActiveIndex?: Dispatch<SetStateAction<number>>;
   setActiveTab: Dispatch<SetStateAction<number>>;
   counts?: boolean | number[];
@@ -45,16 +44,6 @@ export default function MobileHeader({
     regular: "focus:text-rd transition-colors w-full h-full tracking-widest",
   };
 
-  const RabbitElem = () => {
-    return (
-      <img
-        src={rabbit}
-        alt="A white rabbit against a black background shimmering from left to right"
-        className="max-h-[48px]"
-      />
-    );
-  };
-
   const handleLogout = async () => {
     const response = await fetch(`${host}/logout`, {
       method: "POST",
@@ -77,27 +66,7 @@ export default function MobileHeader({
     <header
       className={`flex border-b border-solid border-white transition-colors z-50`}
     >
-      <div className="flex items-center justify-between w-full">
-        <div className="w-full">
-          {logout ? (
-            <RabbitElem />
-          ) : (
-            <Link to={"/"} className="w-full h-full flex justify-center">
-              <RabbitElem />
-            </Link>
-          )}
-        </div>
-
-        <button
-          type="button"
-          onClick={() => setActive(!active)}
-          className={`${active ? "bg-black" : "bg-white"} min-w-[50px] h-[50px] border-l border-solid border-white flex items-center justify-center transition-colors`}
-        >
-          <div
-            className={`${active ? "rotate-45 bg-white" : "-rotate-45 bg-black"} w-[25px] h-[1px] transition-all`}
-          ></div>
-        </button>
-      </div>
+      <TopBar isOpen={active} logout={logout} setIsOpen={setActive} />
 
       <AnimatePresence mode="wait">
         {active && (
@@ -109,7 +78,7 @@ export default function MobileHeader({
             transition={{ type: "spring", bounce: 0, duration: 0.4 }}
             className="absolute text-white w-[calc(100dvw-1.5rem-2px)] h-[calc(100dvh-1.5rem-54px)] flex flex-col items-center z-50 bg-black"
           >
-            <ul className="w-full h-full flex flex-col justify-evenly z-10">
+            <ul className="w-full h-full flex flex-col justify-evenly">
               {data.map((tab: string, index: number) => {
                 return (
                   <li
