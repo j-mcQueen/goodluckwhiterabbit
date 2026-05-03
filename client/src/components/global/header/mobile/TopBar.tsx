@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import rabbit from "../../../../assets/media/gifs/glwr-lenticular.gif";
 
 export default function TopBar({ ...props }) {
-  const { isOpen, logout, setIsOpen } = props;
+  const { isMobilePortfolio, isOpen, logout, setIsOpen } = props;
 
   const Rabbit = () => {
     return (
@@ -28,7 +28,13 @@ export default function TopBar({ ...props }) {
 
       <button
         type="button"
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={() =>
+          setIsOpen(
+            isMobilePortfolio
+              ? { main: !isOpen, subcategories: false, groups: false }
+              : !isOpen,
+          )
+        }
         className={`${isOpen ? "bg-black" : "bg-white"} min-w-[50px] h-[50px] border-l border-solid border-white flex items-center justify-center transition-colors`}
       >
         <div

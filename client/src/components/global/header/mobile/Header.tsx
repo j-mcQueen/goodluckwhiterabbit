@@ -66,7 +66,12 @@ export default function MobileHeader({
     <header
       className={`flex border-b border-solid border-white transition-colors z-50`}
     >
-      <TopBar isOpen={active} logout={logout} setIsOpen={setActive} />
+      <TopBar
+        isMobilePortfolio={false}
+        isOpen={active}
+        logout={logout}
+        setIsOpen={setActive}
+      />
 
       <AnimatePresence mode="wait">
         {active && (

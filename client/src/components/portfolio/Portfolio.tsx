@@ -7,10 +7,10 @@ import { mobile } from "../global/utils/determineViewport";
 import Header from "../global/header/Header";
 import Sidebar from "./Sidebar";
 import Body from "./Body";
-import MobileHeader from "../global/header/mobile/Header";
 import Notice from "../global/Notice";
 import Mail from "../../assets/media/icons/Mail";
 import Contact from "./Contact";
+import MobilePortHeader from "./menu/MobilePortHeader";
 
 export default function Portfolio({ ...props }) {
   const { route, index } = props;
@@ -108,12 +108,11 @@ export default function Portfolio({ ...props }) {
       </AnimatePresence>
 
       {mobile ? (
-        <MobileHeader
-          activeTab={activeTab}
-          data={headerItems}
-          loadTrackerRef={loadTrackerRef}
-          logout={false}
-          setActiveTab={setActiveTab}
+        <MobilePortHeader
+          categories={headerItems}
+          route={route}
+          setImages={setImages}
+          setNotice={setNotice}
         />
       ) : (
         <Header
@@ -127,19 +126,21 @@ export default function Portfolio({ ...props }) {
       )}
 
       <main className="flex flex-col xl:flex-row h-[calc(100dvh-56px-1.5rem)]">
-        <Sidebar
-          activeGroup={activeGroup}
-          activeSub={activeSub}
-          activeTab={activeTab}
-          bodyRef={bodyRef}
-          images={images}
-          mobile={mobile}
-          route={route}
-          setActiveGroup={setActiveGroup}
-          setActiveSub={setActiveSub}
-          setImages={setImages}
-          setNotice={setNotice}
-        />
+        {mobile ? null : (
+          <Sidebar
+            activeGroup={activeGroup}
+            activeSub={activeSub}
+            activeTab={activeTab}
+            bodyRef={bodyRef}
+            images={images}
+            mobile={mobile}
+            route={route}
+            setActiveGroup={setActiveGroup}
+            setActiveSub={setActiveSub}
+            setImages={setImages}
+            setNotice={setNotice}
+          />
+        )}
 
         <Body
           activeGroup={activeGroup}

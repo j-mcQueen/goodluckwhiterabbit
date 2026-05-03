@@ -1,17 +1,23 @@
-export const sidebar_data = {
+export const sidebar_data: {
+  [key: string]: {
+    title: string;
+    subcategories: string[];
+    menu: { [key: string]: string }[];
+  };
+} = {
   "/art": {
     title: "ART",
-    bio: "LOREM IPSUM DOLOR SIT AMET, CONSECTETUR ADIPISCING ELIT, SED DO EIUSMOD TEMPOR INCIDIDUNT UT LABORE ET DOLORE MAGNA ALIQUA.",
-    menu: [{ title: "CLOUDSCAPES" }],
+    subcategories: [],
+    menu: [{ CLOUDSCAPES: "001" }],
   },
   "/design": {
     title: "DESIGN",
-    bio: "LOREM IPSUM DOLOR SIT AMET, CONSECTETUR ADIPISCING ELIT, SED DO EIUSMOD TEMPOR INCIDIDUNT UT LABORE ET DOLORE MAGNA ALIQUA.",
+    subcategories: [],
     menu: [],
   },
   "/photo": {
     title: "PHOTOGRAPHY",
-    bio: "LOREM IPSUM DOLOR SIT AMET, CONSECTETUR ADIPISCING ELIT, SED DO EIUSMOD TEMPOR INCIDIDUNT UT LABORE ET DOLORE MAGNA ALIQUA.",
+    subcategories: ["WEDDINGS", "EVENTS", "FILM", "COMMERCIAL", "EDITORIAL"],
     menu: [
       {
         "STRONG ROPE BREWERY": "001",

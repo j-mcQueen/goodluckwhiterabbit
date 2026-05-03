@@ -18,13 +18,9 @@ export default function Sidebar({ ...props }) {
   } = props;
 
   const categoryData = sidebar_data[route as keyof typeof sidebar_data].menu;
-  const subcategories = [
-    "WEDDINGS",
-    "EVENTS",
-    "FILM",
-    "COMMERCIAL",
-    "EDITORIAL",
-  ];
+  const subcategories =
+    sidebar_data[route as keyof typeof sidebar_data].subcategories;
+
   const animationVariants = {
     initial: {
       x: -20,
@@ -38,7 +34,7 @@ export default function Sidebar({ ...props }) {
   };
 
   return (
-    <aside className="flex xl:flex-col xl:min-w-[245px] xl:max-w-[245px] h-[calc(100dvh-57px-1.5rem)] text-white overflow-x-scroll overflow-y-hidden">
+    <aside className="flex xl:flex-col xl:min-w-[245px] xl:max-w-[245px] xl:h-[calc(100dvh-57px-1.5rem)] text-white overflow-x-scroll overflow-y-hidden">
       {activeTab === 0 ? (
         mobile ? (
           <MobileMenu
