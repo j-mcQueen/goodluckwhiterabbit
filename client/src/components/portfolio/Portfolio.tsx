@@ -14,7 +14,7 @@ import ContactButton from "./ContactButton";
 
 export default function Portfolio({ ...props }) {
   const { route, index } = props;
-  const headerItems = ["PHOTO", "ART", "DESIGN"];
+  const headerItems = ["PHOTO"];
 
   const navigate = useNavigate();
   const bodyRef = useRef<HTMLElement>();
