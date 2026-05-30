@@ -8,9 +8,9 @@ import Header from "../global/header/Header";
 import Sidebar from "./Sidebar";
 import Body from "./Body";
 import Notice from "../global/Notice";
-import Mail from "../../assets/media/icons/Mail";
-import Contact from "./Contact";
-import MobilePortHeader from "./menu/MobilePortHeader";
+import ContactDialog from "./ContactDialog";
+import Nav from "./mobile/Nav";
+import ContactButton from "./ContactButton";
 
 export default function Portfolio({ ...props }) {
   const { route, index } = props;
@@ -79,21 +79,12 @@ export default function Portfolio({ ...props }) {
 
   return (
     <div className="w-[calc(100dvw-1.5rem-2px)] h-[calc(100dvh-1.5rem)] overflow-hidden relative">
-      <Contact contactOpen={contactOpen} setContactOpen={setContactOpen} />
+      <ContactDialog
+        contactOpen={contactOpen}
+        setContactOpen={setContactOpen}
+      />
 
-      <div className="border border-white border-solid absolute bottom-0 right-0 -m-[0.5px] bg-black">
-        <button
-          type="button"
-          onClick={() => setContactOpen((prev) => !prev)}
-          className="text-white text-lg xl:hover:text-rd xl:transition-colors group flex items-center"
-        >
-          <Mail
-            className={
-              "w-[18px] h-[18px] xl:group-hover:drop-shadow-red xl:group-hover:fill-rd xl:group-focus:drop-shadow-red xl:group-focus:fill-rd xl:transition-colors m-5"
-            }
-          />
-        </button>
-      </div>
+      {!mobile ? <ContactButton setContactOpen={setContactOpen} /> : null}
 
       <AnimatePresence>
         {notice.status && (
@@ -108,9 +99,10 @@ export default function Portfolio({ ...props }) {
       </AnimatePresence>
 
       {mobile ? (
-        <MobilePortHeader
+        <Nav
           categories={headerItems}
           route={route}
+          setContactOpen={setContactOpen}
           setImages={setImages}
           setNotice={setNotice}
         />
