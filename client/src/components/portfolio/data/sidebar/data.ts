@@ -8,7 +8,7 @@ export const sidebar_data: {
   "/art": {
     title: "ART",
     subcategories: [],
-    menu: [{ CLOUDSCAPES: "001" }],
+    menu: [],
   },
   "/design": {
     title: "DESIGN",

@@ -26,7 +26,7 @@ export default function Unit({ ...props }) {
     <InView
       as="div"
       style={{ flexGrow: ratio }}
-      className={`flex shrink basis-0 min-w-[600px]`}
+      className={`flex shrink basis-0 min-w-[90dvw] xl:min-w-[600px]`}
       onChange={async (inView, entry) => {
         if (entry.intersectionRatio === 1 || !entry.isIntersecting) return; // prevent callback from firing immediately on first load
 
@@ -55,7 +55,7 @@ export default function Unit({ ...props }) {
     <InView
       as="div"
       style={{ flexGrow: ratio }}
-      className={`flex shrink basis-0 min-w-[600px]`}
+      className={`flex shrink basis-0 min-w-[90dvw] xl:min-w-[600px]`}
       onChange={(inView, entry) => {
         if (entry.intersectionRatio === 1) return; // prevent callback from firing immediately on first load
         if (inView) {

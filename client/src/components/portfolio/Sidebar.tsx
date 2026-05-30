@@ -1,7 +1,6 @@
 import { sidebar_data } from "./data/sidebar/data";
 
 import Menu from "./Menu";
-import MobileMenu from "./MobileMenu";
 
 export default function Sidebar({ ...props }) {
   const {
@@ -9,7 +8,6 @@ export default function Sidebar({ ...props }) {
     activeSub,
     activeTab,
     bodyRef,
-    mobile,
     route,
     setActiveGroup,
     setActiveSub,
@@ -36,35 +34,19 @@ export default function Sidebar({ ...props }) {
   return (
     <aside className="flex xl:flex-col xl:min-w-[245px] xl:max-w-[245px] xl:h-[calc(100dvh-57px-1.5rem)] text-white overflow-x-scroll overflow-y-hidden">
       {activeTab === 0 ? (
-        mobile ? (
-          <MobileMenu
-            activeGroup={activeGroup}
-            activeSub={activeSub}
-            activeTab={activeTab}
-            animationVariants={animationVariants}
-            bodyRef={bodyRef}
-            data={categoryData}
-            setActiveGroup={setActiveGroup}
-            setActiveSub={setActiveSub}
-            setImages={setImages}
-            setNotice={setNotice}
-            subcategories={subcategories}
-          />
-        ) : (
-          <Menu
-            activeGroup={activeGroup}
-            activeSub={activeSub}
-            activeTab={activeTab}
-            animationVariants={animationVariants}
-            bodyRef={bodyRef}
-            data={categoryData}
-            setActiveGroup={setActiveGroup}
-            setActiveSub={setActiveSub}
-            setImages={setImages}
-            setNotice={setNotice}
-            subcategories={subcategories}
-          />
-        )
+        <Menu
+          activeGroup={activeGroup}
+          activeSub={activeSub}
+          activeTab={activeTab}
+          animationVariants={animationVariants}
+          bodyRef={bodyRef}
+          data={categoryData}
+          setActiveGroup={setActiveGroup}
+          setActiveSub={setActiveSub}
+          setImages={setImages}
+          setNotice={setNotice}
+          subcategories={subcategories}
+        />
       ) : null}
     </aside>
   );

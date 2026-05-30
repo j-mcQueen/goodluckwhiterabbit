@@ -17,7 +17,7 @@ const findFilterSort = async (bucket, group, prefix, regex, size) => {
       new ListObjectsV2Command({
         Bucket: bucket,
         Prefix: prefix,
-        StartAfter: `${prefix}/${start}/`,
+        StartAfter: `${prefix}/${group}/${size}`,
         MaxKeys: 100,
       }),
     );
