@@ -24,7 +24,7 @@ exports.adminLogin = [
     .notEmpty()
     .isLength({ min: 4 })
     .withMessage(
-      "You username is too short but you shouldn't be seeing this message so tell Jack!"
+      "You username is too short but you shouldn't be seeing this message so tell Jack!",
     )
     .isAlphanumeric(),
   body("password").trim().notEmpty().isStrongPassword({
@@ -56,13 +56,13 @@ exports.adminLogin = [
       process.env.JWT_SECRET,
       {
         expiresIn: "24h",
-      }
+      },
     );
 
     const accessToken = jwt.sign(
       { _id: req.user._id },
       process.env.JWT_SECRET,
-      { expiresIn: "1h" }
+      { expiresIn: "1h" },
     );
 
     return res
@@ -148,7 +148,6 @@ exports.adminAddClient = [
   },
 ];
 
-// TODO needed still?
 exports.adminGetUserImagesetCount = async (req, res, next) => {
   const verified = await verifyTokens(req, res);
 
@@ -157,7 +156,7 @@ exports.adminGetUserImagesetCount = async (req, res, next) => {
       new ListObjectsV2Command({
         Bucket: process.env.AWS_PRIMARY_BUCKET,
         Prefix: `${req.params.id}/${req.params.imageset}/resized`,
-      })
+      }),
     );
 
     const count = imagesetFiles.Contents ? imagesetFiles.Contents.length : 0;
@@ -175,7 +174,7 @@ exports.adminUpdateUserImagesetCount = async (req, res, next) => {
       {
         [`fileCounts.${req.params.imageset}`]: req.params.count,
       },
-      { new: true }
+      { new: true },
     );
 
     return res.status(200).json(updatedUser.fileCounts);
@@ -212,7 +211,7 @@ exports.adminGetFileAndDelete = async (req, res, next) => {
           Bucket: process.env.AWS_PRIMARY_BUCKET,
           Prefix: `${req.params.id}/${req.params.imageset}/resized/${req.params.index}/`,
           MaxKeys: 1,
-        })
+        }),
       );
 
       const existingOriginal = await s3.send(
@@ -220,7 +219,7 @@ exports.adminGetFileAndDelete = async (req, res, next) => {
           Bucket: process.env.AWS_PRIMARY_BUCKET,
           Prefix: `${req.params.id}/${req.params.imageset}/original/${req.params.index}/`,
           MaxKeys: 1,
-        })
+        }),
       );
 
       if (!existingResized || !existingOriginal) {
@@ -252,7 +251,7 @@ exports.adminGetFileAndDelete = async (req, res, next) => {
                 { Key: existingFiles[1].Contents[0].Key },
               ],
             },
-          })
+          }),
         );
 
         if (!deleted) throw new Error("500");
@@ -298,7 +297,7 @@ exports.adminDeleteUser = async (req, res, next) => {
       let objects;
       try {
         objects = await s3.send(
-          new ListObjectsV2Command({ Bucket: process.env.AWS_PRIMARY_BUCKET })
+          new ListObjectsV2Command({ Bucket: process.env.AWS_PRIMARY_BUCKET }),
         );
         if (!objects.Contents) return res.status(200).json(deleted._id); // if there are no files to delete from S3, send success response
       } catch (err) {
@@ -334,7 +333,7 @@ exports.adminDeleteUser = async (req, res, next) => {
           new DeleteObjectsCommand({
             Bucket: process.env.AWS_PRIMARY_BUCKET,
             Delete: { Objects: deleteTargets },
-          })
+          }),
         );
 
         if (!deletedFiles.Deleted) throw new TypeError("Error deleting files.");
@@ -359,14 +358,14 @@ exports.adminDeleteFile = async (req, res, next) => {
         new ListObjectsV2Command({
           Bucket: process.env.AWS_PRIMARY_BUCKET,
           Prefix: `${req.params.id}/${req.params.imageset}/${req.params.index}`,
-        })
+        }),
       );
 
       const deleted = await s3.send(
         new DeleteObjectsCommand({
           Bucket: process.env.AWS_PRIMARY_BUCKET,
           Delete: { Objects: deleteTargets.Contents },
-        })
+        }),
       );
 
       if (deleted.Deleted.length > 0) {
@@ -386,15 +385,12 @@ exports.uploadFile = async (req, res, next) => {
   const verified = await verifyTokens(req, res);
 
   if (verified) {
-    const large = await sharp(req.files[0].buffer)
-      .resize(2400, null)
-      .toFormat("webp")
-      .toBuffer();
+    const file = req.files[0];
 
-    const small = await sharp(req.files[0].buffer)
-      .resize(768, null)
-      .toFormat("webp")
-      .toBuffer();
+    const [large, small] = await Promise.all(
+      sharp(file.buffer).resize(2400, null).toFormat("webp").toBuffer(),
+      sharp(file.buffer).resize(768, null).toFormat("webp").toBuffer(),
+    );
 
     // upload variations to s3
     try {
@@ -420,13 +416,13 @@ exports.uploadFile = async (req, res, next) => {
           });
 
           await s3.send(cmd);
-        })
+        }),
       );
     } catch (error) {
       return res
         .status(500)
         .json(
-          "There was an error uploading this file and its variations to S3."
+          "There was an error uploading this file and its variations to S3.",
         );
     }
 

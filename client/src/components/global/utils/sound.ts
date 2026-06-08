@@ -11,7 +11,7 @@ export function initSound(audioEl: HTMLAudioElement) {
   } else return;
 }
 
-export async function unlock() {
+async function unlock() {
   if (audioContext?.state === "suspended") {
     await audioContext.resume();
   }

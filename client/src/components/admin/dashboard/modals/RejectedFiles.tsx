@@ -1,4 +1,3 @@
-import { v4 as uuidv4 } from "uuid";
 import Close from "../../../../assets/media/icons/Close";
 
 export default function RejectedFiles({ ...props }) {
@@ -23,7 +22,7 @@ export default function RejectedFiles({ ...props }) {
 
       <ul className="pt-3 grid grid-cols-2 gap-2 justify-start">
         {rejectedFiles.map((filename: string) => {
-          return <li key={uuidv4()}>{filename}</li>;
+          return <li key={filename}>{filename}</li>;
         })}
       </ul>
     </dialog>

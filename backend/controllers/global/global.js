@@ -9,8 +9,6 @@ const { getSignedUrl } = require("@aws-sdk/s3-request-presigner");
 const { validateParams } = require("../utils/validateParams");
 
 const findFilterSort = async (bucket, group, prefix, regex, size) => {
-  const adjustedGroup = Number(group) - 1;
-  const start = String(adjustedGroup).padStart(3, "0");
   let objects;
   try {
     objects = await s3.send(
