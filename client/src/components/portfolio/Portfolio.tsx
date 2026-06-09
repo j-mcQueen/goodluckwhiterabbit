@@ -1,16 +1,15 @@
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
-import { AnimatePresence, motion } from "framer-motion";
 import { triggerBatch } from "./utils/triggerBatch";
 import { mobile } from "../global/utils/determineViewport";
 
 import Header from "../global/header/Header";
 import Sidebar from "./Sidebar";
 import Body from "./Body";
-import Notice from "../global/Notice";
 import ContactDialog from "./ContactDialog";
 import Nav from "./mobile/Nav";
 import ContactButton from "./ContactButton";
+import NoticeDialog from "./NoticeDialog";
 
 export default function Portfolio({ ...props }) {
   const { route, index } = props;
@@ -83,20 +82,9 @@ export default function Portfolio({ ...props }) {
         contactOpen={contactOpen}
         setContactOpen={setContactOpen}
       />
+      <NoticeDialog notice={notice} setNotice={setNotice} />
 
       {!mobile ? <ContactButton setContactOpen={setContactOpen} /> : null}
-
-      <AnimatePresence>
-        {notice.status && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-          >
-            <Notice notice={notice} setNotice={setNotice} />
-          </motion.div>
-        )}
-      </AnimatePresence>
 
       {mobile ? (
         <Nav
