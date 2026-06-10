@@ -11,10 +11,9 @@ export default function ContactButton({ ...props }) {
       svg: "w-[24px] h-[24px]",
     },
     desktop: {
-      cntr: "border border-white border-solid absolute bottom-0 right-0 -m-[0.5px] bg-black",
-      button:
-        "text-white text-lg xl:hover:text-rd xl:transition-colors group flex items-center",
-      svg: "w-[24px] h-[24px] xl:group-hover:drop-shadow-red xl:group-hover:fill-rd xl:group-focus:drop-shadow-red xl:group-focus:fill-rd xl:transition-colors m-5",
+      cntr: "bg-black",
+      button: "xl:hover:text-rd xl:transition-colors group flex items-center",
+      svg: "min-w-[18px] min-h-[18px] xl:w-[18px] xl:h-[18px] xl:group-hover:drop-shadow-red xl:group-hover:fill-rd xl:group-focus:drop-shadow-red xl:group-focus:fill-rd xl:transition-colors m-5",
     },
   };
 

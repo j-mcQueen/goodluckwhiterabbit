@@ -23,7 +23,7 @@ export default function Body({ ...props }) {
       ref={bodyRef}
       className="overflow-y-scroll w-full overflow-x-hidden my-3 xl:my-5"
     >
-      <div className="flex flex-wrap items-stretch justify-center  gap-3 xl:gap-5 px-5">
+      <div className="flex flex-wrap items-stretch justify-center gap-3 xl:gap-5 px-5">
         {images.map((unit: { image: Blob; group: string }, index: number) => {
           return (
             <Fragment key={staticKeys[index]}>

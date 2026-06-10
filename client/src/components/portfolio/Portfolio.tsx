@@ -8,7 +8,6 @@ import Sidebar from "./Sidebar";
 import Body from "./Body";
 import ContactDialog from "./ContactDialog";
 import Nav from "./mobile/Nav";
-import ContactButton from "./ContactButton";
 import NoticeDialog from "./NoticeDialog";
 
 export default function Portfolio({ ...props }) {
@@ -84,8 +83,6 @@ export default function Portfolio({ ...props }) {
       />
       <NoticeDialog notice={notice} setNotice={setNotice} />
 
-      {!mobile ? <ContactButton setContactOpen={setContactOpen} /> : null}
-
       {mobile ? (
         <Nav
           categories={headerItems}
@@ -102,6 +99,7 @@ export default function Portfolio({ ...props }) {
           loadTrackerRef={loadTrackerRef}
           logout={false}
           setActiveTab={setActiveTab}
+          setContactOpen={setContactOpen}
         />
       )}
 

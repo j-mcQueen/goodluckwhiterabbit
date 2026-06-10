@@ -6,6 +6,7 @@ import rabbit from "../../../assets/media/gifs/glwr-lenticular.gif";
 import Instagram from "../../../assets/media/icons/Instagram";
 import Eject from "../../../assets/media/icons/Eject";
 import Next from "../../../assets/media/icons/Next";
+import ContactButton from "../../portfolio/ContactButton";
 
 export default function Header({
   ...props
@@ -17,6 +18,7 @@ export default function Header({
   handleSelect?: ([key]: string) => void;
   setActiveIndex?: Dispatch<SetStateAction<number>>;
   setActiveTab: Dispatch<SetStateAction<number>>;
+  setContactOpen?: Dispatch<SetStateAction<boolean>>;
   images?: { [key: string]: Blob[] };
   loadTrackerRef?: React.MutableRefObject<boolean>;
 }) {
@@ -28,6 +30,7 @@ export default function Header({
     setActiveTab,
     dashboard,
     handleSelect,
+    setContactOpen,
     images,
     loadTrackerRef,
   } = props;
@@ -145,12 +148,16 @@ export default function Header({
             <Eject className="w-5 h-5 group-hover:fill-rd group-focus:fill-rd group-hover:drop-shadow-red group-focus:drop-shadow-red transition-colors" />
           </button>
         ) : (
-          <a
-            href="https://www.instagram.com/goodluckwhiterabbit/"
-            className={`px-5 flex items-center justify-center border-b border-solid`}
-          >
-            <Instagram />
-          </a>
+          <div className="flex border-b border-solid">
+            <a
+              href="https://www.instagram.com/goodluckwhiterabbit/"
+              className={`px-5 flex items-center justify-center border-r border-solid max-h-[58px] max-w-[58px]`}
+            >
+              <Instagram />
+            </a>
+
+            <ContactButton setContactOpen={setContactOpen} />
+          </div>
         )}
       </nav>
     </header>
