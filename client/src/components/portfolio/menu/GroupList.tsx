@@ -35,7 +35,7 @@ export default function GroupList({
 
   return (
     <ul
-      className="flex flex-col items-start [writing-mode:horizontal-tb] w-full overflow-y-scroll xl:max-h-[177px] border-b border-solid bg-black"
+      className="flex flex-col justify-start [writing-mode:horizontal-tb] h-full w-full overflow-y-scroll bg-black"
       ref={listRef}
     >
       {groups.map((group, j) => (
@@ -49,7 +49,7 @@ export default function GroupList({
           <button
             className={`${j === activeGroup ? "" : "opacity-40"} drop-shadow-glo text-stone-200`}
             onClick={async () => {
-              scrollToGroup(activeGroup);
+              scrollToGroup(j);
               if (bodyRef) {
                 bodyRef.current?.scrollTo({ top: 0, behavior: "smooth" });
               }
