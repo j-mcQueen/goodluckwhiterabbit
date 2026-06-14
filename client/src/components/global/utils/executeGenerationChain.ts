@@ -15,7 +15,7 @@ export const executeGenerationChain = async (
   counter: number,
   endPoint: number,
   id: string | undefined,
-  size: string
+  size: string,
 ) => {
   const urls = await generateImagesetGetUrls(
     counter,
@@ -23,7 +23,7 @@ export const executeGenerationChain = async (
     targetImageset,
     setNotice,
     id,
-    size
+    size,
   );
 
   if (urls.files === false) return { stored: 0, files: false, count: 0 };
@@ -33,7 +33,7 @@ export const executeGenerationChain = async (
       urls: urls.presigns,
       files,
     },
-    counter
+    counter,
   );
 
   return { ...newFileData, stored: urls.stored };

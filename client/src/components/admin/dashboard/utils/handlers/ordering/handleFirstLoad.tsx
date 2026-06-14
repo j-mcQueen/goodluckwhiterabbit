@@ -21,7 +21,7 @@ export const handleFirstLoad = async ({ ...params }) => {
 
   if (
     orderedImagesets[newTargetImageset].some(
-      (item: Blob | object) => item instanceof Blob
+      (item: Blob | object) => item instanceof Blob,
     )
   ) {
     return;
@@ -37,7 +37,7 @@ export const handleFirstLoad = async ({ ...params }) => {
     0,
     10,
     targetClient._id,
-    "sm"
+    "sm",
   );
 
   if (data.stored > 0 && data.files) {

@@ -8,14 +8,21 @@ const {
 const { getSignedUrl } = require("@aws-sdk/s3-request-presigner");
 const { validateParams } = require("../utils/validateParams");
 
-const findFilterSort = async (bucket, group, prefix, regex, size) => {
+const findFilterSort = async (
+  bucket,
+  prefix,
+  regex,
+  size,
+  group = undefined,
+) => {
+  // TODO this is configured for portfolio calls, not admin calls. If the source of the request is the admin dashboard, group is not supplied, the request exits early, and the action breaks. Pls fix
   let objects;
   try {
     objects = await s3.send(
       new ListObjectsV2Command({
         Bucket: bucket,
         Prefix: prefix,
-        StartAfter: `${prefix}/${group}/${size}`,
+        StartAfter: group ? `${prefix}/${group}/${size}` : undefined,
         MaxKeys: 100,
       }),
     );
@@ -129,6 +136,9 @@ exports.generateGetPresigned = async (req, res, next) => {
     // loop over S3 objects and generate presigns for matches
     const presigns = [];
     const skipped = [];
+    const indexRegex = new RegExp(
+      `/${req.params.size}/[^/]+_(\\d{1,3})\\.[^.]+$`,
+    );
     for (let i = 0; i < s3Data.results.Contents.length; i++) {
       const position = s3Data.results.Contents[i].Key.match(indexRegex);
       if (
@@ -183,10 +193,11 @@ exports.generatePortfolioUrls = async (req, res, next) => {
       // find, filter, and sort objects by their group numbers
       const { objects, stored } = await findFilterSort(
         process.env.AWS_SECONDARY_BUCKET,
-        req.params.group,
+
         `${req.params.category}/${req.params.sub}`,
         groupRegex,
         req.params.size,
+        req.params.group,
       );
 
       if (!objects.Contents) throw new Error({ message: "No files" });

@@ -13,7 +13,7 @@ export const generateImagesetGetUrls = async (
     }>
   >,
   userId: string | undefined,
-  size: string
+  size: string,
 ) => {
   let presigns;
   try {
@@ -26,7 +26,7 @@ export const generateImagesetGetUrls = async (
           "Content-Type": "application/json",
         },
         credentials: "include",
-      }
+      },
     );
     const data = await response.json();
 
