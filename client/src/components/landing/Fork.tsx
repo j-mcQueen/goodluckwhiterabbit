@@ -3,7 +3,7 @@ import Segment from "./Segment";
 
 export default function Fork() {
   return (
-    <section className="flex flex-col xl:grid xl:grid-cols-3">
+    <section className="flex flex-col w-full">
       {mdata.map((a) => {
         return (
           <Segment

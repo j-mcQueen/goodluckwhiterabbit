@@ -26,7 +26,7 @@ export default function Segment({ ...props }) {
         <img
           src={source}
           alt={alt}
-          className={`${mobile ? dims.m : dims.d} object-cover xl:hover:scale-110 transition-transform duration-500`}
+          className={`${mobile ? dims.m : dims.d} object-cover xl:hover:scale-110 transition-transform duration-500 w-full`}
         />
       </motion.div>
     </Link>
