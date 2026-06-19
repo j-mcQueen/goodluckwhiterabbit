@@ -453,6 +453,7 @@ exports.bulkUpload = async (req, res, next) => {
     });
 
     const tempPaths = sortedFiles.map((file) => file.path); // for clean-up only
+    const existingCount = Number(req.query.fileCount) || 0;
 
     const uploadToS3 = async (buffer, key, contentType, contentLength) => {
       return await s3.send(
@@ -479,7 +480,7 @@ exports.bulkUpload = async (req, res, next) => {
             ]);
 
             const key = (size) =>
-              `${req.body._id}/${req.body.imageset}/${index}/${size}/${file.originalname}`;
+              `${req.body._id}/${req.body.imageset}/${index + existingCount}/${size}/${file.originalname}`;
 
             // concurrent upload -> faster completion
             await Promise.all([
@@ -499,11 +500,9 @@ exports.bulkUpload = async (req, res, next) => {
       );
 
       // make it easy on the frontend to display successfully upload files
-      const firstTen = settled
+      const succeeded = settled
         .map((item, i) =>
-          item.status === "fulfilled" && i < 10
-            ? sortedFiles[i].originalname
-            : null,
+          item.status === "fulfilled" ? sortedFiles[i].originalname : null,
         )
         .filter(Boolean);
 
@@ -514,7 +513,11 @@ exports.bulkUpload = async (req, res, next) => {
         )
         .filter(Boolean);
 
-      res.json({ firstTen, failed });
+      res.json({
+        firstTen: succeeded.slice(0, 10),
+        failed,
+        newCount: succeeded.length + existingCount,
+      });
     } catch (error) {
       return res
         .status(500)

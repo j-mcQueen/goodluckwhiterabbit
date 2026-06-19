@@ -1,20 +1,24 @@
 type BulkUploadSuccess = {
   failed: string[];
   firstTen: string[];
+  newCount: number;
 };
 
 type BulkUploadResponse = BulkUploadSuccess;
 
 export const bulkUpload = async (
   formData: FormData,
-  userId: string,
+  user: { _id: string; fileCounts: { [key: string]: number } },
   imageset: string,
   updateProgress: (percent: number) => void,
 ): Promise<BulkUploadResponse> => {
   return new Promise((resolve, reject) => {
     const req = new XMLHttpRequest();
 
-    req.open("POST", `/users/${userId}/${imageset}/bulkUpload`);
+    req.open(
+      "POST",
+      `/users/${user._id}/${imageset}/bulkUpload?fileCount=${user.fileCounts[imageset]}`,
+    );
     req.withCredentials = true;
     req.setRequestHeader("Accept", "application/json");
 

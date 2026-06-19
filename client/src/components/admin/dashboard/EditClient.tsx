@@ -47,7 +47,7 @@ export default function EditClient({ ...props }) {
         try {
           const data = await bulkUpload(
             formData,
-            targetClient._id,
+            targetClient,
             targetImageset,
             (percent: number) => setUploadProgress(percent),
           );
@@ -65,6 +65,16 @@ export default function EditClient({ ...props }) {
             ...prev,
             [targetImageset]: matched,
           }));
+
+          setTargetClient(
+            (prev: { fileCounts: { [key: string]: number } }) => ({
+              ...prev,
+              fileCounts: {
+                ...prev.fileCounts,
+                [targetImageset]: data.newCount,
+              },
+            }),
+          );
 
           if (data.failed.length > 0) {
             // don't clear queue entirely - leave the failed ones so user can retry bulk upload with failed files
