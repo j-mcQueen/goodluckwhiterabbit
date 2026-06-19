@@ -3,12 +3,12 @@ import { handleDragStart } from "./utils/handlers/handleDragStart";
 import { handleDragEnd } from "./utils/handlers/handleDragEnd";
 import { handleChange } from "./utils/handlers/queueing/handleChange";
 import { handleDelete } from "./utils/handlers/queueing/handleDelete";
+
 import Close from "../../../assets/media/icons/Close";
 
 export default function ImageQueue({ ...props }) {
-  const { setDragTarget } = props;
+  const { queue, setDragTarget, setQueue, setSubmitOpen } = props;
 
-  const [queue, setQueue] = useState<File[]>([]);
   const [uploadCount, setUploadCount] = useState(0);
   const fileRef = useRef<HTMLInputElement>(null);
 
@@ -23,7 +23,22 @@ export default function ImageQueue({ ...props }) {
             {uploadCount === 1 ? " FILE " : " FILES "} QUEUED
           </p>
 
-          <label className="font-tnrBI tracking-widest opacity-80 drop-shadow-glo border border-solid flex items-center px-2 py-1 transition-colors xl:hover:text-rd xl:hover:drop-shadow-red xl:focus:text-rd xl:focus:drop-shadow-red xl:hover:cursor-pointer">
+          {queue.length === 0 ? (
+            <div
+              className={`font-tnrBI text-md tracking-widest opacity-80 drop-shadow-glo border border-solid flex items-center transition-colors xl:hover:text-rd xl:hover:drop-shadow-red xl:focus:text-rd xl:focus:drop-shadow-red xl:hover:cursor-pointer h-[36px] max-h-[36px] ${queue.length === 0 ? "text-gray" : ""}`}
+            >
+              <button
+                type="button"
+                disabled={queue.length > 0 ? false : true}
+                onClick={() => setSubmitOpen(true)}
+                className="px-2 pt-3 pb-2"
+              >
+                SUBMIT
+              </button>
+            </div>
+          ) : null}
+
+          <label className="font-tnrBI text-md tracking-widest opacity-80 drop-shadow-glo border border-solid flex items-center px-2 pt-2 pb-1 transition-colors xl:hover:text-rd xl:hover:drop-shadow-red xl:focus:text-rd xl:focus:drop-shadow-red xl:hover:cursor-pointer h-[36px] max-h-[36px]">
             ADD FILES
             <input
               ref={fileRef}
@@ -48,7 +63,7 @@ export default function ImageQueue({ ...props }) {
                       index,
                       queue,
                       setUploadCount,
-                      setQueue
+                      setQueue,
                     )
                   }
                   className="bg-black border border-solid border-rd p-1 relative"

@@ -3,9 +3,11 @@ import { AnimatePresence, motion } from "framer-motion";
 import { imageset_select_btns } from "./styles/styles";
 import { handleFirstLoadTypes } from "./types/handleFirstLoadTypes";
 import { handleFirstLoad } from "./utils/handlers/ordering/handleFirstLoad";
+import { bulkUpload } from "./utils/handlers/bulkUpload";
 
 import ImageQueue from "./ImageQueue";
 import OrderContainer from "./OrderContainer";
+import SubmitDialog from "./modals/SubmitDialog";
 
 export default function EditClient({ ...props }) {
   const { clients, setClients, setNotice, targetClient, setTargetClient } =
@@ -22,6 +24,11 @@ export default function EditClient({ ...props }) {
   const [started, setStarted] = useState(false);
   const [spinner, setSpinner] = useState(false);
   const [dragTarget, setDragTarget] = useState({});
+  const [submitOpen, setSubmitOpen] = useState(false);
+  const [queue, setQueue] = useState<File[]>([]);
+  const [submitStatus, setSubmitStatus] = useState<number | null>(null);
+  const [uploadProgress, setUploadProgress] = useState<number | null>(null);
+  const [bulkFails, setBulkFails] = useState<string[]>([]);
 
   const [orderedImagesets, setOrderedImagesets] = useState({
     snapshots: Array(10).fill({}),
@@ -30,19 +37,68 @@ export default function EditClient({ ...props }) {
     socials: Array(10).fill({}),
   });
 
-  const [queuedImages, setQueuedImages] = useState(() => {
-    if (targetClient.queue !== undefined) {
-      return [...targetClient.queue[targetImageset]];
-    } else return [];
-  });
-
   return (
     <form
-      onSubmit={(e) => {
+      onSubmit={async (e) => {
         e.preventDefault();
+        const formData = new FormData(e.target as HTMLFormElement);
+        setSubmitStatus(0);
+
+        try {
+          const data = await bulkUpload(
+            formData,
+            targetClient._id,
+            targetImageset,
+            (percent: number) => setUploadProgress(percent),
+          );
+
+          setSubmitStatus(1);
+          setUploadProgress(null);
+          setBulkFails(data.failed);
+
+          const matched = data.firstTen.map((filename) => {
+            const queuedFile = queue.find((file) => file.name === filename);
+            return queuedFile ?? {};
+          });
+
+          setOrderedImagesets((prev) => ({
+            ...prev,
+            [targetImageset]: matched,
+          }));
+
+          if (data.failed.length > 0) {
+            // don't clear queue entirely - leave the failed ones so user can retry bulk upload with failed files
+            const failedNames = new Set(data.failed);
+
+            setQueue((prev) =>
+              prev.filter((file) => failedNames.has(file.name)),
+            );
+          } else {
+            (e.target as HTMLFormElement).reset();
+            setQueue([]);
+          }
+        } catch (error) {
+          setSubmitStatus(null);
+          setUploadProgress(null);
+          setNotice({
+            status: true,
+            message: `There was a problem with your upload. More details: ${error}`,
+            logout: { status: false, path: null },
+          });
+          return;
+        }
       }}
       className="pb-10 border-spacing-0"
     >
+      <SubmitDialog
+        submitOpen={submitOpen}
+        submitStatus={submitStatus}
+        setSubmitOpen={setSubmitOpen}
+        setSubmitStatus={setSubmitStatus}
+        uploadProgress={uploadProgress}
+        bulkFails={bulkFails}
+      />
+
       <hgroup className="flex flex-col items-center pb-10">
         <h1 className="font-tnrBI xl:text-4xl pb-3 tracking-widest opacity-80 drop-shadow-glo">
           {targetClient.name.toUpperCase()}
@@ -121,7 +177,6 @@ export default function EditClient({ ...props }) {
               <OrderContainer
                 clients={clients}
                 dragTarget={dragTarget}
-                queuedImages={queuedImages}
                 targetClient={targetClient}
                 targetImageset={targetImageset}
                 setClients={setClients}
@@ -129,12 +184,16 @@ export default function EditClient({ ...props }) {
                 setNotice={setNotice}
                 setTargetClient={setTargetClient}
                 orderedImagesets={orderedImagesets}
-                setQueuedImages={setQueuedImages}
                 spinner={spinner}
                 setSpinner={setSpinner}
               />
 
-              <ImageQueue setDragTarget={setDragTarget} />
+              <ImageQueue
+                queue={queue}
+                setDragTarget={setDragTarget}
+                setQueue={setQueue}
+                setSubmitOpen={setSubmitOpen}
+              />
             </motion.div>
           )}
         </AnimatePresence>

@@ -15,7 +15,6 @@ const findFilterSort = async (
   size,
   group = undefined,
 ) => {
-  // TODO this is configured for portfolio calls, not admin calls. If the source of the request is the admin dashboard, group is not supplied, the request exits early, and the action breaks. Pls fix
   let objects;
   try {
     objects = await s3.send(

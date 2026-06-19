@@ -1,15 +1,20 @@
 require("dotenv").config();
+
 const passport = require("passport");
 const jwt = require("jsonwebtoken");
 const User = require("../models/user");
 const sharp = require("sharp");
 
 const { body, validationResult } = require("express-validator");
+const { createReadStream } = require("fs");
 const { returnClients } = require("./utils/returnClients");
 const { createCode } = require("./utils/createCode");
 const { verifyTokens } = require("./utils/verifyTokens");
 const { updateCount } = require("./utils/updateCount");
+const { pLimit } = require("p-limit");
 const { s3 } = require("./config/s3");
+
+const limit = pLimit(3);
 
 const {
   ListObjectsV2Command,
@@ -430,5 +435,100 @@ exports.uploadFile = async (req, res, next) => {
     await updateCount(req.body._id, req.body.imageset, res, User, 1);
 
     return res.status(200).send(small);
+  }
+};
+
+exports.bulkUpload = async (req, res, next) => {
+  const verified = await verifyTokens(req, res);
+
+  if (verified) {
+    const sortedFiles = [...req.files].sort((a, b) => {
+      // order inbound files based on filename suffix ("01" -> "XXX")
+      const extractIndex = (filename) => {
+        const match = filename.match(/_(\d+)\./);
+        return match ? parseInt(match[1]) : 0;
+      };
+
+      return extractIndex(a.originalname) - extractIndex(b.originalname);
+    });
+
+    const tempPaths = sortedFiles.map((file) => file.path); // for clean-up only
+
+    const uploadToS3 = async (buffer, key, contentType, contentLength) => {
+      return await s3.send(
+        new PutObjectCommand({
+          Bucket: process.env.AWS_PRIMARY_BUCKET,
+          Key: key,
+          Body: buffer,
+          ContentType: contentType,
+          ...(contentLength && { ContentLength: contentLength }),
+        }),
+      );
+    };
+
+    try {
+      // begin upload and track any files which fail without triggering catch
+      const settled = await Promise.allSettled(
+        sortedFiles.map((file, index) =>
+          // cap concurrent processing and minimise resource (CPU/memory/network) usage
+          limit(async () => {
+            // concurrent resize -> faster completion
+            const [largeBuffer, smallBuffer] = await Promise.all([
+              sharp(file.path).resize(2400, null).toFormat("webp").toBuffer(),
+              sharp(file.path).resize(768, null).toFormat("webp").toBuffer(),
+            ]);
+
+            const key = (size) =>
+              `${req.body._id}/${req.body.imageset}/${index}/${size}/${file.originalname}`;
+
+            // concurrent upload -> faster completion
+            await Promise.all([
+              uploadToS3(
+                createReadStream(file.path),
+                key("og"),
+                file.mimetype,
+                file.size,
+              ),
+              uploadToS3(largeBuffer, key("lg"), "image/webp"),
+              uploadToS3(smallBuffer, key("sm"), "image/webp"),
+            ]);
+
+            // no return - nothing meaningful to use outwith this scope
+          }),
+        ),
+      );
+
+      // make it easy on the frontend to display successfully upload files
+      const firstTen = settled
+        .map((item, i) =>
+          item.status === "fulfilled" && i < 10
+            ? sortedFiles[i].originalname
+            : null,
+        )
+        .filter(Boolean);
+
+      // supply any failed uploads for user notification
+      const failed = settled
+        .map((item, i) =>
+          item.status === "rejected" ? sortedFiles[i].originalname : null,
+        )
+        .filter(Boolean);
+
+      res.json({ firstTen, failed });
+    } catch (error) {
+      return res
+        .status(500)
+        .json({ error: "Upload failed", detail: error.message });
+    } finally {
+      // wipe temp files created as part creating + using a stream
+      await Promise.all(
+        tempPaths.map((path) =>
+          unlink(path).catch((error) => {
+            if (error.code !== "ENOENT")
+              console.error("Cleanup failed:", error);
+          }),
+        ),
+      );
+    }
   }
 };
