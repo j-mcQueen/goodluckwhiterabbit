@@ -1,11 +1,13 @@
-const {
+import express from "express";
+import multer from "multer";
+
+import {
   login,
   getUser,
   generateOriginalGetPresigned,
   downloadAll,
-} = require("../controllers/user/user");
-const express = require("express");
-const multer = require("multer");
+} from "../controllers/user/user.js";
+
 const router = express.Router();
 const upload = multer();
 
@@ -17,4 +19,4 @@ router.get("/:id/:imageset/og/:index", generateOriginalGetPresigned);
 // POST
 router.post("/login", upload.none(), login);
 
-module.exports = router;
+export default router;

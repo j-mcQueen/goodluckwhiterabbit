@@ -1,12 +1,12 @@
-const { verifyTokens } = require("../utils/verifyTokens");
-const { s3 } = require("../config/s3");
-const {
+import {
   PutObjectCommand,
   ListObjectsV2Command,
   GetObjectCommand,
-} = require("@aws-sdk/client-s3");
-const { getSignedUrl } = require("@aws-sdk/s3-request-presigner");
-const { validateParams } = require("../utils/validateParams");
+} from "@aws-sdk/client-s3";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+import { validateParams } from "../utils/validateParams.js";
+import { s3 } from "../config/s3.js";
+import { verifyTokens } from "../utils/verifyTokens.js";
 
 const findFilterSort = async (
   bucket,
@@ -56,7 +56,7 @@ const sortBatch = (arr, suffixRegex, groupRegex) => {
   });
 };
 
-exports.logout = async (req, res, next) => {
+export const logout = async (req, res, next) => {
   // revoke refresh and access tokens
   return res
     .clearCookie("accessToken", {
@@ -72,7 +72,7 @@ exports.logout = async (req, res, next) => {
     .end();
 };
 
-exports.generatePutPresigned = async (req, res, next) => {
+export const generatePutPresigned = async (req, res, next) => {
   const verified = await verifyTokens(req, res);
 
   if (verified) {
@@ -103,7 +103,7 @@ exports.generatePutPresigned = async (req, res, next) => {
   }
 };
 
-exports.generateGetPresigned = async (req, res, next) => {
+export const generateGetPresigned = async (req, res, next) => {
   const verified = await verifyTokens(req, res);
 
   if (verified) {
@@ -173,7 +173,7 @@ exports.generateGetPresigned = async (req, res, next) => {
   }
 };
 
-exports.generatePortfolioUrls = async (req, res, next) => {
+export const generatePortfolioUrls = async (req, res, next) => {
   const verified = validateParams(
     req.params.category,
     req.params.group,
@@ -276,7 +276,7 @@ exports.generatePortfolioUrls = async (req, res, next) => {
   }
 };
 
-exports.countImagesetItems = async (req, res, next) => {
+export const countImagesetItems = async (req, res, next) => {
   const verified = await verifyTokens(req, res);
 
   if (verified) {

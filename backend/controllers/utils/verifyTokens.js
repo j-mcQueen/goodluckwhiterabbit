@@ -1,6 +1,6 @@
-const jwt = require("jsonwebtoken");
+import jwt from "jsonwebtoken";
 
-exports.verifyTokens = async (req, res) => {
+export const verifyTokens = async (req, res) => {
   let decodedAccess;
   try {
     decodedAccess = jwt.verify(req.cookies.accessToken, process.env.JWT_SECRET);
@@ -9,7 +9,7 @@ exports.verifyTokens = async (req, res) => {
     try {
       decodedRefresh = jwt.verify(
         req.cookies.refreshToken,
-        process.env.JWT_SECRET
+        process.env.JWT_SECRET,
       );
     } catch (err) {
       return res
@@ -22,7 +22,7 @@ exports.verifyTokens = async (req, res) => {
       decodedAccess = jwt.sign(
         { _id: decodedRefresh._id },
         process.env.JWT_SECRET,
-        { expiresIn: "1h" }
+        { expiresIn: "1h" },
       );
 
       // attach new access token to response cookie

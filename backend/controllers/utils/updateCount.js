@@ -1,4 +1,4 @@
-exports.updateCount = async (_id, imageset, res, User, value) => {
+export const updateCount = async (_id, imageset, res, User, value) => {
   try {
     const updated = await User.findByIdAndUpdate(
       _id,
@@ -7,7 +7,7 @@ exports.updateCount = async (_id, imageset, res, User, value) => {
           [`fileCounts.${imageset}`]: value,
         },
       },
-      { new: true }
+      { new: true },
     );
 
     return updated;
@@ -15,7 +15,7 @@ exports.updateCount = async (_id, imageset, res, User, value) => {
     return res
       .status(304)
       .json(
-        "We have uploaded your files, but there was a database error. Your file count may not be accurate"
+        "We have uploaded your files, but there was a database error. Your file count may not be accurate",
       );
   }
 };

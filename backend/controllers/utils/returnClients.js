@@ -1,4 +1,4 @@
-exports.returnClients = async (user) => {
+export const returnClients = async (user) => {
   const allUsers = await user
     .find(
       {},
@@ -6,7 +6,7 @@ exports.returnClients = async (user) => {
         // exclude this information from the query
         role: 0,
         __v: 0,
-      }
+      },
     )
     .exec();
 

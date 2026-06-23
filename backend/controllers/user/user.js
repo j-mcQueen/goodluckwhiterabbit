@@ -1,17 +1,16 @@
-require("dotenv").config();
-const jwt = require("jsonwebtoken");
-const User = require("../../models/user");
-const archiver = require("archiver");
-const {
-  GetObjectCommand,
-  ListObjectsV2Command,
-} = require("@aws-sdk/client-s3");
-const { getSignedUrl } = require("@aws-sdk/s3-request-presigner");
-const { body, validationResult } = require("express-validator");
-const { verifyTokens } = require("../utils/verifyTokens");
-const { s3 } = require("../config/s3");
+import "dotenv/config";
 
-exports.login = [
+import jwt from "jsonwebtoken";
+import User from "../../models/user.js";
+import archiver from "archiver";
+
+import { GetObjectCommand, ListObjectsV2Command } from "@aws-sdk/client-s3";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+import { body, validationResult } from "express-validator";
+import { verifyTokens } from "../utils/verifyTokens.js";
+import { s3 } from "../config/s3.js";
+
+export const login = [
   // sanitize received input
   body("code").trim().notEmpty().isStrongPassword({
     minLength: 8,
@@ -57,13 +56,13 @@ exports.login = [
       process.env.JWT_SECRET,
       {
         expiresIn: "24h",
-      }
+      },
     ); // create refresh token
 
     const accessToken = jwt.sign(
       { _id: req.user._id },
       process.env.JWT_SECRET,
-      { expiresIn: "1h" }
+      { expiresIn: "1h" },
     ); // create access token
 
     return res
@@ -82,7 +81,7 @@ exports.login = [
   },
 ];
 
-exports.downloadAll = async (req, res, next) => {
+export const downloadAll = async (req, res, next) => {
   const verified = await verifyTokens(req, res);
 
   if (verified) {
@@ -93,11 +92,11 @@ exports.downloadAll = async (req, res, next) => {
         new ListObjectsV2Command({
           Bucket: process.env.AWS_PRIMARY_BUCKET,
           Prefix: `${req.params.id}/${req.params.imageset}`,
-        })
+        }),
       );
 
       const sorted = objects.Contents.filter((item) =>
-        item.Key.includes(`/og/`)
+        item.Key.includes(`/og/`),
       ).sort((a, b) => {
         const posA = a.Key.match(indexRegex);
         const posB = b.Key.match(indexRegex);
@@ -143,7 +142,7 @@ exports.downloadAll = async (req, res, next) => {
           new GetObjectCommand({
             Bucket: process.env.AWS_PRIMARY_BUCKET,
             Key: file.Key,
-          })
+          }),
         );
         const body = cmd.Body;
 
@@ -155,7 +154,7 @@ exports.downloadAll = async (req, res, next) => {
   }
 };
 
-exports.getUser = async (req, res, next) => {
+export const getUser = async (req, res, next) => {
   const verified = await verifyTokens(req, res);
 
   if (verified) {
@@ -181,7 +180,7 @@ exports.getUser = async (req, res, next) => {
   }
 };
 
-exports.generateOriginalGetPresigned = async (req, res, next) => {
+export const generateOriginalGetPresigned = async (req, res, next) => {
   // generate presigned url for a single original file
   const verified = await verifyTokens(req, res);
 
@@ -191,7 +190,7 @@ exports.generateOriginalGetPresigned = async (req, res, next) => {
         Bucket: process.env.AWS_PRIMARY_BUCKET,
         MaxKeys: 1,
         Prefix: `${req.params.id}/${req.params.imageset}/${req.params.index}/og/`,
-      })
+      }),
     );
     const name = metadata.Contents[0].Key.split("/").pop();
 

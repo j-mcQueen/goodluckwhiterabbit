@@ -1,28 +1,32 @@
-const path = require("path");
-require("dotenv").config({ path: path.join(__dirname, ".env") });
+import path from "path";
+import "dotenv/config";
 
 // middleware + utils
-const cors = require("cors");
-const express = require("express");
-
-const cookieParser = require("cookie-parser");
-const logger = require("morgan");
-const passport = require("passport");
-const createError = require("http-errors");
-const bcrypt = require("bcryptjs");
-const helmet = require("helmet");
-const RateLimit = require("express-rate-limit");
+import cors from "cors";
+import express from "express";
+import cookieParser from "cookie-parser";
+import logger from "morgan";
+import passport from "passport";
+import createError from "http-errors";
+import bcrypt from "bcryptjs";
+import rateLimit from "express-rate-limit";
+import mongoose from "mongoose";
+import helmet from "helmet";
 
 // models
-const Admin = require("./models/admin");
+import Admin from "./models/admin.js";
 
 // routes
-const globalRouter = require("./routes/global");
-const indexRouter = require("./routes/index");
-const userRouter = require("./routes/user");
+import globalRouter from "./routes/global.js";
+import indexRouter from "./routes/index.js";
+import userRouter from "./routes/user.js";
 
-const mongoose = require("mongoose");
-const LocalStrategy = require("passport-local").Strategy;
+import { Strategy as LocalStrategy } from "passport-local";
+import { fileURLToPath } from "url";
+import { dirname } from "path";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 const app = express();
 mongoose.set("strictQuery", false);
@@ -38,7 +42,7 @@ const main = async () => {
 };
 main();
 
-const limiter = RateLimit({
+const limiter = rateLimit({
   windowMs: 1 * 60 * 1000,
   limit: 100,
   // 100 requests max per minute
@@ -46,7 +50,6 @@ const limiter = RateLimit({
 
 app.use(cookieParser());
 app.use(
-  "*",
   cors({
     origin: [
       "http://localhost:5173",
@@ -104,4 +107,4 @@ app.use(function (err, req, res, next) {
   res.send(err);
 });
 
-module.exports = app;
+export default app;

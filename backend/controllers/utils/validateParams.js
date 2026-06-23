@@ -1,5 +1,5 @@
 // for portfolio requests
-exports.validateParams = (category, group, size, start) => {
+export const validateParams = (category, group, size, start) => {
   const acceptedCategories = [
     "PHOTO",
     "EDITORIAL",

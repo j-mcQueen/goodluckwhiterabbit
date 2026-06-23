@@ -1,4 +1,8 @@
-const {
+import fs from "fs";
+import express from "express";
+import multer from "multer";
+
+import {
   adminGetClients,
   adminGetFileAndDelete,
   adminLogin,
@@ -9,11 +13,7 @@ const {
   adminGetUserImagesetCount,
   bulkUpload,
   uploadFile,
-} = require("../controllers/admin");
-
-const fs = require("fs");
-const express = require("express");
-const multer = require("multer");
+} from "../controllers/admin.js";
 
 const router = express.Router();
 const upload = multer(); // enable form data to be unpacked
@@ -49,4 +49,4 @@ router.post("/users/:id/:imageset/bulkUpload", diskUpload.any(), bulkUpload);
 router.delete("/deleteUser/:id", adminDeleteUser);
 router.delete("/users/:id/:imageset/:index/delete", adminDeleteFile);
 
-module.exports = router;
+export default router;

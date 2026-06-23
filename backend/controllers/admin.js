@@ -1,28 +1,26 @@
-require("dotenv").config();
+import "dotenv/config";
+import passport from "passport";
+import jwt from "jsonwebtoken";
+import User from "../models/user.js";
+import sharp from "sharp";
+import pLimit from "p-limit";
 
-const passport = require("passport");
-const jwt = require("jsonwebtoken");
-const User = require("../models/user");
-const sharp = require("sharp");
-
-const { body, validationResult } = require("express-validator");
-const { createReadStream } = require("fs");
-const { returnClients } = require("./utils/returnClients");
-const { createCode } = require("./utils/createCode");
-const { verifyTokens } = require("./utils/verifyTokens");
-const { updateCount } = require("./utils/updateCount");
-const { pLimit } = require("p-limit");
-const { s3 } = require("./config/s3");
-
-const limit = pLimit(3);
-
-const {
+import { body, validationResult } from "express-validator";
+import { createReadStream } from "fs";
+import { returnClients } from "./utils/returnClients.js";
+import { createCode } from "./utils/createCode.js";
+import { verifyTokens } from "./utils/verifyTokens.js";
+import { updateCount } from "./utils/updateCount.js";
+import { s3 } from "./config/s3.js";
+import {
   ListObjectsV2Command,
   DeleteObjectsCommand,
   PutObjectCommand,
-} = require("@aws-sdk/client-s3");
+} from "@aws-sdk/client-s3";
 
-exports.adminLogin = [
+const limit = pLimit(3);
+
+export const adminLogin = [
   // sanitize received input with body from express validator
   body("username")
     .trim()
@@ -86,7 +84,7 @@ exports.adminLogin = [
   },
 ];
 
-exports.adminAddClient = [
+export const adminAddClient = [
   body("clientname").trim().notEmpty().isLength({ min: 4 }),
   body("clientemail").trim().notEmpty().isEmail(),
   body("clientcategory").trim().notEmpty(),
@@ -153,7 +151,7 @@ exports.adminAddClient = [
   },
 ];
 
-exports.adminGetUserImagesetCount = async (req, res, next) => {
+export const adminGetUserImagesetCount = async (req, res, next) => {
   const verified = await verifyTokens(req, res);
 
   if (verified) {
@@ -169,7 +167,7 @@ exports.adminGetUserImagesetCount = async (req, res, next) => {
   }
 };
 
-exports.adminUpdateUserImagesetCount = async (req, res, next) => {
+export const adminUpdateUserImagesetCount = async (req, res, next) => {
   const verified = await verifyTokens(req, res);
 
   if (verified) {
@@ -186,7 +184,7 @@ exports.adminUpdateUserImagesetCount = async (req, res, next) => {
   }
 };
 
-exports.adminGetClients = async (req, res, next) => {
+export const adminGetClients = async (req, res, next) => {
   const verified = await verifyTokens(req, res);
 
   if (verified) {
@@ -205,7 +203,7 @@ exports.adminGetClients = async (req, res, next) => {
   }
 };
 
-exports.adminGetFileAndDelete = async (req, res, next) => {
+export const adminGetFileAndDelete = async (req, res, next) => {
   const verified = await verifyTokens(req, res);
 
   if (verified) {
@@ -276,7 +274,7 @@ exports.adminGetFileAndDelete = async (req, res, next) => {
   }
 };
 
-exports.adminDeleteUser = async (req, res, next) => {
+export const adminDeleteUser = async (req, res, next) => {
   const verified = await verifyTokens(req, res);
 
   if (verified) {
@@ -354,7 +352,7 @@ exports.adminDeleteUser = async (req, res, next) => {
   }
 };
 
-exports.adminDeleteFile = async (req, res, next) => {
+export const adminDeleteFile = async (req, res, next) => {
   const verified = await verifyTokens(req, res);
 
   if (verified) {
@@ -386,7 +384,7 @@ exports.adminDeleteFile = async (req, res, next) => {
   }
 };
 
-exports.uploadFile = async (req, res, next) => {
+export const uploadFile = async (req, res, next) => {
   const verified = await verifyTokens(req, res);
 
   if (verified) {
@@ -438,7 +436,7 @@ exports.uploadFile = async (req, res, next) => {
   }
 };
 
-exports.bulkUpload = async (req, res, next) => {
+export const bulkUpload = async (req, res, next) => {
   const verified = await verifyTokens(req, res);
 
   if (verified) {

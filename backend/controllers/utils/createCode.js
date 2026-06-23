@@ -1,4 +1,4 @@
-exports.createCode = () => {
+export const createCode = () => {
   // create a user login code that contains 2 specials, 2 numbers, 2 lowercase letters, 2 uppercase letters, and a hyphen at index 4
 
   let code = "";
