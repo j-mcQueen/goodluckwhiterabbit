@@ -24,7 +24,6 @@ export const generatePortfolioGetUrls = async (
         method: "GET",
         headers: {
           Accept: "application/json",
-          "Content-Type": "application/json",
         },
         credentials: "include",
       },

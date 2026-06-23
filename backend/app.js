@@ -46,6 +46,7 @@ const limiter = RateLimit({
 
 app.use(cookieParser());
 app.use(
+  "*",
   cors({
     origin: [
       "http://localhost:5173",
@@ -54,7 +55,7 @@ app.use(
       "https://www.goodluckwhiterabbit.com",
     ],
     credentials: true,
-  })
+  }),
 );
 app.use(limiter);
 app.use(helmet());
@@ -79,7 +80,7 @@ passport.use(
       // either the admin search or password matches returned false so send an unauthorized response
       return done(err);
     }
-  })
+  }),
 );
 
 passport.initialize();
