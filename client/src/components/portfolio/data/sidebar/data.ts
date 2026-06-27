@@ -17,7 +17,7 @@ export const sidebar_data: {
   },
   "/photo": {
     title: "PHOTOGRAPHY",
-    subcategories: ["WEDDINGS", "EVENTS", "FILM", "COMMERCIAL", "EDITORIAL"],
+    subcategories: ["WEDDINGS"], // missing: "EVENTS", "FILM", "COMMERCIAL", "EDITORIAL"
     menu: [
       {
         "STRONG ROPE BREWERY": "001",

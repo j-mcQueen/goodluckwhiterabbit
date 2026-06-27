@@ -194,7 +194,7 @@ export default function Nav({ ...props }) {
                                     bounce: 0,
                                     duration: 0.4,
                                   }}
-                                  className="w-full max-h-full flex flex-col overflow-y-auto"
+                                  className="w-full max-h-full flex flex-col overflow-y-auto pr-5"
                                   key="active-groups"
                                 >
                                   {determineArr(
