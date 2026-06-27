@@ -1,6 +1,7 @@
 import { useLayoutEffect, useRef, useState } from "react";
-import Close from "../../assets/media/icons/Close";
 import { handleContactSubmit } from "./utils/handleContactSubmit";
+
+import Close from "../../assets/media/icons/Close";
 
 export default function ContactDialog({ ...props }) {
   const { contactOpen, setContactOpen } = props;

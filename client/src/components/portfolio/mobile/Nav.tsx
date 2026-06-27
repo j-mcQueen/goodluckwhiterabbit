@@ -234,7 +234,7 @@ export default function Nav({ ...props }) {
               })}
             </ul>
 
-            <div className="flex items-center justify-around w-full">
+            <div className="flex items-center justify-around w-full h-[50px]">
               <div className="w-full h-full flex items-center justify-center border-r border-solid border-white relative">
                 <a
                   className="w-full h-full flex items-center justify-center"

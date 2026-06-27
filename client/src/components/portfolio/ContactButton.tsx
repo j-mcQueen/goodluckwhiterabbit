@@ -6,8 +6,8 @@ export default function ContactButton({ ...props }) {
 
   const styleVariants = {
     mobile: {
-      cntr: "w-full h-full text-center",
-      button: "w-full h-full flex justify-center py-2",
+      cntr: "w-full h-[50px] text-center",
+      button: "w-full h-full flex items-center justify-center",
       svg: "w-[24px] h-[24px]",
     },
     desktop: {
