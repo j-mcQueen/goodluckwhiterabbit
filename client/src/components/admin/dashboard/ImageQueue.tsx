@@ -25,13 +25,21 @@ export default function ImageQueue({ ...props }) {
 
           {queue.length > 0 ? (
             <div
-              className={`font-tnrBI text-md tracking-widest opacity-80 drop-shadow-glo border border-solid flex items-center transition-colors xl:hover:text-rd xl:hover:drop-shadow-red xl:focus:text-rd xl:focus:drop-shadow-red xl:hover:cursor-pointer h-[36px] max-h-[36px] ${queue.length === 0 ? "text-gray" : ""}`}
+              className={`font-tnrBI text-md tracking-widest opacity-80 flex items-center h-[36px] max-h-[36px] ${queue.length === 0 ? "text-gray" : ""} gap-5`}
             >
+              <button
+                type="button"
+                onClick={() => setQueue([])}
+                className=" px-2 pt-3 pb-2 border border-solid transition-colors xl:hover:text-rd xl:hover:drop-shadow-red xl:focus:text-rd xl:focus:drop-shadow-red xl:hover:cursor-pointer drop-shadow-glo "
+              >
+                CLEAR
+              </button>
+
               <button
                 type="button"
                 disabled={queue.length > 0 ? false : true}
                 onClick={() => setSubmitOpen(true)}
-                className="px-2 pt-3 pb-2"
+                className="px-2 pt-3 pb-2 border border-solid transition-colors xl:hover:text-rd xl:hover:drop-shadow-red xl:focus:text-rd xl:focus:drop-shadow-red xl:hover:cursor-pointer drop-shadow-glo "
               >
                 SUBMIT
               </button>
