@@ -103,7 +103,7 @@ export default function Portfolio({ ...props }) {
         />
       )}
 
-      <main className="flex flex-col xl:flex-row h-[calc(100dvh-56px-1.5rem)]">
+      <main className="flex flex-col xl:flex-row h-[calc(100dvh-51px-1.5rem)]">
         {mobile ? null : (
           <Sidebar
             activeGroup={activeGroup}
