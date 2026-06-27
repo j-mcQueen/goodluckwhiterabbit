@@ -23,7 +23,7 @@ export default function ImageQueue({ ...props }) {
             {uploadCount === 1 ? " FILE " : " FILES "} QUEUED
           </p>
 
-          {queue.length === 0 ? (
+          {queue.length > 0 ? (
             <div
               className={`font-tnrBI text-md tracking-widest opacity-80 drop-shadow-glo border border-solid flex items-center transition-colors xl:hover:text-rd xl:hover:drop-shadow-red xl:focus:text-rd xl:focus:drop-shadow-red xl:hover:cursor-pointer h-[36px] max-h-[36px] ${queue.length === 0 ? "text-gray" : ""}`}
             >
