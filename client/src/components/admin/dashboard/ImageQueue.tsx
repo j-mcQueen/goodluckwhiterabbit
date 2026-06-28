@@ -29,7 +29,10 @@ export default function ImageQueue({ ...props }) {
             >
               <button
                 type="button"
-                onClick={() => setQueue([])}
+                onClick={() => {
+                  setQueue([]);
+                  setUploadCount(0);
+                }}
                 className=" px-2 pt-3 pb-2 border border-solid transition-colors xl:hover:text-rd xl:hover:drop-shadow-red xl:focus:text-rd xl:focus:drop-shadow-red xl:hover:cursor-pointer drop-shadow-glo "
               >
                 CLEAR

@@ -66,15 +66,21 @@ export default function EditClient({ ...props }) {
             [targetImageset]: matched,
           }));
 
-          setTargetClient(
-            (prev: { fileCounts: { [key: string]: number } }) => ({
-              ...prev,
-              fileCounts: {
-                ...prev.fileCounts,
-                [targetImageset]: data.newCount,
-              },
-            }),
-          );
+          const nextTargetClient = {
+            ...targetClient,
+            fileCounts: {
+              ...targetClient.fileCounts,
+              [targetImageset]: data.newCount,
+            },
+          };
+          setTargetClient(nextTargetClient);
+
+          const nextClients = clients.map((client: { _id: string }) => {
+            return client._id === nextTargetClient._id
+              ? nextTargetClient
+              : client;
+          });
+          setClients(nextClients);
 
           if (data.failed.length > 0) {
             // don't clear queue entirely - leave the failed ones so user can retry bulk upload with failed files

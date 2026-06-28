@@ -1,3 +1,5 @@
+import { determineHost as host } from "../../../../global/utils/determineHost";
+
 type BulkUploadSuccess = {
   failed: string[];
   firstTen: string[];
@@ -17,7 +19,7 @@ export const bulkUpload = async (
 
     req.open(
       "POST",
-      `/users/${user._id}/${imageset}/bulkUpload?fileCount=${user.fileCounts[imageset]}`,
+      `${host}/admin/users/${user._id}/${imageset}/bulkUpload?fileCount=${user.fileCounts[imageset]}`,
     );
     req.withCredentials = true;
     req.setRequestHeader("Accept", "application/json");

@@ -11,6 +11,7 @@ import { returnClients } from "./utils/returnClients.js";
 import { createCode } from "./utils/createCode.js";
 import { verifyTokens } from "./utils/verifyTokens.js";
 import { updateCount } from "./utils/updateCount.js";
+import { unlink } from "fs/promises";
 import { s3 } from "./config/s3.js";
 import {
   ListObjectsV2Command,
@@ -478,7 +479,7 @@ export const bulkUpload = async (req, res, next) => {
             ]);
 
             const key = (size) =>
-              `${req.body._id}/${req.body.imageset}/${index + existingCount}/${size}/${file.originalname}`;
+              `${req.params.id}/${req.params.imageset}/${index + existingCount}/${size}/${file.originalname}`;
 
             // concurrent upload -> faster completion
             await Promise.all([
@@ -510,6 +511,15 @@ export const bulkUpload = async (req, res, next) => {
           item.status === "rejected" ? sortedFiles[i].originalname : null,
         )
         .filter(Boolean);
+
+      // keep database info current
+      await updateCount(
+        req.params.id,
+        req.params.imageset,
+        res,
+        User,
+        succeeded.length,
+      );
 
       res.json({
         firstTen: succeeded.slice(0, 10),

@@ -37,7 +37,11 @@ export default function SubmitDialog({ ...props }) {
           <span className="animate-blink opacity-0 text-rd">&#9607;</span>
           <p>UPLOAD IN PROGRESS</p>
           <p>PLEASE KEEP WINDOW OPEN UNTIL COMPLETION</p>
-          <p>STATUS: {uploadProgress}%</p>
+          <p>
+            {uploadProgress < 100
+              ? `STATUS: ${uploadProgress}%`
+              : "FINALIZING..."}
+          </p>
         </div>
       ) : submitStatus === 1 ? (
         // complete
