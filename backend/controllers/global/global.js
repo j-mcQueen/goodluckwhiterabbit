@@ -22,7 +22,7 @@ const findFilterSort = async (
         Bucket: bucket,
         Prefix: prefix,
         StartAfter: group ? `${prefix}/${group}/${size}` : undefined,
-        MaxKeys: 100,
+        MaxKeys: group ? 100 : 250,
       }),
     );
   } catch (error) {
@@ -138,6 +138,7 @@ export const generateGetPresigned = async (req, res, next) => {
     const indexRegex = new RegExp(
       `/${req.params.size}/[^/]+_(\\d{1,3})\\.[^.]+$`,
     );
+
     for (let i = 0; i < s3Data.results.Contents.length; i++) {
       const position = s3Data.results.Contents[i].Key.match(indexRegex);
       if (
