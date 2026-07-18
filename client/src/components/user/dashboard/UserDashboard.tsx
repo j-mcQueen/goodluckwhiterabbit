@@ -111,7 +111,7 @@ export default function UserDashboard() {
       0,
       10,
       user._id,
-      "lg"
+      "lg",
     );
     setImages({ ...images, [targetImageset]: data.files });
     if (data.files) setSpinner(false);

@@ -131,19 +131,18 @@ export const generateGetPresigned = async (req, res, next) => {
         logout: { status: false, path: null },
       });
     }
-
     // loop over S3 objects and generate presigns for matches
     const presigns = [];
     const skipped = [];
     const indexRegex = new RegExp(
-      `/${req.params.size}/[^/]+_(\\d{1,3})\\.[^.]+$`,
+      `/${req.params.imageset}/(\\d+)/${req.params.size}/`,
     );
 
     for (let i = 0; i < s3Data.results.Contents.length; i++) {
       const position = s3Data.results.Contents[i].Key.match(indexRegex);
       if (
-        Number(position) >= Number(req.params.start) && // this ensures we will always pick up from where we left off when a new batch has been requested
-        Number(position) <= Number(req.params.end) // ensures "out-of-bounds" presigns aren't included
+        Number(position[1]) >= Number(req.params.start) && // this ensures we will always pick up from where we left off when a new batch has been requested
+        Number(position[1]) <= Number(req.params.end) // ensures "out-of-bounds" presigns aren't included
       ) {
         const cmd = new GetObjectCommand({
           Bucket: process.env.AWS_PRIMARY_BUCKET,
