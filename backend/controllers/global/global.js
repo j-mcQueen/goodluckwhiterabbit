@@ -49,8 +49,8 @@ const sortBatch = (arr, suffixRegex, groupRegex) => {
       if (groupA > groupB) return 1;
     }
 
-    const suffixA = Number(a.Key.match(suffixRegex)?.[0] ?? 0);
-    const suffixB = Number(b.Key.match(suffixRegex)?.[0] ?? 0);
+    const suffixA = Number(a.Key.match(suffixRegex)?.[1] ?? 0);
+    const suffixB = Number(b.Key.match(suffixRegex)?.[1] ?? 0);
 
     return suffixA - suffixB;
   });
@@ -131,6 +131,7 @@ export const generateGetPresigned = async (req, res, next) => {
         logout: { status: false, path: null },
       });
     }
+
     // loop over S3 objects and generate presigns for matches
     const presigns = [];
     const skipped = [];

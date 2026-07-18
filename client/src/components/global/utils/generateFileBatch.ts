@@ -1,6 +1,6 @@
 export const generateFileBatch = async (
   images: { urls: string[]; files: object[] },
-  start: number
+  start: number,
 ) => {
   let counter = 0;
   const newFiles =
