@@ -391,10 +391,10 @@ export const uploadFile = async (req, res, next) => {
   if (verified) {
     const file = req.files[0];
 
-    const [large, small] = await Promise.all(
+    const [large, small] = await Promise.all([
       sharp(file.buffer).resize(2400, null).toFormat("webp").toBuffer(),
       sharp(file.buffer).resize(768, null).toFormat("webp").toBuffer(),
-    );
+    ]);
 
     // upload variations to s3
     try {
