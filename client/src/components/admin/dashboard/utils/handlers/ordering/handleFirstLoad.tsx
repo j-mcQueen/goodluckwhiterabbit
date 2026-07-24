@@ -38,6 +38,13 @@ export const handleFirstLoad = async ({ ...params }) => {
     10,
     targetClient._id,
     "sm",
+    (position: number, blob: Blob) => {
+      setOrderedImagesets((prev: { [key: string]: (Blob | object)[] }) => {
+        const nextImageset = [...prev[newTargetImageset]];
+        nextImageset[position] = blob;
+        return { ...prev, [newTargetImageset]: nextImageset };
+      });
+    },
   );
 
   if (data.stored > 0 && data.files) {
@@ -63,12 +70,6 @@ export const handleFirstLoad = async ({ ...params }) => {
     };
 
     updateOrderState(args);
-
-    const nextOrderedImagesets = {
-      ...orderedImagesets,
-      [newTargetImageset]: data.files,
-    };
-    setOrderedImagesets(nextOrderedImagesets);
   }
 
   return setSpinner(false);

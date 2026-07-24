@@ -4,11 +4,11 @@ import multer from "multer";
 
 import {
   adminGetClients,
-  adminGetFileAndDelete,
   adminLogin,
   adminAddClient,
   adminDeleteUser,
   adminDeleteFile,
+  adminSwapFiles,
   adminUpdateUserImagesetCount,
   adminGetUserImagesetCount,
   bulkUpload,
@@ -33,7 +33,6 @@ const diskUpload = multer({
 // GET
 router.get("/users", adminGetClients);
 router.get("/users/:id/:imageset/getCount", adminGetUserImagesetCount);
-router.get("/users/:id/getFile/:imageset/:index", adminGetFileAndDelete);
 
 // POST
 router.post("/login", upload.none(), adminLogin);
@@ -44,6 +43,7 @@ router.post(
 );
 router.post("/uploadFile", upload.any(), uploadFile);
 router.post("/users/:id/:imageset/bulkUpload", diskUpload.any(), bulkUpload);
+router.post("/users/:id/:imageset/swap/:from/:to", adminSwapFiles);
 
 // DELETE
 router.delete("/deleteUser/:id", adminDeleteUser);

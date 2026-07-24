@@ -16,6 +16,9 @@ export const executeGenerationChain = async (
   endPoint: number,
   id: string | undefined,
   size: string,
+  // optional, used by the admin ordering grid's progressive reveal - other
+  // callers (portfolio, user dashboard) omit it; see generateFileBatch.ts
+  onItemLoaded?: (index: number, blob: Blob) => void,
 ) => {
   const urls = await generateImagesetGetUrls(
     counter,
@@ -34,6 +37,7 @@ export const executeGenerationChain = async (
       files,
     },
     counter,
+    onItemLoaded,
   );
 
   return { ...newFileData, stored: urls.stored };

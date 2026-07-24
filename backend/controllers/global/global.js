@@ -1,8 +1,4 @@
-import {
-  PutObjectCommand,
-  ListObjectsV2Command,
-  GetObjectCommand,
-} from "@aws-sdk/client-s3";
+import { ListObjectsV2Command, GetObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { validateParams } from "../utils/validateParams.js";
 import { s3 } from "../config/s3.js";
@@ -70,37 +66,6 @@ export const logout = async (req, res, next) => {
       secure: true,
     })
     .end();
-};
-
-export const generatePutPresigned = async (req, res, next) => {
-  const verified = await verifyTokens(req, res);
-
-  if (verified) {
-    // resized file
-    const cmd1 = new PutObjectCommand({
-      Bucket: process.env.AWS_PRIMARY_BUCKET,
-      Key: `${req.body._id}/${req.body.imageset}/resized/${req.body.index}/${req.body.files[0]}`,
-    });
-
-    // original file
-    const cmd2 = new PutObjectCommand({
-      Bucket: process.env.AWS_PRIMARY_BUCKET,
-      Key: `${req.body._id}/${req.body.imageset}/original/${req.body.index}/${req.body.files[1]}`,
-    });
-
-    try {
-      const [url1, url2] = await Promise.all([
-        await getSignedUrl(s3, cmd1, { expiresIn: 600 }),
-        await getSignedUrl(s3, cmd2, { expiresIn: 600 }),
-      ]);
-
-      if (url1 && url2) {
-        return res.status(200).json([url1, url2]);
-      }
-    } catch (error) {
-      return res.status(500).json("URL generation failed");
-    }
-  }
 };
 
 export const generateGetPresigned = async (req, res, next) => {

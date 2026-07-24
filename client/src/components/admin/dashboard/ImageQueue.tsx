@@ -68,6 +68,7 @@ export default function ImageQueue({ ...props }) {
             return (
               <div key={file.name}>
                 <button
+                  type="button"
                   onClick={() =>
                     handleDelete(
                       uploadCount,

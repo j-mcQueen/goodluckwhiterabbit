@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
 import { handleLoad } from "./utils/handlers/ordering/handleLoad";
 import { handleLoadTypes } from "./types/handleLoadTypes";
 import { generateKeys } from "../../global/utils/generateKeys";
@@ -31,11 +32,14 @@ export default function ImageOrder({ ...props }) {
     <div className="flex items-start">
       <div className="text-white p-3 min-w-[40vw] flex flex-col items-center justify-center">
         <div className="flex flex-col items-center">
-          <div className="flex flex-wrap justify-center max-w-[60dvw] gap-5 px-5 overflow-scroll h-[700px] relative">
+          <motion.div
+            layoutScroll
+            className="flex flex-wrap justify-center max-w-[60dvw] gap-5 px-5 overflow-scroll h-[700px] relative"
+          >
             {order.map((file: Blob | object, index: number) => {
               return (
                 <OrderItem
-                  key={staticKeys[index]}
+                  key={staticKeys[index] ?? index}
                   clients={clients}
                   dragTarget={dragTarget}
                   file={file}
@@ -46,13 +50,15 @@ export default function ImageOrder({ ...props }) {
                   setNotice={setNotice}
                   setOrder={setOrder}
                   setRenderCount={setRenderCount}
+                  setStaticKeys={setStaticKeys}
                   setTargetClient={setTargetClient}
+                  staticKeys={staticKeys}
                   targetClient={targetClient}
                   targetImageset={targetImageset}
                 />
               );
             })}
-          </div>
+          </motion.div>
 
           <button
             onClick={async () => {

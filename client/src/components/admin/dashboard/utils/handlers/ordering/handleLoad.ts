@@ -24,25 +24,44 @@ export const handleLoad = async ({ ...params }) => {
   if (renderCount === targetClient.fileCounts[targetImageset]) {
     const nextOrder = [...order, ...Array(10).fill({})];
     setOrder(nextOrder);
+
+    const nextKeys = [...staticKeys, ...generateKeys(10)];
+    setStaticKeys(nextKeys);
   } else if (renderCount < targetClient.fileCounts[targetImageset]) {
     setSpinner(true);
 
     const imagesetLength = order.length;
+
+    // show empty, stable placeholder slots immediately, before fetching,
+    // so each image can fill its own slot in place as it individually resolves
+    const placeholderOrder = [...order, ...Array(10).fill({})];
+    setOrder(placeholderOrder);
+
+    const placeholderKeys = [...staticKeys, ...generateKeys(10)];
+    setStaticKeys(placeholderKeys);
+
     const data = await executeGenerationChain(
-      order,
+      placeholderOrder,
       targetImageset,
       setNotice,
       imagesetLength,
       imagesetLength + 10,
       targetClient._id,
       "sm",
+      (position: number, blob: Blob) => {
+        setOrder((prev: (Blob | object)[]) => {
+          const next = [...prev];
+          next[position] = blob;
+          return next;
+        });
+      },
     );
 
     const count = renderCount + data.count;
 
-    if (count >= targetClient.fileCounts[targetImageset]) {
+    if (count >= data.stored) {
       const response = await fetch(
-        `${host}/admin/users/${targetClient._id}/updateFileCount/${targetImageset}/${count}`,
+        `${host}/admin/users/${targetClient._id}/updateFileCount/${targetImageset}/${data.stored}`,
         {
           method: "POST",
           headers: {
@@ -81,14 +100,7 @@ export const handleLoad = async ({ ...params }) => {
       }
     }
 
-    const nextOrder = data.files;
-    setOrder(nextOrder);
-
     setRenderCount(count);
     setSpinner(false);
   }
-
-  const generatedKeys = generateKeys(10);
-  const nextKeys = [...staticKeys, ...generatedKeys];
-  return setStaticKeys(nextKeys);
 };

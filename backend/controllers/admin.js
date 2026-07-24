@@ -17,6 +17,7 @@ import {
   ListObjectsV2Command,
   DeleteObjectsCommand,
   PutObjectCommand,
+  CopyObjectCommand,
 } from "@aws-sdk/client-s3";
 
 const limit = pLimit(3);
@@ -204,77 +205,6 @@ export const adminGetClients = async (req, res, next) => {
   }
 };
 
-export const adminGetFileAndDelete = async (req, res, next) => {
-  const verified = await verifyTokens(req, res);
-
-  if (verified) {
-    let existingFiles = [];
-    try {
-      const existingResized = await s3.send(
-        new ListObjectsV2Command({
-          Bucket: process.env.AWS_PRIMARY_BUCKET,
-          Prefix: `${req.params.id}/${req.params.imageset}/resized/${req.params.index}/`,
-          MaxKeys: 1,
-        }),
-      );
-
-      const existingOriginal = await s3.send(
-        new ListObjectsV2Command({
-          Bucket: process.env.AWS_PRIMARY_BUCKET,
-          Prefix: `${req.params.id}/${req.params.imageset}/original/${req.params.index}/`,
-          MaxKeys: 1,
-        }),
-      );
-
-      if (!existingResized || !existingOriginal) {
-        throw new Error("500");
-      } else if (!existingResized.Contents && !existingOriginal.Contents) {
-        // query executed and returned empty, therefore end req/res cycle
-        return res.status(200).json({ success: true });
-      } else {
-        existingFiles.push(existingResized, existingOriginal);
-      }
-    } catch (error) {
-      return res.status(500).json({
-        status: true,
-        message:
-          "There was an error retrieving your images from S3. Please refresh the page and try again. Let Jack know if the problem persists!",
-        logout: { status: false, path: null },
-      });
-    }
-
-    if (existingFiles[0].Contents.length > 0) {
-      // there are matching pre-existing objects at the target index, so delete it in preparation for replacement
-      try {
-        const deleted = await s3.send(
-          new DeleteObjectsCommand({
-            Bucket: process.env.AWS_PRIMARY_BUCKET,
-            Delete: {
-              Objects: [
-                { Key: existingFiles[0].Contents[0].Key },
-                { Key: existingFiles[1].Contents[0].Key },
-              ],
-            },
-          }),
-        );
-
-        if (!deleted) throw new Error("500");
-        else return res.status(200).json({ success: true });
-      } catch (error) {
-        return res.status(500).json({
-          status: true,
-          message:
-            "There was an error removing the previous image at this position from storage. Please refresh the page and try again. Let Jack know if the problem persists!",
-          logout: { status: false, path: null },
-        });
-      }
-    } else {
-      // there is no pre-existing file at the target index, so no further action is necessary
-      return res.status(200).json({ success: true });
-    }
-  }
-};
-
 export const adminDeleteUser = async (req, res, next) => {
   const verified = await verifyTokens(req, res);
 
@@ -361,9 +291,13 @@ export const adminDeleteFile = async (req, res, next) => {
       const deleteTargets = await s3.send(
         new ListObjectsV2Command({
           Bucket: process.env.AWS_PRIMARY_BUCKET,
-          Prefix: `${req.params.id}/${req.params.imageset}/${req.params.index}`,
+          Prefix: `${req.params.id}/${req.params.imageset}/${req.params.index}/`,
         }),
       );
+
+      if (!deleteTargets.Contents || deleteTargets.Contents.length === 0) {
+        return res.status(200).json({ success: true });
+      }
 
       const deleted = await s3.send(
         new DeleteObjectsCommand({
@@ -385,18 +319,124 @@ export const adminDeleteFile = async (req, res, next) => {
   }
 };
 
+export const adminSwapFiles = async (req, res, next) => {
+  const verified = await verifyTokens(req, res);
+
+  if (verified) {
+    const { id, imageset, from, to } = req.params;
+
+    if (from === to) return res.status(200).json({ success: true });
+
+    const bucket = process.env.AWS_PRIMARY_BUCKET;
+    const sourcePrefix = `${id}/${imageset}/${from}/`;
+    const destPrefix = `${id}/${imageset}/${to}/`;
+    const rest = (key, prefix) => key.slice(prefix.length);
+    const encodeKey = (key) => key.split("/").map(encodeURIComponent).join("/");
+    const copy = (sourceKey, destinationKey) =>
+      s3.send(
+        new CopyObjectCommand({
+          Bucket: bucket,
+          CopySource: `${bucket}/${encodeKey(sourceKey)}`,
+          Key: destinationKey,
+        }),
+      );
+
+    try {
+      const [sourceObjects, destObjects] = await Promise.all([
+        s3.send(new ListObjectsV2Command({ Bucket: bucket, Prefix: sourcePrefix })),
+        s3.send(new ListObjectsV2Command({ Bucket: bucket, Prefix: destPrefix })),
+      ]);
+
+      if (!sourceObjects.Contents || sourceObjects.Contents.length === 0) {
+        return res
+          .status(404)
+          .json({ status: 404, message: "There is nothing to move at the source position." });
+      }
+
+      const newKeys = new Set(
+        sourceObjects.Contents.map((obj) => `${destPrefix}${rest(obj.Key, sourcePrefix)}`),
+      );
+      let tempKeys = [];
+
+      if (!destObjects.Contents || destObjects.Contents.length === 0) {
+        // target slot is empty - plain move, no collision is possible
+        await Promise.all(
+          sourceObjects.Contents.map((obj) =>
+            copy(obj.Key, `${destPrefix}${rest(obj.Key, sourcePrefix)}`),
+          ),
+        );
+      } else {
+        // target slot is occupied - stage its files first so a coincidentally
+        // shared filename between the two positions can't clobber content
+        // before it has been copied out
+        const tempPrefix = `${id}/${imageset}/__swap-${Date.now()}__/`;
+        tempKeys = destObjects.Contents.map(
+          (obj) => `${tempPrefix}${rest(obj.Key, destPrefix)}`,
+        );
+
+        await Promise.all(destObjects.Contents.map((obj, i) => copy(obj.Key, tempKeys[i])));
+        await Promise.all(
+          sourceObjects.Contents.map((obj) =>
+            copy(obj.Key, `${destPrefix}${rest(obj.Key, sourcePrefix)}`),
+          ),
+        );
+        await Promise.all(
+          tempKeys.map((key, i) =>
+            copy(key, `${sourcePrefix}${rest(destObjects.Contents[i].Key, destPrefix)}`),
+          ),
+        );
+
+        destObjects.Contents.forEach((obj) =>
+          newKeys.add(`${sourcePrefix}${rest(obj.Key, destPrefix)}`),
+        );
+      }
+
+      // only remove keys that don't now hold content we just wrote there
+      const oldKeys = [
+        ...sourceObjects.Contents.map((obj) => obj.Key),
+        ...(destObjects.Contents || []).map((obj) => obj.Key),
+      ];
+      const staleKeys = oldKeys.filter((key) => !newKeys.has(key));
+
+      await s3.send(
+        new DeleteObjectsCommand({
+          Bucket: bucket,
+          Delete: { Objects: [...staleKeys, ...tempKeys].map((Key) => ({ Key })) },
+        }),
+      );
+
+      return res.status(200).json({ success: true });
+    } catch (error) {
+      return res.status(500).json({
+        status: 500,
+        message: "We could not move this file in storage.",
+      });
+    }
+  }
+};
+
 export const uploadFile = async (req, res, next) => {
   const verified = await verifyTokens(req, res);
 
   if (verified) {
     const file = req.files[0];
+    const prefix = `${req.body._id}/${req.body.imageset}/${req.body.index}/`;
 
-    const [large, small] = await Promise.all([
+    const [large, small, existing] = await Promise.all([
       sharp(file.buffer).resize(2400, null).toFormat("webp").toBuffer(),
       sharp(file.buffer).resize(768, null).toFormat("webp").toBuffer(),
+      s3.send(
+        new ListObjectsV2Command({
+          Bucket: process.env.AWS_PRIMARY_BUCKET,
+          Prefix: prefix,
+        }),
+      ),
     ]);
 
+    const isReplace = Boolean(existing.Contents && existing.Contents.length > 0);
+
     // upload variations to s3
+    let newKeys = [];
     try {
       const variations = [
         { item: small, prefix: "sm" },
@@ -404,22 +444,24 @@ export const uploadFile = async (req, res, next) => {
         { item: req.files[0], prefix: "og" },
       ];
 
-      await Promise.all(
-        variations.map(async ({ item, prefix }) => {
+      newKeys = await Promise.all(
+        variations.map(async ({ item, prefix: sizePrefix }) => {
           const buffer = item.buffer || item;
           const filename =
             item.originalname ||
-            `${prefix}_${req.files[0].originalname.split(".jpg")[0]}.webp`;
+            `${sizePrefix}_${req.files[0].originalname.split(".jpg")[0]}.webp`;
           const contentType = item.originalname ? "image/jpeg" : "image/webp";
+          const key = `${prefix}${sizePrefix}/${filename}`;
 
           const cmd = new PutObjectCommand({
             Bucket: process.env.AWS_PRIMARY_BUCKET,
-            Key: `${req.body._id}/${req.body.imageset}/${req.body.index}/${prefix}/${filename}`,
+            Key: key,
             Body: buffer,
             ContentType: contentType,
           });
 
           await s3.send(cmd);
+          return key;
         }),
       );
     } catch (error) {
@@ -430,8 +472,31 @@ export const uploadFile = async (req, res, next) => {
         );
     }
 
-    // increment user file counts
-    await updateCount(req.body._id, req.body.imageset, res, User, 1);
+    if (isReplace) {
+      // remove any pre-existing files at this index that weren't already
+      // overwritten in place by the upload above
+      const staleKeys = existing.Contents.map((obj) => obj.Key).filter(
+        (key) => !newKeys.includes(key),
+      );
+
+      if (staleKeys.length > 0) {
+        try {
+          await s3.send(
+            new DeleteObjectsCommand({
+              Bucket: process.env.AWS_PRIMARY_BUCKET,
+              Delete: { Objects: staleKeys.map((Key) => ({ Key })) },
+            }),
+          );
+        } catch (error) {
+          // the new image uploaded successfully; a lingering orphan here
+          // is a lesser problem than failing a request that otherwise succeeded
+          console.log("error", error);
+        }
+      }
+    } else {
+      // only a genuinely new image should grow the imageset's file count
+      await updateCount(req.body._id, req.body.imageset, res, User, 1);
+    }
 
     return res.status(200).send(small);
   }

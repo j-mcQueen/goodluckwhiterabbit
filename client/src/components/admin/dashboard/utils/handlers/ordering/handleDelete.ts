@@ -37,8 +37,15 @@ export const handleDelete = async ({ ...params }) => {
       };
 
       updateOrderState(args);
-      return;
+      return { success: true as const };
     }
+
+    return params.setNotice({
+      status: true,
+      message:
+        "There was an error deleting this image. Please refresh the page and try again.",
+      logout: { status: false, path: null },
+    });
   } catch (error) {
     return params.setNotice({
       status: true,

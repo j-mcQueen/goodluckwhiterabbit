@@ -1,16 +1,13 @@
 import express from "express";
-import multer from "multer";
 
 import {
   logout,
-  generatePutPresigned,
   countImagesetItems,
   generateGetPresigned,
   generatePortfolioUrls,
 } from "../controllers/global/global.js";
 
 const router = express.Router();
-const upload = multer(); // enable form data to be unpacked
 
 // GET
 router.get(
@@ -22,6 +19,5 @@ router.get("/users/:id/getImagesetTotals", countImagesetItems);
 
 // POST
 router.post("/logout", logout);
-router.post("/generatePutPresigned", upload.array(), generatePutPresigned);
 
 export default router;

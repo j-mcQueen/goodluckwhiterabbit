@@ -3,8 +3,54 @@ import { updateOrderState } from "./updateOrderState";
 import { determineHost as host } from "../../../../../global/utils/determineHost";
 
 export const handleDrop = async ({ ...params }) => {
-  if (params.index === params.draggedIndex && params.source !== "queue") return; // user made a mistake
+  if (params.source === "order" && params.index === params.draggedIndex) return; // dropped back onto its own position
 
+  return params.source === "order" ? handleSwap(params) : handleQueueUpload(params);
+};
+
+const handleSwap = async (params: any) => {
+  try {
+    const response = await fetch(
+      `${host}/admin/users/${params.targetClient._id}/${params.targetImageset}/swap/${params.draggedIndex}/${params.index}`,
+      {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+      },
+    );
+    const data = await response.json();
+
+    if (data && (response.status === 200 || response.status === 304)) {
+      return { type: "swap" as const };
+    }
+
+    if (response.status === 401) {
+      return params.setNotice({
+        status: true,
+        message:
+          "You are unauthorized to take this action and are being logged out to keep things secure. Please log in and try again.",
+        logout: { status: true, path: "/admin" },
+      });
+    }
+
+    return params.setNotice({
+      status: true,
+      message: "Something went wrong - please try again.",
+      logout: { status: false, path: null },
+    });
+  } catch (error) {
+    return params.setNotice({
+      status: true,
+      message: "Something went wrong - please try again.",
+      logout: { status: false, path: null },
+    });
+  }
+};
+
+const handleQueueUpload = async (params: any) => {
   let blob;
   try {
     const formData = new FormData();
@@ -76,6 +122,6 @@ export const handleDrop = async ({ ...params }) => {
     };
 
     updateOrderState(args);
-    return blob;
+    return { type: "upload" as const, blob };
   }
 };
