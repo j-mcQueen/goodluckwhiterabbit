@@ -11,6 +11,7 @@ export default function Unit({ ...props }) {
     activeTab,
     image,
     index,
+    itemKey,
     lastIndex,
     nextStartIndex,
     setActiveGroup,
@@ -49,7 +50,12 @@ export default function Unit({ ...props }) {
         return await handleIntersection(args);
       }}
     >
-      <Image image={image} innerRef={imgRef} setRatio={setRatio} />
+      <Image
+        image={image}
+        innerRef={imgRef}
+        itemKey={itemKey}
+        setRatio={setRatio}
+      />
     </InView>
   ) : (
     <InView
@@ -65,7 +71,12 @@ export default function Unit({ ...props }) {
         }
       }}
     >
-      <Image image={image} innerRef={imgRef} setRatio={setRatio} />
+      <Image
+        image={image}
+        innerRef={imgRef}
+        itemKey={itemKey}
+        setRatio={setRatio}
+      />
     </InView>
   );
 }

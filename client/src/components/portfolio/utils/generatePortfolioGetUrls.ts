@@ -48,7 +48,7 @@ export const generatePortfolioGetUrls = async (
 
       case 500:
         setNotice(data);
-        break;
+        return { files: false };
 
       default:
         throw new Error("Other");
@@ -59,6 +59,7 @@ export const generatePortfolioGetUrls = async (
       loading: false,
       message: "Something went wrong. Please refresh the page and try again.",
     });
+    return { files: false };
   }
 
   return presigns;

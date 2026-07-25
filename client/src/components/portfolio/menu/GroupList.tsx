@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef } from "react";
+import { generateKeys } from "../../global/utils/generateKeys";
 import { GroupList_T } from "../types/GroupList_T";
 
 export default function GroupList({
@@ -11,7 +12,9 @@ export default function GroupList({
   handleClick,
   setActiveGroup,
   setImages,
+  setNextStartIndex,
   setNotice,
+  setStaticKeys,
 }: GroupList_T) {
   const groupItemRefs = useRef<(HTMLLIElement | null)[]>([]);
   const listRef = useRef<HTMLUListElement | null>(null);
@@ -54,16 +57,30 @@ export default function GroupList({
                 bodyRef.current?.scrollTo({ top: 0, behavior: "smooth" });
               }
 
-              handleClick(
-                activeSub,
-                activeTab,
-                j + 1,
-                setImages,
-                setNotice,
-                true,
-                0,
-              );
-              setActiveGroup(j);
+              try {
+                const nextImages = await handleClick(
+                  activeSub,
+                  activeTab,
+                  j + 1,
+                  setImages,
+                  setNotice,
+                  true,
+                  0,
+                );
+
+                if (nextImages) {
+                  setStaticKeys(generateKeys(nextImages.length));
+                  setNextStartIndex(nextImages.length);
+                }
+
+                setActiveGroup(j);
+              } catch (error) {
+                setNotice({
+                  status: true,
+                  loading: false,
+                  message: "Something went wrong. Please try again.",
+                });
+              }
             }}
           >
             {group}

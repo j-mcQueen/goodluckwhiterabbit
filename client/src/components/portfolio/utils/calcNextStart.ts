@@ -12,7 +12,7 @@ export const calcNextStart = (
     // reset counter if we have moved to another group
     if (latestGroup !== group) {
       counter = 1;
-      latestGroup++;
+      latestGroup = group;
     } else counter++;
   }
   return counter;

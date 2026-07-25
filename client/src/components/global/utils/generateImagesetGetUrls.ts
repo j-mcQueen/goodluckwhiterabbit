@@ -49,7 +49,7 @@ export const generateImagesetGetUrls = async (
 
       case 500:
         setNotice(data);
-        break;
+        return { files: false };
 
       default:
         throw new Error("Other");
@@ -61,6 +61,7 @@ export const generateImagesetGetUrls = async (
         "Something went wrong. To keep things secure, we are logging you out. Please log back in and try again.",
       logout: { status: true, path: "/admin" },
     });
+    return { files: false };
   }
 
   return presigns;

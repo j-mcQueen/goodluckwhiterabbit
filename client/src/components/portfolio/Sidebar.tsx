@@ -14,7 +14,9 @@ export default function Sidebar({ ...props }) {
     setActiveGroup,
     setActiveSub,
     setImages,
+    setNextStartIndex,
     setNotice,
+    setStaticKeys,
   } = props;
 
   const groups =
@@ -50,7 +52,9 @@ export default function Sidebar({ ...props }) {
                 handleClick={triggerBatch}
                 setActiveGroup={setActiveGroup}
                 setImages={setImages}
+                setNextStartIndex={setNextStartIndex}
                 setNotice={setNotice}
+                setStaticKeys={setStaticKeys}
               />
             </div>
           </ul>
@@ -63,7 +67,9 @@ export default function Sidebar({ ...props }) {
             setActiveGroup={setActiveGroup}
             setActiveSub={setActiveSub}
             setImages={setImages}
+            setNextStartIndex={setNextStartIndex}
             setNotice={setNotice}
+            setStaticKeys={setStaticKeys}
             subcategories={subcategories}
           />
         </>

@@ -10,6 +10,7 @@ const findFilterSort = async (
   regex,
   size,
   group = undefined,
+  skipSort = false,
 ) => {
   let objects;
   try {
@@ -25,11 +26,11 @@ const findFilterSort = async (
     throw error;
   }
 
-  let filtered = objects.Contents.filter(
+  let filtered = (objects.Contents ?? []).filter(
     (item) => item.Key.includes(`/${size}/`) && item.Size > 0,
   );
 
-  const sorted = sortBatch(filtered, regex);
+  const sorted = skipSort ? filtered : sortBatch(filtered, regex);
   objects.Contents = sorted;
 
   return { objects, stored: sorted.length };
@@ -83,7 +84,7 @@ export const generateGetPresigned = async (req, res, next) => {
       s3Data.results = objects;
       s3Data.stored = stored;
 
-      if (!s3Data.results.Contents)
+      if (s3Data.stored === 0)
         return res.status(200).json({ files: false });
     } catch (error) {
       if (typeof s3Data.results === "undefined")
@@ -151,7 +152,7 @@ export const generatePortfolioUrls = async (req, res, next) => {
     return res.status(400).json(verified.error);
   } else {
     const groupRegex = /\/(\d{3})\//;
-    const suffixRegex = `(?<=/${req.params.size}/[^/]+_)\\d{1,3}(?=\\.[^.]+$)`;
+    const suffixRegex = `(?<=/${req.params.size}/[^/]+_)(\\d{1,3})(?=\\.[^.]+$)`;
 
     let s3Data = {};
     try {
@@ -163,9 +164,10 @@ export const generatePortfolioUrls = async (req, res, next) => {
         groupRegex,
         req.params.size,
         req.params.group,
+        true, // the group+suffix sort below is the real one; skip the redundant inner sort
       );
 
-      if (!objects.Contents) throw new Error({ message: "No files" });
+      if (stored === 0) return res.status(200).json({ files: false });
 
       const suffixSorted = sortBatch(objects.Contents, suffixRegex, groupRegex);
 
@@ -173,14 +175,12 @@ export const generatePortfolioUrls = async (req, res, next) => {
       s3Data.stored = stored;
     } catch (error) {
       console.log("error", error);
-      return error === "No files"
-        ? res.status(200).json({ files: false })
-        : res.status(500).json({
-            status: true,
-            loading: false,
-            message:
-              "There was an error retrieving your images from S3. Please refresh the page and try again. Let Jack know if the problem persists!",
-          });
+      return res.status(500).json({
+        status: true,
+        loading: false,
+        message:
+          "There was an error retrieving your images from S3. Please refresh the page and try again. Let Jack know if the problem persists!",
+      });
     }
 
     const keys = [];
@@ -256,7 +256,7 @@ export const countImagesetItems = async (req, res, next) => {
       if (!s3Objects.Contents)
         return res
           .status(200)
-          .json({ snapshots: 0, keepsake: 0, core: 0, snips: 0 });
+          .json({ snapshots: 0, keepsake: 0, core: 0, socials: 0 });
 
       if (!s3Objects) throw new Error("500");
     } catch (error) {
@@ -268,17 +268,18 @@ export const countImagesetItems = async (req, res, next) => {
       });
     }
 
-    const totals = { snapshots: 0, keepsake: 0, core: 0, snips: 0 };
+    const totals = { snapshots: 0, keepsake: 0, core: 0, socials: 0 };
 
     for (let i = 0; i < s3Objects.Contents.length; i++) {
       if (s3Objects.Contents[i].Key.includes(req.params.id)) {
         if (s3Objects.Contents[i].Key.includes("snapshots"))
           totals["snapshots"]++;
         else if (s3Objects.Contents[i].Key.includes("keepsake"))
-          totals["keepsake"];
-        else if (s3Objects.Contents[i].Key.includes("core")) totals["core"];
+          totals["keepsake"]++;
+        else if (s3Objects.Contents[i].Key.includes("core"))
+          totals["core"]++;
         else if (s3Objects.Contents[i].Key.includes("socials"))
-          totals["socials"];
+          totals["socials"]++;
       }
     }
     return res.status(200).json(totals);

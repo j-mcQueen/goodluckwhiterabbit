@@ -12,7 +12,9 @@ export default function Menu({ ...props }) {
     setActiveGroup,
     setActiveSub,
     setImages,
+    setNextStartIndex,
     setNotice,
+    setStaticKeys,
     subcategories,
   } = props;
 
@@ -39,7 +41,9 @@ export default function Menu({ ...props }) {
                 setActiveGroup={setActiveGroup}
                 setActiveSub={setActiveSub}
                 setImages={setImages}
+                setNextStartIndex={setNextStartIndex}
                 setNotice={setNotice}
+                setStaticKeys={setStaticKeys}
               />
             </MenuItem>
           );

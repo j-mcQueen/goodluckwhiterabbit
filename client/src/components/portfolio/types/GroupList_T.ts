@@ -21,9 +21,10 @@ export interface GroupList_T {
     >,
     sidebar: boolean,
     start: number,
-  ) => void;
+  ) => Promise<{ blob: Blob; group: string }[] | undefined>;
   setActiveGroup: Dispatch<SetStateAction<number>>;
   setImages: Dispatch<SetStateAction<{ blob: Blob; group: string }[]>>;
+  setNextStartIndex: Dispatch<SetStateAction<number>>;
   setNotice: Dispatch<
     SetStateAction<{
       status: boolean;
@@ -31,4 +32,5 @@ export interface GroupList_T {
       message: string | null;
     }>
   >;
+  setStaticKeys: Dispatch<SetStateAction<string[]>>;
 }

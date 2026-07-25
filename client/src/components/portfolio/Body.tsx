@@ -1,5 +1,4 @@
-import { Fragment, useState } from "react";
-import { generateKeys } from "../global/utils/generateKeys";
+import { Fragment } from "react";
 
 import Unit from "./Unit";
 
@@ -10,13 +9,14 @@ export default function Body({ ...props }) {
     activeTab,
     bodyRef,
     images,
+    nextStartIndex,
     setActiveGroup,
     setImages,
+    setNextStartIndex,
     setNotice,
+    setStaticKeys,
+    staticKeys,
   } = props;
-
-  const [staticKeys, setStaticKeys] = useState(generateKeys(10));
-  const [nextStartIndex, setNextStartIndex] = useState(10);
 
   return (
     <section
@@ -33,6 +33,7 @@ export default function Body({ ...props }) {
                 activeTab={activeTab}
                 image={unit}
                 index={index}
+                itemKey={staticKeys[index]}
                 lastIndex={images.length - 1}
                 nextStartIndex={nextStartIndex}
                 setActiveGroup={setActiveGroup}

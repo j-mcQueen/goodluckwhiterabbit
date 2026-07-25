@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
 import { triggerBatch } from "./utils/triggerBatch";
 import { mobile } from "../global/utils/determineViewport";
+import { generateKeys } from "../global/utils/generateKeys";
 
 import Header from "../global/header/Header";
 import Sidebar from "./Sidebar";
@@ -23,6 +24,8 @@ export default function Portfolio({ ...props }) {
   const [activeSub, setActiveSub] = useState<number>(0);
   const [activeGroup, setActiveGroup] = useState<number>(0); // an index
   const [images, setImages] = useState<{ blob: Blob; group: string }[]>([]);
+  const [staticKeys, setStaticKeys] = useState<string[]>(generateKeys(10));
+  const [nextStartIndex, setNextStartIndex] = useState<number>(10);
   const [notice, setNotice] = useState<{
     status: boolean;
     loading: boolean;
@@ -47,7 +50,7 @@ export default function Portfolio({ ...props }) {
     // provide mechanism for initial images to autoload upon primary category change
     async function fetchData() {
       try {
-        await triggerBatch(
+        const nextImages = await triggerBatch(
           String(activeSub),
           activeTab,
           1,
@@ -56,6 +59,11 @@ export default function Portfolio({ ...props }) {
           true,
           0,
         );
+
+        if (nextImages) {
+          setStaticKeys(generateKeys(nextImages.length));
+          setNextStartIndex(nextImages.length);
+        }
       } catch (error) {
         setNotice({
           status: true,
@@ -116,7 +124,9 @@ export default function Portfolio({ ...props }) {
             setActiveGroup={setActiveGroup}
             setActiveSub={setActiveSub}
             setImages={setImages}
+            setNextStartIndex={setNextStartIndex}
             setNotice={setNotice}
+            setStaticKeys={setStaticKeys}
           />
         )}
 
@@ -126,9 +136,13 @@ export default function Portfolio({ ...props }) {
           activeTab={activeTab}
           bodyRef={bodyRef}
           images={images}
+          nextStartIndex={nextStartIndex}
           setActiveGroup={setActiveGroup}
           setImages={setImages}
+          setNextStartIndex={setNextStartIndex}
           setNotice={setNotice}
+          setStaticKeys={setStaticKeys}
+          staticKeys={staticKeys}
         />
       </main>
     </div>

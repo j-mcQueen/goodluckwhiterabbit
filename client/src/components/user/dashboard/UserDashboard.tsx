@@ -114,7 +114,7 @@ export default function UserDashboard() {
       "lg",
     );
     setImages({ ...images, [targetImageset]: data.files });
-    if (data.files) setSpinner(false);
+    if (data.files !== undefined) setSpinner(false);
   };
 
   return !initialized ? (

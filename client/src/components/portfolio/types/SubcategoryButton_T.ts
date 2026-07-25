@@ -22,12 +22,13 @@ export interface SubcategoryButton_T {
     start: number,
     subIndex?: number,
     setActiveSub?: Dispatch<SetStateAction<number>>,
-  ) => void;
+  ) => Promise<{ blob: Blob; group: string }[] | undefined>;
   index: number;
   label: string;
   setActiveGroup: Dispatch<SetStateAction<number>>;
   setActiveSub: Dispatch<SetStateAction<number>>;
   setImages: Dispatch<SetStateAction<{ blob: Blob; group: string }[]>>;
+  setNextStartIndex: Dispatch<SetStateAction<number>>;
   setNotice: Dispatch<
     SetStateAction<{
       status: boolean;
@@ -35,4 +36,5 @@ export interface SubcategoryButton_T {
       message: string | null;
     }>
   >;
+  setStaticKeys: Dispatch<SetStateAction<string[]>>;
 }
