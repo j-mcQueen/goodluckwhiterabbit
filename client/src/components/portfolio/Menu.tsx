@@ -19,7 +19,10 @@ export default function Menu({ ...props }) {
   } = props;
 
   return (
-    <div className="flex max-h-[calc((100%/5)+1px)]">
+    <div
+      className="flex"
+      style={{ maxHeight: `calc((100% / ${subcategories.length}) + 1px)` }}
+    >
       <ul>
         {subcategories.map((sub: string, index: number) => {
           return (
