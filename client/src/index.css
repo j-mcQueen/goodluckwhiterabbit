@@ -12,6 +12,10 @@
   src:
     local("Times New Roman Bold Italic"),
     url("/fonts/tnr/TimesNewRoman-BoldIt.woff2") format("woff2");
+  /* font reserves 28% descent but every usage in this app is uppercase (~0-2% real ink) — trim the dead space under the glyphs */
+  ascent-override: 72%;
+  descent-override: 8%;
+  line-gap-override: 0%;
 }
 
 @font-face {
