@@ -37,7 +37,7 @@ export default function Sidebar({ ...props }) {
   };
 
   return (
-    <aside className="flex xl:min-w-[245px] xl:max-w-[245px] xl:h-[calc(100dvh-57px-1.5rem)] text-white overflow-x-scroll overflow-y-hidden">
+    <aside className="flex xl:min-w-sidebar xl:max-w-sidebar xl:h-[calc(100dvh-57px-1.5rem)] text-white overflow-x-scroll overflow-y-hidden">
       {activeTab === 0 ? (
         <>
           <ul className="flex flex-row-reverse xl:h-[calc(100dvh-57px-1.5rem)] [writing-mode:sideways-lr]">

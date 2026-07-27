@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { handleAdd } from "./utils/handlers/adding/handleAdd";
 import { handleAddTypes } from "./types/handleAddTypes";
+import { textInput } from "../../global/styles/forms";
 
 import PaneHeader from "./PaneHeader";
 import Loading from "../../global/Loading";
@@ -64,7 +65,7 @@ export default function AddClient({ ...props }) {
             name="clientname"
             placeholder="E.G. GOOD AND LUCK"
             minLength={4}
-            className="w-full mt-1 bg-black border border-solid border-white text-white xl:hover:border-rd focus:border-rd p-3 focus:outline-none placeholder:text-white transition-colors"
+            className={textInput}
             required
           />
         </label>
@@ -83,7 +84,7 @@ export default function AddClient({ ...props }) {
                 });
               setInputValues({ ...inputValues, clientemail: e.target.value });
             }}
-            className="w-full mt-1 bg-black border border-solid border-white text-white xl:hover:border-rd focus:border-rd p-3 focus:outline-none placeholder:text-white transition-colors"
+            className={textInput}
             required
           />
           {errors.takenEmail.state === true ? (
@@ -103,7 +104,7 @@ export default function AddClient({ ...props }) {
                 clientcategory: e.target.value,
               });
             }}
-            className="w-full mt-1 bg-black border border-solid border-white text-white xl:hover:border-rd focus:border-rd p-3 focus:outline-none placeholder:text-white transition-colors"
+            className={textInput}
             required
           />
         </label>

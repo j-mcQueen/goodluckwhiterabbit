@@ -1,4 +1,5 @@
 import { icons } from "../admin/dashboard/styles/styles";
+import { iconFrame } from "./styles/buttons";
 import Prev from "../../assets/media/icons/Prev";
 import Rabbit from "./forms/Rabbit";
 
@@ -24,7 +25,7 @@ export default function Error() {
           <button
             type="button"
             onClick={() => history.back()}
-            className="xl:hover:border-rd focus:border-rd outline-none transition-colors border border-solid border-white w-10 h-10 flex items-center justify-center group mt-5 ml-5"
+            className={`${iconFrame} mt-5 ml-5`}
           >
             <Prev className={icons} />
           </button>

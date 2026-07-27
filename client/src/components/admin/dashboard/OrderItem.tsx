@@ -7,6 +7,8 @@ import { handleDrop } from "./utils/handlers/ordering/handleDrop";
 import { handleDelete } from "./utils/handlers/ordering/handleDelete";
 import { handleDeleteTypes } from "./types/handleDeleteTypes";
 
+import { orderItemDelete } from "../../global/styles/buttons";
+
 import Close from "../../../assets/media/icons/Close";
 import Loading from "../../global/Loading";
 
@@ -150,7 +152,7 @@ export default function OrderItem({ ...props }) {
               setOrder(updatedOrder);
             }
           }}
-          className="absolute bg-black m-1 border border-solid border-rd p-1"
+          className={orderItemDelete}
         >
           <Close className="w-4 h-4" />
         </button>

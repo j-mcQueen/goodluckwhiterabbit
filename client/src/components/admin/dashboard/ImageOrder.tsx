@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { handleLoad } from "./utils/handlers/ordering/handleLoad";
 import { handleLoadTypes } from "./types/handleLoadTypes";
 import { generateKeys } from "../../global/utils/generateKeys";
+import { primaryCta } from "../../global/styles/buttons";
 
 import OrderItem from "./OrderItem";
 
@@ -80,7 +81,7 @@ export default function ImageOrder({ ...props }) {
               await handleLoad(args);
             }}
             type="button"
-            className="font-tnrBI tracking-widest opacity-80 drop-shadow-glo border border-solid px-4 py-2 xl:hover:text-rd xl:hover:drop-shadow-red xl:focus:text-rd xl:focus:drop-shadow-red transition-colors mt-8 mb-5"
+            className={`${primaryCta} px-4 py-2 mt-8 mb-5`}
           >
             LOAD NEXT BATCH
           </button>

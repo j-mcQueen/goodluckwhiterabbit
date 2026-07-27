@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { icons } from "../styles/styles";
+import { primaryCta, modalCloseIcon } from "../../../global/styles/buttons";
 import { handleDeleteSubcategory } from "../utils/handlers/portfolio/handleDeleteSubcategory";
 import { handleDeleteGroup } from "../utils/handlers/portfolio/handleDeleteGroup";
 
@@ -74,7 +75,7 @@ export default function PortfolioDeleteModal({ ...props }) {
             disabled={pending}
             onClick={() => setDeleteModalToggle(EMPTY_TOGGLE)}
             type="button"
-            className="border border-solid xl:hover:border-rd xl:focus:border-red p-2 flex items-center justify-center focus:outline-none transition-colors group"
+            className={modalCloseIcon}
           >
             <Close className={icons} />
           </button>
@@ -90,7 +91,7 @@ export default function PortfolioDeleteModal({ ...props }) {
             onClick={() => handleDelete()}
             disabled={pending}
             type="button"
-            className="font-tnrBI drop-shadow-glo opacity-80 border border-solid xl:hover:drop-shadow-red xl:hover:text-rd xl:focus:drop-shadow-red xl:focus:text-rd py-3 px-5 transition-colors tracking-widest w-full"
+            className={`${primaryCta} py-3 px-5 w-full`}
           >
             {pending ? "DELETING..." : "DELETE"}
           </button>

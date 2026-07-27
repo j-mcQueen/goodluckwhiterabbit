@@ -13,7 +13,7 @@ export default function ContactButton({ ...props }) {
     desktop: {
       cntr: "bg-black",
       button: "xl:hover:text-rd xl:transition-colors group flex items-center",
-      svg: "min-w-[18px] min-h-[18px] xl:w-[18px] xl:h-[18px] xl:group-hover:drop-shadow-red xl:group-hover:fill-rd xl:group-focus:drop-shadow-red xl:group-focus:fill-rd xl:transition-colors m-5",
+      svg: "min-w-4.5 min-h-4.5 xl:w-4.5 xl:h-4.5 xl:group-hover:drop-shadow-red xl:group-hover:fill-rd xl:group-focus:drop-shadow-red xl:group-focus:fill-rd xl:transition-colors m-5",
     },
   };
 

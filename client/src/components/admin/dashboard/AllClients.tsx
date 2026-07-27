@@ -76,7 +76,7 @@ export default function AllClients({ ...props }) {
     return mobile ? (
       <tr
         key={client.code}
-        className={`text-white border-t-[1px] ${index < clients.length - 1 ? "border-b-[1px]" : ""} border-solid border-white text-base`}
+        className={`text-white border-t ${index < clients.length - 1 ? "border-b" : ""} border-solid border-white text-base`}
       >
         <td className="align-middle pl-3 tracking-wider w-1/2">
           {client.name.toUpperCase()}
@@ -101,7 +101,7 @@ export default function AllClients({ ...props }) {
     ) : (
       <tr
         key={client.code}
-        className={`text-white border-t-[1px] ${index < clients.length - 1 ? "border-b-[1px]" : ""} border-solid border-white text-xl`}
+        className={`text-white border-t ${index < clients.length - 1 ? "border-b" : ""} border-solid border-white text-xl`}
       >
         <td className="align-middle pl-3 tracking-wider">
           {client.name.toUpperCase()}

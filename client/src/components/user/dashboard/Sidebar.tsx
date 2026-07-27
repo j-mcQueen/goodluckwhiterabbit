@@ -14,8 +14,8 @@ export default function Sidebar({ ...props }) {
   } = props;
 
   return (
-    <aside className="grid items-center xl:flex xl:flex-col gap-2 xl:gap-5 xl:min-w-[245px] xl:max-w-[245px] xl:max-h-[calc(100dvh-57px-1.5rem)] xl:border-r border-solid border-white border-b-[1px] py-3">
-      <h1 className="text-white text-left xl:text-center text-3xl max-xl:col-start-1 max-xl:col-end-1 max-xl:pl-3">
+    <aside className="grid items-center xl:flex xl:flex-col gap-2 xl:gap-5 xl:min-w-sidebar xl:max-w-sidebar xl:max-h-[calc(100dvh-57px-1.5rem)] xl:border-r border-solid border-white border-b pb-5">
+      <h1 className="font-tnrBI xl:text-2xl text-white text-center tracking-widest opacity-80 drop-shadow-glo max-xl:col-start-1 max-xl:col-end-1 max-xl:pl-3 pt-8">
         {user.name.toUpperCase()}
       </h1>
 
@@ -27,7 +27,7 @@ export default function Sidebar({ ...props }) {
         LOADED:{" "}
         {
           images[activeImageset as keyof typeof images].filter(
-            (img: Blob) => img instanceof Blob === true
+            (img: Blob) => img instanceof Blob === true,
           ).length
         }{" "}
         / {user.fileCounts[activeImageset]}
@@ -59,7 +59,7 @@ export default function Sidebar({ ...props }) {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="text-ylw min-w-[245px] max-w-[245px] px-5 pt-5"
+                className="text-ylw min-w-sidebar max-w-sidebar px-5 pt-5"
               >
                 Your download has started. Please keep this page open while it
                 completes!
@@ -71,7 +71,7 @@ export default function Sidebar({ ...props }) {
             key={"notice"}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="text-blu min-w-[245px] max-w-[245px] px-5 pt-5"
+            className="text-blu min-w-sidebar max-w-sidebar px-5 pt-5"
           >
             Download complete. Enjoy!
           </motion.p>

@@ -120,7 +120,7 @@ export default function EditClient({ ...props }) {
           {targetClient.name.toUpperCase()}
         </h1>
 
-        <p className="font-vt">DATE ADDED: {targetClient.added}</p>
+        <p className="font-vt tracking-vt">DATE ADDED: {targetClient.added}</p>
       </hgroup>
 
       <div className="flex flex-col items-center">

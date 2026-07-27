@@ -4,9 +4,13 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        tnrI: ["Times New Roman Italic", "serif"],
         tnrBI: ["Times New Roman Bold Italic", "serif"],
         vt: ["VT323", "sans-serif"],
+        impact: ["Impact Label Reversed", "sans-serif"],
+      },
+      letterSpacing: {
+        // required minimum for any font-vt element — must exceed tracking-widest (0.1em)
+        vt: "0.2em",
       },
       gridTemplateColumns: {
         imageQueue: "repeat(auto-fit, minmax(100px, 200px))",
@@ -34,9 +38,19 @@ export default {
       },
       width: {
         outer: "calc(100dvw - 1.5rem - 2px)",
+        sidebar: "245px",
+      },
+      minWidth: {
+        sidebar: "245px",
+      },
+      maxWidth: {
+        sidebar: "245px",
       },
       height: {
         outer: "calc(100dvh - 1.5rem - 2px)",
+      },
+      spacing: {
+        4.5: "18px",
       },
       keyframes: {
         blink: {

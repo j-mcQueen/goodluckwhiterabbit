@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { handlePortfolioLoad } from "../utils/handlers/portfolioOrdering/handlePortfolioLoad";
 import { handlePortfolioLoadTypes } from "../types/handlePortfolioLoadTypes";
 import { generateKeys } from "../../../global/utils/generateKeys";
+import { primaryCta } from "../../../global/styles/buttons";
 
 import PortfolioOrderItem from "./PortfolioOrderItem";
 
@@ -82,7 +83,7 @@ export default function PortfolioImageOrder({ ...props }) {
               await handlePortfolioLoad({ ...args, taxonomy, setTaxonomy });
             }}
             type="button"
-            className="font-tnrBI tracking-widest opacity-80 drop-shadow-glo border border-solid px-4 py-2 xl:hover:text-rd xl:hover:drop-shadow-red xl:focus:text-rd xl:focus:drop-shadow-red transition-colors mt-8 mb-5"
+            className={`${primaryCta} px-4 py-2 mt-8 mb-5`}
           >
             LOAD NEXT BATCH
           </button>

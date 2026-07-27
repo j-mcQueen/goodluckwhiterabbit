@@ -1,4 +1,5 @@
 import { useLayoutEffect, useRef } from "react";
+import { dialogDismiss, dialogSubmit } from "../../../global/styles/buttons";
 import Close from "../../../../assets/media/icons/Close";
 
 export default function SubmitDialog({ ...props }) {
@@ -69,11 +70,11 @@ export default function SubmitDialog({ ...props }) {
                 setSubmitStatus(null);
                 return;
               }}
-              className="group focus:outline-none border border-solid border-white p-2"
+              className={dialogDismiss}
             >
               <Close
                 className={
-                  "w-[18px] h-[18px] xl:group-hover:drop-shadow-red xl:group-hover:fill-rd xl:group-focus:drop-shadow-red xl:group-focus:fill-rd xl:transition-colors"
+                  "w-4.5 h-4.5 xl:group-hover:drop-shadow-red xl:group-hover:fill-rd xl:group-focus:drop-shadow-red xl:group-focus:fill-rd xl:transition-colors"
                 }
               />
             </button>
@@ -86,7 +87,7 @@ export default function SubmitDialog({ ...props }) {
 
           <button
             type="submit"
-            className="border border-solid border-white w-full pl-2 py-2 focus:outline-none focus:text-rd"
+            className={dialogSubmit}
           >
             CONFIRM
           </button>

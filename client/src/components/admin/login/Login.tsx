@@ -1,6 +1,7 @@
 import { FormEvent, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { determineHost as host } from "../../global/utils/determineHost";
+import { loginSubmit } from "../../global/styles/buttons";
 import Rabbit from "../../global/forms/Rabbit";
 
 export default function Login() {
@@ -64,7 +65,7 @@ export default function Login() {
                 if (authError) setAuthError(false);
               }}
               required
-              className="font-vt bg-black border border-solid focus:border-red xl:transition-all border-white text-rd h-10 pl-2 mt-2 outline-none"
+              className="font-vt tracking-vt bg-black border border-solid focus:border-red xl:transition-all border-white text-rd h-10 pl-2 mt-2 outline-none"
             />
           </label>
 
@@ -78,16 +79,16 @@ export default function Login() {
                 if (authError) setAuthError(false);
               }}
               required
-              className="font-vt bg-black border border-solid border-white focus:border-red text-rd h-10 pl-2 mt-2 outline-none"
+              className="font-vt tracking-vt bg-black border border-solid border-white focus:border-red text-rd h-10 pl-2 mt-2 outline-none"
             />
           </label>
 
           {authError ? (
-            <div className="font-vt text-md text-rd xl:pl-10">
+            <div className="font-vt tracking-vt text-md text-rd xl:pl-10">
               <p>ACCESS DENIED. YOU SHALL NOT PASS!</p>
             </div>
           ) : (
-            <div className="font-vt text-md xl:pl-10 opacity-0">
+            <div className="font-vt tracking-vt text-md xl:pl-10 opacity-0">
               <p>WELL FOUND! THIS IS AN EASTER EGG.</p>
             </div>
           )}
@@ -95,9 +96,9 @@ export default function Login() {
           <div className="text-end xl:pt-6">
             <button
               type="submit"
-              className="text-white border border-solid border-white xl:hover:text-rd xl:hover:border-red focus:border-red focus:text-rd drop-shadow-glo focus:drop-shadow-red xl:hover:drop-shadow-red outline-none pl-6 pr-5 pt-3 pb-2 xl:transition-all xl:mr-10"
+              className={loginSubmit}
             >
-              <span className="font-tnrBI text-[20px] tracking-widest opacity-80">
+              <span className="font-tnrBI text-xl tracking-widest opacity-80">
                 ENTER
               </span>
             </button>

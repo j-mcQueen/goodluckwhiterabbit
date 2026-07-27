@@ -13,7 +13,7 @@ export default function ImageQueue({ ...props }) {
   const fileRef = useRef<HTMLInputElement>(null);
 
   return (
-    <div className="border-l-[1px] border-solid">
+    <div className="border-l border-solid">
       <div>
         <div className="flex justify-between items-center gap-5 py-4 px-4">
           <p className="text-xl">

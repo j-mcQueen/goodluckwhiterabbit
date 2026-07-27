@@ -8,25 +8,19 @@
 }
 
 @font-face {
-  font-family: "Liquid Crystal";
-  src:
-    local("Liquid Crystal"),
-    url("/fonts/lc/LiquidCrystal-Normal.woff2") format("woff2");
-}
-
-@font-face {
-  font-family: "Times New Roman Italic";
-  src:
-    local("Times New Roman Italic"),
-    url("/fonts/tnr/TimesNewRomanMTStd-Italic.woff2") format("woff2");
-}
-
-@font-face {
   font-family: "Times New Roman Bold Italic";
   src:
     local("Times New Roman Bold Italic"),
     url("/fonts/tnr/TimesNewRoman-BoldIt.woff2") format("woff2");
 }
+
+@font-face {
+  font-family: "Impact Label Reversed";
+  src:
+    local("Impact Label Reversed"),
+    url("/fonts/impact/Impact%20Label%20Reversed.woff2") format("woff2");
+}
+
 :root {
   font-family: "VT323", serif;
   min-width: 300px;

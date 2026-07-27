@@ -5,7 +5,7 @@ export default function RejectedFiles({ ...props }) {
   return (
     <dialog className="block bg-black absolute z-50 bottom-[calc(1.5rem-2px)] p-4 border border-solid border-white text-white max-w-[300px] xl:max-w-[400px] max-h-[150px] overflow-scroll">
       <div className="flex items-start gap-1">
-        <p className="font-inter">
+        <p>
           The client has been successfully added, but some files could not be
           uploaded. For your reference, here are the names of the files not
           uploaded:
@@ -16,7 +16,7 @@ export default function RejectedFiles({ ...props }) {
           onClick={() => setRejectedFiles([])}
           className="border border-solid border-mag p-2"
         >
-          <Close className="w-[18px] h-[18px]" customColor="#FFF" />
+          <Close className="w-4.5 h-4.5" customColor="#FFF" />
         </button>
       </div>
 

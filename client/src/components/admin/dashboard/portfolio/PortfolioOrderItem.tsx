@@ -7,6 +7,8 @@ import { handlePortfolioDrop } from "../utils/handlers/portfolioOrdering/handleP
 import { handlePortfolioDelete } from "../utils/handlers/portfolioOrdering/handlePortfolioDelete";
 import { handlePortfolioDeleteTypes } from "../types/handlePortfolioDeleteTypes";
 
+import { orderItemDelete } from "../../../global/styles/buttons";
+
 import Close from "../../../../assets/media/icons/Close";
 import Loading from "../../../global/Loading";
 
@@ -153,7 +155,7 @@ export default function PortfolioOrderItem({ ...props }) {
               setOrder(updatedOrder);
             }
           }}
-          className="absolute bg-black m-1 border border-solid border-rd p-1"
+          className={orderItemDelete}
         >
           <Close className="w-4 h-4" />
         </button>

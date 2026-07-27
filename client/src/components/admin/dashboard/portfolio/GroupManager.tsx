@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { handleAddGroup } from "../utils/handlers/portfolio/handleAddGroup";
 import { imageset_select_btns } from "../styles/styles";
+import { deleteBadge } from "../../../global/styles/buttons";
 import { portfolio_group } from "../types/portfolioTypes";
 
 import Loading from "../../../global/Loading";
@@ -49,7 +50,7 @@ export default function GroupManager({ ...props }) {
                   estimate: `${group.count} image${group.count === 1 ? "" : "s"}`,
                 })
               }
-              className="absolute -top-2 -right-2 bg-black border border-solid border-rd p-1"
+              className={deleteBadge}
             >
               <Close className="w-3 h-3" />
             </button>

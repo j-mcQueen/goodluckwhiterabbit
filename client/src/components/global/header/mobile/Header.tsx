@@ -132,7 +132,7 @@ export default function MobileHeader({
 
                       {counts && counts[index as keyof typeof counts] === 0 ? (
                         <span className="absolute -translate-y-1">
-                          <span className="font-vt text-sm tracking-widest flex items-center gap-1">
+                          <span className="font-vt text-sm tracking-vt flex items-center gap-1">
                             <Next className="w-4 h-4" />{" "}
                             <span>COMING SOON</span>
                           </span>
@@ -147,7 +147,7 @@ export default function MobileHeader({
             {logout ? (
               <button
                 type="button"
-                className={`text-rd focus:text-rd transition-colors flex justify-center py-3 w-full tracking-widest border-white border-b-[1px]`}
+                className={`text-rd focus:text-rd transition-colors flex justify-center py-3 w-full tracking-widest border-white border-b`}
                 onClick={() => handleLogout()}
               >
                 <Eject className="w-5 h-5 group-hover:fill-rd group-focus:fill-rd group-hover:drop-shadow-red group-focus:drop-shadow-red transition-colors" />

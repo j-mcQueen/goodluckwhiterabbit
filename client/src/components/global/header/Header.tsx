@@ -61,7 +61,7 @@ export default function Header({
   return (
     <header className="text-white">
       <nav className="flex">
-        <div className="border-r border-b border-solid border-white min-w-[245px] flex justify-center">
+        <div className="border-r border-b border-solid border-white min-w-sidebar flex justify-center">
           <img
             src={rabbit}
             alt="A white rabbit against a black background shimmering from left to right"
@@ -69,7 +69,7 @@ export default function Header({
           />
         </div>
 
-        <ul className="flex justify-evenly w-full font-liquid">
+        <ul className="flex justify-evenly w-full">
           {data.map((tab: string, index: number) => {
             return (
               <li
@@ -128,7 +128,7 @@ export default function Header({
                   {dashboard &&
                   dashboard[index as keyof typeof dashboard] === 0 ? (
                     <span className="absolute -translate-y-1">
-                      <span className="font-vt text-sm tracking-normal flex items-center gap-1">
+                      <span className="font-vt text-sm tracking-vt flex items-center gap-1">
                         <Next className="w-4 h-4" /> <span>COMING SOON</span>
                       </span>
                     </span>
@@ -142,7 +142,7 @@ export default function Header({
         {logout ? (
           <button
             type="button"
-            className="xl:hover:text-rd focus:text-rd transition-colors px-[18px] border-b border-solid border-white font-liquid tracking-widest group"
+            className="xl:hover:text-rd focus:text-rd transition-colors px-[18px] border-b border-solid border-white tracking-widest group"
             onClick={() => handleLogout()}
           >
             <Eject className="w-5 h-5 group-hover:fill-rd group-focus:fill-rd group-hover:drop-shadow-red group-focus:drop-shadow-red transition-colors" />

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { handleAddSubcategory } from "../utils/handlers/portfolio/handleAddSubcategory";
 import { imageset_select_btns } from "../styles/styles";
+import { deleteBadge } from "../../../global/styles/buttons";
 import { portfolio_subcategory } from "../types/portfolioTypes";
 
 import Loading from "../../../global/Loading";
@@ -53,7 +54,7 @@ export default function SubcategoryManager({ ...props }) {
                     estimate: `${sub.groups.length} group${sub.groups.length === 1 ? "" : "s"}, ~${totalImages} image${totalImages === 1 ? "" : "s"}`,
                   })
                 }
-                className="absolute -top-2 -right-2 bg-black border border-solid border-rd p-1"
+                className={deleteBadge}
               >
                 <Close className="w-3 h-3" />
               </button>

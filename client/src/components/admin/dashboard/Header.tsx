@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { icons } from "./styles/styles";
+import { iconFrame } from "../../global/styles/buttons";
 import { handleActionClick } from "./utils/handlers/dashboard/handleActionClick";
 import { determineHost as host } from "../../global/utils/determineHost";
 
@@ -37,7 +38,7 @@ export default function Header({ ...props }) {
             onClick={() =>
               handleActionClick([], setTargetClient, "ALL", setActivePane)
             }
-            className="xl:hover:border-rd focus:border-rd outline-none transition-colors border border-solid border-white w-10 h-10 flex items-center justify-center group"
+            className={iconFrame}
           >
             <Prev className={icons} />
           </button>
@@ -46,7 +47,7 @@ export default function Header({ ...props }) {
         <button
           onClick={() => handleLogout()}
           type="button"
-          className="xl:hover:border-rd focus:border-rd outline-none transition-colors border border-solid border-white w-10 h-10 flex items-center justify-center group"
+          className={iconFrame}
         >
           <Eject className={icons} />
         </button>
