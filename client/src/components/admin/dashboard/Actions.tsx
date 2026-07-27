@@ -33,14 +33,14 @@ export default function Actions({ ...props }) {
         case "date":
           sorted = existingClients.sort(
             (a: { added: string }, b: { added: string }) =>
-              new Date(b.added).getTime() - new Date(a.added).getTime()
+              new Date(b.added).getTime() - new Date(a.added).getTime(),
           );
           break;
 
         case "alphabetical":
           sorted = existingClients.sort(
             (a: { name: string }, b: { name: string }) =>
-              a.name.localeCompare(b.name)
+              a.name.localeCompare(b.name),
           );
           break;
       }
@@ -50,7 +50,7 @@ export default function Actions({ ...props }) {
     return (
       <button
         type="button"
-        className={`${sortStyle === index ? "bg-white text-black" : "bg-black text-white"} xl:py-1 xl:px-2 py-2 px-3 border border-solid border-white xl:hover:bg-white xl:hover:text-black focus:text-rd focus:outline-none transition-colors w-full xl:w-auto`}
+        className={`${sortStyle === index ? "bg-white text-black" : "bg-black text-white"} xl:py-1 py-2 px-3 border border-solid border-white xl:hover:bg-white xl:hover:text-black focus:text-rd focus:outline-none transition-colors w-full xl:w-auto`}
         onClick={() => handleClick(index, pattern)}
       >
         {text}
@@ -61,7 +61,7 @@ export default function Actions({ ...props }) {
   const handleSearch = () => {
     const filtered = originalClientsList.current.filter(
       (client: { name: string }) =>
-        client.name.toLowerCase().includes(searchInput.toLowerCase())
+        client.name.toLowerCase().includes(searchInput.toLowerCase()),
     );
 
     setClients(filtered);
@@ -117,17 +117,27 @@ export default function Actions({ ...props }) {
         ) : null}
       </div>
 
-      <div className="flex gap-3 xl:gap-2 w-full">
-        {sortTabs.map((item, index) => {
-          return (
-            <SortTab
-              key={item.name}
-              index={index}
-              text={item.name}
-              pattern={item.pattern}
-            />
-          );
-        })}
+      <div className="flex justify-between gap-3 xl:gap-2 w-full">
+        <div className="flex gap-2">
+          {sortTabs.map((item, index) => {
+            return (
+              <SortTab
+                key={item.name}
+                index={index}
+                text={item.name}
+                pattern={item.pattern}
+              />
+            );
+          })}
+        </div>
+
+        <button
+          className="xl:py-1 xl:px-2 py-2 px-3 border border-solid border-white xl:hover:bg-white xl:hover:text-black focus:text-rd focus:outline-none transition-colors w-full xl:w-auto"
+          type="button"
+          onClick={() => setActivePane("PORTFOLIO")}
+        >
+          PORTFOLIO
+        </button>
       </div>
     </div>
   );

@@ -1,12 +1,8 @@
+import PortfolioSubcategory from "../../models/portfolioSubcategory.js";
+
 // for portfolio requests
-export const validateParams = (category, group, size, start) => {
-  const acceptedCategories = [
-    "PHOTO",
-    "EDITORIAL",
-    "COMMERCIAL",
-    "EVENTS",
-    "FILM",
-  ];
+export const validateParams = async (category, sub, group, size, start) => {
+  const acceptedCategories = ["PHOTO", "ART", "DESIGN"];
 
   if (size !== "sm" && size !== "lg") return { error: "Invalid size" };
 
@@ -19,6 +15,12 @@ export const validateParams = (category, group, size, start) => {
   if (!acceptedCategories.includes(category)) {
     return { error: "Invalid category" };
   }
+
+  const subcategory = await PortfolioSubcategory.findOne({
+    category,
+    name: sub,
+  });
+  if (!subcategory) return { error: "Invalid sub" };
 
   return true;
 };

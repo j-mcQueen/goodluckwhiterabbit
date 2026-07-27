@@ -1,4 +1,3 @@
-import { sidebar_data } from "./data/sidebar/data";
 import { triggerBatch } from "./utils/triggerBatch";
 
 import Menu from "./Menu";
@@ -8,9 +7,11 @@ export default function Sidebar({ ...props }) {
   const {
     activeGroup,
     activeSub,
+    activeSubName,
     activeTab,
     bodyRef,
     route,
+    sidebarData,
     setActiveGroup,
     setActiveSub,
     setImages,
@@ -19,11 +20,9 @@ export default function Sidebar({ ...props }) {
     setStaticKeys,
   } = props;
 
-  const groups =
-    sidebar_data[route as keyof typeof sidebar_data].menu[activeSub];
+  const groups = sidebarData[route]?.menu[activeSub] ?? {};
 
-  const subcategories =
-    sidebar_data[route as keyof typeof sidebar_data].subcategories;
+  const subcategories = sidebarData[route]?.subcategories ?? [];
 
   const animationVariants = {
     initial: {
@@ -45,7 +44,7 @@ export default function Sidebar({ ...props }) {
             <div className={`max-w-[189px] h-full`}>
               <GroupList
                 activeGroup={activeGroup}
-                activeSub={activeSub}
+                activeSub={activeSubName}
                 activeTab={activeTab}
                 bodyRef={bodyRef}
                 groups={Object.keys(groups)}
@@ -61,6 +60,7 @@ export default function Sidebar({ ...props }) {
 
           <Menu
             activeSub={activeSub}
+            activeSubName={activeSubName}
             activeTab={activeTab}
             animationVariants={animationVariants}
             bodyRef={bodyRef}

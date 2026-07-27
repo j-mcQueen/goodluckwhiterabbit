@@ -12,9 +12,8 @@ export const verifyTokens = async (req, res) => {
         process.env.JWT_SECRET,
       );
     } catch (err) {
-      return res
-        .status(401)
-        .json({ status: 401, message: "Refresh token expired." });
+      res.status(401).json({ status: 401, message: "Refresh token expired." });
+      return false;
     }
 
     if (decodedRefresh.exp > 0) {

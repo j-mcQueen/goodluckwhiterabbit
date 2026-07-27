@@ -1,6 +1,5 @@
 import { Fragment, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { sidebar_data } from "../data/sidebar/data";
 import { triggerBatch } from "../utils/triggerBatch";
 
 import TopBar from "../../global/header/mobile/TopBar";
@@ -9,7 +8,8 @@ import ContactButton from "../ContactButton";
 import ListItem from "./ListItem";
 
 export default function Nav({ ...props }) {
-  const { categories, setContactOpen, setImages, setNotice } = props;
+  const { categories, setContactOpen, setImages, setNotice, sidebarData } =
+    props;
 
   const routeMap = {
     0: "/photo",
@@ -24,11 +24,11 @@ export default function Nav({ ...props }) {
   const determineArr = (depth: number, i: number, j?: number) => {
     switch (depth) {
       case 1:
-        return sidebar_data[routeMap[i as keyof typeof routeMap]].subcategories;
+        return sidebarData[routeMap[i as keyof typeof routeMap]]?.subcategories ?? [];
 
       case 2:
         return Object.keys(
-          sidebar_data[routeMap[i as keyof typeof routeMap]].menu[j as number],
+          sidebarData[routeMap[i as keyof typeof routeMap]]?.menu[j as number] ?? {},
         );
 
       default:
@@ -91,7 +91,7 @@ export default function Nav({ ...props }) {
         });
 
         return await triggerBatch(
-          String(j), // activeSub
+          determineArr(1, i)[j as number], // activeSub, resolved to its real name
           i, // activeTab
           k!, // activeGroup
           setImages,

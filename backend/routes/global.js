@@ -5,11 +5,13 @@ import {
   countImagesetItems,
   generateGetPresigned,
   generatePortfolioUrls,
+  getPortfolioTaxonomy,
 } from "../controllers/global/global.js";
 
 const router = express.Router();
 
 // GET
+router.get("/portfolio/taxonomy", getPortfolioTaxonomy);
 router.get(
   "/portfolio/:category/:sub/:group/:size/:start/",
   generatePortfolioUrls,

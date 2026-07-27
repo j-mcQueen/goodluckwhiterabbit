@@ -14,6 +14,19 @@ import {
   bulkUpload,
   uploadFile,
 } from "../controllers/admin.js";
+import {
+  adminGetPortfolioTaxonomy,
+  adminAddSubcategory,
+  adminDeleteSubcategory,
+  adminAddGroup,
+  adminDeleteGroup,
+  adminUploadPortfolioImage,
+  adminBulkUploadPortfolioImages,
+  adminDeletePortfolioImage,
+  adminSwapPortfolioImages,
+  adminUpdatePortfolioGroupCount,
+  adminGetPortfolioGroupImages,
+} from "../controllers/portfolioAdmin.js";
 
 const router = express.Router();
 const upload = multer(); // enable form data to be unpacked
@@ -33,6 +46,11 @@ const diskUpload = multer({
 // GET
 router.get("/users", adminGetClients);
 router.get("/users/:id/:imageset/getCount", adminGetUserImagesetCount);
+router.get("/portfolio/taxonomy", adminGetPortfolioTaxonomy);
+router.get(
+  "/portfolio/:category/:sub/:groupId/:size/:start/",
+  adminGetPortfolioGroupImages,
+);
 
 // POST
 router.post("/login", upload.none(), adminLogin);
@@ -44,9 +62,38 @@ router.post(
 router.post("/uploadFile", upload.any(), uploadFile);
 router.post("/users/:id/:imageset/bulkUpload", diskUpload.any(), bulkUpload);
 router.post("/users/:id/:imageset/swap/:from/:to", adminSwapFiles);
+router.post("/portfolio/:category/subcategories", adminAddSubcategory);
+router.post("/portfolio/subcategories/:subId/groups", adminAddGroup);
+router.post(
+  "/portfolio/:category/:sub/:groupId/uploadFile",
+  upload.any(),
+  adminUploadPortfolioImage,
+);
+router.post(
+  "/portfolio/:category/:sub/:groupId/bulkUpload",
+  diskUpload.any(),
+  adminBulkUploadPortfolioImages,
+);
+router.post(
+  "/portfolio/:category/:sub/:groupId/swap/:from/:to",
+  adminSwapPortfolioImages,
+);
+router.post(
+  "/portfolio/subcategories/:subId/groups/:groupId/updateCount/:count",
+  adminUpdatePortfolioGroupCount,
+);
 
 // DELETE
 router.delete("/deleteUser/:id", adminDeleteUser);
 router.delete("/users/:id/:imageset/:index/delete", adminDeleteFile);
+router.delete("/portfolio/subcategories/:subId", adminDeleteSubcategory);
+router.delete(
+  "/portfolio/subcategories/:subId/groups/:groupId",
+  adminDeleteGroup,
+);
+router.delete(
+  "/portfolio/:category/:sub/:groupId/:position/delete",
+  adminDeletePortfolioImage,
+);
 
 export default router;

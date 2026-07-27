@@ -3,6 +3,10 @@ import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { validateParams } from "../utils/validateParams.js";
 import { s3 } from "../config/s3.js";
 import { verifyTokens } from "../utils/verifyTokens.js";
+import {
+  loadPortfolioTaxonomy,
+  formatPublicTaxonomy,
+} from "../utils/loadPortfolioTaxonomy.js";
 
 const findFilterSort = async (
   bucket,
@@ -140,9 +144,25 @@ export const generateGetPresigned = async (req, res, next) => {
   }
 };
 
+export const getPortfolioTaxonomy = async (req, res, next) => {
+  let docs;
+  try {
+    docs = await loadPortfolioTaxonomy();
+  } catch (error) {
+    return res.status(500).json({
+      status: true,
+      message:
+        "There was an error retrieving the portfolio taxonomy. Please refresh the page and try again. Let Jack know if the problem persists!",
+    });
+  }
+
+  return res.status(200).json(formatPublicTaxonomy(docs));
+};
+
 export const generatePortfolioUrls = async (req, res, next) => {
-  const verified = validateParams(
+  const verified = await validateParams(
     req.params.category,
+    req.params.sub,
     req.params.group,
     req.params.size,
     req.params.start,

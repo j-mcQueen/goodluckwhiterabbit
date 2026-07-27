@@ -23,13 +23,6 @@ export const triggerBatch = async (
   const group = String(nextGroup).padStart(3, "0");
   const tabMap = { 0: "PHOTO", 1: "ART", 2: "DESIGN" };
   const size = mobile ? "sm" : "lg";
-  const subs = {
-    "0": "WEDDINGS",
-    "1": "EVENTS",
-    "2": "FILM",
-    "3": "COMMERCIAL",
-    "4": "EDITORIAL",
-  };
 
   const nextImages = await execute(
     tabMap[activeTab as keyof typeof tabMap],
@@ -37,7 +30,7 @@ export const triggerBatch = async (
     setNotice,
     size,
     start,
-    subs[activeSub as keyof typeof subs],
+    activeSub, // already the resolved subcategory name, not an index
   );
 
   if (setActiveSub && subIndex) setActiveSub(subIndex);

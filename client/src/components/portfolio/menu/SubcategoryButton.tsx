@@ -3,6 +3,7 @@ import { SubcategoryButton_T } from "../types/SubcategoryButton_T";
 
 export default function SubcategoryButton({
   activeSub,
+  activeSubName,
   activeTab,
   bodyRef,
   className = "",
@@ -27,7 +28,7 @@ export default function SubcategoryButton({
 
         try {
           const nextImages = await handleClick(
-            activeSub,
+            activeSubName,
             activeTab,
             0,
             setImages,

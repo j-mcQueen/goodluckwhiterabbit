@@ -10,6 +10,7 @@ import AddClient from "./AddClient";
 import DeleteModal from "./DeleteModal";
 import Actions from "./Actions";
 import EditClient from "./EditClient";
+import PortfolioManager from "./PortfolioManager";
 import RejectedFiles from "./modals/RejectedFiles";
 import Notice from "./modals/Notice";
 
@@ -113,9 +114,17 @@ export default function AdminDashboard() {
       </AnimatePresence>
 
       <Header
-        edit={activePane === "EDIT" ? true : false}
-        setTargetClient={activePane === "EDIT" ? setTargetClient : false}
-        setActivePane={activePane === "EDIT" ? setActivePane : false}
+        edit={activePane === "EDIT" || activePane === "PORTFOLIO"}
+        setTargetClient={
+          activePane === "EDIT" || activePane === "PORTFOLIO"
+            ? setTargetClient
+            : false
+        }
+        setActivePane={
+          activePane === "EDIT" || activePane === "PORTFOLIO"
+            ? setActivePane
+            : false
+        }
       />
 
       <section className="flex justify-center items-center text-white">
@@ -157,6 +166,8 @@ export default function AdminDashboard() {
               setTargetClient={setTargetClient}
               setActivePane={setActivePane}
             />
+          ) : activePane === "PORTFOLIO" ? (
+            <PortfolioManager setNotice={setNotice} />
           ) : null}
         </>
       </section>
