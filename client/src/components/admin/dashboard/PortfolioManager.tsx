@@ -284,7 +284,7 @@ export default function PortfolioManager({ ...props }) {
               initial={{ opacity: 0, translateY: -25 }}
               animate={{ opacity: 1, translateY: 0 }}
               transition={{ duration: 0.25 }}
-              className="border border-solid border-white flex"
+              className="border-b border-solid border-white flex"
             >
               <PortfolioOrderContainer
                 category={activeCategory}
