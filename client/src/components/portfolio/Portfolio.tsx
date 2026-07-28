@@ -19,9 +19,11 @@ const EMPTY_SIDEBAR_DATA: PortfolioSidebarData = {
   "/design": { title: "", subcategories: [], menu: [] },
 };
 
+const CATEGORY_ROUTES = ["/photo", "/art", "/design"];
+
 export default function Portfolio({ ...props }) {
   const { route, index } = props;
-  const headerItems = ["PHOTO"];
+  const headerItems = ["PHOTO", "ART", "DESIGN"];
 
   const navigate = useNavigate();
   const bodyRef = useRef<HTMLElement>();
@@ -47,6 +49,13 @@ export default function Portfolio({ ...props }) {
   });
 
   const activeSubName = sidebarData[route]?.subcategories[activeSub] ?? "";
+
+  // a category tab is only navigable once the admin has actually added a
+  // subcategory to it - matches the existing "COMING SOON" disabled-tab
+  // convention already used by Header/ListItem for the user dashboard
+  const categoryAvailability = CATEGORY_ROUTES.map((categoryRoute) =>
+    (sidebarData[categoryRoute]?.subcategories.length ?? 0) > 0 ? 1 : 0,
+  );
 
   useEffect(() => {
     const fetchTaxonomy = async () => {
@@ -139,7 +148,7 @@ export default function Portfolio({ ...props }) {
         <Header
           activeTab={activeTab}
           data={headerItems}
-          dashboard={false}
+          dashboard={categoryAvailability}
           loadTrackerRef={loadTrackerRef}
           logout={false}
           setActiveTab={setActiveTab}

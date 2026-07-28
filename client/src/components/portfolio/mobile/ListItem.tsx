@@ -1,8 +1,8 @@
 export default function ListItem({ ...props }) {
-  const { depth, index, label, handleClick } = props;
+  const { depth, disabled = false, label, handleClick } = props;
 
   const styles = {
-    item: `w-full h-full ${depth === 0 && index !== 0 ? "text-gray" : ""} overflow-y-scroll relative`,
+    item: `w-full h-full ${disabled ? "text-gray" : ""} overflow-y-scroll relative`,
     button: `w-full h-full max-h-full relative flex flex-col items-center justify-center gap-1 py-5`,
   };
 
@@ -10,12 +10,12 @@ export default function ListItem({ ...props }) {
     <li className={styles.item} key={label}>
       <button
         className={styles.button}
-        disabled={depth === 0 && index !== 0}
+        disabled={disabled}
         onClick={handleClick}
         type="button"
       >
         {label}
-        {depth === 0 && index !== 0 ? <span>(SOON)</span> : null}
+        {depth === 0 && disabled ? <span>(SOON)</span> : null}
       </button>
     </li>
   );

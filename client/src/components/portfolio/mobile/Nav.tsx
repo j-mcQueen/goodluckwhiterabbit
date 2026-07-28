@@ -36,6 +36,11 @@ export default function Nav({ ...props }) {
     }
   };
 
+  // a category is only navigable once the admin has actually added a
+  // subcategory to it - mirrors the desktop Header's dashboard prop
+  const categoryHasContent = (i: number) =>
+    (sidebarData[routeMap[i as keyof typeof routeMap]]?.subcategories.length ?? 0) > 0;
+
   const [isOpen, setIsOpen] = useState({
     main: false,
     subcategories: false,
@@ -127,6 +132,7 @@ export default function Nav({ ...props }) {
                   <div className={setCntrStyles(0)} key={category}>
                     <ListItem
                       depth={0}
+                      disabled={!categoryHasContent(i)}
                       index={i}
                       label={category}
                       handleClick={() => handleClick(0, i)}

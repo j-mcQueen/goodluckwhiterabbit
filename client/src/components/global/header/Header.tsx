@@ -5,14 +5,13 @@ import { Dispatch, SetStateAction } from "react";
 import rabbit from "../../../assets/media/gifs/glwr-lenticular.gif";
 import Instagram from "../../../assets/media/icons/Instagram";
 import Eject from "../../../assets/media/icons/Eject";
-import Next from "../../../assets/media/icons/Next";
 import ContactButton from "../../portfolio/ContactButton";
 
 export default function Header({
   ...props
 }: {
   activeTab: number;
-  dashboard: boolean | string[];
+  dashboard: boolean | number[];
   data: string[];
   logout: boolean;
   handleSelect?: ([key]: string) => void;
@@ -124,15 +123,6 @@ export default function Header({
                   }}
                 >
                   {tab}
-
-                  {dashboard &&
-                  dashboard[index as keyof typeof dashboard] === 0 ? (
-                    <span className="absolute -translate-y-1">
-                      <span className="font-vt text-sm tracking-vt flex items-center gap-1">
-                        <Next className="w-4 h-4" /> <span>COMING SOON</span>
-                      </span>
-                    </span>
-                  ) : null}
                 </button>
               </li>
             );

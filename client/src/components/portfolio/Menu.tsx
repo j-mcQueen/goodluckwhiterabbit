@@ -39,7 +39,6 @@ export default function Menu({ ...props }) {
                 activeTab={activeTab}
                 bodyRef={bodyRef}
                 className={`${index === subcategories.length - 1 ? "border-b-0" : null} ${index === activeSub ? "border-r-black" : null} border border-white border-solid w-[56px]`}
-                disabled={index !== 0}
                 handleClick={triggerBatch}
                 index={index}
                 label={subcategories[index]}
