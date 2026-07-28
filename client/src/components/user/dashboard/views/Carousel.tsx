@@ -17,7 +17,7 @@ export default function Carousel({ ...props }) {
   } = props;
 
   return (
-    <section className="w-full xl:h-[calc(100dvh-57px-1.5rem)] overflow-y-scroll pt-2">
+    <section className="w-full xl:h-[calc(100dvh-57px-var(--frame))] overflow-y-scroll pt-2">
       <div className="flex items-center justify-between px-5">
         {activeIndex > 0 ? (
           <button

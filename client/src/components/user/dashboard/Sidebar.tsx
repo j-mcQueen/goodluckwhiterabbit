@@ -14,7 +14,7 @@ export default function Sidebar({ ...props }) {
   } = props;
 
   return (
-    <aside className="grid items-center xl:flex xl:flex-col gap-2 xl:gap-5 xl:min-w-sidebar xl:max-w-sidebar xl:max-h-[calc(100dvh-57px-1.5rem)] xl:border-r border-solid border-white border-b pb-5">
+    <aside className="grid items-center xl:flex xl:flex-col gap-2 xl:gap-5 xl:min-w-sidebar xl:max-w-sidebar xl:max-h-[calc(100dvh-57px-var(--frame))] xl:border-r border-solid border-white border-b pb-5">
       <h1 className="font-tnrBI xl:text-2xl text-white text-center tracking-widest opacity-80 drop-shadow-glo max-xl:col-start-1 max-xl:col-end-1 max-xl:pl-3 pt-8">
         {user.name.toUpperCase()}
       </h1>

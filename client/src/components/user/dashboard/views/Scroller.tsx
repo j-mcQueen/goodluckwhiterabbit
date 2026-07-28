@@ -18,7 +18,7 @@ export default function Scroller({ ...props }) {
   const [staticKeys, setStaticKeys] = useState(generateKeys(10));
 
   return (
-    <section className="w-full xl:h-[calc(100dvh-57px-1.5rem)] overflow-y-scroll pt-2">
+    <section className="w-full xl:h-[calc(100dvh-57px-var(--frame))] overflow-y-scroll pt-2">
       <div className="flex flex-wrap justify-center items-center gap-y-10 xl:gap-y-12 relative overflow-hidden px-2">
         {imageset
           .filter((image: object) => image instanceof Blob === true)

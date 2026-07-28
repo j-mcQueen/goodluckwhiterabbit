@@ -18,7 +18,7 @@ export default function Nav({ ...props }) {
   };
 
   const setCntrStyles = (depth: number) => {
-    return `${depth === 0 ? "border-b border-solid border-white" : ""} flex items-center w-full h-full min-w-[calc((100dvw-1.5rem-52px)/3)] overflow-hidden min-h-[54.2px]`;
+    return `${depth === 0 ? "border-b border-solid border-white" : ""} flex items-center w-full h-full min-w-[calc((100dvw-var(--frame)-52px)/3)] overflow-hidden min-h-[54.2px]`;
   };
 
   const determineArr = (depth: number, i: number, j?: number) => {
@@ -119,7 +119,7 @@ export default function Nav({ ...props }) {
             animate={{ x: 0, opacity: 1, visibility: "visible" }}
             exit={{ x: -100, opacity: 0 }}
             transition={{ type: "spring", bounce: 0, duration: 0.4 }}
-            className="absolute text-white w-[calc(100dvw-1.5rem-2px)] h-[calc(100dvh-1.5rem-52px)] flex flex-col justify-between items-center z-50 bg-black top-0"
+            className="absolute text-white w-[calc(100dvw-var(--frame)-2px)] h-[calc(100dvh-var(--frame)-52px)] flex flex-col justify-between items-center z-50 bg-black top-0"
           >
             <ul className="w-full h-full flex flex-col justify-evenly overflow-hidden">
               {categories.map((category: string, i: number) => {

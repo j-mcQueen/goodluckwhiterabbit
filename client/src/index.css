@@ -29,6 +29,8 @@
   font-family: "VT323", serif;
   min-width: 300px;
   overflow-x: hidden;
+  /* 2x the #root margin utility in index.html (m-2 = 0.5rem/side) — the amount full-viewport layouts subtract to fit inside the frame */
+  --frame: 1rem;
 }
 
 * {

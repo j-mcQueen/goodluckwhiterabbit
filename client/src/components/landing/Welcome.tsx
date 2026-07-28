@@ -8,7 +8,7 @@ export default function Welcome() {
   const [entered, setEntered] = useState(false);
 
   return (
-    <main className="w-[calc(100dvw-1.5rem)] h-[calc(100dvh-1.5rem)] flex items-center justify-center">
+    <main className="w-[calc(100dvw-var(--frame))] h-[calc(100dvh-var(--frame))] flex items-center justify-center">
       {entered ? (
         <Fork />
       ) : (

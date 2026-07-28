@@ -81,7 +81,7 @@ export default function MobileHeader({
             animate={{ x: 0, opacity: 1, visibility: "visible" }}
             exit={{ x: -100, opacity: 0 }}
             transition={{ type: "spring", bounce: 0, duration: 0.4 }}
-            className="absolute text-white w-[calc(100dvw-1.5rem-2px)] h-[calc(100dvh-1.5rem-54px)] flex flex-col items-center z-50 bg-black"
+            className="absolute text-white w-[calc(100dvw-var(--frame)-2px)] h-[calc(100dvh-var(--frame)-54px)] flex flex-col items-center z-50 bg-black"
           >
             <ul className="w-full h-full flex flex-col justify-evenly">
               {data.map((tab: string, index: number) => {

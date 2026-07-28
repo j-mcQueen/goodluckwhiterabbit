@@ -119,7 +119,7 @@ export default function Portfolio({ ...props }) {
   }, [activeSub, activeTab, activeSubName]);
 
   return (
-    <div className="w-[calc(100dvw-1.5rem-2px)] h-[calc(100dvh-1.5rem)] overflow-hidden relative">
+    <div className="w-[calc(100dvw-var(--frame)-2px)] h-[calc(100dvh-var(--frame))] overflow-hidden relative">
       <ContactDialog
         contactOpen={contactOpen}
         setContactOpen={setContactOpen}
@@ -147,7 +147,7 @@ export default function Portfolio({ ...props }) {
         />
       )}
 
-      <main className="flex flex-col xl:flex-row h-[calc(100dvh-51px-1.5rem)]">
+      <main className="flex flex-col xl:flex-row h-[calc(100dvh-51px-var(--frame))]">
         {mobile ? null : (
           <Sidebar
             activeGroup={activeGroup}

@@ -18,7 +18,7 @@ export default function Segment({ ...props }) {
         animate={{ opacity: 1 }}
         transition={{ duration: 1 }}
         className="flex items-center justify-center border border-white border-solid overflow-hidden m-[-1px]"
-        style={{ height: `calc((100dvh / ${count}) - 1.5rem)` }}
+        style={{ height: `calc((100dvh / ${count}) - var(--frame))` }}
       >
         <h2 className="text-white absolute text-center text-4xl z-50">
           {text}

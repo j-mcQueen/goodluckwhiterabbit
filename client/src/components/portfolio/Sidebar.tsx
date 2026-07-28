@@ -37,10 +37,10 @@ export default function Sidebar({ ...props }) {
   };
 
   return (
-    <aside className="flex xl:min-w-sidebar xl:max-w-sidebar xl:h-[calc(100dvh-57px-1.5rem)] text-white overflow-x-scroll overflow-y-hidden">
+    <aside className="flex xl:min-w-sidebar xl:max-w-sidebar xl:h-[calc(100dvh-57px-var(--frame))] text-white overflow-x-scroll overflow-y-hidden">
       {activeTab === 0 ? (
         <>
-          <ul className="flex flex-row-reverse xl:h-[calc(100dvh-57px-1.5rem)] [writing-mode:sideways-lr]">
+          <ul className="flex flex-row-reverse xl:h-[calc(100dvh-57px-var(--frame))] [writing-mode:sideways-lr]">
             <div className={`max-w-[189px] h-full`}>
               <GroupList
                 activeGroup={activeGroup}

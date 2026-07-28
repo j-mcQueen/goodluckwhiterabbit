@@ -93,7 +93,7 @@ export default function AdminDashboard() {
   }, [location, navigate]);
 
   return (
-    <main className="w-[calc(100dvw-1.5rem-2px)] h-[calc(100dvh-1.5rem-2px)] overflow-scroll overflow-x-hidden relative">
+    <main className="w-[calc(100dvw-var(--frame)-2px)] h-[calc(100dvh-var(--frame)-2px)] overflow-scroll overflow-x-hidden relative">
       {rejectedFiles.length > 0 ? (
         <RejectedFiles
           rejectedFiles={rejectedFiles}

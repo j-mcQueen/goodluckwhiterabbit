@@ -37,7 +37,7 @@ export default {
         red: "#DC2626",
       },
       width: {
-        outer: "calc(100dvw - 1.5rem - 2px)",
+        outer: "calc(100dvw - var(--frame) - 2px)",
         sidebar: "245px",
       },
       minWidth: {
@@ -47,7 +47,7 @@ export default {
         sidebar: "245px",
       },
       height: {
-        outer: "calc(100dvh - 1.5rem - 2px)",
+        outer: "calc(100dvh - var(--frame) - 2px)",
       },
       spacing: {
         4.5: "18px",
