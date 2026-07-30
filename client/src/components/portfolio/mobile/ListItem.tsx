@@ -1,5 +1,5 @@
 export default function ListItem({ ...props }) {
-  const { depth, disabled = false, label, handleClick } = props;
+  const { disabled = false, label, handleClick } = props;
 
   const styles = {
     item: `w-full h-full ${disabled ? "text-gray" : ""} overflow-y-scroll relative`,
@@ -15,7 +15,6 @@ export default function ListItem({ ...props }) {
         type="button"
       >
         {label}
-        {depth === 0 && disabled ? <span>(SOON)</span> : null}
       </button>
     </li>
   );
