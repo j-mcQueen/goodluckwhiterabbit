@@ -8,8 +8,14 @@ import ContactButton from "../ContactButton";
 import ListItem from "./ListItem";
 
 export default function Nav({ ...props }) {
-  const { categories, setContactOpen, setImages, setNotice, sidebarData } =
-    props;
+  const {
+    categories,
+    onGroupSelect,
+    setContactOpen,
+    setImages,
+    setNotice,
+    sidebarData,
+  } = props;
 
   const routeMap = {
     0: "/photo",
@@ -88,22 +94,26 @@ export default function Nav({ ...props }) {
         }));
         break;
 
-      case 2:
+      case 2: {
         setIsOpen({
           main: false,
           subcategories: true,
           groups: true,
         });
 
-        return await triggerBatch(
+        const nextImages = await triggerBatch(
           determineArr(1, i)[j as number], // activeSub, resolved to its real name
           i, // activeTab
-          k!, // activeGroup
+          k! + 1, // groups are 1-indexed on S3 (matches GroupList's j + 1)
           setImages,
           setNotice,
           true,
           0,
         );
+
+        onGroupSelect?.(i, j as number, k as number);
+        return nextImages;
+      }
     }
   };
 
@@ -247,7 +257,7 @@ export default function Nav({ ...props }) {
                   href="https://www.instagram.com/goodluckwhiterabbit/"
                 >
                   <div className="max-w-[24px] max-h-[24px]">
-                    <Instagram />
+                    <Instagram className="w-[24px] h-[24px] overflow-visible" />
                   </div>
                 </a>
               </div>

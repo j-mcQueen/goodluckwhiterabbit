@@ -38,6 +38,10 @@ export default function Portfolio({ ...props }) {
   const [nextStartIndex, setNextStartIndex] = useState<number>(10);
   const [sidebarData, setSidebarData] =
     useState<PortfolioSidebarData>(EMPTY_SIDEBAR_DATA);
+  const [mobileSelection, setMobileSelection] = useState<{
+    categoryIndex: number;
+    subIndex: number;
+  }>({ categoryIndex: index, subIndex: 0 });
   const [notice, setNotice] = useState<{
     status: boolean;
     loading: boolean;
@@ -49,6 +53,37 @@ export default function Portfolio({ ...props }) {
   });
 
   const activeSubName = sidebarData[route]?.subcategories[activeSub] ?? "";
+
+  // mobile has no notion of "route" for the currently browsed category - the
+  // in-place accordion nav (mobile/Nav.tsx) lets you load any category's
+  // groups without navigating, so the breadcrumb tracks its own selection
+  // rather than reusing activeTab/activeSub/route
+  const handleMobileGroupSelect = (
+    categoryIndex: number,
+    subIndex: number,
+    groupIndex: number,
+  ) => {
+    setMobileSelection({ categoryIndex, subIndex });
+    setActiveGroup(groupIndex);
+  };
+
+  const mobileCategoryRoute = CATEGORY_ROUTES[mobileSelection.categoryIndex];
+  const mobileSubName =
+    sidebarData[mobileCategoryRoute]?.subcategories[mobileSelection.subIndex] ??
+    "";
+  const mobileGroupName =
+    Object.keys(
+      sidebarData[mobileCategoryRoute]?.menu[mobileSelection.subIndex] ?? {},
+    )[activeGroup] ?? "";
+
+  const mobileBreadcrumb =
+    mobile && mobileSubName && mobileGroupName
+      ? {
+          category: headerItems[mobileSelection.categoryIndex],
+          subcategory: mobileSubName,
+          group: mobileGroupName,
+        }
+      : null;
 
   // a category tab is only navigable once the admin has actually added a
   // subcategory to it - matches the existing "COMING SOON" disabled-tab
@@ -138,6 +173,7 @@ export default function Portfolio({ ...props }) {
       {mobile ? (
         <Nav
           categories={headerItems}
+          onGroupSelect={handleMobileGroupSelect}
           route={route}
           setContactOpen={setContactOpen}
           setImages={setImages}
@@ -182,6 +218,7 @@ export default function Portfolio({ ...props }) {
           activeSub={activeSubName}
           activeTab={activeTab}
           bodyRef={bodyRef}
+          breadcrumb={mobileBreadcrumb}
           images={images}
           nextStartIndex={nextStartIndex}
           setActiveGroup={setActiveGroup}
