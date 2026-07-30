@@ -50,7 +50,7 @@ export default function ImageQueue({ ...props }) {
           ) : null}
 
           <label className="font-tnrBI text-md tracking-widest opacity-80 drop-shadow-glo border border-solid flex items-center px-2 pt-2 pb-1 transition-colors xl:hover:text-rd xl:hover:drop-shadow-red xl:focus:text-rd xl:focus:drop-shadow-red xl:hover:cursor-pointer h-[36px] max-h-[36px]">
-            ADD FILES
+            ADD
             <input
               ref={fileRef}
               type="file"
