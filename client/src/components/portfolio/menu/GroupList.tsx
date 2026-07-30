@@ -43,14 +43,14 @@ export default function GroupList({
     >
       {groups.map((group, j) => (
         <li
-          className={`${className} ${j === 0 ? "border-t-0" : ""} ${j === groups.length - 1 ? "border-b-0" : ""} border border-stone-200 border-solid w-full py-5 -my-[0.5px] flex items-center justify-center border-r-0 border-l-0 px-7 xl:px-0 min-h-[61px]`}
+          className={`${className} ${j === 0 ? "border-t-0" : ""} ${j === groups.length - 1 ? "border-b-0" : ""} border border-stone-200 border-solid w-full py-5 -my-[0.5px] flex items-center justify-center border-r-0 border-l-0 px-7 xl:px-0 min-h-[61px] tracking-wide`}
           key={group}
           ref={(el) => {
             groupItemRefs.current[j] = el;
           }}
         >
           <button
-            className={`${j === activeGroup ? "" : "opacity-40"} drop-shadow-glo text-stone-200`}
+            className={`${j === activeGroup ? "" : "opacity-40"} drop-shadow-glo text-stone-200 text-xl`}
             onClick={async () => {
               scrollToGroup(j);
               if (bodyRef) {

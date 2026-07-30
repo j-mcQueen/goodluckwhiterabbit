@@ -56,7 +56,7 @@ export default function SubcategoryButton({
       className={`
         [writing-mode:vertical-rl] 
         h-full
-        ${Number(activeSub) === index ? "text-ylw" : ""}
+        ${Number(activeSub) === index ? "text-stone-200 text-xl drop-shadow-glo" : ""}
         ${disabled ? "text-gray" : ""}
         ${className}
       `}

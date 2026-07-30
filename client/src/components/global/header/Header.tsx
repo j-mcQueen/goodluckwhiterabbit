@@ -36,7 +36,7 @@ export default function Header({
   const navigate = useNavigate();
 
   const listItemVariants = {
-    active: "text-rd border-b-black",
+    active: "text-white border-b-black",
     std: "border-b-white",
   };
 
@@ -68,7 +68,7 @@ export default function Header({
           />
         </div>
 
-        <ul className="flex justify-evenly w-full">
+        <ul className="flex justify-evenly w-full text-xl">
           {data.map((tab: string, index: number) => {
             return (
               <li
