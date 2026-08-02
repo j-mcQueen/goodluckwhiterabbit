@@ -40,7 +40,7 @@ export default function Login() {
 
   return (
     <main className="w-[calc(100dvw-var(--frame)-2px)] h-[calc(100dvh-var(--frame)-2px)] flex items-center justify-center">
-      <section className="text-white xl:border xl:border-solid xl:border-white w-[90dvw] h-dvh xl:w-[25dvw] xl:h-[35dvw] pb-6 xl:mx-0 xl:py-0 flex flex-col justify-end">
+      <section className="text-white xl:border xl:border-solid xl:border-white/20 w-[90dvw] h-dvh xl:w-[25dvw] xl:h-[35dvw] pb-6 xl:mx-0 xl:py-0 flex flex-col justify-end">
         <Rabbit />
 
         <hgroup className="pt-10 xl:pb-5">
@@ -65,7 +65,7 @@ export default function Login() {
                 if (authError) setAuthError(false);
               }}
               required
-              className="font-vt tracking-vt bg-black border border-solid focus:border-red xl:transition-all border-white text-rd h-10 pl-2 mt-2 outline-none"
+              className="font-vt tracking-vt bg-black border border-solid focus:border-red xl:transition-all border-white/20 text-rd h-10 pl-2 mt-2 outline-none"
             />
           </label>
 
@@ -79,7 +79,7 @@ export default function Login() {
                 if (authError) setAuthError(false);
               }}
               required
-              className="font-vt tracking-vt bg-black border border-solid border-white focus:border-red text-rd h-10 pl-2 mt-2 outline-none"
+              className="font-vt tracking-vt bg-black border border-solid border-white/20 focus:border-red text-rd h-10 pl-2 mt-2 outline-none"
             />
           </label>
 

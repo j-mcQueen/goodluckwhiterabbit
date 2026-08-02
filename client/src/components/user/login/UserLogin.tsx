@@ -53,7 +53,7 @@ export default function UserLogin() {
 
   return (
     <main className="w-[calc(100dvw-var(--frame)-2px)] h-[calc(100dvh-var(--frame)-2px)] flex items-center justify-center">
-      <section className="text-white xl:border xl:border-solid xl:border-white w-[90dvw] h-dvh xl:w-[25dvw] xl:h-[35dvw] pb-6 xl:mx-0 xl:py-0 flex flex-col justify-center xl:justify-end">
+      <section className="text-white xl:border xl:border-solid xl:border-white/20 w-[90dvw] h-dvh xl:w-[25dvw] xl:h-[35dvw] pb-6 xl:mx-0 xl:py-0 flex flex-col justify-center xl:justify-end">
         <Rabbit />
 
         <hgroup className="pt-10 xl:pb-5 xl:pl-10 pl-3">
@@ -79,7 +79,7 @@ export default function UserLogin() {
               onChange={() => {
                 if (authError) setAuthError({ active: false, message: "" });
               }}
-              className="bg-black border border-solid border-white xl:focus:border-red transition-all font-vt tracking-vt text-rd h-10 pl-2 mt-2 outline-none"
+              className="bg-black border border-solid border-white/20 xl:focus:border-red transition-all font-vt tracking-vt text-rd h-10 pl-2 mt-2 outline-none"
               required
             />
           </label>

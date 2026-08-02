@@ -25,7 +25,7 @@ export default function SubmitDialog({ ...props }) {
   return submitOpen ? (
     <dialog
       ref={dialog}
-      className="text-white bg-black absolute left-0 right-0 top-0 bottom-0 text-center border border-solid border-white p-3 z-20 backdrop:bg-[rgba(0,0,0,0.75)] w-72"
+      className="text-white bg-black absolute left-0 right-0 top-0 bottom-0 text-center border border-solid border-white/20 p-3 z-20 backdrop:bg-[rgba(0,0,0,0.75)] w-72"
       onClose={() => {
         setSubmitOpen(false);
         setSubmitStatus(null);

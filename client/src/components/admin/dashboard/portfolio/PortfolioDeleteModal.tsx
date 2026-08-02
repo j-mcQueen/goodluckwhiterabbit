@@ -54,7 +54,7 @@ export default function PortfolioDeleteModal({ ...props }) {
   };
 
   return (
-    <dialog className="absolute flex items-center justify-center bg-black text-white border border-solid border-white p-3 z-20">
+    <dialog className="absolute flex items-center justify-center bg-black text-white border border-solid border-white/20 p-3 z-20">
       <div className="flex flex-col gap-5 max-w-[400px]">
         <div className="flex items-center justify-between text-lg">
           <h3 className="font-tnrBI">

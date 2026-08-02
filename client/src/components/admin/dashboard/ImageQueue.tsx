@@ -13,7 +13,7 @@ export default function ImageQueue({ ...props }) {
   const fileRef = useRef<HTMLInputElement>(null);
 
   return (
-    <div className="border-l border-solid">
+    <div className="border-l border-solid border-white/20">
       <div>
         <div className="flex justify-between items-center gap-5 py-4 px-4">
           <p className="text-xl">
@@ -33,7 +33,7 @@ export default function ImageQueue({ ...props }) {
                   setQueue([]);
                   setUploadCount(0);
                 }}
-                className=" px-2 pt-3 pb-2 border border-solid transition-colors xl:hover:text-rd xl:hover:drop-shadow-red xl:focus:text-rd xl:focus:drop-shadow-red xl:hover:cursor-pointer drop-shadow-glo "
+                className=" px-2 pt-3 pb-2 border border-solid border-white/20 transition-colors xl:hover:text-rd xl:hover:border-rd xl:hover:drop-shadow-red xl:focus:text-rd xl:focus:border-rd xl:focus:drop-shadow-red xl:hover:cursor-pointer drop-shadow-glo "
               >
                 CLEAR
               </button>
@@ -42,14 +42,14 @@ export default function ImageQueue({ ...props }) {
                 type="button"
                 disabled={queue.length > 0 ? false : true}
                 onClick={() => setSubmitOpen(true)}
-                className="px-2 pt-3 pb-2 border border-solid transition-colors xl:hover:text-rd xl:hover:drop-shadow-red xl:focus:text-rd xl:focus:drop-shadow-red xl:hover:cursor-pointer drop-shadow-glo "
+                className="px-2 pt-3 pb-2 border border-solid border-white/20 transition-colors xl:hover:text-rd xl:hover:border-rd xl:hover:drop-shadow-red xl:focus:text-rd xl:focus:border-rd xl:focus:drop-shadow-red xl:hover:cursor-pointer drop-shadow-glo "
               >
                 SUBMIT
               </button>
             </div>
           ) : null}
 
-          <label className="font-tnrBI text-md tracking-widest opacity-80 drop-shadow-glo border border-solid flex items-center px-2 pt-2 pb-1 transition-colors xl:hover:text-rd xl:hover:drop-shadow-red xl:focus:text-rd xl:focus:drop-shadow-red xl:hover:cursor-pointer h-[36px] max-h-[36px]">
+          <label className="font-tnrBI text-md tracking-widest opacity-80 drop-shadow-glo border border-solid border-white/20 flex items-center px-2 pt-2 pb-1 transition-colors xl:hover:text-rd xl:hover:border-rd xl:hover:drop-shadow-red xl:focus:text-rd xl:focus:border-rd xl:focus:drop-shadow-red xl:hover:cursor-pointer h-[36px] max-h-[36px]">
             ADD
             <input
               ref={fileRef}

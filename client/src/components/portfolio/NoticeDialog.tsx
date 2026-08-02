@@ -20,7 +20,7 @@ export default function NoticeDialog({ ...props }) {
           open
           className="flex justify-center absolute right-0 left-0 bottom-0 w-full text-center mx-0 p-2 bg-inherit"
         >
-          <div className="bg-black border border-solid border-white py-2 px-3">
+          <div className="bg-black border border-solid border-white/20 py-2 px-3">
             <Loading />
           </div>
         </motion.dialog>

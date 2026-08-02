@@ -17,7 +17,7 @@ export default function ActionBar({ ...props }) {
     <>
       <button
         type="button"
-        className="border border-solid border-white p-1 xl:hover:border-red xl:focus:border-red focus:outline-none transition-colors group"
+        className="border border-solid border-white/20 p-1 xl:hover:border-red xl:focus:border-red focus:outline-none transition-colors group"
         onClick={() => {
           const args = {
             id: user._id,

@@ -17,10 +17,10 @@ export default function Segment({ ...props }) {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 1 }}
-        className="flex items-center justify-center border border-white border-solid overflow-hidden m-[-1px]"
+        className="flex items-center justify-center border border-white/20 border-solid overflow-hidden m-[-1px]"
         style={{ height: `calc((100dvh / ${count}) - var(--frame))` }}
       >
-        <h2 className="text-white absolute text-center text-4xl z-50">
+        <h2 className="font-tnrBI drop-shadow-glo text-white absolute text-center text-4xl z-50">
           {text}
         </h2>
 

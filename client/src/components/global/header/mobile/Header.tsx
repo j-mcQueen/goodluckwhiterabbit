@@ -64,7 +64,7 @@ export default function MobileHeader({
 
   return (
     <header
-      className={`flex border-b border-solid border-white transition-colors z-50`}
+      className={`flex border-b border-solid border-white/20 transition-colors z-50`}
     >
       <TopBar
         isMobilePortfolio={false}
@@ -87,7 +87,7 @@ export default function MobileHeader({
               {data.map((tab: string, index: number) => {
                 return (
                   <li
-                    className={`${activeTab === index ? listItemVariants.active : listItemVariants.std} border-b border-solid border-white flex relative h-full bg-black`}
+                    className={`${activeTab === index ? listItemVariants.active : listItemVariants.std} border-b border-solid border-white/20 flex relative h-full bg-black`}
                     key={tab}
                   >
                     <button
@@ -147,14 +147,14 @@ export default function MobileHeader({
             {logout ? (
               <button
                 type="button"
-                className={`text-rd focus:text-rd transition-colors flex justify-center py-3 w-full tracking-widest border-white border-b`}
+                className={`text-rd focus:text-rd transition-colors flex justify-center py-3 w-full tracking-widest border-white/20 border-b`}
                 onClick={() => handleLogout()}
               >
                 <Eject className="w-5 h-5 group-hover:fill-rd group-focus:fill-rd group-hover:drop-shadow-red group-focus:drop-shadow-red transition-colors" />
               </button>
             ) : (
               <div className="flex justify-between w-full min-h-[50px] bg-black">
-                <div className="min-w-[50px] flex items-center justify-center border-r border-solid border-white">
+                <div className="min-w-[50px] flex items-center justify-center border-r border-solid border-white/20">
                   <a href="https://www.instagram.com/goodluckwhiterabbit/">
                     <Instagram />
                   </a>

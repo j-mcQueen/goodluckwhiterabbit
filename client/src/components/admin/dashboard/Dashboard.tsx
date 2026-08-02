@@ -130,7 +130,7 @@ export default function AdminDashboard() {
       <section className="flex justify-center items-center text-white">
         <>
           {activePane === "ALL" ? (
-            <div className="text-white border border-solid border-white w-[85dvw] xl:w-[60dvw]">
+            <div className="text-white border border-solid border-white/20 w-[85dvw] xl:w-[60dvw]">
               <Actions
                 clients={clients}
                 mobile={mobile}

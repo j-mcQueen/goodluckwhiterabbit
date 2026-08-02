@@ -103,9 +103,9 @@ export default function PortfolioManager({ ...props }) {
   };
 
   return (
-    <div className="text-white border border-solid border-white w-[85dvw] xl:w-[75dvw]">
+    <div className="text-white border border-solid border-white/20 w-[85dvw] xl:w-[75dvw]">
       {activeCategory ? (
-        <nav className="flex gap-3 flex-wrap p-3 border-b border-solid border-white text-sm tracking-widest opacity-80">
+        <nav className="flex gap-3 flex-wrap p-3 border-b border-solid border-white/20 text-sm tracking-widest opacity-80">
           <button
             type="button"
             onClick={resetToCategories}
@@ -284,7 +284,7 @@ export default function PortfolioManager({ ...props }) {
               initial={{ opacity: 0, translateY: -25 }}
               animate={{ opacity: 1, translateY: 0 }}
               transition={{ duration: 0.25 }}
-              className="border-b border-solid border-white flex"
+              className="border-b border-solid border-white/20 flex"
             >
               <PortfolioOrderContainer
                 category={activeCategory}
