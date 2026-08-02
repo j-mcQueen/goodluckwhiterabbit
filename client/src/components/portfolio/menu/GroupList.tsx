@@ -50,7 +50,7 @@ export default function GroupList({
           }}
         >
           <button
-            className={`${j === activeGroup ? "text-rd drop-shadow-red xl:focus:outline-none xl:focus:animate-wiggle" : "text-white/70 xl:hover:opacity-100 xl:focus:opacity-100 xl:hover:text-rd xl:focus:text-rd transition-colors xl:focus:outline-none xl:focus:drop-shadow-red xl:hover:drop-shadow-red"} drop-shadow-glo text-xl tracking-vt`}
+            className={`${j === activeGroup ? "text-rd drop-shadow-red xl:focus:outline-none" : "text-white/70 xl:hover:opacity-100 xl:focus:opacity-100 xl:hover:text-rd xl:focus:text-rd transition-colors xl:focus:outline-none xl:focus:drop-shadow-red xl:hover:drop-shadow-red"} drop-shadow-glo text-xl tracking-vt`}
             onClick={async () => {
               scrollToGroup(j);
               if (bodyRef) {

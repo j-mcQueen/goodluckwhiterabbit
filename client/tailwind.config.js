@@ -59,22 +59,10 @@ export default {
           from: { width: 0 },
           to: { width: "100%" },
         },
-        wiggle: {
-          "0%, 100%": { transform: "translateX(0)" },
-          "25%": { transform: "translateX(-3px)" },
-          "75%": { transform: "translateX(3px)" },
-        },
-        wiggleY: {
-          "0%, 100%": { transform: "translateY(0)" },
-          "25%": { transform: "translateY(-3px)" },
-          "75%": { transform: "translateY(3px)" },
-        },
       },
       animation: {
         blink: "blink 1.5s steps(2) infinite",
         typing: "typing 2s steps(80, end)",
-        wiggle: "wiggle 0.5s ease-in-out infinite",
-        wiggleY: "wiggleY 0.5s ease-in-out infinite",
       },
     },
   },
