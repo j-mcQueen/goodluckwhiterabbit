@@ -31,7 +31,13 @@ export default function Body({ ...props }) {
         </div>
       )}
 
-      <div className="flex flex-wrap items-stretch justify-center gap-2 px-2">
+      {/* row height is viewport-relative (not a flat px) so it tracks column
+          width: with 3 columns, colWidth ≈ 100vw/3, and dividing that by our
+          target single-span cell ratio (~0.85, portrait-friendly) gives
+          ~100vw/(3*0.85) ≈ 39vw - a flat px height would drift toward a
+          landscape-shaped single-span cell as the viewport grows, badly
+          over-cropping portraits */}
+      <div className="grid grid-cols-1 gap-2 px-2 xl:grid-flow-dense xl:auto-rows-[39vw] xl:[grid-template-columns:repeat(3,minmax(320px,1fr))]">
         {images.map((unit: { image: Blob; group: string }, index: number) => {
           return (
             <Fragment key={staticKeys[index]}>

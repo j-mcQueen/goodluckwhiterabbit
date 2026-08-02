@@ -4,6 +4,8 @@ import { handleIntersection } from "./utils/handleIntersection";
 
 import Image from "./Image";
 
+const SPAN_THRESHOLD = 1.3; // ratio at/above this is "landscape enough" to take 2 grid columns
+
 export default function Unit({ ...props }) {
   const {
     activeGroup,
@@ -26,8 +28,7 @@ export default function Unit({ ...props }) {
   return index === lastIndex ? (
     <InView
       as="div"
-      style={{ flexGrow: ratio }}
-      className={`flex shrink basis-full xl:basis-0 min-w-0 xl:min-w-[600px]`}
+      className={`flex overflow-hidden ${ratio >= SPAN_THRESHOLD ? "xl:col-span-2" : ""}`}
       onChange={async (inView, entry) => {
         if (entry.intersectionRatio === 1 || !entry.isIntersecting) return; // prevent callback from firing immediately on first load
 
@@ -60,8 +61,7 @@ export default function Unit({ ...props }) {
   ) : (
     <InView
       as="div"
-      style={{ flexGrow: ratio }}
-      className={`flex shrink basis-full xl:basis-0 min-w-0 xl:min-w-[600px]`}
+      className={`flex overflow-hidden ${ratio >= SPAN_THRESHOLD ? "xl:col-span-2" : ""}`}
       onChange={(inView, entry) => {
         if (entry.intersectionRatio === 1) return; // prevent callback from firing immediately on first load
         if (inView) {

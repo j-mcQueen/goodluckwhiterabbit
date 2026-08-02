@@ -28,7 +28,7 @@ export default function Image({ ...props }) {
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           alt=""
-          className={`block object-cover`}
+          className="block w-full h-full object-cover"
           loading="lazy"
           src={src}
           ref={innerRef}
