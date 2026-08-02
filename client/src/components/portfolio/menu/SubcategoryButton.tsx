@@ -54,14 +54,19 @@ export default function SubcategoryButton({
         }
       }}
       className={`
-        [writing-mode:vertical-rl] 
+        [writing-mode:vertical-rl]
         h-full
-        ${Number(activeSub) === index ? "text-stone-200 text-xl drop-shadow-glo" : ""}
+        group
+        ${Number(activeSub) === index ? "text-xl text-rd drop-shadow-red xl:focus:outline-none" : "drop-shadow-glo text-white/70 xl:hover:opacity-100 xl:focus:opacity-100 xl:hover:text-rd xl:focus:text-rd transition-colors xl:focus:outline-none xl:focus:drop-shadow-red xl:hover:drop-shadow-red"}
         ${disabled ? "text-gray" : ""}
         ${className}
       `}
     >
-      {label}
+      <span
+        className={`inline-block ${Number(activeSub) === index ? "xl:group-focus:animate-wiggleY" : ""}`}
+      >
+        {label}
+      </span>
     </button>
   );
 }

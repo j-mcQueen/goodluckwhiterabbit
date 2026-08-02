@@ -41,9 +41,11 @@ export default function Header({
   };
 
   const buttonVariants = {
-    disabled: "opacity-25 w-full h-full tracking-widest",
-    regular:
-      "xl:hover:text-rd focus:text-rd transition-colors w-full h-full tracking-widest",
+    disabled: "opacity-20 w-full h-full tracking-widest",
+    active:
+      "text-rd xl:hover:text-rd xl:focus:text-rd transition-colors w-full h-full tracking-vt xl:focus:outline-none drop-shadow-red xl:focus:drop-shadow-red xl:hover:drop-shadow-red xl:focus:animate-wiggle",
+    inactive:
+      "text-white/70 xl:hover:opacity-100 xl:focus:opacity-100 xl:hover:text-rd xl:focus:text-rd transition-colors w-full h-full tracking-vt xl:focus:outline-none drop-shadow-glo xl:focus:drop-shadow-red xl:hover:drop-shadow-red",
   };
 
   const handleLogout = async () => {
@@ -87,7 +89,9 @@ export default function Header({
                     dashboard &&
                     dashboard[index as keyof typeof dashboard] === 0
                       ? buttonVariants.disabled
-                      : buttonVariants.regular
+                      : activeTab === index
+                        ? buttonVariants.active
+                        : buttonVariants.inactive
                   }
                   onClick={() => {
                     if (loadTrackerRef) loadTrackerRef.current = false; // open path for image autoload
