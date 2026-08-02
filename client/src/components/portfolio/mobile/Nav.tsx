@@ -1,6 +1,7 @@
 import { Fragment, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { triggerBatch } from "../utils/triggerBatch";
+import { DISABLED_CATEGORY_ROUTES } from "../disabledCategories";
 
 import TopBar from "../../global/header/mobile/TopBar";
 import Instagram from "../../../assets/media/icons/Instagram";
@@ -43,8 +44,11 @@ export default function Nav({ ...props }) {
   };
 
   // a category is only navigable once the admin has actually added a
-  // subcategory to it - mirrors the desktop Header's dashboard prop
+  // subcategory to it - mirrors the desktop Header's dashboard prop.
+  // Categories in DISABLED_CATEGORY_ROUTES are forced unavailable regardless
+  // of content (temporary manual override).
   const categoryHasContent = (i: number) =>
+    !DISABLED_CATEGORY_ROUTES.includes(routeMap[i as keyof typeof routeMap]) &&
     (sidebarData[routeMap[i as keyof typeof routeMap]]?.subcategories.length ?? 0) > 0;
 
   const [isOpen, setIsOpen] = useState({

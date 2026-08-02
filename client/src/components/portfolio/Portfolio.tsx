@@ -6,6 +6,7 @@ import { mobile } from "../global/utils/determineViewport";
 import { generateKeys } from "../global/utils/generateKeys";
 import { determineHost as host } from "../global/utils/determineHost";
 import { PortfolioSidebarData } from "./types/PortfolioSidebarData";
+import { DISABLED_CATEGORY_ROUTES } from "./disabledCategories";
 
 import Header from "../global/header/Header";
 import Sidebar from "./Sidebar";
@@ -89,10 +90,21 @@ export default function Portfolio({ ...props }) {
 
   // a category tab is only navigable once the admin has actually added a
   // subcategory to it - matches the existing "COMING SOON" disabled-tab
-  // convention already used by Header/ListItem for the user dashboard
+  // convention already used by Header/ListItem for the user dashboard.
+  // Categories in DISABLED_CATEGORY_ROUTES are forced unavailable regardless
+  // of content (temporary manual override).
   const categoryAvailability = CATEGORY_ROUTES.map((categoryRoute) =>
-    (sidebarData[categoryRoute]?.subcategories.length ?? 0) > 0 ? 1 : 0,
+    !DISABLED_CATEGORY_ROUTES.includes(categoryRoute) &&
+    (sidebarData[categoryRoute]?.subcategories.length ?? 0) > 0
+      ? 1
+      : 0,
   );
+
+  useEffect(() => {
+    if (DISABLED_CATEGORY_ROUTES.includes(route)) {
+      navigate("/");
+    }
+  }, [route, navigate]);
 
   useEffect(() => {
     const fetchTaxonomy = async () => {
