@@ -9,8 +9,7 @@ export default {
         impact: ["Impact Label Reversed", "sans-serif"],
       },
       letterSpacing: {
-        // required minimum for any font-vt element — must exceed tracking-widest (0.1em)
-        vt: "0.2em",
+        vt: "0.1em",
       },
       gridTemplateColumns: {
         imageQueue: "repeat(auto-fit, minmax(100px, 200px))",

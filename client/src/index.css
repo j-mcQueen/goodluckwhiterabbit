@@ -27,13 +27,9 @@
 
 :root {
   font-family: "VT323", serif;
-  /* matches tailwind.config.js's tracking-vt - font-family and letter-spacing
-     both inherit by default, so any text without its own competing font-*
-     class renders in VT323 and needs this minimum spacing to stay legible */
-  letter-spacing: 0.2em;
+  letter-spacing: 0.1em;
   min-width: 300px;
   overflow-x: hidden;
-  /* 2x the #root margin utility in index.html (m-2 = 0.5rem/side) — the amount full-viewport layouts subtract to fit inside the frame */
   --frame: 1rem;
 }
 
