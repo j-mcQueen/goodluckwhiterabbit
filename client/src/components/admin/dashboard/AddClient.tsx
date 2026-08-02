@@ -10,7 +10,7 @@ export default function AddClient({ ...props }) {
   const { clients, setClients, setActivePane } = props;
 
   const checkbox_styles =
-    "h-4 w-4 border border-solid border-white/20 peer-checked:bg-white absolute left-0 -translate-x-7";
+    "h-4 w-4 border border-solid border-white peer-checked:bg-white absolute left-0 -translate-x-7";
 
   const [inputValues, setInputValues] = useState({
     clientname: "",
@@ -33,7 +33,7 @@ export default function AddClient({ ...props }) {
   const [spinner, setSpinner] = useState(false);
 
   return (
-    <div className="text-white border border-solid border-white/20 p-3 w-[40dvw]">
+    <div className="text-white border border-solid border-white p-3 w-[40dvw]">
       <PaneHeader setActivePane={setActivePane} paneTitle={"NEW"} />
 
       <form
@@ -234,7 +234,7 @@ export default function AddClient({ ...props }) {
         <div className="text-center">
           <button
             type="submit"
-            className="border border-solid border-white/20 xl:hover:text-rd xl:hover:border-rd drop-shadow-glo xl:hover:drop-shadow-red xl:focus:text-rd xl:focus:border-rd xl:focus:drop-shadow-red py-3 px-5 transition-colors group"
+            className="border border-solid border-white xl:hover:text-rd xl:hover:border-rd drop-shadow-glo xl:hover:drop-shadow-red xl:focus:text-rd xl:focus:border-rd xl:focus:drop-shadow-red py-3 px-5 transition-colors group"
           >
             <span className="font-tnrBI tracking-widest opacity-80">
               {spinner ? <Loading /> : "ADD"}

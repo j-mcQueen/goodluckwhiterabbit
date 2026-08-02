@@ -188,7 +188,7 @@ export default function EditClient({ ...props }) {
               initial={{ opacity: 0, translateY: -25 }}
               animate={{ opacity: 1, translateY: 0 }}
               transition={{ duration: 0.25 }}
-              className="border border-solid border-white/20 flex"
+              className="border border-solid border-white flex"
             >
               <OrderContainer
                 clients={clients}

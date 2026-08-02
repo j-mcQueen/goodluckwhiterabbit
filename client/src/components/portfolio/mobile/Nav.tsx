@@ -24,7 +24,7 @@ export default function Nav({ ...props }) {
   };
 
   const setCntrStyles = (depth: number) => {
-    return `${depth === 0 ? "border-b border-solid border-white/20" : ""} flex items-center w-full h-full min-w-[calc((100dvw-var(--frame)-52px)/3)] overflow-hidden min-h-[54.2px]`;
+    return `${depth === 0 ? "border-b border-solid border-white" : ""} flex items-center w-full h-full min-w-[calc((100dvw-var(--frame)-52px)/3)] overflow-hidden min-h-[54.2px]`;
   };
 
   const determineArr = (depth: number, i: number, j?: number) => {
@@ -118,7 +118,7 @@ export default function Nav({ ...props }) {
   };
 
   return (
-    <header className="border-b border-solid border-white/20">
+    <header className="border-b border-solid border-white">
       <TopBar
         isMobilePortfolio={true}
         isOpen={isOpen.main}
@@ -251,7 +251,7 @@ export default function Nav({ ...props }) {
             </ul>
 
             <div className="flex items-center justify-around w-full h-[50px]">
-              <div className="w-full h-full flex items-center justify-center border-r border-solid border-white/20 relative">
+              <div className="w-full h-full flex items-center justify-center border-r border-solid border-white relative">
                 <a
                   className="w-full h-full flex items-center justify-center"
                   href="https://www.instagram.com/goodluckwhiterabbit/"

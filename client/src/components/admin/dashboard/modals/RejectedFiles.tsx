@@ -3,7 +3,7 @@ import Close from "../../../../assets/media/icons/Close";
 export default function RejectedFiles({ ...props }) {
   const { rejectedFiles, setRejectedFiles } = props;
   return (
-    <dialog className="block bg-black absolute z-50 bottom-[calc(var(--frame)-2px)] p-4 border border-solid border-white/20 text-white max-w-[300px] xl:max-w-[400px] max-h-[150px] overflow-scroll">
+    <dialog className="block bg-black absolute z-50 bottom-[calc(var(--frame)-2px)] p-4 border border-solid border-white text-white max-w-[300px] xl:max-w-[400px] max-h-[150px] overflow-scroll">
       <div className="flex items-start gap-1">
         <p>
           The client has been successfully added, but some files could not be

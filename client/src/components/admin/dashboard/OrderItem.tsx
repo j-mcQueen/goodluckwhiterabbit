@@ -77,7 +77,7 @@ export default function OrderItem({ ...props }) {
           : imgLoaded
             ? "min-h-[300px] max-h-[350px]"
             : "w-0 min-h-[300px] max-h-[350px]"
-      } shrink-0 border border-solid border-white/20 overflow-hidden`}
+      } shrink-0 border border-solid border-white overflow-hidden`}
       onDrop={async (e) => {
         setDropPending(true);
 

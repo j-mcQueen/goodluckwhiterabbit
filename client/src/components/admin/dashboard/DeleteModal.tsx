@@ -69,7 +69,7 @@ export default function DeleteModal({ ...props }) {
   };
 
   return (
-    <dialog className="absolute flex items-center justify-center bg-black text-white border border-solid border-white/20 p-3">
+    <dialog className="absolute flex items-center justify-center bg-black text-white border border-solid border-white p-3">
       <div className="flex flex-col gap-5">
         <div className="flex items-center justify-between text-lg">
           <h3 className="font-tnrBI">

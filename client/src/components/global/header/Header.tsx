@@ -41,7 +41,7 @@ export default function Header({
 
   const listItemVariants = {
     active: "text-white border-b-black",
-    std: "border-b-white/20",
+    std: "border-b-white",
   };
 
   const buttonVariants = {
@@ -66,11 +66,7 @@ export default function Header({
   return (
     <header className="text-white">
       <nav className="flex">
-        {/* rabbit (187px) + sidebar toggle (58px, matching the mail/instagram
-            buttons) sum to the sidebar's fixed 245px (min-w-sidebar) so this
-            block stays visually aligned with the groups/subcategory columns
-            below it */}
-        <div className="border-r border-b border-solid border-white/20 min-w-[187px] flex justify-center">
+        <div className="border-r border-b border-solid border-white min-w-[189px] flex justify-center">
           <img
             src={rabbit}
             alt="A white rabbit against a black background shimmering from left to right"
@@ -83,7 +79,7 @@ export default function Header({
             type="button"
             aria-label="Toggle sidebar"
             onClick={() => setSidebarOpen((prev) => !prev)}
-            className={`${sidebarOpen ? "bg-white" : "bg-black"} min-w-[58px] max-w-[58px] border-r border-b border-solid border-white/20 flex items-center justify-center transition-colors`}
+            className={`${sidebarOpen ? "bg-white" : "bg-black"} min-w-[56px] max-w-[56px] border-r border-b border-solid border-white flex items-center justify-center transition-colors`}
           >
             <div
               className={`${sidebarOpen ? "rotate-45 bg-black" : "-rotate-45 bg-white"} w-[25px] h-[1px] transition-all`}
@@ -95,7 +91,7 @@ export default function Header({
           {data.map((tab: string, index: number) => {
             return (
               <li
-                className={`${activeTab === index ? listItemVariants.active : listItemVariants.std} ${dashboard && dashboard[index as keyof typeof dashboard] === 0 && index !== data.length - 1 ? "border-r-white/20 inline" : ""}  border-r border-b border-solid border-white/20 w-full flex items-center justify-center relative`}
+                className={`${activeTab === index ? listItemVariants.active : listItemVariants.std} ${dashboard && dashboard[index as keyof typeof dashboard] === 0 && index !== data.length - 1 ? "border-r-white inline" : ""}  border-r border-b border-solid border-white w-full flex items-center justify-center relative`}
                 key={tab}
               >
                 <button
@@ -157,16 +153,16 @@ export default function Header({
         {logout ? (
           <button
             type="button"
-            className="xl:hover:text-rd focus:text-rd transition-colors px-[18px] border-b border-solid border-white/20 tracking-widest group"
+            className="xl:hover:text-rd focus:text-rd transition-colors px-[18px] border-b border-solid border-white tracking-widest group"
             onClick={() => handleLogout()}
           >
             <Eject className="w-5 h-5 group-hover:fill-rd group-focus:fill-rd group-hover:drop-shadow-red group-focus:drop-shadow-red transition-colors" />
           </button>
         ) : (
-          <div className="flex border-b border-solid border-white/20">
+          <div className="flex border-b border-solid border-white">
             <a
               href="https://www.instagram.com/goodluckwhiterabbit/"
-              className="px-5 flex items-center justify-center border-r border-solid border-white/20 max-h-[58px] max-w-[58px] focus:outline-none group"
+              className="px-5 flex items-center justify-center border-r border-solid border-white max-h-[58px] max-w-[58px] focus:outline-none group"
             >
               <Instagram className="min-w-4.5 min-h-4.5 xl:w-4.5 xl:h-4.5 overflow-visible xl:group-hover:fill-rd xl:group-hover:drop-shadow-red xl:group-focus:fill-rd xl:group-focus:drop-shadow-red xl:transition-colors" />
             </a>

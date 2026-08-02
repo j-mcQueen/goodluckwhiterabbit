@@ -14,7 +14,7 @@ export default function Sidebar({ ...props }) {
   } = props;
 
   return (
-    <aside className="grid items-center xl:flex xl:flex-col gap-2 xl:gap-5 xl:min-w-sidebar xl:max-w-sidebar xl:max-h-[calc(100dvh-57px-var(--frame))] xl:border-r border-solid border-white/20 border-b pb-5">
+    <aside className="grid items-center xl:flex xl:flex-col gap-2 xl:gap-5 xl:min-w-sidebar xl:max-w-sidebar xl:max-h-[calc(100dvh-57px-var(--frame))] xl:border-r border-solid border-white border-b pb-5">
       <h1 className="font-tnrBI xl:text-2xl text-white text-center tracking-widest opacity-80 drop-shadow-glo max-xl:col-start-1 max-xl:col-end-1 max-xl:pl-3 pt-8">
         {user.name.toUpperCase()}
       </h1>
@@ -35,7 +35,7 @@ export default function Sidebar({ ...props }) {
 
       <button
         type="button"
-        className="border border-solid border-white/20 text-lg text-white py-1 px-3 xl:hover:border-rd xl:hover:text-rd xl:hover:drop-shadow-red xl:focus:drop-shadow-red xl:focus:text-rd xl:focus:border-rd transition-colors max-xl:row-start-2 max-xl:row-end-2 max-xl:col-start-2 max-xl:col-end-2 max-xl:mr-3"
+        className="border border-solid border-white text-lg text-white py-1 px-3 xl:hover:border-rd xl:hover:text-rd xl:hover:drop-shadow-red xl:focus:drop-shadow-red xl:focus:text-rd xl:focus:border-rd transition-colors max-xl:row-start-2 max-xl:row-end-2 max-xl:col-start-2 max-xl:col-end-2 max-xl:mr-3"
         onClick={() => {
           const args = {
             activeImageset,

@@ -22,7 +22,7 @@ export default function Carousel({ ...props }) {
         {activeIndex > 0 ? (
           <button
             type="button"
-            className="group border border-solid border-white/20 p-1 xl:hover:border-red xl:focus:border-red focus:outline-none transition-colors "
+            className="group border border-solid border-white p-1 xl:hover:border-red xl:focus:border-red focus:outline-none transition-colors "
             onClick={() => setActiveIndex(activeIndex - 1)}
           >
             <Shift className="w-5 h-5 -rotate-90 xl:group-hover:fill-rd xl:group-hover:drop-shadow-red xl:group-focus:fill-rd transition-all" />
@@ -45,7 +45,7 @@ export default function Carousel({ ...props }) {
         {activeIndex < user.fileCounts[activeImageset] - 1 ? (
           <button
             type="button"
-            className="group border border-solid border-white/20 p-1 xl:hover:border-red xl:focus:border-red focus:outline-none transition-colors "
+            className="group border border-solid border-white p-1 xl:hover:border-red xl:focus:border-red focus:outline-none transition-colors "
             onClick={() => {
               if (activeIndex < loaded - 1) {
                 setActiveIndex(activeIndex + 1);

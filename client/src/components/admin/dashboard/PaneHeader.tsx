@@ -13,7 +13,7 @@ export default function PaneHeader({ ...props }) {
 
       <button
         type="button"
-        className="border border-solid border-white/20 xl:hover:border-rd p-2 flex items-center justify-center focus:border-red outline-none transition-colors group"
+        className="border border-solid border-white xl:hover:border-rd p-2 flex items-center justify-center focus:border-red outline-none transition-colors group"
         onClick={() => {
           setActivePane("ALL");
           new Audio(clicky).play();

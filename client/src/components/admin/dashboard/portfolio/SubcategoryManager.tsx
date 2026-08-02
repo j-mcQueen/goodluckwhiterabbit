@@ -89,12 +89,12 @@ export default function SubcategoryManager({ ...props }) {
           placeholder="NEW SUBCATEGORY NAME"
           minLength={1}
           maxLength={50}
-          className="bg-black border border-solid border-white/20 text-white xl:hover:border-rd focus:border-rd p-2 focus:outline-none placeholder:text-white transition-colors uppercase"
+          className="bg-black border border-solid border-white text-white xl:hover:border-rd focus:border-rd p-2 focus:outline-none placeholder:text-white transition-colors uppercase"
           required
         />
         <button
           type="submit"
-          className="border border-solid border-white/20 px-3 py-2 xl:hover:text-rd xl:hover:border-rd xl:hover:drop-shadow-red focus:text-rd focus:border-rd focus:outline-none transition-colors"
+          className="border border-solid border-white px-3 py-2 xl:hover:text-rd xl:hover:border-rd xl:hover:drop-shadow-red focus:text-rd focus:border-rd focus:outline-none transition-colors"
         >
           {spinner ? <Loading /> : "ADD SUBCATEGORY"}
         </button>

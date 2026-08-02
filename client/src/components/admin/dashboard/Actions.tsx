@@ -50,7 +50,7 @@ export default function Actions({ ...props }) {
     return (
       <button
         type="button"
-        className={`${sortStyle === index ? "bg-white text-black" : "bg-black text-white"} xl:py-1 py-2 px-3 border border-solid border-white/20 xl:hover:bg-white xl:hover:text-black focus:text-rd focus:outline-none transition-colors w-full xl:w-auto`}
+        className={`${sortStyle === index ? "bg-white text-black" : "bg-black text-white"} xl:py-1 py-2 px-3 border border-solid border-white xl:hover:bg-white xl:hover:text-black focus:text-rd focus:outline-none transition-colors w-full xl:w-auto`}
         onClick={() => handleClick(index, pattern)}
       >
         {text}
@@ -90,7 +90,7 @@ export default function Actions({ ...props }) {
                 if (e.key === "Enter") handleSearch();
               }}
               placeholder="SEARCH ARCHIVE"
-              className="bg-black border border-solid border-white/20 xl:hover:border-rd focus:border-rd focus:outline-none transition-colors text-white p-[10px] max-h-[40px] flex-grow placeholder:text-white text-lg"
+              className="bg-black border border-solid border-white xl:hover:border-rd focus:border-rd focus:outline-none transition-colors text-white p-[10px] max-h-[40px] flex-grow placeholder:text-white text-lg"
             />
           </label>
         </div>
@@ -98,7 +98,7 @@ export default function Actions({ ...props }) {
         <button
           type="button"
           onClick={() => handleSearch()}
-          className="w-10 h-10 border border-solid border-white/20 flex justify-center p-[10px] focus:border-rd xl:hover:border-rd xl:transition-colors xl:focus:outline-none group"
+          className="w-10 h-10 border border-solid border-white flex justify-center p-[10px] focus:border-rd xl:hover:border-rd xl:transition-colors xl:focus:outline-none group"
         >
           <Search className={icons} />
         </button>
@@ -110,7 +110,7 @@ export default function Actions({ ...props }) {
               new Audio(clicky).play();
             }}
             type="button"
-            className="w-10 h-10 border border-solid border-white/20 flex justify-center items-center focus:border-rd xl:transition-all xl:hover:border-rd xl:focus:outline-none group"
+            className="w-10 h-10 border border-solid border-white flex justify-center items-center focus:border-rd xl:transition-all xl:hover:border-rd xl:focus:outline-none group"
           >
             <Add className={icons} />
           </button>
@@ -132,7 +132,7 @@ export default function Actions({ ...props }) {
         </div>
 
         <button
-          className="xl:py-1 xl:px-2 py-2 px-3 border border-solid border-white/20 xl:hover:bg-white xl:hover:text-black focus:text-rd focus:outline-none transition-colors w-full xl:w-auto"
+          className="xl:py-1 xl:px-2 py-2 px-3 border border-solid border-white xl:hover:bg-white xl:hover:text-black focus:text-rd focus:outline-none transition-colors w-full xl:w-auto"
           type="button"
           onClick={() => setActivePane("PORTFOLIO")}
         >

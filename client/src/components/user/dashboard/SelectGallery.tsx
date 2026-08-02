@@ -6,9 +6,9 @@ const SelectGallery = ({ ...props }) => {
 
   const buttonVariants = {
     populated:
-      "border border-solid border-white/20 py-2 px-3 text-lg xl:hover:text-rd xl:hover:border-rd focus:text-red focus:border-rd xl:hover:drop-shadow-red focus:outline-none transition-all",
+      "border border-solid border-white py-2 px-3 text-lg xl:hover:text-rd xl:hover:border-rd focus:text-red focus:border-rd xl:hover:drop-shadow-red focus:outline-none transition-all",
     empty:
-      "border border-solid border-white/20 py-2 px-3 text-lg relative opacity-15",
+      "border border-solid border-white py-2 px-3 text-lg relative opacity-15",
   };
 
   const fileCountEntries = Object.entries(user.fileCounts);

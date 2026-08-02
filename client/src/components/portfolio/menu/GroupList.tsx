@@ -43,7 +43,7 @@ export default function GroupList({
     >
       {groups.map((group, j) => (
         <li
-          className={`${className} ${j === 0 ? "border-t-0" : ""} ${j === groups.length - 1 ? "border-b-0" : ""} border border-white/20 border-solid w-full py-5 -my-[0.5px] flex items-center justify-center border-r-0 border-l-0 px-7 xl:px-0 min-h-[61px] tracking-wide`}
+          className={`${className} ${j === 0 ? "border-t-0" : ""} ${j === groups.length - 1 ? "border-b-0" : ""} border border-white border-solid w-full py-5 -my-[0.5px] flex items-center justify-center border-r-0 border-l-0 px-7 xl:px-0 min-h-[61px] tracking-wide`}
           key={group}
           ref={(el) => {
             groupItemRefs.current[j] = el;

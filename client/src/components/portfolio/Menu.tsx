@@ -39,7 +39,7 @@ export default function Menu({ ...props }) {
                 activeSubName={activeSubName}
                 activeTab={activeTab}
                 bodyRef={bodyRef}
-                className={`${index === subcategories.length - 1 ? "border-b-0" : null} ${index === activeSub ? "border-r-0" : null} border border-white/20 border-solid w-[56px]`}
+                className={`${index === subcategories.length - 1 ? "border-b-0" : null} ${index === activeSub ? "border-r-0" : null} border border-white border-solid w-[56px]`}
                 handleClick={triggerBatch}
                 index={index}
                 label={subcategories[index]}

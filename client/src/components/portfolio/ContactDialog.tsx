@@ -26,7 +26,7 @@ export default function ContactDialog({ ...props }) {
         setSubmitSuccess(null);
         return;
       }}
-      className="absolute top-0 bottom-0 bg-black border border-solid border-white/20 p-3 text-white z-20 backdrop:bg-[rgba(0,0,0,0.6)]"
+      className="absolute top-0 bottom-0 bg-black border border-solid border-white p-3 text-white z-20 backdrop:bg-[rgba(0,0,0,0.6)]"
     >
       {!submitSuccess ? (
         <form
@@ -74,7 +74,7 @@ export default function ContactDialog({ ...props }) {
                 id="name"
                 placeholder="NAME *"
                 autoComplete="on"
-                className="bg-black border border-solid border-white/20 focus:border-rd focus:outline-none w-full pl-2 py-2"
+                className="bg-black border border-solid border-white focus:border-rd focus:outline-none w-full pl-2 py-2"
                 required
               />
             </label>
@@ -86,7 +86,7 @@ export default function ContactDialog({ ...props }) {
                 id="subject"
                 placeholder="SUBJECT *"
                 autoComplete="on"
-                className="bg-black border border-solid border-white/20 focus:border-rd focus:outline-none w-full pl-2 py-2"
+                className="bg-black border border-solid border-white focus:border-rd focus:outline-none w-full pl-2 py-2"
                 required
               />
             </label>
@@ -98,7 +98,7 @@ export default function ContactDialog({ ...props }) {
                 id="email"
                 placeholder="EMAIL *"
                 autoComplete="on"
-                className="bg-black border border-solid border-white/20 focus:border-rd focus:outline-none w-full pl-2 py-2"
+                className="bg-black border border-solid border-white focus:border-rd focus:outline-none w-full pl-2 py-2"
                 required
               />
             </label>
@@ -108,7 +108,7 @@ export default function ContactDialog({ ...props }) {
                 name="message"
                 id="message"
                 placeholder="MESSAGE *"
-                className="bg-black border border-solid border-white/20 focus:border-rd focus:outline-none h-48 w-full pl-2 py-2"
+                className="bg-black border border-solid border-white focus:border-rd focus:outline-none h-48 w-full pl-2 py-2"
                 required
               ></textarea>
             </label>

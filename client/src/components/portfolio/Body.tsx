@@ -25,7 +25,7 @@ export default function Body({ ...props }) {
       className="overflow-y-scroll w-full overflow-x-hidden mb-[0.625rem] xl:my-2"
     >
       {breadcrumb && (
-        <div className="sticky top-0 z-10 w-full bg-black backdrop-blur-sm border-b border-white/20 px-3 py-1 text-md leading-tight tracking-widest text-white/75 uppercase truncate text-center">
+        <div className="sticky top-0 z-10 w-full bg-black backdrop-blur-sm border-b border-white px-3 py-1 text-md leading-tight tracking-widest text-white/75 uppercase truncate text-center">
           {breadcrumb.category} -- {breadcrumb.subcategory} --{" "}
           {breadcrumb.group}
         </div>
