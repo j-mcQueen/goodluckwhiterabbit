@@ -35,10 +35,10 @@ export default function TopBar({ ...props }) {
               : !isOpen,
           )
         }
-        className={`${isOpen ? "bg-black" : "bg-white"} min-w-[50px] h-[50px] border-l border-solid border-white flex items-center justify-center transition-colors`}
+        className={`${isOpen ? "bg-white" : "bg-black"} min-w-[50px] h-[50px] border-l border-solid border-white flex items-center justify-center transition-colors`}
       >
         <div
-          className={`${isOpen ? "rotate-45 bg-white" : "-rotate-45 bg-black"} w-[25px] h-[1px] transition-all`}
+          className={`${isOpen ? "rotate-45 bg-black" : "-rotate-45 bg-white"} w-[25px] h-[1px] transition-all`}
         ></div>
       </button>
     </div>
