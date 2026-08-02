@@ -38,7 +38,26 @@ export default function Sidebar({ ...props }) {
 
   return (
     <aside className="flex xl:min-w-sidebar xl:max-w-sidebar xl:h-[calc(100dvh-57px-var(--frame))] text-white overflow-x-scroll overflow-y-hidden">
-      <ul className="flex flex-row-reverse xl:h-[calc(100dvh-57px-var(--frame))] [writing-mode:sideways-lr]">
+      {/* subcategories are the parent of groups, so they should come first in
+          tab order - order-2 keeps this visually on the right, matching its
+          existing position, independent of DOM/tab order */}
+      <Menu
+        activeSub={activeSub}
+        activeSubName={activeSubName}
+        activeTab={activeTab}
+        animationVariants={animationVariants}
+        bodyRef={bodyRef}
+        className="order-2"
+        setActiveGroup={setActiveGroup}
+        setActiveSub={setActiveSub}
+        setImages={setImages}
+        setNextStartIndex={setNextStartIndex}
+        setNotice={setNotice}
+        setStaticKeys={setStaticKeys}
+        subcategories={subcategories}
+      />
+
+      <ul className="flex flex-row-reverse order-1 xl:h-[calc(100dvh-57px-var(--frame))] [writing-mode:sideways-lr]">
         <div className={`max-w-[189px] h-full`}>
           <GroupList
             activeGroup={activeGroup}
@@ -55,21 +74,6 @@ export default function Sidebar({ ...props }) {
           />
         </div>
       </ul>
-
-      <Menu
-        activeSub={activeSub}
-        activeSubName={activeSubName}
-        activeTab={activeTab}
-        animationVariants={animationVariants}
-        bodyRef={bodyRef}
-        setActiveGroup={setActiveGroup}
-        setActiveSub={setActiveSub}
-        setImages={setImages}
-        setNextStartIndex={setNextStartIndex}
-        setNotice={setNotice}
-        setStaticKeys={setStaticKeys}
-        subcategories={subcategories}
-      />
     </aside>
   );
 }

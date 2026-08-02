@@ -10,6 +10,7 @@ export default function Menu({ ...props }) {
     activeTab,
     animationVariants,
     bodyRef,
+    className = "",
     setActiveGroup,
     setActiveSub,
     setImages,
@@ -21,7 +22,7 @@ export default function Menu({ ...props }) {
 
   return (
     <div
-      className="flex"
+      className={`flex ${className}`}
       style={{ maxHeight: `calc((100% / ${subcategories.length}) + 1px)` }}
     >
       <ul>
