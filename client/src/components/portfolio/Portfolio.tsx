@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
+import { AnimatePresence } from "framer-motion";
 import { triggerBatch } from "./utils/triggerBatch";
 import { mobile } from "../global/utils/determineViewport";
 import { generateKeys } from "../global/utils/generateKeys";
@@ -30,6 +31,7 @@ export default function Portfolio({ ...props }) {
   const loadTrackerRef = useRef(false); // tracks when to pull first set of images
 
   const [contactOpen, setContactOpen] = useState<boolean>(false);
+  const [sidebarOpen, setSidebarOpen] = useState<boolean>(false);
   const [activeTab, setActiveTab] = useState<number>(index);
   const [activeSub, setActiveSub] = useState<number>(0);
   const [activeGroup, setActiveGroup] = useState<number>(0); // an index
@@ -189,29 +191,34 @@ export default function Portfolio({ ...props }) {
           logout={false}
           setActiveTab={setActiveTab}
           setContactOpen={setContactOpen}
+          setSidebarOpen={setSidebarOpen}
+          sidebarOpen={sidebarOpen}
         />
       )}
 
-      <main className="flex flex-col xl:flex-row h-[calc(100dvh-51px-var(--frame))]">
-        {mobile ? null : (
-          <Sidebar
-            activeGroup={activeGroup}
-            activeSub={activeSub}
-            activeSubName={activeSubName}
-            activeTab={activeTab}
-            bodyRef={bodyRef}
-            images={images}
-            mobile={mobile}
-            route={route}
-            sidebarData={sidebarData}
-            setActiveGroup={setActiveGroup}
-            setActiveSub={setActiveSub}
-            setImages={setImages}
-            setNextStartIndex={setNextStartIndex}
-            setNotice={setNotice}
-            setStaticKeys={setStaticKeys}
-          />
-        )}
+      <main className="relative flex flex-col xl:flex-row h-[calc(100dvh-51px-var(--frame))]">
+        <AnimatePresence>
+          {!mobile && sidebarOpen && (
+            <Sidebar
+              key="portfolio-sidebar"
+              activeGroup={activeGroup}
+              activeSub={activeSub}
+              activeSubName={activeSubName}
+              activeTab={activeTab}
+              bodyRef={bodyRef}
+              images={images}
+              mobile={mobile}
+              route={route}
+              sidebarData={sidebarData}
+              setActiveGroup={setActiveGroup}
+              setActiveSub={setActiveSub}
+              setImages={setImages}
+              setNextStartIndex={setNextStartIndex}
+              setNotice={setNotice}
+              setStaticKeys={setStaticKeys}
+            />
+          )}
+        </AnimatePresence>
 
         <Body
           activeGroup={activeGroup}

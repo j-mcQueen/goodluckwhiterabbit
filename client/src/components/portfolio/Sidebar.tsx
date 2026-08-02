@@ -1,3 +1,4 @@
+import { motion } from "framer-motion";
 import { triggerBatch } from "./utils/triggerBatch";
 
 import Menu from "./Menu";
@@ -37,7 +38,13 @@ export default function Sidebar({ ...props }) {
   };
 
   return (
-    <aside className="flex xl:min-w-sidebar xl:max-w-sidebar xl:h-[calc(100dvh-57px-var(--frame))] text-white overflow-x-scroll overflow-y-hidden">
+    <motion.aside
+      initial={{ x: -245, opacity: 0 }}
+      animate={{ x: 0, opacity: 1 }}
+      exit={{ x: -245, opacity: 0 }}
+      transition={{ type: "spring", bounce: 0, duration: 0.4 }}
+      className="absolute left-0 top-0 z-20 flex xl:min-w-sidebar xl:max-w-sidebar xl:h-[calc(100dvh-57px-var(--frame))] text-white overflow-x-scroll overflow-y-hidden bg-black"
+    >
       {/* subcategories are the parent of groups, so they should come first in
           tab order - order-2 keeps this visually on the right, matching its
           existing position, independent of DOM/tab order */}
@@ -74,6 +81,6 @@ export default function Sidebar({ ...props }) {
           />
         </div>
       </ul>
-    </aside>
+    </motion.aside>
   );
 }

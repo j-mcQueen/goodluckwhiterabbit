@@ -20,6 +20,8 @@ export default function Header({
   setContactOpen?: Dispatch<SetStateAction<boolean>>;
   images?: { [key: string]: Blob[] };
   loadTrackerRef?: React.MutableRefObject<boolean>;
+  sidebarOpen?: boolean;
+  setSidebarOpen?: Dispatch<SetStateAction<boolean>>;
 }) {
   const {
     logout,
@@ -32,6 +34,8 @@ export default function Header({
     setContactOpen,
     images,
     loadTrackerRef,
+    sidebarOpen,
+    setSidebarOpen,
   } = props;
   const navigate = useNavigate();
 
@@ -62,13 +66,30 @@ export default function Header({
   return (
     <header className="text-white">
       <nav className="flex">
-        <div className="border-r border-b border-solid border-white/20 min-w-sidebar flex justify-center">
+        {/* rabbit (187px) + sidebar toggle (58px, matching the mail/instagram
+            buttons) sum to the sidebar's fixed 245px (min-w-sidebar) so this
+            block stays visually aligned with the groups/subcategory columns
+            below it */}
+        <div className="border-r border-b border-solid border-white/20 min-w-[187px] flex justify-center">
           <img
             src={rabbit}
             alt="A white rabbit against a black background shimmering from left to right"
             className="max-h-14"
           />
         </div>
+
+        {setSidebarOpen && (
+          <button
+            type="button"
+            aria-label="Toggle sidebar"
+            onClick={() => setSidebarOpen((prev) => !prev)}
+            className={`${sidebarOpen ? "bg-white" : "bg-black"} min-w-[58px] max-w-[58px] border-r border-b border-solid border-white/20 flex items-center justify-center transition-colors`}
+          >
+            <div
+              className={`${sidebarOpen ? "rotate-45 bg-black" : "-rotate-45 bg-white"} w-[25px] h-[1px] transition-all`}
+            ></div>
+          </button>
+        )}
 
         <ul className="flex justify-evenly w-full text-xl">
           {data.map((tab: string, index: number) => {
