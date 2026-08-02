@@ -141,9 +141,9 @@ export default function Header({
           <div className="flex border-b border-solid border-white/20">
             <a
               href="https://www.instagram.com/goodluckwhiterabbit/"
-              className={`px-5 flex items-center justify-center border-r border-solid border-white/20 max-h-[58px] max-w-[58px]`}
+              className="px-5 flex items-center justify-center border-r border-solid border-white/20 max-h-[58px] max-w-[58px] focus:outline-none group"
             >
-              <Instagram />
+              <Instagram className="min-w-4.5 min-h-4.5 xl:w-4.5 xl:h-4.5 overflow-visible xl:group-hover:fill-rd xl:group-hover:drop-shadow-red xl:group-focus:fill-rd xl:group-focus:drop-shadow-red xl:transition-colors" />
             </a>
 
             <ContactButton setContactOpen={setContactOpen} />
