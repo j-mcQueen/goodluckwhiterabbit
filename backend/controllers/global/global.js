@@ -7,6 +7,8 @@ import {
   loadPortfolioTaxonomy,
   formatPublicTaxonomy,
 } from "../utils/loadPortfolioTaxonomy.js";
+import PortfolioSubcategory from "../../models/portfolioSubcategory.js";
+import PortfolioMemo from "../../models/portfolioMemo.js";
 
 const findFilterSort = async (
   bucket,
@@ -260,6 +262,114 @@ export const generatePortfolioUrls = async (req, res, next) => {
       ? res.status(200).json({ presigns, keys, skipped, stored: s3Data.stored })
       : res.status(200).json({ presigns, keys, stored: s3Data.stored });
   }
+};
+
+// layout-aware counterpart to generatePortfolioUrls above, used only for
+// a single group whose taxonomy hasMemo flag is true (§2.1/§5). Unlike
+// generatePortfolioUrls this does not spill over into the next group in a
+// subcategory once exhausted - deliberately out of scope here (see spec
+// task notes on the public-site spillover/memo-boundary interaction), so
+// the client is responsible for switching group/endpoint at that boundary.
+// Paginates over `layout` array indices, resolving each entry to either a
+// presigned image URL or inlined memo html, same response shape as the
+// admin version (adminGetPortfolioGroupLayout).
+export const generatePortfolioLayoutUrls = async (req, res, next) => {
+  const { category, sub, groupId, size, start } = req.params;
+
+  if (size !== "sm" && size !== "lg") {
+    return res.status(400).json({ error: "Invalid size" });
+  }
+  if (!Number.isInteger(Number(start)) || Number(start) < 0) {
+    return res.status(400).json({ error: "Invalid start index" });
+  }
+
+  const subcategory = await PortfolioSubcategory.findOne({ category, name: sub });
+  const group = subcategory?.groups.find((g) => g.groupId === groupId);
+  if (!group) return res.status(404).json({ error: "Group not found" });
+
+  const startNum = Number(start);
+  const batch = group.layout.slice(startNum, startNum + 10);
+
+  if (batch.length === 0) return res.status(200).json({ files: false });
+
+  const groupPrefix = `${category}/${sub}/${groupId}/`;
+  const positionRegex = /_(\d{1,3})\.[^.]+$/;
+  const keyByPosition = new Map();
+
+  if (batch.some((entry) => entry.type === "image")) {
+    let listed;
+    try {
+      listed = await s3.send(
+        new ListObjectsV2Command({
+          Bucket: process.env.AWS_SECONDARY_BUCKET,
+          Prefix: groupPrefix,
+        }),
+      );
+    } catch (error) {
+      return res.status(500).json({
+        status: true,
+        message:
+          "There was an error retrieving these images from S3. Please refresh the page and try again.",
+      });
+    }
+
+    for (const obj of listed.Contents ?? []) {
+      if (!obj.Key.includes(`/${size}/`) || obj.Size === 0) continue;
+      const match = obj.Key.match(positionRegex);
+      if (match) keyByPosition.set(Number(match[1]), obj.Key);
+    }
+  }
+
+  const results = await Promise.allSettled(
+    batch.map(async (entry) => {
+      if (entry.type === "memo") {
+        const memo = await PortfolioMemo.findOne({ memoId: entry.memoId }).lean();
+        if (!memo) throw new Error("memo missing");
+        return { type: "memo", memoId: entry.memoId, html: memo.html };
+      }
+
+      const key = keyByPosition.get(entry.position);
+      if (!key) throw new Error("image missing");
+      const url = await getSignedUrl(
+        s3,
+        new GetObjectCommand({ Bucket: process.env.AWS_SECONDARY_BUCKET, Key: key }),
+        { expiresIn: 600 },
+      );
+      return { type: "image", position: entry.position, url };
+    }),
+  );
+
+  const items = [];
+  const skipped = [];
+  results.forEach((result, i) => {
+    if (result.status === "fulfilled") {
+      items.push(result.value);
+    } else {
+      const entry = batch[i];
+      skipped.push(entry.type === "memo" ? entry.memoId : String(entry.position));
+    }
+  });
+
+  return res.status(200).json({ items, stored: group.layout.length, skipped });
+};
+
+// tiny, dedicated check so the public site can decide, per group, whether
+// to use the layout-aware read path or the untouched existing one, without
+// changing the shape of getPortfolioTaxonomy's response (which every
+// visitor's sidebar/menu already depends on) or its many existing
+// consumers (Sidebar.tsx, GroupList.tsx, MenuItem.tsx, mobile nav, etc.)
+export const getPortfolioGroupHasMemo = async (req, res, next) => {
+  const { category, sub, groupId } = req.params;
+
+  const subcategory = await PortfolioSubcategory.findOne(
+    { category, name: sub },
+    { groups: 1 },
+  );
+  const group = subcategory?.groups.find((g) => g.groupId === groupId);
+  if (!group) return res.status(404).json({ error: "Group not found" });
+
+  const hasMemo = group.layout.some((entry) => entry.type === "memo");
+  return res.status(200).json({ hasMemo });
 };
 
 export const countImagesetItems = async (req, res, next) => {

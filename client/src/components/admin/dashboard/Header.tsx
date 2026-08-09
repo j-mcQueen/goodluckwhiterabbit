@@ -24,12 +24,14 @@ export default function Header({ ...props }) {
   };
 
   return (
-    <header className="flex justify-between p-3">
-      <img
-        src={rabbit}
-        alt="A leaping white rabbit"
-        className="xl:max-h-[50px] xl:scale-[2] translate-x-10"
-      />
+    <header className="flex justify-between items-center p-3">
+      <div className="h-10 min-w-[189px] flex items-center overflow-hidden">
+        <img
+          src={rabbit}
+          alt="A leaping white rabbit"
+          className="h-full xl:scale-[2] xl:translate-x-10"
+        />
+      </div>
 
       <div className="flex gap-5">
         {edit ? (

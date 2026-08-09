@@ -7,7 +7,8 @@ import { handleDelete } from "./utils/handlers/queueing/handleDelete";
 import Close from "../../../assets/media/icons/Close";
 
 export default function ImageQueue({ ...props }) {
-  const { queue, setDragTarget, setQueue, setSubmitOpen } = props;
+  const { queue, setDragTarget, setQueue, setSubmitOpen, compress = true } =
+    props;
 
   const [uploadCount, setUploadCount] = useState(0);
   const fileRef = useRef<HTMLInputElement>(null);
@@ -55,7 +56,9 @@ export default function ImageQueue({ ...props }) {
               ref={fileRef}
               type="file"
               name="additions"
-              onChange={(e) => handleChange(e, setUploadCount, setQueue)}
+              onChange={(e) =>
+                handleChange(e, setUploadCount, setQueue, compress)
+              }
               className="opacity-0 w-[1px]"
               accept="image/*"
               multiple

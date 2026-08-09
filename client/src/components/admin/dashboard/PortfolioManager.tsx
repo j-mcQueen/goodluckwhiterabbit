@@ -3,8 +3,6 @@ import { AnimatePresence, motion } from "framer-motion";
 import { determineHost as host } from "../../global/utils/determineHost";
 import { imageset_select_btns } from "./styles/styles";
 import { portfolio_subcategory } from "./types/portfolioTypes";
-import { handlePortfolioFirstLoad } from "./utils/handlers/portfolioOrdering/handlePortfolioFirstLoad";
-import { handlePortfolioFirstLoadTypes } from "./types/handlePortfolioFirstLoadTypes";
 import { portfolioBulkUpload } from "./utils/handlers/portfolioOrdering/portfolioBulkUpload";
 
 import SubcategoryManager from "./portfolio/SubcategoryManager";
@@ -33,17 +31,22 @@ export default function PortfolioManager({ ...props }) {
     useState<portfolio_subcategory | null>(null);
   const [targetGroupId, setTargetGroupId] = useState("");
   const [started, setStarted] = useState(false);
-  const [spinner, setSpinner] = useState(false);
   const [dragTarget, setDragTarget] = useState({});
-  const [order, setOrder] = useState<(Blob | object)[]>(Array(10).fill({}));
   const [queue, setQueue] = useState<File[]>([]);
   const [submitOpen, setSubmitOpen] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<number | null>(null);
   const [uploadProgress, setUploadProgress] = useState<number | null>(null);
   const [bulkFails, setBulkFails] = useState<string[]>([]);
-  const [deleteModalToggle, setDeleteModalToggle] = useState(
-    EMPTY_DELETE_TOGGLE,
-  );
+  const [deleteModalToggle, setDeleteModalToggle] =
+    useState(EMPTY_DELETE_TOGGLE);
+  // one-shot signal for PortfolioAdminGrid.tsx to catch itself up after a
+  // bulk upload - deliberately NOT the group's plain `count`, which changes
+  // for other incidental reasons (e.g. resolving during navigation) and
+  // would make the grid auto-load its entire backlog on those too
+  const [bulkUploadSignal, setBulkUploadSignal] = useState<{
+    key: number;
+    newCount: number;
+  } | null>(null);
 
   useEffect(() => {
     const getTaxonomy = async () => {
@@ -86,24 +89,21 @@ export default function PortfolioManager({ ...props }) {
     setTargetSubcategory(null);
     setTargetGroupId("");
     setStarted(false);
-    setOrder(Array(10).fill({}));
   };
 
   const resetToSubcategories = () => {
     setTargetSubcategory(null);
     setTargetGroupId("");
     setStarted(false);
-    setOrder(Array(10).fill({}));
   };
 
   const resetToGroups = () => {
     setTargetGroupId("");
     setStarted(false);
-    setOrder(Array(10).fill({}));
   };
 
   return (
-    <div className="text-white border border-solid border-white w-[85dvw] xl:w-[75dvw]">
+    <div className="text-white border border-solid border-white w-[85dvw] xl:w-full xl:mx-3 xl:mb-3">
       {activeCategory ? (
         <nav className="flex gap-3 flex-wrap p-3 border-b border-solid border-white text-sm tracking-widest opacity-80">
           <button
@@ -182,21 +182,11 @@ export default function PortfolioManager({ ...props }) {
           taxonomy={taxonomy}
           setTaxonomy={setTaxonomy}
           setDeleteModalToggle={setDeleteModalToggle}
-          onSelectGroup={async (groupId: string) => {
-            const args: handlePortfolioFirstLoadTypes = {
-              category: activeCategory,
-              newTargetGroupId: groupId,
-              order,
-              setNotice,
-              setOrder,
-              setSpinner,
-              setStarted,
-              setTargetGroupId,
-              setTargetSubcategory,
-              targetSubcategory,
-            };
-
-            await handlePortfolioFirstLoad({ ...args, taxonomy, setTaxonomy });
+          onSelectGroup={(groupId: string) => {
+            // PortfolioAdminGrid.tsx fetches its own data on mount from
+            // category/sub/groupId - nothing more to load here
+            setTargetGroupId(groupId);
+            setStarted(true);
           }}
         />
       ) : (
@@ -218,21 +208,7 @@ export default function PortfolioManager({ ...props }) {
               setSubmitStatus(1);
               setUploadProgress(null);
               setBulkFails(data.failed);
-
-              // paint the newly-uploaded files into their slots immediately
-              // using the local File objects, rather than waiting on a
-              // refetch - mirrors EditClient.tsx's bulk-upload handling
-              const existingCount = activeGroup?.count ?? 0;
-              const updatedOrder = [...order];
-              const succeededSet = new Set(data.succeeded);
-              let nextPosition = existingCount;
-              queue.forEach((file) => {
-                if (succeededSet.has(file.name)) {
-                  updatedOrder[nextPosition] = file;
-                  nextPosition += 1;
-                }
-              });
-              setOrder(updatedOrder);
+              setBulkUploadSignal({ key: Date.now(), newCount: data.newCount });
 
               const updatedGroups = targetSubcategory.groups.map((group) =>
                 group.groupId === targetGroupId
@@ -252,7 +228,9 @@ export default function PortfolioManager({ ...props }) {
 
               if (data.failed.length > 0) {
                 const failedNames = new Set(data.failed);
-                setQueue((prev) => prev.filter((file) => failedNames.has(file.name)));
+                setQueue((prev) =>
+                  prev.filter((file) => failedNames.has(file.name)),
+                );
               } else {
                 (e.target as HTMLFormElement).reset();
                 setQueue([]);
@@ -290,14 +268,12 @@ export default function PortfolioManager({ ...props }) {
                 category={activeCategory}
                 dragTarget={dragTarget}
                 setNotice={setNotice}
-                setSpinner={setSpinner}
                 targetSubcategory={targetSubcategory}
                 setTargetSubcategory={setTargetSubcategory}
                 targetGroupId={targetGroupId}
-                orderedGroup={order}
-                spinner={spinner}
                 taxonomy={taxonomy}
                 setTaxonomy={setTaxonomy}
+                bulkUploadSignal={bulkUploadSignal}
               />
 
               <ImageQueue
@@ -305,6 +281,7 @@ export default function PortfolioManager({ ...props }) {
                 setDragTarget={setDragTarget}
                 setQueue={setQueue}
                 setSubmitOpen={setSubmitOpen}
+                compress={false}
               />
             </motion.div>
           </AnimatePresence>

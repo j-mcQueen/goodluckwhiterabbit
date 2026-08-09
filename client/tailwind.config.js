@@ -18,7 +18,7 @@ export default {
       dropShadow: {
         blu: "2px 2px 2px #0075FF",
         mag: "2px 2px 2px #FF73FF",
-        red: "2px 2px 2px #DC2626",
+        red: "0px 0px 3px #DC2626",
         grn: "2px 2px 2px #08FF09",
         ylw: "2px 2px 2px #FFF500",
         glo: "0px 0px 2px #FFF",

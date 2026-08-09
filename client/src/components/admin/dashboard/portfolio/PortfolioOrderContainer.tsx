@@ -1,53 +1,51 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import PortfolioFileInfo from "./PortfolioFileInfo";
-import PortfolioImageOrder from "./PortfolioImageOrder";
+import PortfolioAdminGrid from "./PortfolioAdminGrid";
 
+// One grid for every group now (PortfolioAdminGrid.tsx), memo-managed or
+// not - no more hasMemo branch here, no more layoutVersion/onMemoCreated
+// plumbing. The grid fetches its own data and derives hasMemo locally, so
+// this container is just wiring: which group, and the taxonomy state
+// PortfolioFileInfo and the grid's own count-updating handlers need.
 const PortfolioOrderContainer = ({ ...props }) => {
   const {
     category,
     dragTarget,
-    orderedGroup,
     setNotice,
-    setSpinner,
     setTargetSubcategory,
-    spinner,
     targetSubcategory,
     targetGroupId,
     taxonomy,
     setTaxonomy,
+    bulkUploadSignal,
   } = props;
 
-  const [renderCount, setRenderCount] = useState(0);
-
-  useEffect(() => {
-    setRenderCount(
-      orderedGroup.filter((item: object | Blob) => item instanceof Blob)
-        .length,
-    );
-  }, [orderedGroup]);
+  // PortfolioAdminGrid.tsx paginates, so "how many files are displayed"
+  // isn't the same as the group's total stored count - the grid reports its
+  // own real loaded-image count back up here as it loads/changes.
+  const [loadedImageCount, setLoadedImageCount] = useState(0);
 
   return (
     <div className="flex flex-col">
       <PortfolioFileInfo
-        renderCount={renderCount}
-        spinner={spinner}
+        renderCount={loadedImageCount}
+        spinner={false}
         targetSubcategory={targetSubcategory}
         targetGroupId={targetGroupId}
       />
 
-      <PortfolioImageOrder
+      <PortfolioAdminGrid
         category={category}
+        sub={targetSubcategory.name}
+        groupId={targetGroupId}
         dragTarget={dragTarget}
-        renderCount={renderCount}
-        setRenderCount={setRenderCount}
-        setNotice={setNotice}
         targetSubcategory={targetSubcategory}
         setTargetSubcategory={setTargetSubcategory}
-        targetGroupId={targetGroupId}
-        orderedGroup={orderedGroup}
-        setSpinner={setSpinner}
         taxonomy={taxonomy}
         setTaxonomy={setTaxonomy}
+        setNotice={setNotice}
+        bulkUploadSignal={bulkUploadSignal}
+        onLoadedImageCountChange={setLoadedImageCount}
       />
     </div>
   );

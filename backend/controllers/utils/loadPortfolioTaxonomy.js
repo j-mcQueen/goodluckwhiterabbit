@@ -55,6 +55,11 @@ export const formatAdminTaxonomy = (subcategoryDocs) => {
         name: group.name,
         order: group.order,
         count: group.count,
+        // lets the admin queue decide, before fetching content, whether this
+        // group needs the layout-aware read path (§2.1/§5) or the existing
+        // untouched one - full `layout` isn't included here to keep the
+        // taxonomy fetch light, only the flag needed to branch
+        hasMemo: (group.layout ?? []).some((entry) => entry.type === "memo"),
       })),
   }));
 };

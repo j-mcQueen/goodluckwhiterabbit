@@ -24,8 +24,16 @@ import {
   adminBulkUploadPortfolioImages,
   adminDeletePortfolioImage,
   adminSwapPortfolioImages,
+  adminSwapPortfolioLayout,
+  adminMovePortfolioLayoutItem,
+  adminRepairPortfolioLayout,
   adminUpdatePortfolioGroupCount,
   adminGetPortfolioGroupImages,
+  adminGetPortfolioGroupLayout,
+  adminCreatePortfolioMemo,
+  adminGetPortfolioMemo,
+  adminUpdatePortfolioMemo,
+  adminDeletePortfolioMemo,
 } from "../controllers/portfolioAdmin.js";
 
 const router = express.Router();
@@ -50,6 +58,11 @@ router.get("/portfolio/taxonomy", adminGetPortfolioTaxonomy);
 router.get(
   "/portfolio/:category/:sub/:groupId/:size/:start/",
   adminGetPortfolioGroupImages,
+);
+router.get("/portfolio/memo/:memoId", adminGetPortfolioMemo);
+router.get(
+  "/portfolio/:category/:sub/:groupId/layout/:size/:start",
+  adminGetPortfolioGroupLayout,
 );
 
 // POST
@@ -79,9 +92,23 @@ router.post(
   adminSwapPortfolioImages,
 );
 router.post(
+  "/portfolio/:category/:sub/:groupId/layout/swap/:from/:to",
+  adminSwapPortfolioLayout,
+);
+router.post(
+  "/portfolio/:category/:sub/:groupId/layout/move/:from/:to",
+  adminMovePortfolioLayoutItem,
+);
+router.post(
+  "/portfolio/:category/:sub/:groupId/layout/repair",
+  adminRepairPortfolioLayout,
+);
+router.post(
   "/portfolio/subcategories/:subId/groups/:groupId/updateCount/:count",
   adminUpdatePortfolioGroupCount,
 );
+router.post("/portfolio/:category/:sub/:groupId/memo", adminCreatePortfolioMemo);
+router.post("/portfolio/memo/:memoId", adminUpdatePortfolioMemo);
 
 // DELETE
 router.delete("/deleteUser/:id", adminDeleteUser);
@@ -94,6 +121,10 @@ router.delete(
 router.delete(
   "/portfolio/:category/:sub/:groupId/:position/delete",
   adminDeletePortfolioImage,
+);
+router.delete(
+  "/portfolio/:category/:sub/:groupId/memo/:memoId",
+  adminDeletePortfolioMemo,
 );
 
 export default router;

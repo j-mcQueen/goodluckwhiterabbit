@@ -241,6 +241,7 @@ export default function Portfolio({ ...props }) {
           images={images}
           nextStartIndex={nextStartIndex}
           setActiveGroup={setActiveGroup}
+          setContactOpen={setContactOpen}
           setImages={setImages}
           setNextStartIndex={setNextStartIndex}
           setNotice={setNotice}

@@ -1,6 +1,7 @@
 import sharp from "sharp";
 import pLimit from "p-limit";
 import { unlink } from "fs/promises";
+import { randomUUID } from "crypto";
 import {
   ListObjectsV2Command,
   PutObjectCommand,
@@ -19,6 +20,11 @@ import {
 import { deleteS3Prefix } from "./utils/deleteS3Prefix.js";
 import { updatePortfolioGroupCount } from "./utils/updatePortfolioGroupCount.js";
 import PortfolioSubcategory from "../models/portfolioSubcategory.js";
+import PortfolioMemo from "../models/portfolioMemo.js";
+import {
+  derivePortfolioImagePositionsFromS3,
+  reconcilePortfolioLayout,
+} from "./utils/derivePortfolioLayoutFromS3.js";
 
 const CATEGORIES = ["PHOTO", "ART", "DESIGN"];
 const SUBCATEGORY_NAME_REGEX = /^[A-Z0-9_-]{1,50}$/;
@@ -292,13 +298,41 @@ export const adminUploadPortfolioImage = async (req, res, next) => {
       return res.status(400).json({ error: "Invalid category" });
     }
 
-    if (!isValidPosition(req.body.position)) {
+    const isReplace = req.body.isReplace === "true";
+    if (isReplace && !isValidPosition(req.body.position)) {
       return res.status(400).json({ error: "Invalid position" });
     }
-    const position = Number(req.body.position);
 
     const owner = await findGroupOwner(category, sub, groupId);
     if (owner.error) return res.status(404).json({ error: owner.error });
+
+    const group = owner.subcategory.groups.find(
+      (candidate) => candidate.groupId === groupId,
+    );
+    const existingImagePositions = (group.layout ?? [])
+      .filter((item) => item.type === "image")
+      .map((item) => item.position);
+
+    // append position is always derived server-side from the group's own
+    // layout, never trusted from the client - the admin grid paginates in
+    // batches, so a client that hasn't loaded the whole group can't reliably
+    // compute a collision-free "next" position itself. Guessing wrong here
+    // would silently land on an existing position and get treated as a
+    // replace below, destroying an image the client never even saw.
+    let position;
+    if (isReplace) {
+      position = Number(req.body.position);
+      if (!existingImagePositions.includes(position)) {
+        return res
+          .status(400)
+          .json({ error: "No existing image at that position to replace" });
+      }
+    } else {
+      position =
+        existingImagePositions.length > 0
+          ? Math.max(...existingImagePositions) + 1
+          : 0;
+    }
 
     const file = req.files?.[0];
     if (!file) return res.status(400).json({ error: "No file provided" });
@@ -374,7 +408,6 @@ export const adminUploadPortfolioImage = async (req, res, next) => {
       }
     }
 
-    const isReplace = existingMatches.length > 0;
     if (!isReplace) {
       await updatePortfolioGroupCount(
         owner.subcategory._id,
@@ -383,9 +416,18 @@ export const adminUploadPortfolioImage = async (req, res, next) => {
         PortfolioSubcategory,
         1,
       );
+      // $addToSet, not $push - LayoutItemSchema has _id:false so this is a
+      // plain value match, safe to call even if layout already has this
+      // position (e.g. after a self-heal race)
+      await PortfolioSubcategory.updateOne(
+        { _id: owner.subcategory._id, "groups.groupId": groupId },
+        { $addToSet: { "groups.$.layout": { type: "image", position } } },
+      );
     }
 
-    return res.status(200).send(small);
+    // JSON (not a raw blob body) so the client can learn the server-derived
+    // `position` for an append - it doesn't know it up front under pagination
+    return res.status(200).json({ position, image: small.toString("base64") });
   }
 };
 
@@ -458,6 +500,9 @@ export const adminBulkUploadPortfolioImages = async (req, res, next) => {
       const failed = settled
         .map((item, i) => (item.status === "rejected" ? files[i].originalname : null))
         .filter(Boolean);
+      const succeededPositions = settled
+        .map((item, i) => (item.status === "fulfilled" ? i + existingCount : null))
+        .filter((position) => position !== null);
 
       await updatePortfolioGroupCount(
         owner.subcategory._id,
@@ -466,6 +511,19 @@ export const adminBulkUploadPortfolioImages = async (req, res, next) => {
         PortfolioSubcategory,
         succeeded.length,
       );
+
+      if (succeededPositions.length > 0) {
+        await PortfolioSubcategory.updateOne(
+          { _id: owner.subcategory._id, "groups.groupId": groupId },
+          {
+            $addToSet: {
+              "groups.$.layout": {
+                $each: succeededPositions.map((position) => ({ type: "image", position })),
+              },
+            },
+          },
+        );
+      }
 
       return res.status(200).json({
         succeeded,
@@ -538,6 +596,14 @@ export const adminDeletePortfolioImage = async (req, res, next) => {
       res,
       PortfolioSubcategory,
       -1,
+    );
+    // no image position is renumbered on delete (matches the S3 behavior
+    // above - a gap is left, not compacted), so this only ever removes the
+    // one entry for the deleted position; every other layout entry, image
+    // or memo, is untouched
+    await PortfolioSubcategory.updateOne(
+      { _id: owner.subcategory._id, "groups.groupId": groupId },
+      { $pull: { "groups.$.layout": { type: "image", position: Number(position) } } },
     );
 
     return res.status(200).json({ success: true });
@@ -652,6 +718,109 @@ export const adminSwapPortfolioImages = async (req, res, next) => {
   }
 };
 
+// swaps two entries' positions within a group's `layout` array - used for
+// all drag-to-reorder in a memo-managed group (image-image, image-memo, or
+// memo-memo alike), since display order there is the array's own sequence,
+// not S3 position values. No S3 call: unlike adminSwapPortfolioImages, this
+// never touches image content, only the order layout renders it in.
+export const adminSwapPortfolioLayout = async (req, res, next) => {
+  const verified = await verifyTokens(req, res);
+
+  if (verified) {
+    const { category, sub, groupId, from, to } = req.params;
+
+    if (!CATEGORIES.includes(category)) {
+      return res.status(400).json({ error: "Invalid category" });
+    }
+
+    const owner = await findGroupOwner(category, sub, groupId);
+    if (owner.error) return res.status(404).json({ error: owner.error });
+
+    const group = owner.subcategory.groups.find((g) => g.groupId === groupId);
+    const fromIndex = Number(from);
+    const toIndex = Number(to);
+
+    const isValidIndex = (value) =>
+      Number.isInteger(value) && value >= 0 && value < group.layout.length;
+
+    if (!isValidIndex(fromIndex) || !isValidIndex(toIndex)) {
+      return res.status(400).json({ error: "Invalid layout index" });
+    }
+    if (fromIndex === toIndex) return res.status(200).json({ success: true });
+
+    const entries = group.layout;
+    [entries[fromIndex], entries[toIndex]] = [entries[toIndex], entries[fromIndex]];
+    group.layout = entries;
+
+    try {
+      await owner.subcategory.save();
+    } catch (error) {
+      return res.status(500).json({ error: "Could not reorder the queue." });
+    }
+
+    return res.status(200).json({ success: true, layout: group.layout });
+  }
+};
+
+// relocates one layout entry to a new gap position - splice out, splice in,
+// shifting everything in between. Not the same as a swap: dropping a memo
+// tile onto a gap marker shouldn't trade places with whatever else is at
+// that index, it should slot in there and let the rest of the sequence
+// shift around it. `to` is a gap index (0..layout.length, one more possible
+// value than there are elements - "drop after everything" is valid), not
+// an existing-element index like adminSwapPortfolioLayout's `to`.
+export const adminMovePortfolioLayoutItem = async (req, res, next) => {
+  const verified = await verifyTokens(req, res);
+
+  if (verified) {
+    const { category, sub, groupId, from, to } = req.params;
+
+    if (!CATEGORIES.includes(category)) {
+      return res.status(400).json({ error: "Invalid category" });
+    }
+
+    const owner = await findGroupOwner(category, sub, groupId);
+    if (owner.error) return res.status(404).json({ error: owner.error });
+
+    const group = owner.subcategory.groups.find((g) => g.groupId === groupId);
+    const fromIndex = Number(from);
+    const toGapIndex = Number(to);
+
+    if (
+      !Number.isInteger(fromIndex) ||
+      fromIndex < 0 ||
+      fromIndex >= group.layout.length
+    ) {
+      return res.status(400).json({ error: "Invalid source index" });
+    }
+    if (
+      !Number.isInteger(toGapIndex) ||
+      toGapIndex < 0 ||
+      toGapIndex > group.layout.length
+    ) {
+      return res.status(400).json({ error: "Invalid target gap" });
+    }
+
+    // dropping onto the gap immediately before or after its own current
+    // position is a no-op - removing then reinserting there changes nothing
+    const adjustedTo = toGapIndex > fromIndex ? toGapIndex - 1 : toGapIndex;
+    if (adjustedTo === fromIndex) return res.status(200).json({ success: true });
+
+    const entries = group.layout;
+    const [item] = entries.splice(fromIndex, 1);
+    entries.splice(adjustedTo, 0, item);
+    group.layout = entries;
+
+    try {
+      await owner.subcategory.save();
+    } catch (error) {
+      return res.status(500).json({ error: "Could not move this item in the queue." });
+    }
+
+    return res.status(200).json({ success: true, layout: group.layout });
+  }
+};
+
 // absolute-set count reconciliation, mirroring admin.js's
 // adminUpdateUserImagesetCount - used by the frontend's self-healing pattern
 // when a load discovers the true S3 count differs from what's stored
@@ -671,6 +840,166 @@ export const adminUpdatePortfolioGroupCount = async (req, res, next) => {
 
     const group = updated.groups.find((g) => g.groupId === groupId);
     return res.status(200).json({ count: group.count });
+  }
+};
+
+// layout self-heal, same trigger pattern as count reconciliation above -
+// the admin queue calls this once it's observed a group's full S3 listing
+// (see handlePortfolioLoad.ts), so drift repairs itself on next full view
+// of a group rather than staying silently wrong until someone notices.
+export const adminRepairPortfolioLayout = async (req, res, next) => {
+  const verified = await verifyTokens(req, res);
+
+  if (verified) {
+    const { category, sub, groupId } = req.params;
+
+    if (!CATEGORIES.includes(category)) {
+      return res.status(400).json({ error: "Invalid category" });
+    }
+
+    const owner = await findGroupOwner(category, sub, groupId);
+    if (owner.error) return res.status(404).json({ error: owner.error });
+
+    const group = owner.subcategory.groups.find((g) => g.groupId === groupId);
+    const truePositions = await derivePortfolioImagePositionsFromS3(category, sub, groupId);
+    group.layout = reconcilePortfolioLayout(group.layout, truePositions);
+
+    try {
+      await owner.subcategory.save();
+    } catch (error) {
+      return res.status(500).json({ error: "Could not repair layout." });
+    }
+
+    return res.status(200).json({ layout: group.layout });
+  }
+};
+
+// ---- memo CRUD ----
+// memo content is stored as rendered markup (`html`), not separate
+// structured fields (per spec) - the html itself carries data-field-tagged
+// elements so the admin edit dialog can parse prior field values back out
+// client-side. The server treats it as an opaque string; it only ever
+// touches `layout` (position) and PortfolioMemo (content) separately.
+const MAX_MEMO_HTML_LENGTH = 20000;
+
+const isValidMemoHtml = (html) =>
+  typeof html === "string" && html.trim().length > 0 && html.length <= MAX_MEMO_HTML_LENGTH;
+
+export const adminCreatePortfolioMemo = async (req, res, next) => {
+  const verified = await verifyTokens(req, res);
+
+  if (verified) {
+    const { category, sub, groupId } = req.params;
+    const { html, position } = req.body;
+
+    if (!CATEGORIES.includes(category)) {
+      return res.status(400).json({ error: "Invalid category" });
+    }
+    if (!isValidMemoHtml(html)) {
+      return res.status(400).json({ error: "Invalid memo content" });
+    }
+
+    const owner = await findGroupOwner(category, sub, groupId);
+    if (owner.error) return res.status(404).json({ error: owner.error });
+
+    const group = owner.subcategory.groups.find((g) => g.groupId === groupId);
+    const insertAt = Number.isInteger(Number(position))
+      ? Math.min(Math.max(Number(position), 0), group.layout.length)
+      : group.layout.length;
+
+    let memo;
+    try {
+      memo = await PortfolioMemo.create({ memoId: randomUUID(), category, html });
+    } catch (error) {
+      return res.status(500).json({ error: "Could not save memo content" });
+    }
+
+    group.layout.splice(insertAt, 0, { type: "memo", memoId: memo.memoId });
+
+    try {
+      await owner.subcategory.save();
+    } catch (error) {
+      await PortfolioMemo.deleteOne({ memoId: memo.memoId }); // roll back the orphaned content doc
+      return res.status(500).json({ error: "Could not place memo in queue" });
+    }
+
+    return res.status(200).json({ memoId: memo.memoId, layout: group.layout });
+  }
+};
+
+export const adminGetPortfolioMemo = async (req, res, next) => {
+  const verified = await verifyTokens(req, res);
+
+  if (verified) {
+    const { memoId } = req.params;
+    const memo = await PortfolioMemo.findOne({ memoId });
+
+    if (!memo) return res.status(404).json({ error: "Memo not found" });
+
+    return res
+      .status(200)
+      .json({ memoId: memo.memoId, category: memo.category, html: memo.html });
+  }
+};
+
+export const adminUpdatePortfolioMemo = async (req, res, next) => {
+  const verified = await verifyTokens(req, res);
+
+  if (verified) {
+    const { memoId } = req.params;
+    const { html } = req.body;
+
+    if (!isValidMemoHtml(html)) {
+      return res.status(400).json({ error: "Invalid memo content" });
+    }
+
+    // edit only ever touches memo content, never `layout` - this is what
+    // guarantees a re-save returns to the memo's existing queue position
+    const updated = await PortfolioMemo.findOneAndUpdate(
+      { memoId },
+      { $set: { html } },
+      { new: true },
+    );
+
+    if (!updated) return res.status(404).json({ error: "Memo not found" });
+
+    return res.status(200).json({ memoId: updated.memoId, html: updated.html });
+  }
+};
+
+export const adminDeletePortfolioMemo = async (req, res, next) => {
+  const verified = await verifyTokens(req, res);
+
+  if (verified) {
+    const { category, sub, groupId, memoId } = req.params;
+
+    if (!CATEGORIES.includes(category)) {
+      return res.status(400).json({ error: "Invalid category" });
+    }
+
+    const owner = await findGroupOwner(category, sub, groupId);
+    if (owner.error) return res.status(404).json({ error: owner.error });
+
+    const group = owner.subcategory.groups.find((g) => g.groupId === groupId);
+    const index = group.layout.findIndex(
+      (entry) => entry.type === "memo" && entry.memoId === memoId,
+    );
+
+    if (index === -1) return res.status(404).json({ error: "Memo not found in this group" });
+
+    // remove the one layout entry only - no image position is touched, so
+    // the grid re-flows around the closed gap with nothing to renumber
+    group.layout.splice(index, 1);
+
+    try {
+      await owner.subcategory.save();
+    } catch (error) {
+      return res.status(500).json({ error: "Could not remove memo from queue" });
+    }
+
+    await PortfolioMemo.deleteOne({ memoId });
+
+    return res.status(200).json({ success: true, layout: group.layout });
   }
 };
 
@@ -769,5 +1098,94 @@ export const adminGetPortfolioGroupImages = async (req, res, next) => {
     return skipped.length > 0
       ? res.status(200).json({ presigns, keys: resolvedKeys, skipped, stored })
       : res.status(200).json({ presigns, keys: resolvedKeys, stored });
+  }
+};
+
+// layout-aware counterpart to adminGetPortfolioGroupImages above, used only
+// for groups where taxonomy's hasMemo flag is true (§2.1/§5 - zero-memo
+// groups keep using the untouched endpoint above, unconditionally). Paginates
+// over `layout` array indices rather than S3 position, so image and memo
+// entries interleave in the admin's actual display order; each item resolves
+// to either a presigned image URL or inlined memo html.
+export const adminGetPortfolioGroupLayout = async (req, res, next) => {
+  const verified = await verifyTokens(req, res);
+
+  if (verified) {
+    const { category, sub, groupId, size, start } = req.params;
+
+    if (!CATEGORIES.includes(category)) {
+      return res.status(400).json({ error: "Invalid category" });
+    }
+    if (size !== "sm" && size !== "lg") {
+      return res.status(400).json({ error: "Invalid size" });
+    }
+    if (!Number.isInteger(Number(start)) || Number(start) < 0) {
+      return res.status(400).json({ error: "Invalid start index" });
+    }
+
+    const owner = await findGroupOwner(category, sub, groupId);
+    if (owner.error) return res.status(404).json({ error: owner.error });
+
+    const group = owner.subcategory.groups.find((g) => g.groupId === groupId);
+    const startNum = Number(start);
+    const batch = group.layout.slice(startNum, startNum + 10);
+
+    const groupPrefix = `${category}/${sub}/${groupId}/`;
+    const positionRegex = /_(\d{1,3})\.[^.]+$/;
+    const keyByPosition = new Map();
+
+    if (batch.some((entry) => entry.type === "image")) {
+      let listed;
+      try {
+        listed = await s3.send(
+          new ListObjectsV2Command({
+            Bucket: process.env.AWS_SECONDARY_BUCKET,
+            Prefix: groupPrefix,
+          }),
+        );
+      } catch (error) {
+        return res.status(500).json({
+          error: "There was an error retrieving these images from S3.",
+        });
+      }
+
+      for (const obj of listed.Contents ?? []) {
+        if (!obj.Key.includes(`/${size}/`) || obj.Size === 0) continue;
+        const match = obj.Key.match(positionRegex);
+        if (match) keyByPosition.set(Number(match[1]), obj.Key);
+      }
+    }
+
+    const results = await Promise.allSettled(
+      batch.map(async (entry) => {
+        if (entry.type === "memo") {
+          const memo = await PortfolioMemo.findOne({ memoId: entry.memoId }).lean();
+          if (!memo) throw new Error("memo missing");
+          return { type: "memo", memoId: entry.memoId, html: memo.html };
+        }
+
+        const key = keyByPosition.get(entry.position);
+        if (!key) throw new Error("image missing");
+        const url = await getSignedUrl(
+          s3,
+          new GetObjectCommand({ Bucket: process.env.AWS_SECONDARY_BUCKET, Key: key }),
+          { expiresIn: 600 },
+        );
+        return { type: "image", position: entry.position, url };
+      }),
+    );
+
+    const items = [];
+    const skipped = [];
+    results.forEach((result, i) => {
+      if (result.status === "fulfilled") {
+        items.push(result.value);
+      } else {
+        const entry = batch[i];
+        skipped.push(entry.type === "memo" ? entry.memoId : String(entry.position));
+      }
+    });
+
+    return res.status(200).json({ items, stored: group.layout.length, skipped });
   }
 };
