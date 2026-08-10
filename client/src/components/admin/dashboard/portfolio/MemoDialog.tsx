@@ -1,16 +1,15 @@
-import { useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import { icons } from "../styles/styles";
 import { primaryCta, modalCloseIcon } from "../../../global/styles/buttons";
 import { textInput } from "../../../global/styles/forms";
-import { ArtMemoFields, MemoFields, PortfolioCategory } from "../../../global/memo/types";
+import {
+  ArtMemoFields,
+  MemoFields,
+  PortfolioCategory,
+} from "../../../global/memo/types";
 
 import Close from "../../../../assets/media/icons/Close";
 
-// Admin dialog panel, desktop and mobile share the same stacked-field
-// layout (spec §7) - "MEMO" header with X close, Title/Subheading (or
-// Title/Year for Art), Body textarea, Inquire toggle + Submit on one row.
-// All fields independently optional - Submit is never blocked on any
-// single field being filled.
 export default function MemoDialog({
   category,
   initialFields,
@@ -34,11 +33,23 @@ export default function MemoDialog({
     setPending(false);
   };
 
+  const dialog = useRef<HTMLDialogElement>(null);
+  useLayoutEffect(() => {
+    // update DOM before browser paint
+    dialog.current?.showModal();
+  }, []);
+
   return (
-    <dialog className="absolute flex items-center justify-center bg-black text-white border border-solid border-white p-4 z-20 w-full max-w-[500px]">
+    <dialog
+      ref={dialog}
+      onClose={onClose}
+      className="absolute flex items-center justify-center bg-black text-white border border-solid border-white p-4 z-20 w-full max-w-[500px] backdrop:bg-[rgba(0,0,0,0.6)] backdrop:backdrop-blur-sm"
+    >
       <div className="flex flex-col gap-4 w-full">
         <div className="flex items-center justify-between">
-          <h3 className="font-tnrBI drop-shadow-glo tracking-widest opacity-80 text-lg">MEMO</h3>
+          <h3 className="font-tnrBI drop-shadow-glo tracking-widest opacity-80 text-lg">
+            MEMO
+          </h3>
           <button type="button" onClick={onClose} className={modalCloseIcon}>
             <Close className={icons} />
           </button>
@@ -50,7 +61,9 @@ export default function MemoDialog({
             type="text"
             value={fields.title}
             onChange={(e) => setFields({ ...fields, title: e.target.value })}
-            placeholder={isArt ? "E.G. A DREAM IS A WISH" : "E.G. MEMORIES AWAIT"}
+            placeholder={
+              isArt ? "E.G. A DREAM IS A WISH" : "E.G. MEMORIES AWAIT"
+            }
             className={textInput}
           />
         </label>
@@ -61,7 +74,9 @@ export default function MemoDialog({
             <input
               type="text"
               value={artFields.year}
-              onChange={(e) => setFields({ ...artFields, year: e.target.value })}
+              onChange={(e) =>
+                setFields({ ...artFields, year: e.target.value })
+              }
               placeholder="E.G. 2024"
               className={textInput}
             />
@@ -73,7 +88,10 @@ export default function MemoDialog({
               type="text"
               value={(fields as { subheading: string }).subheading}
               onChange={(e) =>
-                setFields({ ...fields, subheading: e.target.value } as MemoFields)
+                setFields({
+                  ...fields,
+                  subheading: e.target.value,
+                } as MemoFields)
               }
               placeholder="E.G. RED BUTTE GARDEN"
               className={textInput}
@@ -96,7 +114,9 @@ export default function MemoDialog({
             <input
               type="checkbox"
               checked={artFields.sold}
-              onChange={(e) => setFields({ ...artFields, sold: e.target.checked })}
+              onChange={(e) =>
+                setFields({ ...artFields, sold: e.target.checked })
+              }
             />
             SOLD?
           </label>
@@ -108,7 +128,9 @@ export default function MemoDialog({
               <input
                 type="checkbox"
                 checked={artFields.inquire}
-                onChange={(e) => setFields({ ...artFields, inquire: e.target.checked })}
+                onChange={(e) =>
+                  setFields({ ...artFields, inquire: e.target.checked })
+                }
               />
               INQUIRE BUTTON
             </label>
