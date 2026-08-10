@@ -103,7 +103,7 @@ export default function PortfolioManager({ ...props }) {
   };
 
   return (
-    <div className="text-white border border-solid border-white w-[85dvw] xl:w-full xl:mx-3 xl:mb-3">
+    <div className="text-white border border-solid border-white w-[85dvw] xl:w-full xl:mb-3 flex-1 min-h-0 flex flex-col">
       {activeCategory ? (
         <nav className="flex gap-3 flex-wrap p-3 border-b border-solid border-white text-sm tracking-widest opacity-80">
           <button
@@ -246,7 +246,7 @@ export default function PortfolioManager({ ...props }) {
               return;
             }
           }}
-          className="pb-10 border-spacing-0"
+          className="flex-1 min-h-0 flex flex-col"
         >
           <SubmitDialog
             submitOpen={submitOpen}
@@ -262,7 +262,7 @@ export default function PortfolioManager({ ...props }) {
               initial={{ opacity: 0, translateY: -25 }}
               animate={{ opacity: 1, translateY: 0 }}
               transition={{ duration: 0.25 }}
-              className="border-b border-solid border-white flex"
+              className="flex flex-1 min-h-0"
             >
               <PortfolioOrderContainer
                 category={activeCategory}

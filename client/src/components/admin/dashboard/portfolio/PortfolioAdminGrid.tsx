@@ -571,9 +571,9 @@ export default function PortfolioAdminGrid({
   );
 
   return (
-    <div className="flex items-start">
-      <div className="text-white p-3 min-w-[40vw] flex flex-col items-center justify-center">
-        <div className="flex flex-wrap items-stretch justify-center gap-2 max-w-[60dvw] px-5 overflow-scroll h-[700px] relative">
+    <div className="flex items-stretch flex-1 min-h-0">
+      <div className="text-white p-3 min-w-[40vw] flex flex-col items-center justify-center flex-1 min-h-0">
+        <div className="flex flex-wrap items-stretch justify-center gap-2 max-w-[60dvw] px-5 overflow-scroll flex-1 min-h-0 relative">
           {segments.map((segment) => {
             if (segment.kind === "memo") {
               const memoFlatIndex = flatIndexByKey.get(segment.memoId)!;

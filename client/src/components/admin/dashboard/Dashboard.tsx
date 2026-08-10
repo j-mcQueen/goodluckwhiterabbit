@@ -62,8 +62,8 @@ export default function AdminDashboard() {
               return setClients(
                 data.sort(
                   (a: { added: string }, b: { added: string }) =>
-                    new Date(b.added).getTime() - new Date(a.added).getTime()
-                )
+                    new Date(b.added).getTime() - new Date(a.added).getTime(),
+                ),
               );
 
             case 401:
@@ -93,7 +93,7 @@ export default function AdminDashboard() {
   }, [location, navigate]);
 
   return (
-    <main className="w-[calc(100dvw-var(--frame)-2px)] h-[calc(100dvh-var(--frame)-2px)] overflow-scroll overflow-x-hidden relative">
+    <main className="w-[calc(100dvw-var(--frame)-2px)] h-[calc(100dvh-var(--frame)-2px)] overflow-scroll overflow-x-hidden relative flex flex-col">
       {rejectedFiles.length > 0 ? (
         <RejectedFiles
           rejectedFiles={rejectedFiles}
@@ -127,7 +127,7 @@ export default function AdminDashboard() {
         }
       />
 
-      <section className="flex justify-center items-center text-white">
+      <section className="flex flex-col flex-1 min-h-0 justify-center items-center text-white xl:mx-3">
         <>
           {activePane === "ALL" ? (
             <div className="text-white border border-solid border-white w-[85dvw] xl:w-[60dvw]">
