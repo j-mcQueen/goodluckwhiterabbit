@@ -7,16 +7,21 @@ import { handleDelete } from "./utils/handlers/queueing/handleDelete";
 import Close from "../../../assets/media/icons/Close";
 
 export default function ImageQueue({ ...props }) {
-  const { queue, setDragTarget, setQueue, setSubmitOpen, compress = true } =
-    props;
+  const {
+    queue,
+    setDragTarget,
+    setQueue,
+    setSubmitOpen,
+    compress = true,
+  } = props;
 
   const [uploadCount, setUploadCount] = useState(0);
   const fileRef = useRef<HTMLInputElement>(null);
 
   return (
-    <div className="border-l border-solid border-white">
-      <div>
-        <div className="flex justify-between items-center gap-5 py-4 px-4">
+    <div className="border-l border-solid border-white w-[280px] shrink-0 flex flex-col min-h-0">
+      <div className="flex flex-col flex-1 min-h-0">
+        <div className="flex flex-wrap justify-between items-center gap-x-3 gap-y-2 p-3 shrink-0">
           <p className="text-xl">
             <span className={`${uploadCount > 0 ? "text-rd" : ""}`}>
               {uploadCount}
@@ -24,49 +29,49 @@ export default function ImageQueue({ ...props }) {
             {uploadCount === 1 ? " FILE " : " FILES "} QUEUED
           </p>
 
-          {queue.length > 0 ? (
-            <div
-              className={`font-tnrBI text-md tracking-widest opacity-80 flex items-center h-[36px] max-h-[36px] ${queue.length === 0 ? "text-gray" : ""} gap-5`}
-            >
-              <button
-                type="button"
-                onClick={() => {
-                  setQueue([]);
-                  setUploadCount(0);
-                }}
-                className=" px-2 pt-3 pb-2 border border-solid border-white transition-colors xl:hover:text-rd xl:hover:border-rd xl:hover:drop-shadow-red xl:focus:text-rd xl:focus:border-rd xl:focus:drop-shadow-red xl:hover:cursor-pointer drop-shadow-glo "
-              >
-                CLEAR
-              </button>
+          <div className="flex items-center gap-2">
+            {queue.length > 0 ? (
+              <>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setQueue([]);
+                    setUploadCount(0);
+                  }}
+                  className="font-tnrBI text-md tracking-widest opacity-80 flex items-center h-[36px] max-h-[36px] px-2 pt-3 pb-2 border border-solid border-white transition-colors xl:hover:text-rd xl:hover:border-rd xl:hover:drop-shadow-red xl:focus:text-rd xl:focus:border-rd xl:focus:drop-shadow-red xl:hover:cursor-pointer drop-shadow-glo"
+                >
+                  CLEAR
+                </button>
 
-              <button
-                type="button"
-                disabled={queue.length > 0 ? false : true}
-                onClick={() => setSubmitOpen(true)}
-                className="px-2 pt-3 pb-2 border border-solid border-white transition-colors xl:hover:text-rd xl:hover:border-rd xl:hover:drop-shadow-red xl:focus:text-rd xl:focus:border-rd xl:focus:drop-shadow-red xl:hover:cursor-pointer drop-shadow-glo "
-              >
-                SUBMIT
-              </button>
-            </div>
-          ) : null}
+                <button
+                  type="button"
+                  disabled={queue.length > 0 ? false : true}
+                  onClick={() => setSubmitOpen(true)}
+                  className="font-tnrBI text-md tracking-widest opacity-80 flex items-center h-[36px] max-h-[36px] px-2 pt-3 pb-2 border border-solid border-white transition-colors xl:hover:text-rd xl:hover:border-rd xl:hover:drop-shadow-red xl:focus:text-rd xl:focus:border-rd xl:focus:drop-shadow-red xl:hover:cursor-pointer drop-shadow-glo"
+                >
+                  SUBMIT
+                </button>
+              </>
+            ) : null}
 
-          <label className="font-tnrBI text-md tracking-widest opacity-80 drop-shadow-glo border border-solid border-white flex items-center px-2 pt-2 pb-1 transition-colors xl:hover:text-rd xl:hover:border-rd xl:hover:drop-shadow-red xl:focus:text-rd xl:focus:border-rd xl:focus:drop-shadow-red xl:hover:cursor-pointer h-[36px] max-h-[36px]">
-            ADD
-            <input
-              ref={fileRef}
-              type="file"
-              name="additions"
-              onChange={(e) =>
-                handleChange(e, setUploadCount, setQueue, compress)
-              }
-              className="opacity-0 w-[1px]"
-              accept="image/*"
-              multiple
-            />
-          </label>
+            <label className="font-tnrBI text-md tracking-widest opacity-80 drop-shadow-glo border border-solid border-white flex items-center px-2 pt-2 pb-1 transition-colors xl:hover:text-rd xl:hover:border-rd xl:hover:drop-shadow-red xl:focus:text-rd xl:focus:border-rd xl:focus:drop-shadow-red xl:hover:cursor-pointer h-[36px] max-h-[36px]">
+              ADD
+              <input
+                ref={fileRef}
+                type="file"
+                name="additions"
+                onChange={(e) =>
+                  handleChange(e, setUploadCount, setQueue, compress)
+                }
+                className="opacity-0 w-[1px]"
+                accept="image/*"
+                multiple
+              />
+            </label>
+          </div>
         </div>
 
-        <div className="grid grid-cols-3 gap-5 overflow-scroll h-full max-h-[800px] p-3">
+        <div className="grid grid-cols-2 gap-5 overflow-y-auto overflow-x-hidden flex-1 min-h-0 p-3">
           {queue.map((file: File, index: number) => {
             return (
               <div key={file.name}>
@@ -100,7 +105,7 @@ export default function ImageQueue({ ...props }) {
                   onDragEnd={(e) => handleDragEnd(e)}
                   src={file instanceof File ? URL.createObjectURL(file) : ""}
                   alt={file.name}
-                  className="opacity-100 max-w-[15dvh] xl:hover:cursor-pointer"
+                  className="opacity-100 w-full max-w-[15dvh] xl:hover:cursor-pointer"
                 />
               </div>
             );
