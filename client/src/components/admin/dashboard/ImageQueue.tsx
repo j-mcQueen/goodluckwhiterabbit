@@ -21,7 +21,7 @@ export default function ImageQueue({ ...props }) {
   return (
     <div className="border-l border-solid border-white w-[280px] shrink-0 flex flex-col min-h-0">
       <div className="flex flex-col flex-1 min-h-0">
-        <div className="flex flex-wrap justify-between items-center gap-x-3 gap-y-2 p-3 shrink-0">
+        <div className="flex flex-wrap justify-between items-center gap-x-3 gap-y-2 p-3 pb-0 shrink-0">
           <p className="text-xl">
             <span className={`${uploadCount > 0 ? "text-rd" : ""}`}>
               {uploadCount}

@@ -84,7 +84,8 @@ const GAP_MARKER_ICON_CLASSES = "w-5 h-5 opacity-80";
 // in a flex row alongside full-height widow-pair image tiles
 // (IMAGE_TILE_CLASSES), so it needs to match their height the same way it
 // always did.
-const GAP_WRAPPER_CLASSES = "shrink-0 w-14 min-h-[300px] max-h-[350px] flex items-center justify-center";
+const GAP_WRAPPER_CLASSES =
+  "shrink-0 w-14 min-h-[300px] max-h-[350px] flex items-center justify-center";
 // the marker directly before a memo is rendered inside its own flex row
 // alongside the memo (see the memo-wrap div below, which uses items-stretch
 // so this stretches to match the memo's own rendered height), not as a
@@ -92,17 +93,19 @@ const GAP_WRAPPER_CLASSES = "shrink-0 w-14 min-h-[300px] max-h-[350px] flex item
 // something - that was fragile (an isolated tall gap when nothing preceded
 // it on the same line, or a forced extra line break splitting an
 // otherwise-continuous image row).
-const MEMO_GAP_WRAPPER_CLASSES = "shrink-0 w-14 flex items-center justify-center";
+const MEMO_GAP_WRAPPER_CLASSES =
+  "shrink-0 w-14 flex items-center justify-center";
 // the run-trailing marker used to reuse GAP_WRAPPER_CLASSES's 300-350px
 // min/max-height, sized for sitting inline next to a flex-wrap tile of the
 // same height. Now that the grid wrapper is flex-col, a lone flex-col child
 // with that height renders as its own mostly-empty 300-350px-tall row -
 // hence the dedicated short, full-width bar here instead.
-const TRAILING_GAP_WRAPPER_CLASSES = "w-full h-16 flex items-center justify-center";
+const TRAILING_GAP_WRAPPER_CLASSES =
+  "w-full h-16 flex items-center justify-center";
 const EMPTY_SLOT_CLASSES =
   "shrink-0 w-[220px] min-h-[300px] max-h-[350px] border border-dashed border-white/30 xl:hover:border-white/70 transition-colors";
 const LOAD_BATCH_BUTTON_CLASSES =
-  "font-tnrBI text-md tracking-widest opacity-80 drop-shadow-glo px-3 pt-3 pb-2 border border-solid border-white transition-colors xl:hover:text-rd xl:hover:border-rd xl:hover:drop-shadow-red xl:focus:text-rd xl:focus:border-rd xl:focus:drop-shadow-red xl:hover:cursor-pointer w-full mt-2 disabled:opacity-30 disabled:cursor-not-allowed";
+  "font-tnrBI text-md tracking-widest opacity-80 drop-shadow-glo p-3 border border-solid border-white transition-colors xl:hover:text-rd xl:hover:border-rd xl:hover:drop-shadow-red xl:focus:text-rd xl:focus:border-rd xl:focus:drop-shadow-red xl:hover:cursor-pointer w-full mt-3 disabled:opacity-30 disabled:cursor-not-allowed";
 
 // prototype: span-packed grid (mirrors the live site's MemoAwareBody/Body
 // dense packing) instead of flex-wrap. A packed 3-column grid has no spare
@@ -846,7 +849,7 @@ export default function PortfolioAdminGrid({
       <div className="text-white p-3 flex flex-col flex-1 min-h-0 min-w-0">
         <div
           ref={setGridWrapperNode}
-          className="flex flex-col gap-2 px-8 overflow-scroll flex-1 min-h-0"
+          className="flex flex-col gap-2 overflow-scroll flex-1 min-h-0"
         >
           {segments.map((segment) => {
             if (segment.kind === "memo") {

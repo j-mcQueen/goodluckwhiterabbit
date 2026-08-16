@@ -9,7 +9,7 @@ const PortfolioFileInfo = ({ ...props }) => {
   );
 
   return (
-    <header className="flex justify-between items-center w-full p-3">
+    <header className="flex justify-between items-center w-full p-3 border-b border-solid border-white">
       <h2 className="xl:text-2xl tracking-tight">
         {activeGroup?.name.toUpperCase()}
       </h2>
