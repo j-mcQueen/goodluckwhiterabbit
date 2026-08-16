@@ -126,13 +126,18 @@ export default function Portfolio({ ...props }) {
   }, []);
 
   useEffect(() => {
+    // don't fight the disabled-category redirect above - without this guard,
+    // this effect re-navigates to the disabled route on the same tick since
+    // activeTab still holds that category's index, clobbering the redirect
+    if (DISABLED_CATEGORY_ROUTES.includes(route)) return;
+
     const newRoute = {
       0: "/photo",
       1: "/art",
       2: "/design",
     };
 
-    return navigate(newRoute[activeTab as keyof typeof newRoute]);
+    navigate(newRoute[activeTab as keyof typeof newRoute]);
   }, [activeTab, navigate, route]);
 
   useEffect(() => {
