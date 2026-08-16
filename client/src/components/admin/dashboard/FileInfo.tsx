@@ -12,7 +12,7 @@ const FileInfo = ({ ...props }) => {
   };
 
   return (
-    <header className="flex justify-between items-center w-full py-5 px-5">
+    <header className="flex justify-between items-center w-full p-3 border-b border-solid border-white">
       <h2 className="xl:text-2xl tracking-tight">
         {headingText[targetImageset as keyof file_info_heading]}
       </h2>

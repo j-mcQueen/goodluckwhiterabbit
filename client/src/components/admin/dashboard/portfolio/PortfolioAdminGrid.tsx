@@ -37,7 +37,7 @@ import MemoDialog from "./MemoDialog";
 import Loading from "../../../global/Loading";
 import Memo from "../../../../assets/media/icons/Memo";
 import Close from "../../../../assets/media/icons/Close";
-import { orderItemDelete } from "../../../global/styles/buttons";
+import { loadBatchButton, orderItemDelete } from "../../../global/styles/buttons";
 
 type DialogState =
   | { mode: "closed" }
@@ -104,8 +104,6 @@ const TRAILING_GAP_WRAPPER_CLASSES =
   "w-full h-16 flex items-center justify-center";
 const EMPTY_SLOT_CLASSES =
   "shrink-0 w-[220px] min-h-[300px] max-h-[350px] border border-dashed border-white/30 xl:hover:border-white/70 transition-colors";
-const LOAD_BATCH_BUTTON_CLASSES =
-  "font-tnrBI text-md tracking-widest opacity-80 drop-shadow-glo p-3 border border-solid border-white transition-colors xl:hover:text-rd xl:hover:border-rd xl:hover:drop-shadow-red xl:focus:text-rd xl:focus:border-rd xl:focus:drop-shadow-red xl:hover:cursor-pointer w-full mt-3 disabled:opacity-30 disabled:cursor-not-allowed";
 
 // prototype: span-packed grid (mirrors the live site's MemoAwareBody/Body
 // dense packing) instead of flex-wrap. A packed 3-column grid has no spare
@@ -947,7 +945,7 @@ export default function PortfolioAdminGrid({
 
         <button
           type="button"
-          className={LOAD_BATCH_BUTTON_CLASSES}
+          className={loadBatchButton}
           onClick={() => {
             if (caughtUp) {
               setEmptySlotCount((prev) => prev + BATCH_SIZE);

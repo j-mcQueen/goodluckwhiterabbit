@@ -21,3 +21,6 @@ export const deleteBadge =
 
 export const orderItemDelete =
   "absolute bg-black m-1 border border-solid border-rd p-1";
+
+export const loadBatchButton =
+  "font-tnrBI text-md tracking-widest opacity-80 drop-shadow-glo p-3 border border-solid border-white transition-colors xl:hover:text-rd xl:hover:border-rd xl:hover:drop-shadow-red xl:focus:text-rd xl:focus:border-rd xl:focus:drop-shadow-red xl:hover:cursor-pointer w-full mt-3 disabled:opacity-30 disabled:cursor-not-allowed";

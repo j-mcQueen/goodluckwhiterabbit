@@ -27,6 +27,7 @@ export default function OrderItem({ ...props }) {
     setStaticKeys,
     setTargetClient,
     staticKeys,
+    style,
     targetClient,
     targetImageset,
   } = props;
@@ -71,13 +72,8 @@ export default function OrderItem({ ...props }) {
       ref={itemRef}
       layout
       transition={{ type: "spring", stiffness: 300, damping: 30 }}
-      className={`${
-        file instanceof Blob === false
-          ? "h-[300px] w-[200px] min-h-[300px]"
-          : imgLoaded
-            ? "min-h-[300px] max-h-[350px]"
-            : "w-0 min-h-[300px] max-h-[350px]"
-      } shrink-0 border border-solid border-white overflow-hidden`}
+      className="relative w-full h-full border border-solid border-white overflow-hidden"
+      style={style}
       onDrop={async (e) => {
         setDropPending(true);
 
@@ -174,7 +170,7 @@ export default function OrderItem({ ...props }) {
             transition={{ duration: 0.2 }}
             loading="lazy"
             draggable={true}
-            className="block object-cover min-h-[300px] max-h-[350px]"
+            className="block w-full h-full object-cover"
             src={imgSrc}
             onLoad={() => setImgLoaded(true)}
           />

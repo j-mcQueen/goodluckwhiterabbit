@@ -127,7 +127,7 @@ export default function AdminDashboard() {
         }
       />
 
-      <section className="flex flex-col flex-1 min-h-0 justify-center items-center text-white xl:mx-3">
+      <section className="flex flex-col flex-1 min-h-0 justify-[safe_center] items-center text-white xl:mx-3">
         <>
           {activePane === "ALL" ? (
             <div className="text-white border border-solid border-white w-[85dvw] xl:w-[60dvw]">

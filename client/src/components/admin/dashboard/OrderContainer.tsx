@@ -27,7 +27,7 @@ const OrderContainer = ({ ...props }) => {
   }, [orderedImagesets, targetImageset]);
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col flex-1 min-w-0 min-h-0">
       <FileInfo
         renderCount={renderCount}
         spinner={spinner}
