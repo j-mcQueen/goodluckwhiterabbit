@@ -26,7 +26,7 @@ const PortfolioOrderContainer = ({ ...props }) => {
   const [loadedImageCount, setLoadedImageCount] = useState(0);
 
   return (
-    <div className="flex flex-col flex-1 min-h-0">
+    <div className="flex flex-col flex-1 min-h-0 min-w-0">
       <PortfolioFileInfo
         renderCount={loadedImageCount}
         spinner={false}
