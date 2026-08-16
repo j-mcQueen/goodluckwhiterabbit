@@ -59,16 +59,18 @@ const generateArtMemoHtml = (fields: ArtMemoFields): string => {
 
   if (fields.title.trim() || fields.year.trim()) {
     const title = fields.title.trim()
-      ? `<span data-field="title">${escapeHtml(fields.title)},</span> `
+      ? `<span data-field="title" class="uppercase">${escapeHtml(fields.title)},</span> `
       : "";
-    const year = fields.year.trim() ? `<span data-field="year">${escapeHtml(fields.year)}</span>` : "";
+    const year = fields.year.trim()
+      ? `<span data-field="year" class="font-tnr">${escapeHtml(fields.year)}</span>`
+      : "";
     parts.push(
       `<p class="font-tnrBI text-white text-lg xl:text-xl text-center">${title}${year}</p>`,
     );
   }
   if (fields.body.trim()) {
     parts.push(
-      `<p data-field="body" class="font-vt tracking-vt text-white uppercase text-sm text-center mt-3">${escapeHtml(fields.body)}</p>`,
+      `<p data-field="body" class="font-vt tracking-vt text-white uppercase text-sm text-center mt-3 whitespace-pre-line">${escapeHtml(fields.body)}</p>`,
     );
   }
   if (fields.inquire) {

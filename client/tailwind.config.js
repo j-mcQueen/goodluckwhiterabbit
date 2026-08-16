@@ -5,6 +5,7 @@ export default {
     extend: {
       fontFamily: {
         tnrBI: ["Times New Roman Bold Italic", "serif"],
+        tnr: ["Times New Roman Bold", "serif"],
         vt: ["VT323", "sans-serif"],
         impact: ["Impact Label Reversed", "sans-serif"],
       },

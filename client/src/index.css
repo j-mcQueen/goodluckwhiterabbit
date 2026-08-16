@@ -19,6 +19,13 @@
 }
 
 @font-face {
+  font-family: "Times New Roman Bold";
+  src:
+    local("Times New Roman Bold"),
+    url("/fonts/tnr/TimesNewRomanMTStd-Bold.woff2") format("woff2");
+}
+
+@font-face {
   font-family: "Impact Label Reversed";
   src:
     local("Impact Label Reversed"),
