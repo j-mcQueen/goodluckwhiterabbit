@@ -41,10 +41,7 @@ export default function Portfolio({ ...props }) {
   const [nextStartIndex, setNextStartIndex] = useState<number>(10);
   const [sidebarData, setSidebarData] =
     useState<PortfolioSidebarData>(EMPTY_SIDEBAR_DATA);
-  const [mobileSelection, setMobileSelection] = useState<{
-    categoryIndex: number;
-    subIndex: number;
-  }>({ categoryIndex: index, subIndex: 0 });
+  const [mobileSubIndex, setMobileSubIndex] = useState<number>(0);
   const [notice, setNotice] = useState<{
     status: boolean;
     loading: boolean;
@@ -57,32 +54,22 @@ export default function Portfolio({ ...props }) {
 
   const activeSubName = sidebarData[route]?.subcategories[activeSub] ?? "";
 
-  // mobile has no notion of "route" for the currently browsed category - the
-  // in-place accordion nav (mobile/Nav.tsx) lets you load any category's
-  // groups without navigating, so the breadcrumb tracks its own selection
-  // rather than reusing activeTab/activeSub/route
-  const handleMobileGroupSelect = (
-    categoryIndex: number,
-    subIndex: number,
-    groupIndex: number,
-  ) => {
-    setMobileSelection({ categoryIndex, subIndex });
+  // mobile nav is scoped to the current route (no primary-category
+  // switching), so position only needs to track subcategory + group within it
+  const handleMobileGroupSelect = (subIndex: number, groupIndex: number) => {
+    setMobileSubIndex(subIndex);
     setActiveGroup(groupIndex);
   };
 
-  const mobileCategoryRoute = CATEGORY_ROUTES[mobileSelection.categoryIndex];
-  const mobileSubName =
-    sidebarData[mobileCategoryRoute]?.subcategories[mobileSelection.subIndex] ??
-    "";
+  const mobileSubName = sidebarData[route]?.subcategories[mobileSubIndex] ?? "";
   const mobileGroupName =
-    Object.keys(
-      sidebarData[mobileCategoryRoute]?.menu[mobileSelection.subIndex] ?? {},
-    )[activeGroup] ?? "";
+    Object.keys(sidebarData[route]?.menu[mobileSubIndex] ?? {})[activeGroup] ??
+    "";
 
   const mobileBreadcrumb =
     mobile && mobileSubName && mobileGroupName
       ? {
-          category: headerItems[mobileSelection.categoryIndex],
+          category: headerItems[index],
           subcategory: mobileSubName,
           group: mobileGroupName,
         }
@@ -191,7 +178,9 @@ export default function Portfolio({ ...props }) {
 
       {mobile ? (
         <Nav
-          categories={headerItems}
+          activeGroupIndex={activeGroup}
+          activeSubIndex={mobileSubIndex}
+          categoryIndex={index}
           onGroupSelect={handleMobileGroupSelect}
           route={route}
           setContactOpen={setContactOpen}

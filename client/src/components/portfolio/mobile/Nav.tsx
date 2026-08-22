@@ -1,7 +1,6 @@
-import { Fragment, useState } from "react";
+import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { triggerBatch } from "../utils/triggerBatch";
-import { DISABLED_CATEGORY_ROUTES } from "../disabledCategories";
 
 import TopBar from "../../global/header/mobile/TopBar";
 import Instagram from "../../../assets/media/icons/Instagram";
@@ -10,116 +9,50 @@ import ListItem from "./ListItem";
 
 export default function Nav({ ...props }) {
   const {
-    categories,
+    activeGroupIndex,
+    activeSubIndex,
+    categoryIndex,
     onGroupSelect,
+    route,
     setContactOpen,
     setImages,
     setNotice,
     sidebarData,
   } = props;
 
-  const routeMap = {
-    0: "/photo",
-    1: "/art",
-    2: "/design",
+  const [isOpen, setIsOpen] = useState({ main: false });
+  const [selectedSub, setSelectedSub] = useState<number>(0);
+
+  // seed the browse selection with the currently active subcategory every
+  // time the nav is opened, so it renders pre-expanded to the user's position
+  useEffect(() => {
+    if (isOpen.main) setSelectedSub(activeSubIndex);
+  }, [isOpen.main, activeSubIndex]);
+
+  const subcategories: string[] = sidebarData[route]?.subcategories ?? [];
+  const groups: string[] = Object.keys(
+    sidebarData[route]?.menu[selectedSub] ?? {},
+  );
+
+  const handleGroupClick = async (k: number) => {
+    const nextImages = await triggerBatch(
+      subcategories[selectedSub],
+      categoryIndex,
+      k + 1, // groups are 1-indexed on S3 (matches GroupList's j + 1)
+      setImages,
+      setNotice,
+      true,
+      0,
+    );
+
+    onGroupSelect?.(selectedSub, k);
+    setIsOpen({ main: false });
+
+    return nextImages;
   };
 
-  const setCntrStyles = (depth: number) => {
-    return `${depth === 0 ? "border-b border-solid border-white" : ""} flex items-center w-full h-full min-w-[calc((100dvw-var(--frame)-52px)/3)] overflow-hidden min-h-[54.2px]`;
-  };
-
-  const determineArr = (depth: number, i: number, j?: number) => {
-    switch (depth) {
-      case 1:
-        return sidebarData[routeMap[i as keyof typeof routeMap]]?.subcategories ?? [];
-
-      case 2:
-        return Object.keys(
-          sidebarData[routeMap[i as keyof typeof routeMap]]?.menu[j as number] ?? {},
-        );
-
-      default:
-        return [];
-    }
-  };
-
-  // a category is only navigable once the admin has actually added a
-  // subcategory to it - mirrors the desktop Header's dashboard prop.
-  // Categories in DISABLED_CATEGORY_ROUTES are forced unavailable regardless
-  // of content (temporary manual override).
-  const categoryHasContent = (i: number) =>
-    !DISABLED_CATEGORY_ROUTES.includes(routeMap[i as keyof typeof routeMap]) &&
-    (sidebarData[routeMap[i as keyof typeof routeMap]]?.subcategories.length ?? 0) > 0;
-
-  const [isOpen, setIsOpen] = useState({
-    main: false,
-    subcategories: false,
-    groups: false,
-  });
-
-  const [toggledIndexes, setToggledIndexes] = useState<{
-    [key: string]: number | null;
-  }>({
-    subcategories: null,
-    groups: null,
-  });
-
-  const handleClick = async (
-    depth: number,
-    i: number,
-    j?: number,
-    k?: number,
-  ) => {
-    interface Prev {
-      [key: string]: boolean;
-    }
-
-    switch (depth) {
-      case 0:
-        setIsOpen((prev: Prev) => ({
-          main: true,
-          subcategories: !prev.subcategories,
-          groups: false,
-        }));
-
-        setToggledIndexes({ subcategories: i, groups: null });
-        break;
-
-      case 1:
-        setIsOpen((prev: Prev) => ({
-          main: true,
-          subcategories: true,
-          groups: !prev.groups,
-        }));
-
-        setToggledIndexes((prev) => ({
-          subcategories: prev.subcategories,
-          groups: j!,
-        }));
-        break;
-
-      case 2: {
-        setIsOpen({
-          main: false,
-          subcategories: true,
-          groups: true,
-        });
-
-        const nextImages = await triggerBatch(
-          determineArr(1, i)[j as number], // activeSub, resolved to its real name
-          i, // activeTab
-          k! + 1, // groups are 1-indexed on S3 (matches GroupList's j + 1)
-          setImages,
-          setNotice,
-          true,
-          0,
-        );
-
-        onGroupSelect?.(i, j as number, k as number);
-        return nextImages;
-      }
-    }
-  };
+  const rowStyles = (j: number, length: number) =>
+    `${j === 0 ? "border-t-0" : ""} ${j === length - 1 ? "border-b-0" : ""} border border-white border-solid border-l-0 border-r-0 -my-[0.5px] w-full min-h-[54.2px] flex items-center overflow-hidden`;
 
   return (
     <header className="border-b border-solid border-white">
@@ -140,121 +73,48 @@ export default function Nav({ ...props }) {
             transition={{ type: "spring", bounce: 0, duration: 0.4 }}
             className="absolute text-white w-[calc(100dvw-var(--frame)-2px)] h-[calc(100dvh-var(--frame)-52px)] flex flex-col justify-between items-center z-50 bg-black top-0"
           >
-            <ul className="w-full h-full flex flex-col justify-evenly overflow-hidden">
-              {categories.map((category: string, i: number) => {
-                return (
-                  <div className={setCntrStyles(0)} key={category}>
+            <div className="flex w-full h-full overflow-hidden">
+              <ul className="w-1/2 h-full flex flex-col justify-evenly overflow-y-auto border-r border-solid border-white">
+                {subcategories.map((subcategory: string, j: number) => (
+                  <div
+                    className={rowStyles(j, subcategories.length)}
+                    key={subcategory}
+                  >
                     <ListItem
-                      depth={0}
-                      disabled={!categoryHasContent(i)}
-                      index={i}
-                      label={category}
-                      handleClick={() => handleClick(0, i)}
+                      active={j === activeSubIndex}
+                      label={subcategory}
+                      handleClick={() => setSelectedSub(j)}
                     />
-
-                    <AnimatePresence mode="wait">
-                      {isOpen.subcategories &&
-                        toggledIndexes.subcategories === i && (
-                          <Fragment key="categories-and-groups">
-                            <motion.ul
-                              initial={{
-                                x: 100,
-                                opacity: 0,
-                                visibility: "hidden",
-                              }}
-                              animate={{
-                                x: 0,
-                                opacity: 1,
-                                visibility: "visible",
-                              }}
-                              exit={{ x: 100, opacity: 0 }}
-                              transition={{
-                                type: "spring",
-                                bounce: 0,
-                                duration: 0.4,
-                              }}
-                              className="w-full max-h-full flex flex-col overflow-y-auto"
-                              key="active-subcategories"
-                            >
-                              {determineArr(1, i).map(
-                                (subcategory: string, j: number) => {
-                                  return (
-                                    <div
-                                      className={setCntrStyles(1)}
-                                      key={subcategory}
-                                    >
-                                      <ListItem
-                                        depth={1}
-                                        index={j}
-                                        label={subcategory}
-                                        handleClick={() => handleClick(1, i, j)}
-                                      />
-                                    </div>
-                                  );
-                                },
-                              )}
-                            </motion.ul>
-
-                            <AnimatePresence mode="wait">
-                              {isOpen.groups && (
-                                <motion.ul
-                                  initial={{
-                                    x: 100,
-                                    opacity: 0,
-                                    visibility: "hidden",
-                                  }}
-                                  animate={{
-                                    x: 0,
-                                    opacity: 1,
-                                    visibility: "visible",
-                                  }}
-                                  exit={{ x: 100, opacity: 0 }}
-                                  transition={{
-                                    type: "spring",
-                                    bounce: 0,
-                                    duration: 0.4,
-                                  }}
-                                  className="w-full max-h-full flex flex-col overflow-y-auto pr-5"
-                                  key="active-groups"
-                                >
-                                  {determineArr(
-                                    2,
-                                    i,
-                                    toggledIndexes.subcategories,
-                                  ).map((group: string, k: number) => {
-                                    return (
-                                      <div
-                                        className={setCntrStyles(2)}
-                                        key={group}
-                                      >
-                                        <ListItem
-                                          depth={2}
-                                          index={k}
-                                          label={group}
-                                          handleClick={() =>
-                                            handleClick(
-                                              2,
-                                              i,
-                                              toggledIndexes.subcategories!,
-                                              k,
-                                            )
-                                          }
-                                        />
-                                      </div>
-                                    );
-                                  })}
-                                </motion.ul>
-                              )}
-                            </AnimatePresence>
-                          </Fragment>
-                        )}
-                    </AnimatePresence>
                   </div>
-                );
-              })}
-            </ul>
+                ))}
+              </ul>
 
-            <div className="flex items-center justify-around w-full h-[50px]">
+              <AnimatePresence mode="wait">
+                <motion.ul
+                  key={selectedSub}
+                  initial={{ x: 40, opacity: 0 }}
+                  animate={{ x: 0, opacity: 1 }}
+                  exit={{ x: 40, opacity: 0 }}
+                  transition={{ type: "spring", bounce: 0, duration: 0.4 }}
+                  className="w-1/2 h-full flex flex-col justify-evenly overflow-y-auto"
+                >
+                  {groups.map((group: string, k: number) => (
+                    <div className={rowStyles(k, groups.length)} key={group}>
+                      <ListItem
+                        active={
+                          selectedSub === activeSubIndex &&
+                          k === activeGroupIndex
+                        }
+                        label={group}
+                        handleClick={() => handleGroupClick(k)}
+                      />
+                    </div>
+                  ))}
+                </motion.ul>
+              </AnimatePresence>
+            </div>
+
+            <div className="flex items-center justify-around w-full h-[50px] border-t border-solid border-white">
               <div className="w-full h-full flex items-center justify-center border-r border-solid border-white relative">
                 <a
                   className="w-full h-full flex items-center justify-center"

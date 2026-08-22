@@ -1,16 +1,15 @@
 export default function ListItem({ ...props }) {
-  const { disabled = false, label, handleClick } = props;
+  const { active = false, label, handleClick } = props;
 
   const styles = {
-    item: `w-full h-full ${disabled ? "text-gray" : ""} overflow-y-scroll relative`,
-    button: `w-full h-full max-h-full relative flex flex-col items-center justify-center gap-1 py-5`,
+    item: "w-full h-full overflow-y-scroll relative",
+    button: `w-full h-full max-h-full relative flex flex-col items-center justify-center gap-1 py-5 transition-colors ${active ? "text-rd drop-shadow-red" : "text-white/70"}`,
   };
 
   return (
-    <li className={styles.item} key={label}>
+    <li className={styles.item}>
       <button
         className={styles.button}
-        disabled={disabled}
         onClick={handleClick}
         type="button"
       >
