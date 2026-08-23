@@ -33,13 +33,17 @@ export const triggerBatch = async (
     activeSub, // already the resolved subcategory name, not an index
   );
 
-  if (setActiveSub && subIndex) setActiveSub(subIndex);
+  if (setActiveSub && subIndex !== undefined) setActiveSub(subIndex);
 
   const containsGroup = nextImages.some(
     (image: { blob: Blob; group: string }) => image.group === group,
   );
 
-  if (containsGroup || Number(nextImages[0].group) === Number(group) + 1) {
+  if (
+    containsGroup ||
+    (nextImages.length > 0 &&
+      Number(nextImages[0].group) === Number(group) + 1)
+  ) {
     // edge case coverage where we have old values and a new group at start
     // new images have been generated
 

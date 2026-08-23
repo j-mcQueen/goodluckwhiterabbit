@@ -4,7 +4,11 @@ import { checkPortfolioGroupHasMemo } from "../global/memo/checkPortfolioGroupHa
 import Unit from "./Unit";
 import MemoAwareBody from "./MemoAwareBody";
 
-const TAB_CATEGORY: Record<number, string> = { 0: "PHOTO", 1: "ART", 2: "DESIGN" };
+const TAB_CATEGORY: Record<number, string> = {
+  0: "PHOTO",
+  1: "ART",
+  2: "DESIGN",
+};
 
 export default function Body({ ...props }) {
   const {
@@ -52,9 +56,11 @@ export default function Body({ ...props }) {
     setHasMemo(false);
 
     if (category && activeSub) {
-      checkPortfolioGroupHasMemo(category, activeSub, groupId).then((result) => {
-        if (!cancelled) setHasMemo(result);
-      });
+      checkPortfolioGroupHasMemo(category, activeSub, groupId).then(
+        (result) => {
+          if (!cancelled) setHasMemo(result);
+        },
+      );
     }
 
     return () => {

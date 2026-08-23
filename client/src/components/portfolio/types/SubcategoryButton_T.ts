@@ -2,7 +2,6 @@ import { Dispatch, SetStateAction } from "react";
 
 export interface SubcategoryButton_T {
   activeSub: string;
-  activeSubName: string;
   activeTab: number;
   bodyRef: React.RefObject<HTMLElement> | null;
   className?: string;

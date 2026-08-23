@@ -50,7 +50,6 @@ export default function Sidebar({ ...props }) {
           existing position, independent of DOM/tab order */}
       <Menu
         activeSub={activeSub}
-        activeSubName={activeSubName}
         activeTab={activeTab}
         animationVariants={animationVariants}
         bodyRef={bodyRef}
