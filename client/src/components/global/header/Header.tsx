@@ -88,19 +88,6 @@ export default function Header({
           )}
         </div>
 
-        {setSidebarOpen && (
-          <button
-            type="button"
-            aria-label="Toggle sidebar"
-            onClick={() => setSidebarOpen((prev) => !prev)}
-            className={`${sidebarOpen ? "bg-white" : "bg-black"} min-w-[56px] max-w-[56px] border-r border-b border-solid border-white flex items-center justify-center transition-colors`}
-          >
-            <div
-              className={`${sidebarOpen ? "rotate-45 bg-black" : "-rotate-45 bg-white"} w-[25px] h-[1px] transition-all`}
-            ></div>
-          </button>
-        )}
-
         <ul className="flex justify-evenly w-full text-xl">
           {data.map((tab: string, index: number) => {
             return (
@@ -174,6 +161,19 @@ export default function Header({
           </button>
         ) : (
           <div className="flex border-b border-solid border-white">
+            {setSidebarOpen && (
+              <button
+                type="button"
+                aria-label="Toggle sidebar"
+                onClick={() => setSidebarOpen((prev) => !prev)}
+                className={`${sidebarOpen ? "bg-white" : "bg-black"} min-w-[56px] max-w-[56px] border-r border-solid border-white flex items-center justify-center transition-colors`}
+              >
+                <div
+                  className={`${sidebarOpen ? "-rotate-45 bg-black" : "rotate-45 bg-white"} w-[25px] h-[1px] transition-all`}
+                ></div>
+              </button>
+            )}
+
             <a
               href="https://www.instagram.com/goodluckwhiterabbit/"
               className="px-5 flex items-center justify-center border-r border-solid border-white max-h-[58px] max-w-[58px] focus:outline-none group"
