@@ -1,48 +1,45 @@
-import { useState } from "react";
-import { motion } from "framer-motion";
+import { useEffect, useRef } from "react";
+import { useLocation } from "react-router-dom";
 
 import rabbit from "../../assets/media/gifs/glwr-lenticular.gif";
+import ThisWayUp from "../../assets/media/icons/ThisWayUp";
 import Fork from "./Fork";
 
 export default function Welcome() {
-  const [entered, setEntered] = useState(false);
+  const location = useLocation();
+  const forkRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    // rabbit gif in the portfolio header links back here with this flag so
+    // returning visitors land straight on the category picker, not the intro
+    if ((location.state as { toSegments?: boolean } | null)?.toSegments) {
+      forkRef.current?.scrollIntoView({ behavior: "instant" });
+    }
+  }, [location.state]);
 
   return (
-    <main className="w-[calc(100dvw-var(--frame))] h-[calc(100dvh-var(--frame))] flex items-center justify-center">
-      {entered ? (
+    <main className="w-[calc(100dvw-var(--frame))] h-[calc(100dvh-var(--frame))] overflow-y-scroll snap-y snap-mandatory">
+      <section className="flex flex-col items-center justify-between h-[calc(100dvh-var(--frame))] py-10 snap-start snap-always">
+        <img
+          className="max-w-[200px]"
+          src={rabbit}
+          alt="A white rabbit against a black background shimmering from left to right"
+        />
+
+        {/* reserved for a future biography section */}
+        <div />
+
+        <ThisWayUp className="w-10 h-10 opacity-80 drop-shadow-glo" />
+      </section>
+
+      {/* only visible mid-scroll, between the two snap points - clipped out
+          of view at rest on either side, so it never doubles up against
+          #root's own frame border once Fork fills the screen */}
+      <div className="h-px bg-white" />
+
+      <div ref={forkRef} className="snap-start snap-always">
         <Fork />
-      ) : (
-        <section className="flex flex-col items-center justify-center h-dvh">
-          <img
-            className="max-w-[200px]"
-            src={rabbit}
-            alt="A white rabbit against a black background shimmering from left to right"
-          />
-
-          <div>
-            <h1 className="font-tnrBI whitespace-nowrap overflow-hidden animate-typing text-white pt-4 pb-6 xl:py-10 text-xl xl:text-4xl tracking-widest opacity-80 drop-shadow-glo">
-              WELCOME TO MY WORLD
-            </h1>
-          </div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 25 }}
-            animate={{
-              opacity: 1,
-              y: 0,
-              transition: { duration: 0.5, delay: 2.1 },
-            }}
-            className="mt-9"
-          >
-            <button
-              onClick={() => setEntered(true)}
-              className="font-vt tracking-vt border border-solid border-white xl:hover:border-red xl:hover:text-rd xl:focus:text-rd xl:hover:drop-shadow-red focus:drop-shadow-red text-xl focus:outline-none xl:focus:border-rd text-white drop-shadow-glo opacity-80 py-1 px-2 xl:hover:bg-red-600 xl:transition-colors"
-            >
-              ENTER
-            </button>
-          </motion.div>
-        </section>
-      )}
+      </div>
     </main>
   );
 }

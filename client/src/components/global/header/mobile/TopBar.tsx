@@ -20,7 +20,11 @@ export default function TopBar({ ...props }) {
         {logout ? (
           <Rabbit />
         ) : (
-          <Link to={"/"} className="w-full h-full flex justify-center">
+          <Link
+            to={"/"}
+            state={{ toSegments: true }}
+            className="w-full h-full flex justify-center"
+          >
             <Rabbit />
           </Link>
         )}

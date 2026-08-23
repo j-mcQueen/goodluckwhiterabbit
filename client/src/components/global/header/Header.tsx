@@ -67,11 +67,25 @@ export default function Header({
     <header className="text-white">
       <nav className="flex">
         <div className="border-r border-b border-solid border-white min-w-[189px] flex justify-center">
-          <img
-            src={rabbit}
-            alt="A white rabbit against a black background shimmering from left to right"
-            className="max-h-14"
-          />
+          {logout ? (
+            <img
+              src={rabbit}
+              alt="A white rabbit against a black background shimmering from left to right"
+              className="max-h-14"
+            />
+          ) : (
+            <button
+              type="button"
+              onClick={() => navigate("/", { state: { toSegments: true } })}
+              className="flex justify-center"
+            >
+              <img
+                src={rabbit}
+                alt="A white rabbit against a black background shimmering from left to right"
+                className="max-h-14"
+              />
+            </button>
+          )}
         </div>
 
         {setSidebarOpen && (

@@ -1,10 +1,11 @@
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
 import { AnimatePresence } from "framer-motion";
 import { triggerBatch } from "./utils/triggerBatch";
 import { mobile } from "../global/utils/determineViewport";
 import { generateKeys } from "../global/utils/generateKeys";
 import { determineHost as host } from "../global/utils/determineHost";
+import { playSound } from "../global/utils/sound";
 import { PortfolioSidebarData } from "./types/PortfolioSidebarData";
 import { DISABLED_CATEGORY_ROUTES } from "./disabledCategories";
 
@@ -28,13 +29,16 @@ export default function Portfolio({ ...props }) {
   const headerItems = ["PHOTO", "ART", "DESIGN"];
 
   const navigate = useNavigate();
+  const location = useLocation();
   const bodyRef = useRef<HTMLElement>();
   const loadTrackerRef = useRef(false); // tracks when to pull first set of images
 
   const [contactOpen, setContactOpen] = useState<boolean>(false);
   const [sidebarOpen, setSidebarOpen] = useState<boolean>(false);
   const [activeTab, setActiveTab] = useState<number>(index);
-  const [activeSub, setActiveSub] = useState<number>(0);
+  const [activeSub, setActiveSub] = useState<number>(
+    (location.state as { subIndex?: number } | null)?.subIndex ?? 0,
+  );
   const [activeGroup, setActiveGroup] = useState<number>(0); // an index
   const [images, setImages] = useState<{ blob: Blob; group: string }[]>([]);
   const [staticKeys, setStaticKeys] = useState<string[]>(generateKeys(10));
@@ -124,7 +128,15 @@ export default function Portfolio({ ...props }) {
       2: "/design",
     };
 
-    navigate(newRoute[activeTab as keyof typeof newRoute]);
+    const target = newRoute[activeTab as keyof typeof newRoute];
+
+    // already here (true on every mount, since activeTab starts out synced
+    // to route) - skip the redundant same-path navigate, which would wipe
+    // any incoming location.state (e.g. the landing page's subIndex/
+    // playSoundOnLoad) before anything downstream gets a chance to read it
+    if (target === route) return;
+
+    navigate(target);
   }, [activeTab, navigate, route]);
 
   useEffect(() => {
@@ -144,6 +156,15 @@ export default function Portfolio({ ...props }) {
         if (nextImages) {
           setStaticKeys(generateKeys(nextImages.length));
           setNextStartIndex(nextImages.length);
+
+          // only the landing page's subcategory pick asks for this - normal
+          // in-portfolio category/tab switches stay silent
+          if (
+            (location.state as { playSoundOnLoad?: boolean } | null)
+              ?.playSoundOnLoad
+          ) {
+            playSound();
+          }
         }
       } catch (error) {
         setNotice({
@@ -166,7 +187,7 @@ export default function Portfolio({ ...props }) {
       fetchData();
       return;
     } else return;
-  }, [activeSub, activeTab, activeSubName]);
+  }, [activeSub, activeTab, activeSubName, location.state]);
 
   return (
     <div className="w-[calc(100dvw-var(--frame)-2px)] h-[calc(100dvh-var(--frame))] overflow-hidden relative">
