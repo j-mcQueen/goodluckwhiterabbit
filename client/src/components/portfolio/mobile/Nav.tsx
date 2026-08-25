@@ -1,11 +1,11 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { triggerBatch } from "../utils/triggerBatch";
 
 import TopBar from "../../global/header/mobile/TopBar";
 import Instagram from "../../../assets/media/icons/Instagram";
 import ContactButton from "../ContactButton";
-import ListItem from "./ListItem";
+import BrowseColumns from "../BrowseColumns";
 
 export default function Nav({ ...props }) {
   const {
@@ -21,38 +21,47 @@ export default function Nav({ ...props }) {
   } = props;
 
   const [isOpen, setIsOpen] = useState({ main: false });
-  const [selectedSub, setSelectedSub] = useState<number>(0);
-
-  // seed the browse selection with the currently active subcategory every
-  // time the nav is opened, so it renders pre-expanded to the user's position
-  useEffect(() => {
-    if (isOpen.main) setSelectedSub(activeSubIndex);
-  }, [isOpen.main, activeSubIndex]);
 
   const subcategories: string[] = sidebarData[route]?.subcategories ?? [];
   const groups: string[] = Object.keys(
-    sidebarData[route]?.menu[selectedSub] ?? {},
+    sidebarData[route]?.menu[activeSubIndex] ?? {},
   );
 
-  const handleGroupClick = async (k: number) => {
+  const handleSubcategoryClick = async (j: number) => {
+    if (j === activeSubIndex) return; // already active - stay open on its groups
+
     const nextImages = await triggerBatch(
-      subcategories[selectedSub],
+      subcategories[j],
       categoryIndex,
-      k + 1, // groups are 1-indexed on S3 (matches GroupList's j + 1)
+      1,
       setImages,
       setNotice,
       true,
       0,
     );
 
-    onGroupSelect?.(selectedSub, k);
+    onGroupSelect?.(j, 0);
     setIsOpen({ main: false });
 
     return nextImages;
   };
 
-  const rowStyles = (j: number, length: number) =>
-    `${j === 0 ? "border-t-0" : ""} ${j === length - 1 ? "border-b-0" : ""} border border-white border-solid border-l-0 border-r-0 -my-[0.5px] w-full min-h-[54.2px] flex items-center overflow-hidden`;
+  const handleGroupClick = async (k: number) => {
+    const nextImages = await triggerBatch(
+      subcategories[activeSubIndex],
+      categoryIndex,
+      k + 1, // groups are 1-indexed on S3
+      setImages,
+      setNotice,
+      true,
+      0,
+    );
+
+    onGroupSelect?.(activeSubIndex, k);
+    setIsOpen({ main: false });
+
+    return nextImages;
+  };
 
   return (
     <header className="border-b border-solid border-white">
@@ -73,46 +82,15 @@ export default function Nav({ ...props }) {
             transition={{ type: "spring", bounce: 0, duration: 0.4 }}
             className="absolute text-white w-[calc(100dvw-var(--frame)-2px)] h-[calc(100dvh-var(--frame)-52px)] flex flex-col justify-between items-center z-50 bg-black top-0"
           >
-            <div className="flex w-full h-full overflow-hidden">
-              <ul className="w-1/2 h-full flex flex-col justify-evenly overflow-y-auto border-r border-solid border-white">
-                {subcategories.map((subcategory: string, j: number) => (
-                  <div
-                    className={rowStyles(j, subcategories.length)}
-                    key={subcategory}
-                  >
-                    <ListItem
-                      active={j === activeSubIndex}
-                      label={subcategory}
-                      handleClick={() => setSelectedSub(j)}
-                    />
-                  </div>
-                ))}
-              </ul>
-
-              <AnimatePresence mode="wait">
-                <motion.ul
-                  key={selectedSub}
-                  initial={{ x: 40, opacity: 0 }}
-                  animate={{ x: 0, opacity: 1 }}
-                  exit={{ x: 40, opacity: 0 }}
-                  transition={{ type: "spring", bounce: 0, duration: 0.4 }}
-                  className="w-1/2 h-full flex flex-col justify-evenly overflow-y-auto"
-                >
-                  {groups.map((group: string, k: number) => (
-                    <div className={rowStyles(k, groups.length)} key={group}>
-                      <ListItem
-                        active={
-                          selectedSub === activeSubIndex &&
-                          k === activeGroupIndex
-                        }
-                        label={group}
-                        handleClick={() => handleGroupClick(k)}
-                      />
-                    </div>
-                  ))}
-                </motion.ul>
-              </AnimatePresence>
-            </div>
+            <BrowseColumns
+              subcategories={subcategories}
+              groups={groups}
+              selectedSub={activeSubIndex}
+              onSubcategoryClick={handleSubcategoryClick}
+              activeSubIndex={activeSubIndex}
+              activeGroupIndex={activeGroupIndex}
+              handleGroupClick={handleGroupClick}
+            />
 
             <div className="flex items-center justify-around w-full h-[50px] border-t border-solid border-white">
               <div className="w-full h-full flex items-center justify-center border-r border-solid border-white relative">

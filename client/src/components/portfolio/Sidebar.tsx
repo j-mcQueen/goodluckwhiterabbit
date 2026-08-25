@@ -1,14 +1,13 @@
 import { motion } from "framer-motion";
 import { triggerBatch } from "./utils/triggerBatch";
+import { generateKeys } from "../global/utils/generateKeys";
 
-import Menu from "./Menu";
-import GroupList from "./menu/GroupList";
+import BrowseColumns from "./BrowseColumns";
 
 export default function Sidebar({ ...props }) {
   const {
     activeGroup,
     activeSub,
-    activeSubName,
     activeTab,
     bodyRef,
     route,
@@ -18,68 +17,98 @@ export default function Sidebar({ ...props }) {
     setImages,
     setNextStartIndex,
     setNotice,
+    setSidebarOpen,
     setStaticKeys,
   } = props;
 
-  const groups = sidebarData[route]?.menu[activeSub] ?? {};
+  const subcategories: string[] = sidebarData[route]?.subcategories ?? [];
+  const groups: string[] = Object.keys(sidebarData[route]?.menu[activeSub] ?? {});
 
-  const subcategories = sidebarData[route]?.subcategories ?? [];
+  const handleSubcategoryClick = async (j: number) => {
+    if (j === activeSub) return; // already active - stay open on its groups
 
-  const animationVariants = {
-    initial: {
-      x: -20,
-      opacity: 0,
-    },
-    animate: (index: number) => ({
-      x: 0,
-      opacity: 1,
-      transition: { delay: 0.05 * index },
-    }),
+    if (bodyRef) {
+      bodyRef.current?.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    try {
+      const nextImages = await triggerBatch(
+        subcategories[j],
+        activeTab,
+        1,
+        setImages,
+        setNotice,
+        true,
+        0,
+        j,
+        setActiveSub,
+      );
+
+      if (nextImages) {
+        setStaticKeys(generateKeys(nextImages.length));
+        setNextStartIndex(nextImages.length);
+      }
+
+      setActiveGroup(0);
+      setSidebarOpen(false);
+    } catch (error) {
+      setNotice({
+        status: true,
+        loading: false,
+        message: "Something went wrong. Please try again.",
+      });
+    }
+  };
+
+  const handleGroupClick = async (k: number) => {
+    if (bodyRef) {
+      bodyRef.current?.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    try {
+      const nextImages = await triggerBatch(
+        subcategories[activeSub],
+        activeTab,
+        k + 1,
+        setImages,
+        setNotice,
+        true,
+        0,
+      );
+
+      if (nextImages) {
+        setStaticKeys(generateKeys(nextImages.length));
+        setNextStartIndex(nextImages.length);
+      }
+
+      setActiveGroup(k);
+      setSidebarOpen(false);
+    } catch (error) {
+      setNotice({
+        status: true,
+        loading: false,
+        message: "Something went wrong. Please try again.",
+      });
+    }
   };
 
   return (
     <motion.aside
-      initial={{ x: -245, opacity: 0 }}
-      animate={{ x: 0, opacity: 1 }}
-      exit={{ x: -245, opacity: 0 }}
+      initial={{ height: "0%", opacity: 0 }}
+      animate={{ height: "100%", opacity: 1 }}
+      exit={{ height: "0%", opacity: 0 }}
       transition={{ type: "spring", bounce: 0, duration: 0.4 }}
-      className="absolute left-0 top-0 z-20 flex xl:min-w-sidebar xl:max-w-sidebar xl:h-[calc(100dvh-57px-var(--frame))] text-white overflow-x-scroll overflow-y-hidden bg-black"
+      className="absolute left-0 top-0 z-20 w-full text-white overflow-hidden bg-black"
     >
-      {/* subcategories are the parent of groups, so they should come first in
-          tab order - order-2 keeps this visually on the right, matching its
-          existing position, independent of DOM/tab order */}
-      <Menu
-        activeSub={activeSub}
-        activeTab={activeTab}
-        animationVariants={animationVariants}
-        bodyRef={bodyRef}
-        className="order-2"
-        setActiveGroup={setActiveGroup}
-        setActiveSub={setActiveSub}
-        setImages={setImages}
-        setNextStartIndex={setNextStartIndex}
-        setNotice={setNotice}
-        setStaticKeys={setStaticKeys}
+      <BrowseColumns
         subcategories={subcategories}
+        groups={groups}
+        selectedSub={activeSub}
+        onSubcategoryClick={handleSubcategoryClick}
+        activeSubIndex={activeSub}
+        activeGroupIndex={activeGroup}
+        handleGroupClick={handleGroupClick}
       />
-
-      <ul className="flex flex-row-reverse order-1 xl:h-[calc(100dvh-57px-var(--frame))] [writing-mode:sideways-lr]">
-        <div className={`max-w-[189px] h-full`}>
-          <GroupList
-            activeGroup={activeGroup}
-            activeSub={activeSubName}
-            activeTab={activeTab}
-            bodyRef={bodyRef}
-            groups={Object.keys(groups)}
-            handleClick={triggerBatch}
-            setActiveGroup={setActiveGroup}
-            setImages={setImages}
-            setNextStartIndex={setNextStartIndex}
-            setNotice={setNotice}
-            setStaticKeys={setStaticKeys}
-          />
-        </div>
-      </ul>
     </motion.aside>
   );
 }

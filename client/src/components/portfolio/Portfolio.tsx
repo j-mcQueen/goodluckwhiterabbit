@@ -230,11 +230,8 @@ export default function Portfolio({ ...props }) {
               key="portfolio-sidebar"
               activeGroup={activeGroup}
               activeSub={activeSub}
-              activeSubName={activeSubName}
               activeTab={activeTab}
               bodyRef={bodyRef}
-              images={images}
-              mobile={mobile}
               route={route}
               sidebarData={sidebarData}
               setActiveGroup={setActiveGroup}
@@ -242,6 +239,7 @@ export default function Portfolio({ ...props }) {
               setImages={setImages}
               setNextStartIndex={setNextStartIndex}
               setNotice={setNotice}
+              setSidebarOpen={setSidebarOpen}
               setStaticKeys={setStaticKeys}
             />
           )}
