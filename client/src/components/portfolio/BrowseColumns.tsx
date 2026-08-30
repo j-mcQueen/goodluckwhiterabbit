@@ -1,7 +1,8 @@
 import { AnimatePresence, motion } from "framer-motion";
 import ListItem from "./ListItem";
 
-const rowStyles = "flex-1 min-h-[54.2px] w-full flex items-center overflow-hidden";
+const rowStyles =
+  "flex-1 min-h-[54.2px] w-full flex items-center overflow-hidden";
 
 export default function BrowseColumns({
   subcategories,
@@ -37,16 +38,18 @@ export default function BrowseColumns({
       <AnimatePresence mode="wait">
         <motion.ul
           key={selectedSub}
-          initial={{ x: 40, opacity: 0 }}
-          animate={{ x: 0, opacity: 1 }}
-          exit={{ x: 40, opacity: 0 }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
           transition={{ type: "spring", bounce: 0, duration: 0.4 }}
           className="w-1/2 h-full flex flex-col divide-y divide-solid divide-white overflow-y-auto"
         >
           {groups.map((group: string, k: number) => (
             <div className={rowStyles} key={group}>
               <ListItem
-                active={selectedSub === activeSubIndex && k === activeGroupIndex}
+                active={
+                  selectedSub === activeSubIndex && k === activeGroupIndex
+                }
                 label={group}
                 handleClick={() => handleGroupClick(k)}
               />

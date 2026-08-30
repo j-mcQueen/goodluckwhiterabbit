@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { determineHost as host } from "../utils/determineHost";
-import { Dispatch, SetStateAction } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 
 import rabbit from "../../../assets/media/gifs/glwr-lenticular.gif";
 import Instagram from "../../../assets/media/icons/Instagram";
@@ -20,8 +20,8 @@ export default function Header({
   setContactOpen?: Dispatch<SetStateAction<boolean>>;
   images?: { [key: string]: Blob[] };
   loadTrackerRef?: React.MutableRefObject<boolean>;
-  sidebarOpen?: boolean;
-  setSidebarOpen?: Dispatch<SetStateAction<boolean>>;
+  onActiveTabRectChange?: (rect: { left: number; width: number } | null) => void;
+  onCategoryTabClick?: (index: number) => void;
 }) {
   const {
     logout,
@@ -34,10 +34,31 @@ export default function Header({
     setContactOpen,
     images,
     loadTrackerRef,
-    sidebarOpen,
-    setSidebarOpen,
+    onActiveTabRectChange,
+    onCategoryTabClick,
   } = props;
   const navigate = useNavigate();
+
+  const [activeTabNode, setActiveTabNode] = useState<HTMLLIElement | null>(
+    null,
+  );
+
+  // reports the active category tab's viewport rect up to Portfolio, which
+  // uses it to size/position the desktop sidebar overlay to match
+  useEffect(() => {
+    if (!activeTabNode || !onActiveTabRectChange) return;
+
+    const report = () => {
+      const rect = activeTabNode.getBoundingClientRect();
+      onActiveTabRectChange({ left: rect.left, width: rect.width });
+    };
+
+    report();
+
+    const observer = new ResizeObserver(report);
+    observer.observe(activeTabNode);
+    return () => observer.disconnect();
+  }, [activeTabNode, onActiveTabRectChange]);
 
   const listItemVariants = {
     active: "text-white border-b-black",
@@ -92,6 +113,9 @@ export default function Header({
           {data.map((tab: string, index: number) => {
             return (
               <li
+                ref={(el) => {
+                  if (index === activeTab) setActiveTabNode(el);
+                }}
                 className={`${activeTab === index ? listItemVariants.active : listItemVariants.std} ${dashboard && dashboard[index as keyof typeof dashboard] === 0 && index !== data.length - 1 ? "border-r-white inline" : ""}  border-r border-b border-solid border-white w-full flex items-center justify-center relative`}
                 key={tab}
               >
@@ -112,10 +136,10 @@ export default function Header({
                         : buttonVariants.inactive
                   }
                   onClick={() => {
-                    if (loadTrackerRef) loadTrackerRef.current = false; // open path for image autoload
-                    setActiveTab(index);
-
                     if (logout === true) {
+                      if (loadTrackerRef) loadTrackerRef.current = false; // open path for image autoload
+                      setActiveTab(index);
+
                       const map = {
                         SOCIALS: "socials",
                         "KEEPSAKE PREVIEW": "keepsake",
@@ -134,13 +158,7 @@ export default function Header({
 
                       if (setActiveIndex) setActiveIndex(0);
                     } else {
-                      const newRoute = {
-                        0: "/photo",
-                        1: "/art",
-                        2: "/design",
-                      };
-
-                      return navigate(newRoute[index as keyof typeof newRoute]);
+                      onCategoryTabClick?.(index);
                     }
                   }}
                 >
@@ -161,19 +179,6 @@ export default function Header({
           </button>
         ) : (
           <div className="flex border-b border-solid border-white">
-            {setSidebarOpen && (
-              <button
-                type="button"
-                aria-label="Toggle sidebar"
-                onClick={() => setSidebarOpen((prev) => !prev)}
-                className={`${sidebarOpen ? "bg-white" : "bg-black"} min-w-[56px] max-w-[56px] border-r border-solid border-white flex items-center justify-center transition-colors`}
-              >
-                <div
-                  className={`${sidebarOpen ? "-rotate-45 bg-black" : "rotate-45 bg-white"} w-[25px] h-[1px] transition-all`}
-                ></div>
-              </button>
-            )}
-
             <a
               href="https://www.instagram.com/goodluckwhiterabbit/"
               className="px-5 flex items-center justify-center border-r border-solid border-white max-h-[58px] max-w-[58px] focus:outline-none group"

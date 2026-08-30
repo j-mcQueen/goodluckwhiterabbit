@@ -31,11 +31,18 @@ export default function Portfolio({ ...props }) {
   const navigate = useNavigate();
   const location = useLocation();
   const bodyRef = useRef<HTMLElement>();
+  const mainRef = useRef<HTMLElement>(null);
   const loadTrackerRef = useRef(false); // tracks when to pull first set of images
 
   const [contactOpen, setContactOpen] = useState<boolean>(false);
   const [sidebarOpen, setSidebarOpen] = useState<boolean>(false);
+  const [sidebarRect, setSidebarRect] = useState<{
+    left: number;
+    width: number;
+  } | null>(null);
   const [activeTab, setActiveTab] = useState<number>(index);
+  const [browseTab, setBrowseTab] = useState<number>(index);
+  const [browseSub, setBrowseSub] = useState<number>(0);
   const [activeSub, setActiveSub] = useState<number>(
     (location.state as { subIndex?: number } | null)?.subIndex ?? 0,
   );
@@ -63,6 +70,37 @@ export default function Portfolio({ ...props }) {
   const handleMobileGroupSelect = (subIndex: number, groupIndex: number) => {
     setMobileSubIndex(subIndex);
     setActiveGroup(groupIndex);
+  };
+
+  // clicking your own active tab toggles its sidebar; clicking a different
+  // tab opens/keeps open a *browse* session for that category without
+  // committing (no route/activeTab change) until a pick is made within it
+  const handleCategoryTabClick = (tabIndex: number) => {
+    if (tabIndex !== browseTab) {
+      setBrowseTab(tabIndex);
+      setBrowseSub(0);
+    }
+
+    if (tabIndex === activeTab) {
+      setSidebarOpen((prev) => !prev);
+    } else {
+      setSidebarOpen(true);
+    }
+  };
+
+  // keeps the desktop sidebar overlay sized/positioned to exactly match the
+  // active category tab in the header, so it reads as a dropdown from that tab
+  const handleActiveTabRectChange = (
+    rect: { left: number; width: number } | null,
+  ) => {
+    const mainRect = mainRef.current?.getBoundingClientRect();
+
+    if (!rect || !mainRect) {
+      setSidebarRect(null);
+      return;
+    }
+
+    setSidebarRect({ left: rect.left - mainRect.left, width: rect.width });
   };
 
   const mobileSubName = sidebarData[route]?.subcategories[mobileSubIndex] ?? "";
@@ -216,14 +254,17 @@ export default function Portfolio({ ...props }) {
           dashboard={categoryAvailability}
           loadTrackerRef={loadTrackerRef}
           logout={false}
+          onActiveTabRectChange={handleActiveTabRectChange}
+          onCategoryTabClick={handleCategoryTabClick}
           setActiveTab={setActiveTab}
           setContactOpen={setContactOpen}
-          setSidebarOpen={setSidebarOpen}
-          sidebarOpen={sidebarOpen}
         />
       )}
 
-      <main className="relative flex flex-col xl:flex-row h-[calc(100dvh-51px-var(--frame))]">
+      <main
+        ref={mainRef}
+        className="relative flex flex-col xl:flex-row h-[calc(100dvh-51px-var(--frame))]"
+      >
         <AnimatePresence>
           {!mobile && sidebarOpen && (
             <Sidebar
@@ -232,10 +273,14 @@ export default function Portfolio({ ...props }) {
               activeSub={activeSub}
               activeTab={activeTab}
               bodyRef={bodyRef}
-              route={route}
+              browseSub={browseSub}
+              browseTab={browseTab}
+              route={CATEGORY_ROUTES[browseTab]}
               sidebarData={sidebarData}
+              sidebarRect={sidebarRect}
               setActiveGroup={setActiveGroup}
               setActiveSub={setActiveSub}
+              setActiveTab={setActiveTab}
               setImages={setImages}
               setNextStartIndex={setNextStartIndex}
               setNotice={setNotice}
