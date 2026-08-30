@@ -38,7 +38,7 @@ export default function Fork() {
       : [{ ...mdata[selected], i: selected }];
 
   return (
-    <section className="flex flex-row w-full h-[calc(100dvh-var(--frame))]">
+    <section className="flex flex-col xl:flex-row w-full h-[calc(100dvh-var(--frame))]">
       <AnimatePresence>
         {visible.map((a, pos) => {
           const available =
