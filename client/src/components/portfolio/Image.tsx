@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { handleLoad } from "./utils/handleLoad";
 
 export default function Image({ ...props }) {
-  const { image, innerRef, itemKey, setRatio } = props;
+  const { image, innerRef, itemKey, setRatio, fit = "cover" } = props;
   const [src, setSrc] = useState("");
 
   useEffect(() => {
@@ -28,7 +28,7 @@ export default function Image({ ...props }) {
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           alt=""
-          className="block w-full h-full object-cover"
+          className={`block w-full h-full ${fit === "contain" ? "object-contain" : "object-cover"}`}
           loading="lazy"
           src={src}
           ref={innerRef}

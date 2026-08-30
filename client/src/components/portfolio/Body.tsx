@@ -30,6 +30,7 @@ export default function Body({ ...props }) {
 
   const category = TAB_CATEGORY[activeTab];
   const groupId = String(activeGroup + 1).padStart(3, "0");
+  const stacked = category === "ART" || category === "DESIGN";
 
   // `images` can be a cross-group spillover list from the existing
   // infinite-scroll pagination (generatePortfolioUrls spills into the next
@@ -88,13 +89,20 @@ export default function Body({ ...props }) {
           setContactOpen={setContactOpen}
         />
       ) : (
-        // row height is viewport-relative (not a flat px) so it tracks
-        // column width: with 3 columns, colWidth ≈ 100vw/3, and dividing
-        // that by our target single-span cell ratio (~0.85,
-        // portrait-friendly) gives ~100vw/(3*0.85) ≈ 39vw - a flat px
-        // height would drift toward a landscape-shaped single-span cell as
-        // the viewport grows, badly over-cropping portraits
-        <div className="grid grid-cols-1 gap-2 px-2 xl:grid-flow-dense xl:auto-rows-[39vw] xl:[grid-template-columns:repeat(3,minmax(320px,1fr))]">
+        <div
+          className={
+            stacked
+              ? "h-full flex flex-col"
+              : // row height is viewport-relative (not a flat px) so it
+                // tracks column width: with 3 columns, colWidth ≈ 100vw/3,
+                // and dividing that by our target single-span cell ratio
+                // (~0.85, portrait-friendly) gives ~100vw/(3*0.85) ≈ 39vw -
+                // a flat px height would drift toward a landscape-shaped
+                // single-span cell as the viewport grows, badly
+                // over-cropping portraits
+                "grid grid-cols-1 gap-2 px-2 xl:grid-flow-dense xl:auto-rows-[39vw] xl:[grid-template-columns:repeat(3,minmax(320px,1fr))]"
+          }
+        >
           {images.map((unit: { image: Blob; group: string }, index: number) => {
             return (
               <Fragment key={staticKeys[index]}>
@@ -112,6 +120,7 @@ export default function Body({ ...props }) {
                   setNextStartIndex={setNextStartIndex}
                   setNotice={setNotice}
                   setStaticKeys={setStaticKeys}
+                  stacked={stacked}
                 />
               </Fragment>
             );

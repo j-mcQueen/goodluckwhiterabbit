@@ -3,10 +3,12 @@ import { mobile } from "../global/utils/determineViewport";
 import { fetchFullPortfolioLayout } from "../global/memo/fetchFullPortfolioLayout";
 import {
   splitPortfolioLayoutIntoSegments,
+  PortfolioLayoutEntry,
   PortfolioLayoutSegment,
 } from "../global/utils/splitPortfolioLayoutIntoSegments";
 import MemoDisplay from "../global/memo/MemoDisplay";
 import WidowMemoPair from "../global/memo/WidowMemoPair";
+import StackedItem, { STACKED_IMAGE_FRAME_CLASSES } from "./StackedItem";
 
 // Rendering path for a memo-managed group only (Body.tsx branches into this
 // per spec §2.1 - zero-memo groups never reach this component). Segmented
@@ -28,7 +30,14 @@ export default function MemoAwareBody({
   groupId: string;
   setContactOpen: (open: boolean) => void;
 }) {
+  // ART/DESIGN never use the 3-column packing/widow machinery below - a
+  // single column has no such thing as a widow row, so those categories
+  // walk the flat, already-ordered `entries` list directly instead of
+  // segmenting it (see StackedItem.tsx for the fill-available-height layout).
+  const stacked = category === "ART" || category === "DESIGN";
+
   const [segments, setSegments] = useState<PortfolioLayoutSegment[] | null>(null);
+  const [entries, setEntries] = useState<PortfolioLayoutEntry[] | null>(null);
   const [urlsByKey, setUrlsByKey] = useState<Map<string, string>>(new Map());
 
   useEffect(() => {
@@ -36,8 +45,9 @@ export default function MemoAwareBody({
     let objectUrls: string[] = [];
 
     setSegments(null);
+    setEntries(null);
     fetchFullPortfolioLayout(category, sub, groupId, mobile ? "sm" : "lg").then(
-      ({ entries, blobsByKey }) => {
+      ({ entries: fetchedEntries, blobsByKey }) => {
         if (cancelled) return;
 
         const nextUrls = new Map<string, string>();
@@ -45,7 +55,11 @@ export default function MemoAwareBody({
         objectUrls = [...nextUrls.values()];
 
         setUrlsByKey(nextUrls);
-        setSegments(splitPortfolioLayoutIntoSegments(entries));
+        if (stacked) {
+          setEntries(fetchedEntries);
+        } else {
+          setSegments(splitPortfolioLayoutIntoSegments(fetchedEntries));
+        }
       },
     );
 
@@ -53,15 +67,22 @@ export default function MemoAwareBody({
       cancelled = true;
       objectUrls.forEach((url) => URL.revokeObjectURL(url));
     };
-  }, [category, sub, groupId]);
+  }, [category, sub, groupId, stacked]);
 
-  const renderImage = (key: string) => {
+  const renderImage = (key: string, fit: "cover" | "contain" = "cover") => {
     const url = urlsByKey.get(key);
     if (!url) return null;
-    return <img src={url} alt="" className="block w-full h-full object-cover" loading="lazy" />;
+    return (
+      <img
+        src={url}
+        alt=""
+        className={`block w-full h-full ${fit === "contain" ? "object-contain" : "object-cover"}`}
+        loading="lazy"
+      />
+    );
   };
 
-  if (!segments) {
+  if (stacked ? !entries : !segments) {
     return (
       <div className="flex items-center justify-center h-full text-white/70 font-vt tracking-vt text-sm">
         LOADING...
@@ -69,9 +90,33 @@ export default function MemoAwareBody({
     );
   }
 
+  if (stacked) {
+    return (
+      <div className="h-full flex flex-col">
+        {entries!.map((entry) =>
+          entry.type === "memo" ? (
+            <StackedItem key={`memo-${entry.memoId}`}>
+              <MemoDisplay
+                html={entry.html}
+                onInquire={() => setContactOpen(true)}
+                className="w-full"
+              />
+            </StackedItem>
+          ) : (
+            <StackedItem key={`image-${entry.key}`}>
+              <div className={STACKED_IMAGE_FRAME_CLASSES}>
+                {renderImage(entry.key, "contain")}
+              </div>
+            </StackedItem>
+          ),
+        )}
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col">
-      {segments.map((segment, index) => {
+      {segments!.map((segment, index) => {
         if (segment.kind === "memo") {
           if (segment.pairedWidowImages.length > 0) {
             return (
