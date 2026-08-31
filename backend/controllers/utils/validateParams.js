@@ -22,5 +22,5 @@ export const validateParams = async (category, sub, group, size, start) => {
   });
   if (!subcategory) return { error: "Invalid sub" };
 
-  return true;
+  return { subcategory };
 };

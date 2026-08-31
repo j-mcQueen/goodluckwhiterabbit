@@ -10,22 +10,14 @@ import {
 import PortfolioSubcategory from "../../models/portfolioSubcategory.js";
 import PortfolioMemo from "../../models/portfolioMemo.js";
 
-const findFilterSort = async (
-  bucket,
-  prefix,
-  regex,
-  size,
-  group = undefined,
-  skipSort = false,
-) => {
+const findFilterSort = async (bucket, prefix, regex, size) => {
   let objects;
   try {
     objects = await s3.send(
       new ListObjectsV2Command({
         Bucket: bucket,
         Prefix: prefix,
-        StartAfter: group ? `${prefix}/${group}/${size}` : undefined,
-        MaxKeys: group ? 100 : 250,
+        MaxKeys: 250,
       }),
     );
   } catch (error) {
@@ -36,22 +28,14 @@ const findFilterSort = async (
     (item) => item.Key.includes(`/${size}/`) && item.Size > 0,
   );
 
-  const sorted = skipSort ? filtered : sortBatch(filtered, regex);
+  const sorted = sortBatch(filtered, regex);
   objects.Contents = sorted;
 
   return { objects, stored: sorted.length };
 };
 
-const sortBatch = (arr, suffixRegex, groupRegex) => {
+const sortBatch = (arr, suffixRegex) => {
   return arr.sort((a, b) => {
-    if (groupRegex) {
-      const groupA = Number(a.Key.match(groupRegex)?.[1] ?? 0);
-      const groupB = Number(b.Key.match(groupRegex)?.[1] ?? 0);
-
-      if (groupA < groupB) return -1;
-      if (groupA > groupB) return 1;
-    }
-
     const suffixA = Number(a.Key.match(suffixRegex)?.[1] ?? 0);
     const suffixB = Number(b.Key.match(suffixRegex)?.[1] ?? 0);
 
@@ -161,6 +145,12 @@ export const getPortfolioTaxonomy = async (req, res, next) => {
   return res.status(200).json(formatPublicTaxonomy(docs));
 };
 
+// walks a subcategory's groups in *display* order (the taxonomy's `order`
+// field), not S3 key order - a group's groupId is a permanent physical
+// identifier, decoupled on purpose from where it currently ranks (see
+// models/portfolioSubcategory.js), so an admin reordering groups never
+// touches S3 and this is the one place that has to resolve "next" through
+// the ordered list instead of just continuing a lexicographic key scan.
 export const generatePortfolioUrls = async (req, res, next) => {
   const verified = await validateParams(
     req.params.category,
@@ -172,96 +162,98 @@ export const generatePortfolioUrls = async (req, res, next) => {
 
   if (verified.error) {
     return res.status(400).json(verified.error);
-  } else {
-    const groupRegex = /\/(\d{3})\//;
-    const suffixRegex = `(?<=/${req.params.size}/[^/]+_)(\\d{1,3})(?=\\.[^.]+$)`;
+  }
 
-    let s3Data = {};
-    try {
-      // find, filter, and sort objects by their group numbers
-      const { objects, stored } = await findFilterSort(
-        process.env.AWS_SECONDARY_BUCKET,
+  const { category, sub, group, size } = req.params;
+  const positionRegex = /_(\d{1,3})\.[^.]+$/;
 
-        `${req.params.category}/${req.params.sub}`,
-        groupRegex,
-        req.params.size,
-        req.params.group,
-        true, // the group+suffix sort below is the real one; skip the redundant inner sort
+  const orderedGroups = [...verified.subcategory.groups].sort(
+    (a, b) => a.order - b.order,
+  );
+  const startGroupIndex = orderedGroups.findIndex((g) => g.groupId === group);
+
+  if (startGroupIndex === -1) return res.status(200).json({ files: false });
+
+  const keys = [];
+  let cursorStart = Number(req.params.start);
+  let stored = 0;
+
+  try {
+    for (
+      let i = startGroupIndex;
+      i < orderedGroups.length && keys.length < 10;
+      i++
+    ) {
+      const groupId = orderedGroups[i].groupId;
+      const prefix = `${category}/${sub}/${groupId}/`;
+
+      const listed = await s3.send(
+        new ListObjectsV2Command({
+          Bucket: process.env.AWS_SECONDARY_BUCKET,
+          Prefix: prefix,
+        }),
       );
 
-      if (stored === 0) return res.status(200).json({ files: false });
+      const matches = (listed.Contents ?? [])
+        .filter((obj) => obj.Key.includes(`/${size}/`) && obj.Size > 0)
+        .sort(
+          (a, b) =>
+            Number(a.Key.match(positionRegex)?.[1] ?? 0) -
+            Number(b.Key.match(positionRegex)?.[1] ?? 0),
+        );
 
-      const suffixSorted = sortBatch(objects.Contents, suffixRegex, groupRegex);
+      stored += matches.length;
 
-      s3Data.results = suffixSorted;
-      s3Data.stored = stored;
-    } catch (error) {
-      console.log("error", error);
-      return res.status(500).json({
-        status: true,
-        loading: false,
-        message:
-          "There was an error retrieving your images from S3. Please refresh the page and try again. Let Jack know if the problem persists!",
-      });
-    }
-
-    const keys = [];
-    let normalizedGroup = req.params.group;
-    let normalizedStart = req.params.start;
-    for (const obj of s3Data.results) {
-      // check for out-of-bounds starts (+ groups with)
-      const keyGroup = Number(obj.Key.match(groupRegex)[1]);
-      if (keyGroup > normalizedGroup && normalizedStart > 0) {
-        normalizedGroup = keyGroup;
-        normalizedStart = 0;
+      for (const obj of matches) {
+        const pos = Number(obj.Key.match(positionRegex)?.[1]);
+        if (!Number.isInteger(pos) || pos < cursorStart) continue;
+        keys.push(obj.Key);
+        if (keys.length === 10) break;
       }
 
-      const match = obj.Key.match(suffixRegex);
-      const pos = Number(match[0]);
-
-      // skip edge cases which indicate incorrect starting point
-      if (keyGroup < normalizedGroup || !match) continue;
-      if (keyGroup >= normalizedGroup && pos < normalizedStart) continue;
-
-      // get the keys you want to generate presigned urls for from the given starting point
-      if (pos >= Number(normalizedStart)) keys.push(obj.Key);
-      if (keys.length === 10) break;
+      cursorStart = 0; // every group after the requested one starts from its own beginning
     }
+  } catch (error) {
+    return res.status(500).json({
+      status: true,
+      loading: false,
+      message:
+        "There was an error retrieving your images from S3. Please refresh the page and try again. Let Jack know if the problem persists!",
+    });
+  }
 
-    const presignPromises = keys.map(async (key) => {
-      const cmd = new GetObjectCommand({
-        Bucket: process.env.AWS_SECONDARY_BUCKET,
-        Key: key,
-      });
+  if (keys.length === 0) return res.status(200).json({ files: false });
 
-      try {
-        const url = await getSignedUrl(s3, cmd, { expiresIn: 600 });
-        return { status: "fulfilled", key, url };
-      } catch (error) {
-        return { status: "rejected", key };
-      }
+  const presignPromises = keys.map(async (key) => {
+    const cmd = new GetObjectCommand({
+      Bucket: process.env.AWS_SECONDARY_BUCKET,
+      Key: key,
     });
 
-    const results = await Promise.allSettled(presignPromises);
-
-    const presigns = [];
-    const skipped = [];
-    for (const result of results) {
-      if (
-        result.status === "fulfilled" &&
-        result.value.status === "fulfilled"
-      ) {
-        presigns.push(result.value.url);
-      } else {
-        const key = result.value.key;
-        skipped.push(key.split("/").pop());
-      }
+    try {
+      const url = await getSignedUrl(s3, cmd, { expiresIn: 600 });
+      return { status: "fulfilled", key, url };
+    } catch (error) {
+      return { status: "rejected", key };
     }
+  });
 
-    return skipped.length > 0
-      ? res.status(200).json({ presigns, keys, skipped, stored: s3Data.stored })
-      : res.status(200).json({ presigns, keys, stored: s3Data.stored });
+  const results = await Promise.allSettled(presignPromises);
+
+  const presigns = [];
+  const skipped = [];
+  for (const result of results) {
+    if (result.status === "fulfilled" && result.value.status === "fulfilled") {
+      presigns.push(result.value.url);
+    } else {
+      const key = result.value.key;
+      skipped.push(key.split("/").pop());
+    }
   }
+
+  return skipped.length > 0
+    ? res.status(200).json({ presigns, keys, skipped, stored })
+    : res.status(200).json({ presigns, keys, stored });
 };
 
 // layout-aware counterpart to generatePortfolioUrls above, used only for

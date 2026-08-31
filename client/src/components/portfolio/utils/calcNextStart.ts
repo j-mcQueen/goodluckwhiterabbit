@@ -1,18 +1,16 @@
 export const calcNextStart = (
-  activeGroup: number,
+  activeGroupId: string,
   result: { blob: Blob; group: string }[],
   prevStart: number,
 ) => {
   // prime state for next use
   let counter = prevStart;
-  let latestGroup = activeGroup;
+  let latestGroupId = activeGroupId;
   for (const obj of result) {
-    const group = Number(obj.group);
-
     // reset counter if we have moved to another group
-    if (latestGroup !== group) {
+    if (latestGroupId !== obj.group) {
       counter = 1;
-      latestGroup = group;
+      latestGroupId = obj.group;
     } else counter++;
   }
   return counter;

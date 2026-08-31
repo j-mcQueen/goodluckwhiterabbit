@@ -2,6 +2,8 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
 import { AnimatePresence } from "framer-motion";
 import { triggerBatch } from "./utils/triggerBatch";
+import { resolveGroupId } from "./utils/resolveGroupId";
+import { resolveGroupIndex } from "./utils/resolveGroupIndex";
 import { mobile } from "../global/utils/determineViewport";
 import { generateKeys } from "../global/utils/generateKeys";
 import { determineHost as host } from "../global/utils/determineHost";
@@ -46,7 +48,10 @@ export default function Portfolio({ ...props }) {
   const [activeSub, setActiveSub] = useState<number>(
     (location.state as { subIndex?: number } | null)?.subIndex ?? 0,
   );
-  const [activeGroup, setActiveGroup] = useState<number>(0); // an index
+  const [activeGroup, setActiveGroup] = useState<number>(0); // a position in the sidebar list - cosmetic only
+  const [activeGroupId, setActiveGroupId] = useState<string | undefined>(
+    undefined,
+  ); // real S3 groupId - authoritative for all data-fetching decisions
   const [images, setImages] = useState<{ blob: Blob; group: string }[]>([]);
   const [staticKeys, setStaticKeys] = useState<string[]>(generateKeys(10));
   const [nextStartIndex, setNextStartIndex] = useState<number>(10);
@@ -67,10 +72,36 @@ export default function Portfolio({ ...props }) {
 
   // mobile nav is scoped to the current route (no primary-category
   // switching), so position only needs to track subcategory + group within it
-  const handleMobileGroupSelect = (subIndex: number, groupIndex: number) => {
+  const handleMobileGroupSelect = (
+    subIndex: number,
+    groupIndex: number,
+    groupId: string,
+  ) => {
     setMobileSubIndex(subIndex);
     setActiveGroup(groupIndex);
+    setActiveGroupId(groupId);
   };
+
+  // keeps the cosmetic sidebar/nav highlight index in sync when
+  // activeGroupId changes without a known index - the only case is organic
+  // scroll (Unit.tsx knows the real groupId of what just scrolled into view
+  // but not its position in the sidebar list); click-driven changes already
+  // set both directly, so this is a no-op for those
+  useEffect(() => {
+    if (!activeGroupId) return;
+
+    const subIndexForLookup = mobile ? mobileSubIndex : activeSub;
+    const derivedIndex = resolveGroupIndex(
+      sidebarData,
+      route,
+      subIndexForLookup,
+      activeGroupId,
+    );
+
+    if (derivedIndex !== undefined && derivedIndex !== activeGroup) {
+      setActiveGroup(derivedIndex);
+    }
+  }, [activeGroupId, sidebarData, route, mobileSubIndex, activeSub, activeGroup]);
 
   // clicking your own active tab toggles its sidebar; clicking a different
   // tab opens/keeps open a *browse* session for that category without
@@ -180,11 +211,14 @@ export default function Portfolio({ ...props }) {
   useEffect(() => {
     // provide mechanism for initial images to autoload upon primary category change
     async function fetchData() {
+      const groupId = resolveGroupId(sidebarData, route, activeSub, 0);
+      if (!groupId) return; // subcategory has no groups yet
+
       try {
         const nextImages = await triggerBatch(
           activeSubName,
           activeTab,
-          1,
+          groupId,
           setImages,
           setNotice,
           true,
@@ -222,10 +256,11 @@ export default function Portfolio({ ...props }) {
       loadTrackerRef.current = true;
       bodyRef.current?.scrollTo({ top: 0, behavior: "smooth" });
       setActiveGroup(0);
+      setActiveGroupId(resolveGroupId(sidebarData, route, activeSub, 0));
       fetchData();
       return;
     } else return;
-  }, [activeSub, activeTab, activeSubName, location.state]);
+  }, [activeSub, activeTab, activeSubName, location.state, route, sidebarData]);
 
   return (
     <div className="w-[calc(100dvw-var(--frame)-2px)] h-[calc(100dvh-var(--frame))] overflow-hidden relative">
@@ -279,6 +314,7 @@ export default function Portfolio({ ...props }) {
               sidebarData={sidebarData}
               sidebarRect={sidebarRect}
               setActiveGroup={setActiveGroup}
+              setActiveGroupId={setActiveGroupId}
               setActiveSub={setActiveSub}
               setActiveTab={setActiveTab}
               setImages={setImages}
@@ -291,14 +327,14 @@ export default function Portfolio({ ...props }) {
         </AnimatePresence>
 
         <Body
-          activeGroup={activeGroup}
+          activeGroupId={activeGroupId}
           activeSub={activeSubName}
           activeTab={activeTab}
           bodyRef={bodyRef}
           breadcrumb={mobileBreadcrumb}
           images={images}
           nextStartIndex={nextStartIndex}
-          setActiveGroup={setActiveGroup}
+          setActiveGroupId={setActiveGroupId}
           setContactOpen={setContactOpen}
           setImages={setImages}
           setNextStartIndex={setNextStartIndex}

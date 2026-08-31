@@ -5,7 +5,7 @@ import { mobile } from "../../global/utils/determineViewport";
 export const triggerBatch = async (
   activeSub: string,
   activeTab: number,
-  nextGroup: number,
+  groupId: string, // real S3 groupId, already resolved by the caller - see resolveGroupId.ts
   setImages: Dispatch<SetStateAction<{ blob: Blob; group: string }[]>>,
   setNotice: Dispatch<
     SetStateAction<{
@@ -20,13 +20,12 @@ export const triggerBatch = async (
   setActiveSub?: Dispatch<SetStateAction<number>>,
 ) => {
   setNotice({ status: true, loading: true, message: "LOADING..." });
-  const group = String(nextGroup).padStart(3, "0");
   const tabMap = { 0: "PHOTO", 1: "ART", 2: "DESIGN" };
   const size = mobile ? "sm" : "lg";
 
   const nextImages = await execute(
     tabMap[activeTab as keyof typeof tabMap],
-    group,
+    groupId,
     setNotice,
     size,
     start,
@@ -35,18 +34,11 @@ export const triggerBatch = async (
 
   if (setActiveSub && subIndex !== undefined) setActiveSub(subIndex);
 
-  const containsGroup = nextImages.some(
-    (image: { blob: Blob; group: string }) => image.group === group,
-  );
-
-  if (
-    containsGroup ||
-    (nextImages.length > 0 &&
-      Number(nextImages[0].group) === Number(group) + 1)
-  ) {
-    // edge case coverage where we have old values and a new group at start
-    // new images have been generated
-
+  // the backend only ever walks forward from the requested group through
+  // the subcategory's *ordered* group sequence (see generatePortfolioUrls),
+  // so anything it returns - whether from the requested group or one it
+  // spilled into - is already valid, correctly-ordered content
+  if (nextImages.length > 0) {
     setImages((prev) => {
       // setter fn ensures we don't mistakenly mutate
       return sidebar ? nextImages : [...prev, ...nextImages];

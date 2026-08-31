@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { triggerBatch } from "./utils/triggerBatch";
 import { generateKeys } from "../global/utils/generateKeys";
+import { resolveGroupId } from "./utils/resolveGroupId";
 
 import BrowseColumns from "./BrowseColumns";
 
@@ -16,6 +17,7 @@ export default function Sidebar({ ...props }) {
     route,
     sidebarData,
     setActiveGroup,
+    setActiveGroupId,
     setActiveSub,
     setActiveTab,
     setImages,
@@ -43,6 +45,9 @@ export default function Sidebar({ ...props }) {
   const handleSubcategoryClick = async (j: number) => {
     if (j === highlightSub) return; // already shown - stay open on its groups
 
+    const groupId = resolveGroupId(sidebarData, route, j, 0);
+    if (!groupId) return; // subcategory has no groups yet
+
     if (bodyRef) {
       bodyRef.current?.scrollTo({ top: 0, behavior: "smooth" });
     }
@@ -51,7 +56,7 @@ export default function Sidebar({ ...props }) {
       const nextImages = await triggerBatch(
         subcategories[j],
         browseTab,
-        1,
+        groupId,
         setImages,
         setNotice,
         true,
@@ -66,6 +71,7 @@ export default function Sidebar({ ...props }) {
       }
 
       setActiveGroup(0);
+      setActiveGroupId(groupId);
 
       if (!isActiveCategory) {
         setActiveTab(browseTab);
@@ -83,6 +89,9 @@ export default function Sidebar({ ...props }) {
   };
 
   const handleGroupClick = async (k: number) => {
+    const groupId = resolveGroupId(sidebarData, route, highlightSub, k);
+    if (!groupId) return;
+
     if (bodyRef) {
       bodyRef.current?.scrollTo({ top: 0, behavior: "smooth" });
     }
@@ -91,7 +100,7 @@ export default function Sidebar({ ...props }) {
       const nextImages = await triggerBatch(
         subcategories[highlightSub],
         browseTab,
-        k + 1,
+        groupId,
         setImages,
         setNotice,
         true,
@@ -106,6 +115,7 @@ export default function Sidebar({ ...props }) {
       }
 
       setActiveGroup(k);
+      setActiveGroupId(groupId);
 
       if (!isActiveCategory) {
         setActiveTab(browseTab);
