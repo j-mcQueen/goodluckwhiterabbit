@@ -213,7 +213,11 @@ export const adminAddGroup = async (req, res, next) => {
     }
 
     const groupId = String(claimed.nextGroupSeq).padStart(3, "0");
-    const order = claimed.groups.length;
+    // new groups display first - `order` only has to sort lower than every
+    // existing sibling, so this never renumbers (writes to) the rest of the
+    // group array, unlike a manual reorder (adminMovePortfolioGroup) which does
+    const existingOrders = claimed.groups.map((group) => group.order);
+    const order = existingOrders.length > 0 ? Math.min(...existingOrders) - 1 : 0;
 
     try {
       await PortfolioSubcategory.findByIdAndUpdate(req.params.subId, {
@@ -229,6 +233,62 @@ export const adminAddGroup = async (req, res, next) => {
     }
 
     return res.status(201).json({ groupId, name, order, count: 0 });
+  }
+};
+
+// reorders a subcategory's groups - splice-and-renumber the whole
+// order-sorted array, mirroring adminMovePortfolioLayoutItem's gap-index
+// move one level up. Never touches S3: groupId (the physical S3 folder
+// name) is permanent, only display `order` changes - see
+// models/portfolioSubcategory.js for why the two are decoupled.
+export const adminMovePortfolioGroup = async (req, res, next) => {
+  const verified = await verifyTokens(req, res);
+
+  if (verified) {
+    const { subId, groupId, to } = req.params;
+
+    const subcategory = await PortfolioSubcategory.findById(subId);
+    if (!subcategory) return res.status(404).json({ error: "Subcategory not found" });
+
+    const sorted = [...subcategory.groups].sort((a, b) => a.order - b.order);
+    const fromIndex = sorted.findIndex((group) => group.groupId === groupId);
+    if (fromIndex === -1) return res.status(404).json({ error: "Group not found" });
+
+    const toGapIndex = Number(to);
+    if (!Number.isInteger(toGapIndex) || toGapIndex < 0 || toGapIndex > sorted.length) {
+      return res.status(400).json({ error: "Invalid target gap" });
+    }
+
+    // dropping onto the gap immediately before or after its own current
+    // position is a no-op - same convention as adminMovePortfolioLayoutItem.
+    // Still echoes `groups` (unchanged) so the client can always trust the
+    // response as the authoritative post-move state, no special-casing needed.
+    const adjustedTo = toGapIndex > fromIndex ? toGapIndex - 1 : toGapIndex;
+    if (adjustedTo === fromIndex) {
+      return res.status(200).json({
+        success: true,
+        groups: formatAdminTaxonomy([subcategory])[0].groups,
+      });
+    }
+
+    const [moved] = sorted.splice(fromIndex, 1);
+    sorted.splice(adjustedTo, 0, moved);
+    sorted.forEach((group, index) => {
+      group.order = index;
+    });
+
+    subcategory.groups = sorted;
+
+    try {
+      await subcategory.save();
+    } catch (error) {
+      return res.status(500).json({ error: "Could not reorder groups." });
+    }
+
+    return res.status(200).json({
+      success: true,
+      groups: formatAdminTaxonomy([subcategory])[0].groups,
+    });
   }
 };
 

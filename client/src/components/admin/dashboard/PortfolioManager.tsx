@@ -182,6 +182,7 @@ export default function PortfolioManager({ ...props }) {
           taxonomy={taxonomy}
           setTaxonomy={setTaxonomy}
           setDeleteModalToggle={setDeleteModalToggle}
+          setNotice={setNotice}
           onSelectGroup={(groupId: string) => {
             // PortfolioAdminGrid.tsx fetches its own data on mount from
             // category/sub/groupId - nothing more to load here

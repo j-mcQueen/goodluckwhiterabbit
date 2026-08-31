@@ -20,6 +20,7 @@ import {
   adminDeleteSubcategory,
   adminAddGroup,
   adminDeleteGroup,
+  adminMovePortfolioGroup,
   adminUploadPortfolioImage,
   adminBulkUploadPortfolioImages,
   adminDeletePortfolioImage,
@@ -77,6 +78,10 @@ router.post("/users/:id/:imageset/bulkUpload", diskUpload.any(), bulkUpload);
 router.post("/users/:id/:imageset/swap/:from/:to", adminSwapFiles);
 router.post("/portfolio/:category/subcategories", adminAddSubcategory);
 router.post("/portfolio/subcategories/:subId/groups", adminAddGroup);
+router.post(
+  "/portfolio/subcategories/:subId/groups/:groupId/move/:to",
+  adminMovePortfolioGroup,
+);
 router.post(
   "/portfolio/:category/:sub/:groupId/uploadFile",
   upload.any(),
