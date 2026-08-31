@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { triggerBatch } from "../utils/triggerBatch";
+import { resolveGroupId } from "../utils/resolveGroupId";
 
 import TopBar from "../../global/header/mobile/TopBar";
 import Instagram from "../../../assets/media/icons/Instagram";
@@ -30,34 +31,40 @@ export default function Nav({ ...props }) {
   const handleSubcategoryClick = async (j: number) => {
     if (j === activeSubIndex) return; // already active - stay open on its groups
 
+    const groupId = resolveGroupId(sidebarData, route, j, 0);
+    if (!groupId) return; // subcategory has no groups yet
+
     const nextImages = await triggerBatch(
       subcategories[j],
       categoryIndex,
-      1,
+      groupId,
       setImages,
       setNotice,
       true,
       0,
     );
 
-    onGroupSelect?.(j, 0);
+    onGroupSelect?.(j, 0, groupId);
     setIsOpen({ main: false });
 
     return nextImages;
   };
 
   const handleGroupClick = async (k: number) => {
+    const groupId = resolveGroupId(sidebarData, route, activeSubIndex, k);
+    if (!groupId) return;
+
     const nextImages = await triggerBatch(
       subcategories[activeSubIndex],
       categoryIndex,
-      k + 1, // groups are 1-indexed on S3
+      groupId,
       setImages,
       setNotice,
       true,
       0,
     );
 
-    onGroupSelect?.(activeSubIndex, k);
+    onGroupSelect?.(activeSubIndex, k, groupId);
     setIsOpen({ main: false });
 
     return nextImages;

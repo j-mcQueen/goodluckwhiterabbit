@@ -9,7 +9,7 @@ const SPAN_THRESHOLD = 1.3; // ratio at/above this is "landscape enough" to take
 
 export default function Unit({ ...props }) {
   const {
-    activeGroup,
+    activeGroupId,
     activeSub,
     activeTab,
     image,
@@ -17,7 +17,7 @@ export default function Unit({ ...props }) {
     itemKey,
     lastIndex,
     nextStartIndex,
-    setActiveGroup,
+    setActiveGroupId,
     setImages,
     setNextStartIndex,
     setNotice,
@@ -52,12 +52,13 @@ export default function Unit({ ...props }) {
       onChange={async (inView, entry) => {
         if (entry.intersectionRatio === 1 || !entry.isIntersecting) return; // prevent callback from firing immediately on first load
 
-        const imageGroup = Number(image.group) - 1;
-        const diff = imageGroup - activeGroup;
-        if (diff !== 0) setActiveGroup(imageGroup);
+        // image.group is ground truth for "what group is now in view" -
+        // parsed straight from the just-loaded image's real S3 key, so no
+        // arithmetic reconstruction from a display index is needed
+        if (image.group !== activeGroupId) setActiveGroupId(image.group);
 
         const args = {
-          activeGroup: diff !== 0 ? imageGroup + 1 : activeGroup + 1,
+          activeGroupId: image.group,
           activeSub,
           activeTab,
           inView,
@@ -79,10 +80,8 @@ export default function Unit({ ...props }) {
       className={wrapperClassName}
       onChange={(inView, entry) => {
         if (entry.intersectionRatio === 1) return; // prevent callback from firing immediately on first load
-        if (inView) {
-          const imageGroup = Number(image.group) - 1;
-          const diff = imageGroup - activeGroup;
-          if (diff !== 0) setActiveGroup(imageGroup);
+        if (inView && image.group !== activeGroupId) {
+          setActiveGroupId(image.group);
         }
       }}
     >

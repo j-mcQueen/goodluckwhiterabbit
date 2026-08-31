@@ -4,7 +4,7 @@ import { triggerIntersection } from "./triggerIntersection";
 
 export const handleIntersection = async ({ ...params }) => {
   const {
-    activeGroup,
+    activeGroupId,
     activeSub,
     activeTab,
     inView,
@@ -17,7 +17,7 @@ export const handleIntersection = async ({ ...params }) => {
 
   try {
     const args = {
-      activeGroup,
+      activeGroupId,
       activeSub,
       activeTab,
       inView,
@@ -32,7 +32,7 @@ export const handleIntersection = async ({ ...params }) => {
       return;
     }
 
-    const nextStart = calcNextStart(activeGroup, result, nextStartIndex);
+    const nextStart = calcNextStart(activeGroupId, result, nextStartIndex);
     setNextStartIndex(nextStart);
 
     // only generate the extra keys needed

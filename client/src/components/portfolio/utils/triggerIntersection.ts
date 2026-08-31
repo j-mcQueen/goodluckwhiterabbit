@@ -2,7 +2,7 @@ import { triggerBatch } from "./triggerBatch";
 
 export const triggerIntersection = async ({ ...params }) => {
   const {
-    activeGroup,
+    activeGroupId,
     activeSub,
     activeTab,
     inView,
@@ -15,7 +15,7 @@ export const triggerIntersection = async ({ ...params }) => {
     const result = await triggerBatch(
       activeSub,
       activeTab,
-      activeGroup,
+      activeGroupId,
       setImages,
       setNotice,
       false,

@@ -12,14 +12,14 @@ const TAB_CATEGORY: Record<number, string> = {
 
 export default function Body({ ...props }) {
   const {
-    activeGroup,
+    activeGroupId,
     activeSub,
     activeTab,
     bodyRef,
     breadcrumb,
     images,
     nextStartIndex,
-    setActiveGroup,
+    setActiveGroupId,
     setContactOpen,
     setImages,
     setNextStartIndex,
@@ -29,7 +29,9 @@ export default function Body({ ...props }) {
   } = props;
 
   const category = TAB_CATEGORY[activeTab];
-  const groupId = String(activeGroup + 1).padStart(3, "0");
+  // real S3 groupId, resolved upstream (Portfolio.tsx) from the taxonomy -
+  // `activeGroup` is only a position in the sidebar's order-sorted list
+  const groupId = activeGroupId as string | undefined;
   const stacked = category === "ART" || category === "DESIGN";
 
   // `images` can be a cross-group spillover list from the existing
@@ -56,7 +58,7 @@ export default function Body({ ...props }) {
     let cancelled = false;
     setHasMemo(false);
 
-    if (category && activeSub) {
+    if (category && activeSub && groupId) {
       checkPortfolioGroupHasMemo(category, activeSub, groupId).then(
         (result) => {
           if (!cancelled) setHasMemo(result);
@@ -81,7 +83,7 @@ export default function Body({ ...props }) {
         </div>
       )}
 
-      {hasMemo && isCleanSingleGroupView ? (
+      {hasMemo && isCleanSingleGroupView && groupId ? (
         <MemoAwareBody
           category={category}
           sub={activeSub}
@@ -107,7 +109,7 @@ export default function Body({ ...props }) {
             return (
               <Fragment key={staticKeys[index]}>
                 <Unit
-                  activeGroup={activeGroup}
+                  activeGroupId={activeGroupId}
                   activeSub={activeSub}
                   activeTab={activeTab}
                   image={unit}
@@ -115,7 +117,7 @@ export default function Body({ ...props }) {
                   itemKey={staticKeys[index]}
                   lastIndex={images.length - 1}
                   nextStartIndex={nextStartIndex}
-                  setActiveGroup={setActiveGroup}
+                  setActiveGroupId={setActiveGroupId}
                   setImages={setImages}
                   setNextStartIndex={setNextStartIndex}
                   setNotice={setNotice}
