@@ -223,7 +223,11 @@ export default function Body({ ...props }) {
                   {renderPlainImages({ ...block, images: mainImages }, isLastBlock)}
                 </div>
                 {trailingImages.length > 0 && (
-                  <WidowImagesRow className="flex flex-col xl:flex-row xl:justify-center gap-2 w-full px-2">
+                  // mt-2 matches the main grid's own gap-2 between rows -
+                  // this row is a separate sibling container, not an actual
+                  // row of that grid, so it needs its own top margin to
+                  // avoid sitting flush against the grid above it
+                  <WidowImagesRow className="flex flex-col xl:flex-row xl:justify-center gap-2 w-full px-2 mt-2">
                     {trailingImages.map((image) => (
                       <Unit
                         key={image.key}
