@@ -1,8 +1,14 @@
-import { Fragment, useEffect, useState } from "react";
-import { checkPortfolioGroupHasMemo } from "../global/memo/checkPortfolioGroupHasMemo";
+import { Fragment, useRef } from "react";
+import { handlePortfolioIntersection } from "./utils/handlePortfolioIntersection";
+import { handleMemoBlockIntersection } from "./utils/handleMemoBlockIntersection";
+import { PortfolioBlock } from "./types/PortfolioBlock";
+import MemoDisplay from "../global/memo/MemoDisplay";
 
 import Unit from "./Unit";
-import MemoAwareBody from "./MemoAwareBody";
+import PortfolioMemoSegments from "./PortfolioMemoSegments";
+import PortfolioTrigger from "./PortfolioTrigger";
+import StackedItem, { STACKED_ITEM_CLASSES, STACKED_IMAGE_FRAME_CLASSES } from "./StackedItem";
+import WidowImagesRow from "../global/memo/WidowImagesRow";
 
 const TAB_CATEGORY: Record<number, string> = {
   0: "PHOTO",
@@ -10,66 +16,157 @@ const TAB_CATEGORY: Record<number, string> = {
   2: "DESIGN",
 };
 
+const PLAIN_GRID_CLASSES =
+  // row height is viewport-relative (not a flat px) so it tracks column
+  // width: with 3 columns, colWidth ≈ 100vw/3, and dividing that by our
+  // target single-span cell ratio (~0.85, portrait-friendly) gives
+  // ~100vw/(3*0.85) ≈ 39vw - a flat px height would drift toward a
+  // landscape-shaped single-span cell as the viewport grows, badly
+  // over-cropping portraits
+  "grid grid-cols-1 gap-2 px-2 xl:grid-flow-dense xl:auto-rows-[39vw] xl:[grid-template-columns:repeat(3,minmax(320px,1fr))]";
+
 export default function Body({ ...props }) {
   const {
     activeGroupId,
     activeSub,
+    activeSubIndex,
     activeTab,
+    blocks,
     bodyRef,
     breadcrumb,
-    images,
     nextStartIndex,
+    route,
     setActiveGroupId,
+    setBlocks,
     setContactOpen,
-    setImages,
     setNextStartIndex,
     setNotice,
-    setStaticKeys,
-    staticKeys,
+    sidebarData,
   } = props;
 
   const category = TAB_CATEGORY[activeTab];
-  // real S3 groupId, resolved upstream (Portfolio.tsx) from the taxonomy -
-  // `activeGroup` is only a position in the sidebar's order-sorted list
-  const groupId = activeGroupId as string | undefined;
   const stacked = category === "ART" || category === "DESIGN";
 
-  // `images` can be a cross-group spillover list from the existing
-  // infinite-scroll pagination (generatePortfolioUrls spills into the next
-  // group once the current one is exhausted) - swapping the whole view to
-  // MemoAwareBody the moment activeGroup's intersection-observer tracking
-  // touches a memo-managed group would cut that spillover view off
-  // mid-scroll. Only doing so for a "clean" single-group view (everything
-  // currently loaded belongs to groupId - true right after a sidebar group
-  // click, which replaces `images` outright) keeps the untouched scroll
-  // path intact; scrolling organically into a memo-managed group via
-  // spillover is explicitly out of scope for this pass (see spec task
-  // notes) and falls back to the existing grid instead of swapping.
-  const isCleanSingleGroupView =
-    images.length > 0 &&
-    images.every((unit: { group: string }) => unit.group === groupId);
+  // Only one batch fetch may ever be in flight at a time, across both
+  // trigger paths below (only one block is ever "the tail" at once, so one
+  // shared guard covers both). Without this, a growing memo run can
+  // re-fire its own IntersectionObserver purely because appending content
+  // made the observed element taller - with no guard, that immediately
+  // fires a second overlapping fetch against a stale cursor, duplicating
+  // entries (and their React keys) and compounding into a runaway loop.
+  // Dropping the redundant call here is safe: once state settles and the
+  // container's real size is reflected, a genuine geometry change will
+  // fire the observer again on its own and be let through normally.
+  const isFetchingRef = useRef(false);
 
-  // zero-memo groups (the overwhelming default) never run this check's
-  // result through anything - see the render branch below, which falls
-  // straight through to the untouched grid unless this resolves true
-  const [hasMemo, setHasMemo] = useState(false);
-
-  useEffect(() => {
-    let cancelled = false;
-    setHasMemo(false);
-
-    if (category && activeSub && groupId) {
-      checkPortfolioGroupHasMemo(category, activeSub, groupId).then(
-        (result) => {
-          if (!cancelled) setHasMemo(result);
-        },
-      );
+  const runTriggerOnce = async (trigger: () => Promise<void>) => {
+    if (isFetchingRef.current) return;
+    isFetchingRef.current = true;
+    try {
+      await trigger();
+    } finally {
+      isFetchingRef.current = false;
     }
+  };
 
-    return () => {
-      cancelled = true;
-    };
-  }, [category, activeSub, groupId]);
+  // fires only from the true last rendered node in the whole blocks
+  // sequence, whatever kind of block that happens to be - see the
+  // isLast checks in each render branch below
+  const triggerPlainPipeline = (imageGroup: string) =>
+    runTriggerOnce(() =>
+      handlePortfolioIntersection({
+        activeGroupId: imageGroup,
+        activeSub,
+        activeSubIndex,
+        activeTab,
+        inView: true,
+        nextStartIndex,
+        route,
+        setBlocks,
+        setNextStartIndex,
+        setNotice,
+        sidebarData,
+      }),
+    );
+
+  const triggerMemoBlock = (block: Extract<PortfolioBlock, { kind: "memo-aware" }>) =>
+    runTriggerOnce(() =>
+      handleMemoBlockIntersection({
+        activeSub,
+        activeSubIndex,
+        activeTab,
+        block,
+        route,
+        setBlocks,
+        setNextStartIndex,
+        setNotice,
+        sidebarData,
+      }),
+    );
+
+  const renderPlainImages = (
+    block: Extract<PortfolioBlock, { kind: "plain" }>,
+    isLastBlock: boolean,
+  ) =>
+    block.images.map((image, imageIndex) => {
+      const isLastImage = isLastBlock && imageIndex === block.images.length - 1;
+      return (
+        <Fragment key={image.key}>
+          <Unit
+            activeGroupId={activeGroupId}
+            image={image}
+            itemKey={image.key}
+            onTrigger={isLastImage ? () => triggerPlainPipeline(image.group) : undefined}
+            setActiveGroupId={setActiveGroupId}
+            stacked={stacked}
+          />
+        </Fragment>
+      );
+    });
+
+  const renderStackedMemoBlock = (
+    block: Extract<PortfolioBlock, { kind: "memo-aware" }>,
+    isLastBlock: boolean,
+  ) =>
+    block.entries.map((entry, entryIndex) => {
+      const key = entry.type === "memo" ? `memo-${entry.memoId}` : `image-${entry.key}`;
+      const isLastEntry = isLastBlock && entryIndex === block.entries.length - 1;
+
+      const content =
+        entry.type === "memo" ? (
+          <MemoDisplay
+            html={entry.html}
+            onInquire={() => setContactOpen(true)}
+            className="w-full"
+          />
+        ) : (
+          <div className={STACKED_IMAGE_FRAME_CLASSES}>
+            {(() => {
+              const url = block.urlsByKey.get(entry.key);
+              return url ? (
+                <img
+                  src={url}
+                  alt=""
+                  className="block w-full h-full object-contain"
+                  loading="lazy"
+                />
+              ) : null;
+            })()}
+          </div>
+        );
+
+      return isLastEntry ? (
+        <PortfolioTrigger
+          key={key}
+          className={STACKED_ITEM_CLASSES}
+          onTrigger={() => triggerMemoBlock(block)}
+        >
+          {content}
+        </PortfolioTrigger>
+      ) : (
+        <StackedItem key={key}>{content}</StackedItem>
+      );
+    });
 
   return (
     <section
@@ -83,51 +180,77 @@ export default function Body({ ...props }) {
         </div>
       )}
 
-      {hasMemo && isCleanSingleGroupView && groupId ? (
-        <MemoAwareBody
-          category={category}
-          sub={activeSub}
-          groupId={groupId}
-          setContactOpen={setContactOpen}
-        />
-      ) : (
-        <div
-          className={
-            stacked
-              ? "h-full flex flex-col"
-              : // row height is viewport-relative (not a flat px) so it
-                // tracks column width: with 3 columns, colWidth ≈ 100vw/3,
-                // and dividing that by our target single-span cell ratio
-                // (~0.85, portrait-friendly) gives ~100vw/(3*0.85) ≈ 39vw -
-                // a flat px height would drift toward a landscape-shaped
-                // single-span cell as the viewport grows, badly
-                // over-cropping portraits
-                "grid grid-cols-1 gap-2 px-2 xl:grid-flow-dense xl:auto-rows-[39vw] xl:[grid-template-columns:repeat(3,minmax(320px,1fr))]"
-          }
-        >
-          {images.map((unit: { image: Blob; group: string }, index: number) => {
+      {stacked ? (
+        <div className="h-full flex flex-col">
+          {(blocks as PortfolioBlock[]).map((block, blockIndex) => {
+            const isLastBlock = blockIndex === blocks.length - 1;
             return (
-              <Fragment key={staticKeys[index]}>
-                <Unit
-                  activeGroupId={activeGroupId}
-                  activeSub={activeSub}
-                  activeTab={activeTab}
-                  image={unit}
-                  index={index}
-                  itemKey={staticKeys[index]}
-                  lastIndex={images.length - 1}
-                  nextStartIndex={nextStartIndex}
-                  setActiveGroupId={setActiveGroupId}
-                  setImages={setImages}
-                  setNextStartIndex={setNextStartIndex}
-                  setNotice={setNotice}
-                  setStaticKeys={setStaticKeys}
-                  stacked={stacked}
-                />
+              <Fragment key={block.blockKey}>
+                {block.kind === "plain"
+                  ? renderPlainImages(block, isLastBlock)
+                  : renderStackedMemoBlock(block, isLastBlock)}
               </Fragment>
             );
           })}
         </div>
+      ) : (
+        (blocks as PortfolioBlock[]).map((block, blockIndex) => {
+          const isLastBlock = blockIndex === blocks.length - 1;
+          // a plain block only ever has something after it once the next
+          // group has a memo (consecutive memo-less groups merge into the
+          // same block - see appendPlainImages), and a memo-aware group's
+          // own final run only has something after it once the *next*
+          // group's memo-aware block has started - either way, "is there a
+          // following block" here means "does a memo follow"
+          const nextBlockIsMemo = blocks[blockIndex + 1]?.kind === "memo-aware";
+
+          if (block.kind === "plain") {
+            // trailing widow row, if any, centers separately instead of
+            // sitting left-aligned inside the dense grid - trailingWidowKeys
+            // is only ever populated once, right when this block closed
+            // (see handlePortfolioIntersection.ts's computeTrailingWidowKeys
+            // call), using real measured ratios rather than guessing from
+            // count alone - a plain image's aspect ratio isn't known until
+            // it loads, so a landscape image anywhere earlier in the
+            // sequence would throw off a count-based guess
+            const widowKeySet = new Set(nextBlockIsMemo ? block.trailingWidowKeys ?? [] : []);
+            const mainImages = block.images.filter((image) => !widowKeySet.has(image.key));
+            const trailingImages = block.images.filter((image) => widowKeySet.has(image.key));
+
+            return (
+              <Fragment key={block.blockKey}>
+                <div className={PLAIN_GRID_CLASSES}>
+                  {renderPlainImages({ ...block, images: mainImages }, isLastBlock)}
+                </div>
+                {trailingImages.length > 0 && (
+                  <WidowImagesRow className="flex flex-col xl:flex-row xl:justify-center gap-2 w-full px-2">
+                    {trailingImages.map((image) => (
+                      <Unit
+                        key={image.key}
+                        activeGroupId={activeGroupId}
+                        image={image}
+                        itemKey={image.key}
+                        layout="row"
+                        setActiveGroupId={setActiveGroupId}
+                      />
+                    ))}
+                  </WidowImagesRow>
+                )}
+              </Fragment>
+            );
+          }
+
+          return (
+            <PortfolioMemoSegments
+              key={block.blockKey}
+              entries={block.entries}
+              urlsByKey={block.urlsByKey}
+              onInquire={() => setContactOpen(true)}
+              onTrigger={isLastBlock ? () => triggerMemoBlock(block) : undefined}
+              endsBeforeMemo={nextBlockIsMemo}
+            />
+          );
+        })
       )}
     </section>
   );

@@ -13,11 +13,17 @@ export const loadPortfolioTaxonomy = async () => {
   return PortfolioSubcategory.find().sort({ category: 1, order: 1 }).lean();
 };
 
-// shape: { "/photo": { title, subcategories: string[], menu: { [name]: groupId }[] }, ... }
+// shape: { "/photo": { title, subcategories: string[], menu: { [name]: groupId }[], groupHasMemo: { [groupId]: boolean }[] }, ... }
+// groupHasMemo is index-aligned with menu/subcategories (one map per
+// subcategory) and keyed by groupId rather than name, since every caller
+// that needs it already holds a groupId (resolveGroupId's return value) -
+// this is purely additive, menu's existing shape and every one of its
+// pre-existing consumers (Sidebar.tsx, GroupList.tsx, MenuItem.tsx, mobile
+// nav) are untouched.
 export const formatPublicTaxonomy = (subcategoryDocs) => {
   const sidebarData = {};
   for (const meta of Object.values(CATEGORY_META)) {
-    sidebarData[meta.path] = { title: meta.title, subcategories: [], menu: [] };
+    sidebarData[meta.path] = { title: meta.title, subcategories: [], menu: [], groupHasMemo: [] };
   }
 
   const byCategory = {};
@@ -35,6 +41,13 @@ export const formatPublicTaxonomy = (subcategoryDocs) => {
         groupMap[group.name] = group.groupId;
       }
       return groupMap;
+    });
+    sidebarData[meta.path].groupHasMemo = subs.map((sub) => {
+      const hasMemoMap = {};
+      for (const group of sub.groups) {
+        hasMemoMap[group.groupId] = (group.layout ?? []).some((entry) => entry.type === "memo");
+      }
+      return hasMemoMap;
     });
   }
 

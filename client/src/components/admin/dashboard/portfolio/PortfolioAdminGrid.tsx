@@ -917,6 +917,13 @@ export default function PortfolioAdminGrid({
               );
             }
 
+            // this admin view edits one group in isolation and never knows
+            // the next group's memo status, so it always calls
+            // splitPortfolioLayoutIntoSegments without endsBeforeMemo -
+            // a "widow" segment (cross-group centering, no memo of its
+            // own) can therefore never actually occur here
+            if (segment.kind === "widow") return null;
+
             return renderRun(
               segment,
               `run-${flatIndexByKey.get(segment.images[0].key)}`,

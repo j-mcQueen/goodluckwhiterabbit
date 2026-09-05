@@ -6,12 +6,14 @@ import {
 
 // Splits a group's full layout sequence into render segments, bounded by
 // memos and by the group's own start/end (spec §2.1). Also resolves widow
-// pairing: a run's trailing row, if it doesn't fill 3 columns, is a widow
-// and - since a widow can by definition only occur immediately before a
-// hard boundary - is always followed by a memo, except possibly the
-// group's absolute final run, which has no following memo to pair with and
-// stays a plain short row. One rule, applied uniformly at every boundary,
-// not special-cased per direction (see spec §2.1 for the full reasoning).
+// pairing: a run's trailing row, if it doesn't fill 3 columns, is a widow.
+// Mid-sequence, a widow is always immediately followed by a memo in the
+// same group, and pairs with it (PortfolioMemoSegment.pairedWidowImages).
+// The group's absolute final run has no such memo within the group to pair
+// with - if the *next group* has one, the caller passes endsBeforeMemo so
+// this still centers the widow (PortfolioWidowSegment, no memo attached,
+// since that memo renders in a separate block entirely); otherwise it
+// stays a plain short row, exactly as before this existed.
 
 export type PortfolioLayoutImageEntry = {
   type: "image";
@@ -47,7 +49,14 @@ export type PortfolioMemoSegment = {
   pairedWidowImages: PortfolioWidowImage[];
 };
 
-export type PortfolioLayoutSegment = PortfolioRunSegment | PortfolioMemoSegment;
+// A widow row centered with no memo of its own - the pairing memo lives in
+// the next group's separate block (see endsBeforeMemo above).
+export type PortfolioWidowSegment = {
+  kind: "widow";
+  images: PortfolioWidowImage[];
+};
+
+export type PortfolioLayoutSegment = PortfolioRunSegment | PortfolioMemoSegment | PortfolioWidowSegment;
 
 const toRunItems = (images: PortfolioLayoutImageEntry[]): RunImageItem[] =>
   images.map((image) => ({ key: image.key, ratio: image.ratio }));
@@ -58,8 +67,27 @@ const packImages = (images: PortfolioLayoutImageEntry[]): PortfolioRunSegment =>
   packing: packPortfolioRun(toRunItems(images)),
 });
 
+// splits a packed run's trailing widow row out from the rest of it -
+// shared by the mid-sequence (paired with a same-group memo) and
+// end-of-group (paired with nothing, or a cross-group memo) cases
+const splitWidowFromRun = (
+  runSegment: PortfolioRunSegment,
+): { nonWidowImages: PortfolioLayoutImageEntry[]; widowImages: PortfolioWidowImage[] } => {
+  const widowKeySet = new Set(runSegment.packing.widowKeys);
+  const columnSpanByKey = new Map(
+    runSegment.packing.placements.map((placement) => [placement.key, placement.columnSpan]),
+  );
+  const nonWidowImages = runSegment.images.filter((image) => !widowKeySet.has(image.key));
+  const widowImages: PortfolioWidowImage[] = runSegment.images
+    .filter((image) => widowKeySet.has(image.key))
+    .map((image) => ({ ...image, columnSpan: columnSpanByKey.get(image.key) ?? 1 }));
+
+  return { nonWidowImages, widowImages };
+};
+
 export const splitPortfolioLayoutIntoSegments = (
   entries: PortfolioLayoutEntry[],
+  endsBeforeMemo = false,
 ): PortfolioLayoutSegment[] => {
   const segments: PortfolioLayoutSegment[] = [];
   let pendingImages: PortfolioLayoutImageEntry[] = [];
@@ -80,14 +108,7 @@ export const splitPortfolioLayoutIntoSegments = (
       return;
     }
 
-    const widowKeySet = new Set(runSegment.packing.widowKeys);
-    const columnSpanByKey = new Map(
-      runSegment.packing.placements.map((placement) => [placement.key, placement.columnSpan]),
-    );
-    const nonWidowImages = runSegment.images.filter((image) => !widowKeySet.has(image.key));
-    const widowImages: PortfolioWidowImage[] = runSegment.images
-      .filter((image) => widowKeySet.has(image.key))
-      .map((image) => ({ ...image, columnSpan: columnSpanByKey.get(image.key) ?? 1 }));
+    const { nonWidowImages, widowImages } = splitWidowFromRun(runSegment);
 
     if (nonWidowImages.length > 0) {
       segments.push(packImages(nonWidowImages));
@@ -108,11 +129,18 @@ export const splitPortfolioLayoutIntoSegments = (
     }
   }
 
-  // the group's absolute final run, if any - its trailing widow row (if
-  // short) has no following memo to pair with, so it stays a plain short
-  // row exactly as it behaves today (spec §2.1)
   if (pendingImages.length > 0) {
-    segments.push(packImages(pendingImages));
+    const runSegment = packImages(pendingImages);
+
+    if (endsBeforeMemo && runSegment.packing.isWidowRow) {
+      const { nonWidowImages, widowImages } = splitWidowFromRun(runSegment);
+      if (nonWidowImages.length > 0) segments.push(packImages(nonWidowImages));
+      segments.push({ kind: "widow", images: widowImages });
+    } else {
+      // no memo follows (in this group or, per endsBeforeMemo, the next
+      // one either) - stays a plain short row, exactly as before this existed
+      segments.push(runSegment);
+    }
   }
 
   return segments;

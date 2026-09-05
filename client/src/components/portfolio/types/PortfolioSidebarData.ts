@@ -6,5 +6,6 @@ export interface PortfolioSidebarData {
     title: string;
     subcategories: string[];
     menu: { [name: string]: string }[];
+    groupHasMemo: { [groupId: string]: boolean }[];
   };
 }

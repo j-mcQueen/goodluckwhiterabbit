@@ -1,8 +1,8 @@
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import { triggerBatch } from "./utils/triggerBatch";
-import { generateKeys } from "../global/utils/generateKeys";
 import { resolveGroupId } from "./utils/resolveGroupId";
+import { resolveGroupHasMemo } from "./utils/resolveGroupHasMemo";
+import { loadPortfolioBlocksForGroup } from "./utils/loadPortfolioBlocksForGroup";
 
 import BrowseColumns from "./BrowseColumns";
 
@@ -20,11 +20,10 @@ export default function Sidebar({ ...props }) {
     setActiveGroupId,
     setActiveSub,
     setActiveTab,
-    setImages,
+    setBlocks,
     setNextStartIndex,
     setNotice,
     setSidebarOpen,
-    setStaticKeys,
     sidebarRect,
   } = props;
 
@@ -53,23 +52,21 @@ export default function Sidebar({ ...props }) {
     }
 
     try {
-      const nextImages = await triggerBatch(
-        subcategories[j],
-        browseTab,
+      const hasMemo = resolveGroupHasMemo(sidebarData, route, j, groupId);
+      const { blocks, nextStartIndex } = await loadPortfolioBlocksForGroup({
+        activeSub: subcategories[j],
+        activeTab: browseTab,
         groupId,
-        setImages,
+        hasMemo,
         setNotice,
-        true,
-        0,
-        j,
-        setActiveSub,
-      );
+      });
 
-      if (nextImages) {
-        setStaticKeys(generateKeys(nextImages.length));
-        setNextStartIndex(nextImages.length);
+      if (blocks.length > 0) {
+        setBlocks(blocks);
+        setNextStartIndex(nextStartIndex);
       }
 
+      setActiveSub(j);
       setActiveGroup(0);
       setActiveGroupId(groupId);
 
@@ -97,23 +94,21 @@ export default function Sidebar({ ...props }) {
     }
 
     try {
-      const nextImages = await triggerBatch(
-        subcategories[highlightSub],
-        browseTab,
+      const hasMemo = resolveGroupHasMemo(sidebarData, route, highlightSub, groupId);
+      const { blocks, nextStartIndex } = await loadPortfolioBlocksForGroup({
+        activeSub: subcategories[highlightSub],
+        activeTab: browseTab,
         groupId,
-        setImages,
+        hasMemo,
         setNotice,
-        true,
-        0,
-        !isActiveCategory ? highlightSub : undefined,
-        !isActiveCategory ? setActiveSub : undefined,
-      );
+      });
 
-      if (nextImages) {
-        setStaticKeys(generateKeys(nextImages.length));
-        setNextStartIndex(nextImages.length);
+      if (blocks.length > 0) {
+        setBlocks(blocks);
+        setNextStartIndex(nextStartIndex);
       }
 
+      if (!isActiveCategory) setActiveSub(highlightSub);
       setActiveGroup(k);
       setActiveGroupId(groupId);
 

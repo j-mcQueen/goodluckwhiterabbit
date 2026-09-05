@@ -345,25 +345,6 @@ export const generatePortfolioLayoutUrls = async (req, res, next) => {
   return res.status(200).json({ items, stored: group.layout.length, skipped });
 };
 
-// tiny, dedicated check so the public site can decide, per group, whether
-// to use the layout-aware read path or the untouched existing one, without
-// changing the shape of getPortfolioTaxonomy's response (which every
-// visitor's sidebar/menu already depends on) or its many existing
-// consumers (Sidebar.tsx, GroupList.tsx, MenuItem.tsx, mobile nav, etc.)
-export const getPortfolioGroupHasMemo = async (req, res, next) => {
-  const { category, sub, groupId } = req.params;
-
-  const subcategory = await PortfolioSubcategory.findOne(
-    { category, name: sub },
-    { groups: 1 },
-  );
-  const group = subcategory?.groups.find((g) => g.groupId === groupId);
-  if (!group) return res.status(404).json({ error: "Group not found" });
-
-  const hasMemo = group.layout.some((entry) => entry.type === "memo");
-  return res.status(200).json({ hasMemo });
-};
-
 export const countImagesetItems = async (req, res, next) => {
   const verified = await verifyTokens(req, res);
 

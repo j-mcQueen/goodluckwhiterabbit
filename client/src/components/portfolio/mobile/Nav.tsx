@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { triggerBatch } from "../utils/triggerBatch";
 import { resolveGroupId } from "../utils/resolveGroupId";
+import { resolveGroupHasMemo } from "../utils/resolveGroupHasMemo";
+import { loadPortfolioBlocksForGroup } from "../utils/loadPortfolioBlocksForGroup";
 
 import TopBar from "../../global/header/mobile/TopBar";
 import Instagram from "../../../assets/media/icons/Instagram";
@@ -15,8 +16,9 @@ export default function Nav({ ...props }) {
     categoryIndex,
     onGroupSelect,
     route,
+    setBlocks,
     setContactOpen,
-    setImages,
+    setNextStartIndex,
     setNotice,
     sidebarData,
   } = props;
@@ -34,40 +36,44 @@ export default function Nav({ ...props }) {
     const groupId = resolveGroupId(sidebarData, route, j, 0);
     if (!groupId) return; // subcategory has no groups yet
 
-    const nextImages = await triggerBatch(
-      subcategories[j],
-      categoryIndex,
+    const hasMemo = resolveGroupHasMemo(sidebarData, route, j, groupId);
+    const { blocks, nextStartIndex } = await loadPortfolioBlocksForGroup({
+      activeSub: subcategories[j],
+      activeTab: categoryIndex,
       groupId,
-      setImages,
+      hasMemo,
       setNotice,
-      true,
-      0,
-    );
+    });
+
+    if (blocks.length > 0) {
+      setBlocks(blocks);
+      setNextStartIndex(nextStartIndex);
+    }
 
     onGroupSelect?.(j, 0, groupId);
     setIsOpen({ main: false });
-
-    return nextImages;
   };
 
   const handleGroupClick = async (k: number) => {
     const groupId = resolveGroupId(sidebarData, route, activeSubIndex, k);
     if (!groupId) return;
 
-    const nextImages = await triggerBatch(
-      subcategories[activeSubIndex],
-      categoryIndex,
+    const hasMemo = resolveGroupHasMemo(sidebarData, route, activeSubIndex, groupId);
+    const { blocks, nextStartIndex } = await loadPortfolioBlocksForGroup({
+      activeSub: subcategories[activeSubIndex],
+      activeTab: categoryIndex,
       groupId,
-      setImages,
+      hasMemo,
       setNotice,
-      true,
-      0,
-    );
+    });
+
+    if (blocks.length > 0) {
+      setBlocks(blocks);
+      setNextStartIndex(nextStartIndex);
+    }
 
     onGroupSelect?.(activeSubIndex, k, groupId);
     setIsOpen({ main: false });
-
-    return nextImages;
   };
 
   return (

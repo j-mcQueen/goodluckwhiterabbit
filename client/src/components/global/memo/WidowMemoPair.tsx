@@ -1,5 +1,6 @@
 import { ReactNode } from "react";
 import MemoDisplay from "./MemoDisplay";
+import WidowImagesRow from "./WidowImagesRow";
 
 // Renders a run's trailing widow row (1-2 images that don't fill all 3
 // grid columns) together with the memo that follows it, both centered on
@@ -19,7 +20,7 @@ export default function WidowMemoPair({
 }) {
   return (
     <div className="flex flex-col items-center w-full gap-2">
-      <div className="flex justify-center gap-2 w-full px-2">
+      <WidowImagesRow>
         {widowImages.map((image) => (
           <div
             key={image.key}
@@ -28,7 +29,7 @@ export default function WidowMemoPair({
             {renderImage(image.key)}
           </div>
         ))}
-      </div>
+      </WidowImagesRow>
       <MemoDisplay html={html} onInquire={onInquire} />
     </div>
   );

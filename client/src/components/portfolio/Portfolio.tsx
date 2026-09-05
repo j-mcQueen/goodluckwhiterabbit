@@ -1,14 +1,15 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
 import { AnimatePresence } from "framer-motion";
-import { triggerBatch } from "./utils/triggerBatch";
 import { resolveGroupId } from "./utils/resolveGroupId";
 import { resolveGroupIndex } from "./utils/resolveGroupIndex";
+import { resolveGroupHasMemo } from "./utils/resolveGroupHasMemo";
+import { loadPortfolioBlocksForGroup } from "./utils/loadPortfolioBlocksForGroup";
 import { mobile } from "../global/utils/determineViewport";
-import { generateKeys } from "../global/utils/generateKeys";
 import { determineHost as host } from "../global/utils/determineHost";
 import { playSound } from "../global/utils/sound";
 import { PortfolioSidebarData } from "./types/PortfolioSidebarData";
+import { PortfolioBlock } from "./types/PortfolioBlock";
 import { DISABLED_CATEGORY_ROUTES } from "./disabledCategories";
 
 import Header from "../global/header/Header";
@@ -19,9 +20,9 @@ import Nav from "./mobile/Nav";
 import NoticeDialog from "./NoticeDialog";
 
 const EMPTY_SIDEBAR_DATA: PortfolioSidebarData = {
-  "/photo": { title: "", subcategories: [], menu: [] },
-  "/art": { title: "", subcategories: [], menu: [] },
-  "/design": { title: "", subcategories: [], menu: [] },
+  "/photo": { title: "", subcategories: [], menu: [], groupHasMemo: [] },
+  "/art": { title: "", subcategories: [], menu: [], groupHasMemo: [] },
+  "/design": { title: "", subcategories: [], menu: [], groupHasMemo: [] },
 };
 
 const CATEGORY_ROUTES = ["/photo", "/art", "/design"];
@@ -52,8 +53,7 @@ export default function Portfolio({ ...props }) {
   const [activeGroupId, setActiveGroupId] = useState<string | undefined>(
     undefined,
   ); // real S3 groupId - authoritative for all data-fetching decisions
-  const [images, setImages] = useState<{ blob: Blob; group: string }[]>([]);
-  const [staticKeys, setStaticKeys] = useState<string[]>(generateKeys(10));
+  const [blocks, setBlocks] = useState<PortfolioBlock[]>([]);
   const [nextStartIndex, setNextStartIndex] = useState<number>(10);
   const [sidebarData, setSidebarData] =
     useState<PortfolioSidebarData>(EMPTY_SIDEBAR_DATA);
@@ -215,19 +215,19 @@ export default function Portfolio({ ...props }) {
       if (!groupId) return; // subcategory has no groups yet
 
       try {
-        const nextImages = await triggerBatch(
-          activeSubName,
-          activeTab,
-          groupId,
-          setImages,
-          setNotice,
-          true,
-          0,
-        );
+        const hasMemo = resolveGroupHasMemo(sidebarData, route, activeSub, groupId);
+        const { blocks: nextBlocks, nextStartIndex: resolvedStart } =
+          await loadPortfolioBlocksForGroup({
+            activeSub: activeSubName,
+            activeTab,
+            groupId,
+            hasMemo,
+            setNotice,
+          });
 
-        if (nextImages) {
-          setStaticKeys(generateKeys(nextImages.length));
-          setNextStartIndex(nextImages.length);
+        if (nextBlocks.length > 0) {
+          setBlocks(nextBlocks);
+          setNextStartIndex(resolvedStart);
 
           // only the landing page's subcategory pick asks for this - normal
           // in-portfolio category/tab switches stay silent
@@ -277,8 +277,9 @@ export default function Portfolio({ ...props }) {
           categoryIndex={index}
           onGroupSelect={handleMobileGroupSelect}
           route={route}
+          setBlocks={setBlocks}
           setContactOpen={setContactOpen}
-          setImages={setImages}
+          setNextStartIndex={setNextStartIndex}
           setNotice={setNotice}
           sidebarData={sidebarData}
         />
@@ -317,11 +318,10 @@ export default function Portfolio({ ...props }) {
               setActiveGroupId={setActiveGroupId}
               setActiveSub={setActiveSub}
               setActiveTab={setActiveTab}
-              setImages={setImages}
+              setBlocks={setBlocks}
               setNextStartIndex={setNextStartIndex}
               setNotice={setNotice}
               setSidebarOpen={setSidebarOpen}
-              setStaticKeys={setStaticKeys}
             />
           )}
         </AnimatePresence>
@@ -329,18 +329,19 @@ export default function Portfolio({ ...props }) {
         <Body
           activeGroupId={activeGroupId}
           activeSub={activeSubName}
+          activeSubIndex={activeSub}
           activeTab={activeTab}
+          blocks={blocks}
           bodyRef={bodyRef}
           breadcrumb={mobileBreadcrumb}
-          images={images}
           nextStartIndex={nextStartIndex}
+          route={route}
           setActiveGroupId={setActiveGroupId}
+          setBlocks={setBlocks}
           setContactOpen={setContactOpen}
-          setImages={setImages}
           setNextStartIndex={setNextStartIndex}
           setNotice={setNotice}
-          setStaticKeys={setStaticKeys}
-          staticKeys={staticKeys}
+          sidebarData={sidebarData}
         />
       </main>
     </div>

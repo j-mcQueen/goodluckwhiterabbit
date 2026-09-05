@@ -6,12 +6,12 @@ type LayoutApiItem =
   | { type: "image"; position: number; url: string }
   | { type: "memo"; memoId: string; html: string };
 
-// Admin counterpart to fetchFullPortfolioLayout.ts (public site), but
-// fetches a single page at a time rather than looping to completion - large
-// groups (50+ full-resolution images) shouldn't all be fetched and decoded
-// into memory just to open the admin grid. Used by PortfolioAdminGrid.tsx,
-// which accumulates pages itself and exposes a "load next batch" affordance
-// instead of loading everything up front.
+// Admin counterpart to fetchPortfolioLayoutBatch.ts (public site) - same
+// single-page-at-a-time shape, since large groups (50+ full-resolution
+// images) shouldn't all be fetched and decoded into memory just to open the
+// admin grid. Used by PortfolioAdminGrid.tsx, which accumulates pages
+// itself and exposes a "load next batch" affordance instead of loading
+// everything up front.
 export const fetchAdminPortfolioLayoutBatch = async (
   category: string,
   sub: string,
