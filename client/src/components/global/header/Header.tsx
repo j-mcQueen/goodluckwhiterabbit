@@ -65,13 +65,21 @@ export default function Header({
     std: "border-b-white",
   };
 
-  const buttonVariants = {
-    disabled: "opacity-20 w-full h-full tracking-widest",
-    active:
-      "text-rd xl:hover:text-rd xl:focus:text-rd transition-colors w-full h-full tracking-vt xl:focus:outline-none drop-shadow-red xl:focus:drop-shadow-red xl:hover:drop-shadow-red",
-    inactive:
-      "text-white/70 xl:hover:opacity-100 xl:focus:opacity-100 xl:hover:text-rd xl:focus:text-rd transition-colors w-full h-full tracking-vt xl:focus:outline-none drop-shadow-glo xl:focus:drop-shadow-red xl:hover:drop-shadow-red",
-  };
+  const buttonVariants = logout
+    ? {
+        disabled: "opacity-20 w-full h-full tracking-widest",
+        active:
+          "text-rd xl:hover:text-rd xl:focus:text-rd transition-colors w-full h-full tracking-vt xl:focus:outline-none drop-shadow-red xl:focus:drop-shadow-red xl:hover:drop-shadow-red",
+        inactive:
+          "text-white/70 xl:hover:opacity-100 xl:focus:opacity-100 xl:hover:text-rd xl:focus:text-rd transition-colors w-full h-full tracking-vt xl:focus:outline-none drop-shadow-glo xl:focus:drop-shadow-red xl:hover:drop-shadow-red",
+      }
+    : {
+        disabled: "text-gray/50 w-full h-full tracking-widest",
+        active:
+          "text-white transition-colors w-full h-full tracking-vt xl:focus:outline-none drop-shadow-glo",
+        inactive:
+          "text-gray xl:hover:text-white xl:focus:text-white transition-colors w-full h-full tracking-vt xl:focus:outline-none",
+      };
 
   const handleLogout = async () => {
     const response = await fetch(`${host}/logout`, {

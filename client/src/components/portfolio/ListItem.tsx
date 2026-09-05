@@ -3,7 +3,7 @@ export default function ListItem({ ...props }) {
 
   const styles = {
     item: "w-full h-full overflow-y-scroll relative",
-    button: `w-full h-full max-h-full relative flex flex-col items-center justify-center gap-1 py-5 transition-colors ${active ? "text-rd drop-shadow-red" : "text-white/70"}`,
+    button: `w-full h-full max-h-full relative flex flex-col items-center justify-center gap-1 py-5 transition-colors ${active ? "text-white drop-shadow-glo" : "text-gray xl:hover:text-white xl:focus:text-white"}`,
   };
 
   return (
