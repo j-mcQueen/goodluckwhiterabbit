@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import { useLocation } from "react-router-dom";
+import { motion } from "framer-motion";
 
 import rabbit from "../../assets/media/gifs/glwr-lenticular.gif";
 import ThisWayUp from "../../assets/media/icons/ThisWayUp";
@@ -26,8 +27,18 @@ export default function Welcome() {
           alt="A white rabbit against a black background shimmering from left to right"
         />
 
-        {/* reserved for a future biography section */}
-        <div />
+        <div className="text-xl text-white text-center tracking-vt">
+          <p className="pb-5">
+            THE WORK AND ARCHIVE OF NYC-BASED ARTIST, PHOTOGRAPHER, AND DESIGNER
+            KAI McQUEEN.
+          </p>
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1, transition: { delay: 0.5, duration: 1 } }}
+          >
+            AN INQUIRY INTO WHAT IS, EVER IN PURSUIT OF PURPOSE AND BALANCE.
+          </motion.p>
+        </div>
 
         <ThisWayUp className="w-10 h-10 opacity-80 drop-shadow-glo" />
       </section>
