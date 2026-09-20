@@ -101,12 +101,16 @@ export default function Fork() {
                   isFirstInPage={posInPage === 0}
                   isLast={pos === visible.length - 1}
                   // bare bottom edge only where the tile's bottom actually
-                  // meets the frame: a full page, or a selected tile filling
-                  // it. A lone tile with room beneath (reserved for contact
-                  // info) keeps its bottom border.
+                  // meets the frame: the final page when full, or a selected
+                  // tile filling it. Every other page's last tile keeps its
+                  // bottom border - it is the only divider between pages
+                  // (the next page's first tile is bare on top). A lone tile
+                  // with room beneath (reserved for contact info) keeps it too.
                   isLastInPage={
                     posInPage === tiles.length - 1 &&
-                    (tiles.length === TILES_PER_PAGE || selected !== null)
+                    (selected !== null ||
+                      (tiles.length === TILES_PER_PAGE &&
+                        page === pages[pages.length - 1].page))
                   }
                   key={`${a.alt}-${selected === a.i}`}
                   onDeselect={() => changeSelected(null)}
