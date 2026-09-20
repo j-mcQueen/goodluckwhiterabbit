@@ -103,24 +103,26 @@ export default function Portfolio({ ...props }) {
     }
   }, [activeGroupId, sidebarData, route, mobileSubIndex, activeSub, activeGroup]);
 
-  // clicking your own active tab toggles its sidebar; clicking a different
-  // tab opens/keeps open a *browse* session for that category without
-  // committing (no route/activeTab change) until a pick is made within it
+  // clicking the tab whose sidebar is currently showing closes it; clicking
+  // any other tab (or any tab while closed) opens a *browse* session for that
+  // category without committing (no route/activeTab change) until a pick is
+  // made within it
   const handleCategoryTabClick = (tabIndex: number) => {
+    if (sidebarOpen && tabIndex === browseTab) {
+      setSidebarOpen(false);
+      return;
+    }
+
     if (tabIndex !== browseTab) {
       setBrowseTab(tabIndex);
       setBrowseSub(0);
     }
 
-    if (tabIndex === activeTab) {
-      setSidebarOpen((prev) => !prev);
-    } else {
-      setSidebarOpen(true);
-    }
+    setSidebarOpen(true);
   };
 
   // keeps the desktop sidebar overlay sized/positioned to exactly match the
-  // active category tab in the header, so it reads as a dropdown from that tab
+  // browsed category tab in the header, so it reads as a dropdown from that tab
   const handleActiveTabRectChange = (
     rect: { left: number; width: number } | null,
   ) => {
@@ -286,6 +288,7 @@ export default function Portfolio({ ...props }) {
       ) : (
         <Header
           activeTab={activeTab}
+          anchorTab={browseTab}
           data={headerItems}
           dashboard={categoryAvailability}
           loadTrackerRef={loadTrackerRef}

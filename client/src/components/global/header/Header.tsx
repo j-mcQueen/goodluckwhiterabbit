@@ -11,6 +11,7 @@ export default function Header({
   ...props
 }: {
   activeTab: number;
+  anchorTab?: number; // tab whose rect is reported via onActiveTabRectChange; defaults to activeTab
   dashboard: boolean | number[];
   data: string[];
   logout: boolean;
@@ -28,6 +29,7 @@ export default function Header({
     data,
     setActiveIndex,
     activeTab,
+    anchorTab = activeTab,
     setActiveTab,
     dashboard,
     handleSelect,
@@ -39,26 +41,27 @@ export default function Header({
   } = props;
   const navigate = useNavigate();
 
-  const [activeTabNode, setActiveTabNode] = useState<HTMLLIElement | null>(
+  const [anchorTabNode, setAnchorTabNode] = useState<HTMLLIElement | null>(
     null,
   );
 
-  // reports the active category tab's viewport rect up to Portfolio, which
-  // uses it to size/position the desktop sidebar overlay to match
+  // reports the anchor tab's (the one being browsed, else the active one)
+  // viewport rect up to Portfolio, which uses it to size/position the desktop
+  // sidebar overlay to match
   useEffect(() => {
-    if (!activeTabNode || !onActiveTabRectChange) return;
+    if (!anchorTabNode || !onActiveTabRectChange) return;
 
     const report = () => {
-      const rect = activeTabNode.getBoundingClientRect();
+      const rect = anchorTabNode.getBoundingClientRect();
       onActiveTabRectChange({ left: rect.left, width: rect.width });
     };
 
     report();
 
     const observer = new ResizeObserver(report);
-    observer.observe(activeTabNode);
+    observer.observe(anchorTabNode);
     return () => observer.disconnect();
-  }, [activeTabNode, onActiveTabRectChange]);
+  }, [anchorTabNode, onActiveTabRectChange]);
 
   const listItemVariants = {
     active: "text-white border-b-black",
@@ -122,7 +125,7 @@ export default function Header({
             return (
               <li
                 ref={(el) => {
-                  if (index === activeTab) setActiveTabNode(el);
+                  if (index === anchorTab) setAnchorTabNode(el);
                 }}
                 className={`${activeTab === index ? listItemVariants.active : listItemVariants.std} ${dashboard && dashboard[index as keyof typeof dashboard] === 0 && index !== data.length - 1 ? "border-r-white inline" : ""}  border-r border-b border-solid border-white w-full flex items-center justify-center relative`}
                 key={tab}
