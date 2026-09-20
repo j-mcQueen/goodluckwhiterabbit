@@ -11,7 +11,6 @@ export const portfolioBulkUpload = async (
   category: string,
   sub: string,
   groupId: string,
-  existingCount: number,
   updateProgress: (percent: number) => void,
 ): Promise<PortfolioBulkUploadResponse> => {
   return new Promise((resolve, reject) => {
@@ -19,7 +18,7 @@ export const portfolioBulkUpload = async (
 
     req.open(
       "POST",
-      `${host}/admin/portfolio/${category}/${sub}/${groupId}/bulkUpload?fileCount=${existingCount}`,
+      `${host}/admin/portfolio/${category}/${sub}/${groupId}/bulkUpload`,
     );
     req.withCredentials = true;
     req.setRequestHeader("Accept", "application/json");

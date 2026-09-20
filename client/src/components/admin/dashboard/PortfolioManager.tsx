@@ -80,10 +80,6 @@ export default function PortfolioManager({ ...props }) {
     getTaxonomy();
   }, [setNotice]);
 
-  const activeGroup = targetSubcategory?.groups.find(
-    (group) => group.groupId === targetGroupId,
-  );
-
   const resetToCategories = () => {
     setActiveCategory(null);
     setTargetSubcategory(null);
@@ -202,7 +198,6 @@ export default function PortfolioManager({ ...props }) {
                 activeCategory,
                 targetSubcategory.name,
                 targetGroupId,
-                activeGroup?.count ?? 0,
                 (percent: number) => setUploadProgress(percent),
               );
 

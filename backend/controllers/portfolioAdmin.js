@@ -493,7 +493,9 @@ export const adminUploadPortfolioImage = async (req, res, next) => {
 
 // multi-file append upload - mirrors admin.js's bulkUpload, but simpler:
 // no `og` variant, and no filename-suffix sort step since the browser-built
-// upload queue's array order already is the intended position order (§7)
+// upload queue's array order already is the intended position order (§7).
+// The starting position is derived server-side (see below), never taken from
+// the client's file count.
 export const adminBulkUploadPortfolioImages = async (req, res, next) => {
   const verified = await verifyTokens(req, res);
 
@@ -522,8 +524,35 @@ export const adminBulkUploadPortfolioImages = async (req, res, next) => {
       return res.status(404).json({ error: owner.error });
     }
 
-    const existingCount = Number(req.query.fileCount) || 0;
     const prefix = `${category}/${sub}/${groupId}/`;
+
+    // first free position = one past the highest position already used, by
+    // either the layout or S3. Deliberately not the group's `count`: deletes
+    // leave gaps in positions (and partial-failure batches leave count short
+    // of the highest position used), so count can sit at or below an
+    // occupied position. Starting there would write a second, differently
+    // named object at that same position, which the public reader lists as a
+    // duplicate image. Taking the max of both sources also covers layout drift.
+    let startPosition;
+    try {
+      const s3Positions = await derivePortfolioImagePositionsFromS3(
+        category,
+        sub,
+        groupId,
+      );
+      const layoutGroup = owner.subcategory.groups.find(
+        (candidate) => candidate.groupId === groupId,
+      );
+      const layoutPositions = (layoutGroup.layout ?? [])
+        .filter((item) => item.type === "image")
+        .map((item) => item.position);
+      startPosition = Math.max(-1, ...s3Positions, ...layoutPositions) + 1;
+    } catch (error) {
+      await cleanupTemp();
+      return res
+        .status(500)
+        .json({ error: "Upload failed", detail: "Could not read the group's current images." });
+    }
 
     const uploadToS3 = (buffer, key) =>
       s3.send(
@@ -539,7 +568,7 @@ export const adminBulkUploadPortfolioImages = async (req, res, next) => {
       const settled = await Promise.allSettled(
         files.map((file, index) =>
           limit(async () => {
-            const position = index + existingCount;
+            const position = index + startPosition;
             const filename = `${sanitizeFilenameBase(file.originalname)}_${position}.webp`;
             const [largeBuffer, smallBuffer] = await Promise.all([
               sharp(file.path).resize(2400, null).toFormat("webp").toBuffer(),
@@ -561,15 +590,18 @@ export const adminBulkUploadPortfolioImages = async (req, res, next) => {
         .map((item, i) => (item.status === "rejected" ? files[i].originalname : null))
         .filter(Boolean);
       const succeededPositions = settled
-        .map((item, i) => (item.status === "fulfilled" ? i + existingCount : null))
+        .map((item, i) => (item.status === "fulfilled" ? i + startPosition : null))
         .filter((position) => position !== null);
 
-      await updatePortfolioGroupCount(
+      const updated = await updatePortfolioGroupCount(
         owner.subcategory._id,
         groupId,
         res,
         PortfolioSubcategory,
         succeeded.length,
+      );
+      const updatedGroup = updated?.groups?.find(
+        (candidate) => candidate.groupId === groupId,
       );
 
       if (succeededPositions.length > 0) {
@@ -588,7 +620,7 @@ export const adminBulkUploadPortfolioImages = async (req, res, next) => {
       return res.status(200).json({
         succeeded,
         failed,
-        newCount: succeeded.length + existingCount,
+        newCount: updatedGroup?.count ?? succeeded.length,
       });
     } catch (error) {
       return res
