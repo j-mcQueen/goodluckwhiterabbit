@@ -24,7 +24,7 @@ export default function Views({ ...props }) {
   });
 
   return (
-    <div className="flex xl:flex-row flex-col max-h-[calc(100dvh-57px-var(--frame))]">
+    <div className="flex xl:flex-row flex-col max-h-[calc(100dvh-var(--header)-var(--frame))] xl:h-[calc(100dvh-var(--header)-var(--frame))]">
       <Sidebar
         activeImageset={activeImageset}
         images={images}

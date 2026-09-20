@@ -4,26 +4,26 @@ import rabbit from "../../../../assets/media/gifs/glwr-lenticular.gif";
 export default function TopBar({ ...props }) {
   const { isMobilePortfolio, isOpen, logout, setIsOpen } = props;
 
-  const Rabbit = () => {
+  const Rabbit = ({ className = "max-h-[48px]" }: { className?: string }) => {
     return (
       <img
         src={rabbit}
         alt="A white rabbit against a black background shimmering from left to right"
-        className="max-h-[48px]"
+        className={className}
       />
     );
   };
 
   return (
     <div className="flex items-center justify-between w-full">
-      <div className="w-full">
+      <div className="w-full flex justify-center">
         {logout ? (
-          <Rabbit />
+          <Rabbit className="max-h-4" />
         ) : (
           <Link
             to={"/"}
             state={{ toSegments: true }}
-            className="w-full h-full flex justify-center"
+            className="w-full h-4 flex justify-center"
           >
             <Rabbit />
           </Link>

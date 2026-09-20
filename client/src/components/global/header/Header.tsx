@@ -21,7 +21,9 @@ export default function Header({
   setContactOpen?: Dispatch<SetStateAction<boolean>>;
   images?: { [key: string]: Blob[] };
   loadTrackerRef?: React.MutableRefObject<boolean>;
-  onActiveTabRectChange?: (rect: { left: number; width: number } | null) => void;
+  onActiveTabRectChange?: (
+    rect: { left: number; width: number } | null,
+  ) => void;
   onCategoryTabClick?: (index: number) => void;
 }) {
   const {
@@ -98,23 +100,25 @@ export default function Header({
   return (
     <header className="text-white">
       <nav className="flex">
-        <div className="border-r border-b border-solid border-white min-w-[189px] flex justify-center">
+        <div
+          className={`border-r border-b border-solid border-white flex justify-center items-center ${logout ? "min-w-sidebar max-w-sidebar px-5" : "min-w-[189px]"}`}
+        >
           {logout ? (
             <img
               src={rabbit}
               alt="A white rabbit against a black background shimmering from left to right"
-              className="max-h-14"
+              className="w-full"
             />
           ) : (
             <button
               type="button"
               onClick={() => navigate("/", { state: { toSegments: true } })}
-              className="flex justify-center"
+              className="flex justify-center items-center"
             >
               <img
                 src={rabbit}
                 alt="A white rabbit against a black background shimmering from left to right"
-                className="max-h-14"
+                className="max-h-4"
               />
             </button>
           )}
@@ -183,7 +187,7 @@ export default function Header({
         {logout ? (
           <button
             type="button"
-            className="xl:hover:text-rd focus:text-rd transition-colors px-[18px] border-b border-solid border-white tracking-widest group"
+            className="xl:hover:text-rd focus:text-rd transition-colors p-[18px] border-b border-solid border-white tracking-widest group"
             onClick={() => handleLogout()}
           >
             <Eject className="w-5 h-5 group-hover:fill-rd group-focus:fill-rd group-hover:drop-shadow-red group-focus:drop-shadow-red transition-colors" />

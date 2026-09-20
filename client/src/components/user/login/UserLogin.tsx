@@ -29,13 +29,13 @@ export default function UserLogin() {
         case 404:
           // user not found
           throw new TypeError(
-            "User not found. Please check your code and try again."
+            "User not found. Please check your code and try again.",
           );
 
         case 500:
           // something else went wrong
           throw new TypeError(
-            "Something went wrong. Please reach out for assistance."
+            "Something went wrong. Please reach out for assistance.",
           );
 
         default:
@@ -54,9 +54,9 @@ export default function UserLogin() {
   return (
     <main className="w-[calc(100dvw-var(--frame)-2px)] h-[calc(100dvh-var(--frame)-2px)] flex items-center justify-center">
       <section className="text-white xl:border xl:border-solid xl:border-white w-[90dvw] h-dvh xl:w-[25dvw] xl:h-[35dvw] pb-6 xl:mx-0 xl:py-0 flex flex-col justify-center xl:justify-end">
-        <Rabbit />
+        <Rabbit className="max-h-4" />
 
-        <hgroup className="pt-10 xl:pb-5 xl:pl-10 pl-3">
+        <hgroup className="pt-10 xl:pb-5 xl:pl-10">
           <h1 className="font-tnrBI text-2xl xl:text-3xl tracking-widest opacity-80 drop-shadow-glo pt-10">
             MEMORIES AWAIT
           </h1>
@@ -95,10 +95,7 @@ export default function UserLogin() {
           )}
 
           <div className="text-end xl:pt-6">
-            <button
-              type="submit"
-              className={loginSubmit}
-            >
+            <button type="submit" className={loginSubmit}>
               <span className="font-tnrBI text-xl tracking-widest opacity-80">
                 ENTER
               </span>

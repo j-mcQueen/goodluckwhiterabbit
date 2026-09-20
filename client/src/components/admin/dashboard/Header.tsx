@@ -29,7 +29,7 @@ export default function Header({ ...props }) {
         <img
           src={rabbit}
           alt="A leaping white rabbit"
-          className="h-full xl:scale-[2] xl:translate-x-10"
+          className="h-4 xl:translate-x-10"
         />
       </div>
 

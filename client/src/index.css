@@ -38,6 +38,8 @@
   min-width: 300px;
   overflow-x: hidden;
   --frame: 1rem;
+  /* dashboard header height: square eject button (20px icon + 2*18px padding) + 1px border */
+  --header: 57px;
 }
 
 * {

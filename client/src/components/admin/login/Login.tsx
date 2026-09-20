@@ -94,10 +94,7 @@ export default function Login() {
           )}
 
           <div className="text-end xl:pt-6">
-            <button
-              type="submit"
-              className={loginSubmit}
-            >
+            <button type="submit" className={loginSubmit}>
               <span className="font-tnrBI text-xl tracking-widest opacity-80">
                 ENTER
               </span>
