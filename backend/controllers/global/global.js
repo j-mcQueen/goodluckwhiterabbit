@@ -204,9 +204,11 @@ export const generatePortfolioUrls = async (req, res, next) => {
 
       stored += matches.length;
 
-      for (const obj of matches) {
-        const pos = Number(obj.Key.match(positionRegex)?.[1]);
-        if (!Number.isInteger(pos) || pos < cursorStart) continue;
+      // `start` is an index into the position-sorted list (the client sends
+      // its count of already-loaded images), not a position number - positions
+      // have gaps after deletes, so comparing against them would re-serve
+      // images near the end of a group as duplicates
+      for (const obj of matches.slice(cursorStart)) {
         keys.push(obj.Key);
         if (keys.length === 10) break;
       }
