@@ -22,7 +22,7 @@ export default function Welcome() {
     <main className="w-[calc(100dvw-var(--frame))] h-[calc(100dvh-var(--frame))] overflow-y-scroll snap-y snap-mandatory">
       <section className="flex flex-col items-center justify-between h-[calc(100dvh-var(--frame))] py-10 snap-start snap-always">
         <img
-          className="max-w-[200px]"
+          className="max-w-[300px]"
           src={rabbit}
           alt="A white rabbit against a black background shimmering from left to right"
         />
@@ -35,12 +35,14 @@ export default function Welcome() {
           <motion.p
             initial={{ opacity: 0 }}
             animate={{ opacity: 1, transition: { delay: 0.5, duration: 1 } }}
+            className="max-xl:pb-[4.5rem]"
           >
-            AN INQUIRY INTO WHAT IS, EVER IN PURSUIT OF PURPOSE AND BALANCE.
+            AN INQUIRY INTO WHAT IS, <br className="xl:hidden" />
+            EVER IN PURSUIT OF PURPOSE AND BALANCE.
           </motion.p>
         </div>
 
-        <ThisWayUp className="w-10 h-10 opacity-80 drop-shadow-glo" />
+        <ThisWayUp className="w-7 h-7 opacity-80 drop-shadow-glo" />
       </section>
 
       {/* only visible mid-scroll, between the two snap points - clipped out
@@ -48,7 +50,9 @@ export default function Welcome() {
           #root's own frame border once Fork fills the screen */}
       <div className="h-px bg-white" />
 
-      <div ref={forkRef} className="snap-start snap-always">
+      {/* below xl Fork's own pages are the snap points - a snap area taller
+          than the viewport would let scrolling settle anywhere inside it */}
+      <div ref={forkRef} className="xl:snap-start xl:snap-always">
         <Fork />
       </div>
     </main>

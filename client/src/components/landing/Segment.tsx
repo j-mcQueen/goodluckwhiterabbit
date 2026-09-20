@@ -4,26 +4,28 @@ import { motion, AnimatePresence } from "framer-motion";
 import Rewind from "../../assets/media/icons/Rewind";
 
 const BACK_BUTTON_CLASSES =
-  "w-10 h-10 xl:w-8 xl:h-8 border border-dashed border-white/40 bg-black/50 xl:hover:border-white/70 xl:hover:bg-black/70 transition-colors flex items-center justify-center xl:hover:cursor-pointer";
+  "w-10 h-10 xl:w-8 xl:h-8 border border-solid border-white bg-black/50 xl:hover:bg-black/70 transition-colors flex items-center justify-center xl:hover:cursor-pointer";
 
 export default function Segment({ ...props }) {
   const {
     alt,
     available,
     isFirst,
+    isFirstInPage,
     isLast,
+    isLastInPage,
     onDeselect,
     onSelect,
     path,
     selected,
     source,
+    subSource,
     subcategories,
     text,
   } = props;
 
   const navigate = useNavigate();
   const [exitSubIndex, setExitSubIndex] = useState<number | null>(null);
-  const [backExiting, setBackExiting] = useState(false);
   // gates hover-reveal and clicks on the tiles below until the entering
   // chrome (label or subcategory list) has actually finished fading in -
   // otherwise a click while the mouse already sits over a tile fires the
@@ -51,20 +53,17 @@ export default function Segment({ ...props }) {
     setExitSubIndex(index);
   };
 
-  const handleBackClick = () => {
-    setBackExiting(true);
-  };
-
-  // mobile stacks segments in a column (dividers on top/bottom, outer
-  // top/bottom edges bare); xl: restores the row layout (dividers on
-  // left/right, outer left/right edges bare)
+  // mobile stacks segments in a column, two per screen-height page (dividers
+  // on top/bottom, each page's outer top/bottom edges bare); xl: restores the
+  // row layout (dividers on left/right, outer left/right edges bare)
   const segmentBorderClasses = `border-l-0 border-r-0 -my-[0.5px] xl:my-0 xl:-mx-[0.5px] xl:border-t-0 xl:border-b-0 ${
-    isFirst ? "border-t-0 xl:border-l-0" : "xl:border-l"
-  } ${isLast ? "border-b-0 xl:border-r-0" : "xl:border-r"}`;
+    isFirstInPage ? "border-t-0" : ""
+  } ${isFirst ? "xl:border-l-0" : "xl:border-l"} ${
+    isLastInPage ? "border-b-0" : ""
+  } ${isLast ? "xl:border-r-0" : "xl:border-r"}`;
 
   return (
     <motion.div
-      layout
       variants={segmentVariants}
       initial="hidden"
       animate={exitSubIndex === null ? "visible" : "hidden"}
@@ -76,13 +75,25 @@ export default function Segment({ ...props }) {
         }
       }}
       transition={{ duration: 0.5 }}
-      className={`relative flex flex-1 h-full items-center justify-center border border-white border-solid overflow-hidden ${segmentBorderClasses}`}
+      className={`relative flex flex-none xl:flex-1 xl:h-full ${selected ? "h-full" : "h-1/2"} items-center justify-center border border-white border-solid overflow-hidden ${segmentBorderClasses}`}
     >
-      <img
-        src={source}
-        alt={alt}
-        className="h-dvh opacity-70 object-cover w-full"
-      />
+      {/* primary-level image sits underneath; the subcategory-level image
+          crossfades in over it (same 500ms as the rest of the chrome) once a
+          segment is selected. Both share one opacity-70 wrapper so the
+          crossfade never dips or lets the lower image bleed through. */}
+      <div className="relative h-dvh w-full opacity-70">
+        <img
+          src={source}
+          alt={alt}
+          className="absolute inset-0 h-full w-full object-cover"
+        />
+        <img
+          src={subSource}
+          alt=""
+          aria-hidden="true"
+          className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-500 ${selected ? "opacity-100" : "opacity-0"}`}
+        />
+      </div>
 
       {/* click/hover target and the image covering, merged into one layer
           that never itself fades - only its own hover-driven opacity does.
@@ -97,25 +108,18 @@ export default function Segment({ ...props }) {
             aria-label={label}
             disabled={!chromeReady || (!selected && !available)}
             onClick={() => (selected ? handleSubcategoryClick(i) : onSelect())}
-            className={`flex-1 w-full xl:w-auto xl:h-full bg-black transition-opacity duration-500 opacity-0 xl:opacity-100 ${!chromeReady || (!selected && !available) ? "cursor-default" : ""} ${selected && chromeReady ? "xl:hover:opacity-0" : ""}`}
+            className={`flex-1 w-full xl:w-auto xl:h-full bg-black transition-opacity duration-500 opacity-0 xl:opacity-100 ${!chromeReady || (!selected && !available) ? "cursor-default" : ""} ${chromeReady && (selected || available) ? "xl:hover:opacity-0" : ""}`}
           />
         ))}
       </div>
 
-      <AnimatePresence
-        onExitComplete={() => {
-          if (backExiting) {
-            onDeselect();
-            setBackExiting(false);
-          }
-        }}
-      >
-        {selected && !backExiting && (
+      <AnimatePresence>
+        {selected && (
           <motion.button
             key="back"
             type="button"
             aria-label="Back to categories"
-            onClick={handleBackClick}
+            onClick={onDeselect}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
