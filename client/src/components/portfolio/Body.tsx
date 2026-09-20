@@ -7,7 +7,11 @@ import MemoDisplay from "../global/memo/MemoDisplay";
 import Unit from "./Unit";
 import PortfolioMemoSegments from "./PortfolioMemoSegments";
 import PortfolioTrigger from "./PortfolioTrigger";
-import StackedItem, { STACKED_ITEM_CLASSES, STACKED_IMAGE_FRAME_CLASSES } from "./StackedItem";
+import StackedItem, {
+  STACKED_ITEM_CLASSES,
+  STACKED_MEMO_ITEM_CLASSES,
+  STACKED_IMAGE_FRAME_CLASSES,
+} from "./StackedItem";
 import WidowImagesRow from "../global/memo/WidowImagesRow";
 
 const TAB_CATEGORY: Record<number, string> = {
@@ -158,13 +162,17 @@ export default function Body({ ...props }) {
       return isLastEntry ? (
         <PortfolioTrigger
           key={key}
-          className={STACKED_ITEM_CLASSES}
+          className={
+            entry.type === "memo" ? STACKED_MEMO_ITEM_CLASSES : STACKED_ITEM_CLASSES
+          }
           onTrigger={() => triggerMemoBlock(block)}
         >
           {content}
         </PortfolioTrigger>
       ) : (
-        <StackedItem key={key}>{content}</StackedItem>
+        <StackedItem key={key} memo={entry.type === "memo"}>
+          {content}
+        </StackedItem>
       );
     });
 
