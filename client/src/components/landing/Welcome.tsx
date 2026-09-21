@@ -27,7 +27,7 @@ export default function Welcome() {
           alt="A white rabbit against a black background shimmering from left to right"
         />
 
-        <div className="text-xl text-white text-center tracking-vt">
+        <div className="xl:text-xl text-white text-center tracking-vt max-xl:px-10">
           <p className="pb-5">
             THE WORK AND ARCHIVE OF NYC-BASED ARTIST, PHOTOGRAPHER, AND DESIGNER
             KAI McQUEEN.
@@ -35,7 +35,6 @@ export default function Welcome() {
           <motion.p
             initial={{ opacity: 0 }}
             animate={{ opacity: 1, transition: { delay: 0.5, duration: 1 } }}
-            className="max-xl:pb-[4.5rem]"
           >
             AN INQUIRY INTO WHAT IS, <br className="xl:hidden" />
             EVER IN PURSUIT OF PURPOSE AND BALANCE.
