@@ -7,6 +7,7 @@ import { appendMemoBatch } from "./appendMemoBatch";
 import { computeTrailingWidowKeys } from "./computeTrailingWidowKeys";
 import { applyTrailingWidowKeys } from "./applyTrailingWidowKeys";
 import { fetchPortfolioLayoutBatch } from "../../global/memo/fetchPortfolioLayoutBatch";
+import { truncateAtMemoGroup } from "./truncateAtMemoGroup";
 import { PortfolioBlock } from "../types/PortfolioBlock";
 import { PortfolioSidebarData } from "../types/PortfolioSidebarData";
 
@@ -61,27 +62,18 @@ export const handlePortfolioIntersection = async ({
 
   if (!result || result.length === 0) return;
 
-  const boundaryIndex = result.findIndex(
-    (item: { group: string }) => item.group !== activeGroupId,
+  // the boundary that matters is the first image of a memo group - not
+  // merely the first group change: a batch can cross several groups, and a
+  // memo group further along must not be swallowed into the plain block
+  const { kept: before, memoGroupId: newGroupId } = truncateAtMemoGroup(result as { blob: Blob; group: string }[], (groupId) =>
+    resolveGroupHasMemo(sidebarData, route, activeSubIndex, groupId),
   );
-
-  if (boundaryIndex === -1) {
-    setBlocks((prev) => appendPlainImages(prev, result));
-    return;
-  }
-
-  const before = result.slice(0, boundaryIndex);
-  const after = result.slice(boundaryIndex);
-  const newGroupId = after[0].group;
 
   if (before.length > 0) {
     setBlocks((prev) => appendPlainImages(prev, before));
   }
 
-  if (!resolveGroupHasMemo(sidebarData, route, activeSubIndex, newGroupId)) {
-    setBlocks((prev) => appendPlainImages(prev, after));
-    return;
-  }
+  if (!newGroupId) return;
 
   // the plain pipeline is closing here (a memo block is about to be
   // appended right after it) - capture whatever plain block is currently

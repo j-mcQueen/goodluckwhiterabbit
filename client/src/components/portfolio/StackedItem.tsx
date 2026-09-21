@@ -33,9 +33,9 @@ export const STACKED_ITEM_CLASSES = `min-h-full ${STACKED_ITEM_BASE_CLASSES}`;
 // after `py-`, and variants after both, so these override the base py-1.5.)
 //
 // The `.memo-content` override zeroes the vertical padding baked into a
-// stored ART memo's markup (generateMemoHtml.ts, `pt-2 pb-10`): it's
-// lopsided, so left in place the memo sits off-center between the images
-// above and below it, whereas this item's own padding is symmetric.
+// stored ART memo's markup (older memos carry a lopsided `pt-2 pb-10`): left
+// in place the memo sits off-center between the images above and below it,
+// whereas this item's own padding is symmetric.
 export const STACKED_MEMO_ITEM_CLASSES = `min-h-[10%] shrink-0 first:pt-3 pb-[calc(0.375rem+4rem)] last:pb-[calc(0.75rem+4rem)] [&_.memo-content]:py-0 ${STACKED_ITEM_BASE_CLASSES}`;
 
 // Wraps the actual <img> so it gets a definite height to resolve its own

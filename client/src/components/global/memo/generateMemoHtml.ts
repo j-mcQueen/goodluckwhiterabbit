@@ -27,7 +27,7 @@ const escapeHtml = (value: string): string =>
     .replace(/'/g, "&#39;");
 
 const INQUIRE_BUTTON_CLASSES =
-  "font-tnrBI tracking-widest xl:text-sm text-white opacity-80 drop-shadow-glo border border-solid border-white xl:hover:text-rd xl:hover:border-rd xl:hover:drop-shadow-red xl:focus:text-rd xl:focus:border-rd xl:focus:drop-shadow-red transition-colors px-4 py-2 mt-4";
+  "font-tnrBI tracking-widest text-base text-white opacity-80 drop-shadow-glo border border-solid border-white xl:hover:text-rd xl:hover:border-rd xl:hover:drop-shadow-red xl:focus:text-rd xl:focus:border-rd xl:focus:drop-shadow-red transition-colors px-4 py-2 mt-4";
 
 const inquireButtonHtml = () =>
   `<button type="button" data-field="inquire" class="${INQUIRE_BUTTON_CLASSES}">INQUIRE</button>`;
@@ -65,12 +65,12 @@ const generateArtMemoHtml = (fields: ArtMemoFields): string => {
       ? `<span data-field="year" class="font-tnr">${escapeHtml(fields.year)}</span>`
       : "";
     parts.push(
-      `<p class="font-tnrBI text-white text-lg xl:text-xl text-center">${title}${year}</p>`,
+      `<p class="font-tnrBI text-white text-base text-center">${title}${year}</p>`,
     );
   }
   if (fields.body.trim()) {
     parts.push(
-      `<p data-field="body" class="font-vt tracking-vt text-white uppercase text-sm xl:text-base text-center mt-3 whitespace-pre-line">${escapeHtml(fields.body)}</p>`,
+      `<p data-field="body" class="font-vt tracking-vt text-white uppercase text-base text-center mt-3 whitespace-pre-line">${escapeHtml(fields.body)}</p>`,
     );
   }
   if (fields.inquire) {
@@ -80,7 +80,7 @@ const generateArtMemoHtml = (fields: ArtMemoFields): string => {
     parts.push(`<p data-field="sold" class="font-tnrBI text-rd text-center mt-3">* COLLECTED *</p>`);
   }
 
-  return `<div class="memo-content flex flex-col items-center pt-2 pb-10 px-4" data-memo-category="ART">${parts.join("")}</div>`;
+  return `<div class="memo-content flex flex-col items-center py-2 px-4" data-memo-category="ART">${parts.join("")}</div>`;
 };
 
 export const generateMemoHtml = (category: PortfolioCategory, fields: MemoFields): string =>

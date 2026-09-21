@@ -7,6 +7,7 @@ import MemoDisplay from "../global/memo/MemoDisplay";
 import Unit from "./Unit";
 import PortfolioMemoSegments from "./PortfolioMemoSegments";
 import PortfolioTrigger from "./PortfolioTrigger";
+import GroupSentinel from "./GroupSentinel";
 import StackedItem, {
   STACKED_ITEM_CLASSES,
   STACKED_MEMO_ITEM_CLASSES,
@@ -73,6 +74,22 @@ export default function Body({ ...props }) {
     }
   };
 
+  // A pagination fetch can still be in flight when the user picks another
+  // group (or category), which replaces `blocks` wholesale. Left alone, that
+  // late response would append the *previous* group's images (and reset the
+  // cursor) into the new view. Every navigation produces a fresh first
+  // block, so its key identifies the view a fetch was started for; setters
+  // handed to a fetch are wrapped to drop their writes once that's changed.
+  const viewKeyRef = useRef<string | undefined>();
+  viewKeyRef.current = (blocks as PortfolioBlock[])[0]?.blockKey;
+
+  const dropIfViewChanged = <A extends unknown[]>(setter: (...args: A) => void) => {
+    const startKey = viewKeyRef.current;
+    return (...args: A) => {
+      if (viewKeyRef.current === startKey) setter(...args);
+    };
+  };
+
   // fires only from the true last rendered node in the whole blocks
   // sequence, whatever kind of block that happens to be - see the
   // isLast checks in each render branch below
@@ -86,8 +103,8 @@ export default function Body({ ...props }) {
         inView: true,
         nextStartIndex,
         route,
-        setBlocks,
-        setNextStartIndex,
+        setBlocks: dropIfViewChanged(setBlocks),
+        setNextStartIndex: dropIfViewChanged(setNextStartIndex),
         setNotice,
         sidebarData,
       }),
@@ -101,8 +118,8 @@ export default function Body({ ...props }) {
         activeTab,
         block,
         route,
-        setBlocks,
-        setNextStartIndex,
+        setBlocks: dropIfViewChanged(setBlocks),
+        setNextStartIndex: dropIfViewChanged(setNextStartIndex),
         setNotice,
         sidebarData,
       }),
@@ -194,6 +211,13 @@ export default function Body({ ...props }) {
             const isLastBlock = blockIndex === blocks.length - 1;
             return (
               <Fragment key={block.blockKey}>
+                {block.kind === "memo-aware" && (
+                  <GroupSentinel
+                    groupId={block.groupId}
+                    activeGroupId={activeGroupId}
+                    setActiveGroupId={setActiveGroupId}
+                  />
+                )}
                 {block.kind === "plain"
                   ? renderPlainImages(block, isLastBlock)
                   : renderStackedMemoBlock(block, isLastBlock)}
@@ -253,14 +277,20 @@ export default function Body({ ...props }) {
           }
 
           return (
-            <PortfolioMemoSegments
-              key={block.blockKey}
-              entries={block.entries}
-              urlsByKey={block.urlsByKey}
-              onInquire={() => setContactOpen(true)}
-              onTrigger={isLastBlock ? () => triggerMemoBlock(block) : undefined}
-              endsBeforeMemo={nextBlockIsMemo}
-            />
+            <Fragment key={block.blockKey}>
+              <GroupSentinel
+                groupId={block.groupId}
+                activeGroupId={activeGroupId}
+                setActiveGroupId={setActiveGroupId}
+              />
+              <PortfolioMemoSegments
+                entries={block.entries}
+                urlsByKey={block.urlsByKey}
+                onInquire={() => setContactOpen(true)}
+                onTrigger={isLastBlock ? () => triggerMemoBlock(block) : undefined}
+                endsBeforeMemo={nextBlockIsMemo}
+              />
+            </Fragment>
           );
         })
       )}

@@ -42,6 +42,7 @@ export default function Nav({ ...props }) {
       activeTab: categoryIndex,
       groupId,
       hasMemo,
+      isMemoGroup: (id: string) => resolveGroupHasMemo(sidebarData, route, j, id),
       setNotice,
     });
 
@@ -59,13 +60,16 @@ export default function Nav({ ...props }) {
     if (!groupId) return;
 
     const hasMemo = resolveGroupHasMemo(sidebarData, route, activeSubIndex, groupId);
-    const { blocks, nextStartIndex } = await loadPortfolioBlocksForGroup({
+    const { blocks, nextStartIndex, empty } = await loadPortfolioBlocksForGroup({
       activeSub: subcategories[activeSubIndex],
       activeTab: categoryIndex,
       groupId,
       hasMemo,
+      isMemoGroup: (id: string) => resolveGroupHasMemo(sidebarData, route, activeSubIndex, id),
       setNotice,
     });
+
+    if (empty) return; // notice already raised - stay on the current group
 
     if (blocks.length > 0) {
       setBlocks(blocks);

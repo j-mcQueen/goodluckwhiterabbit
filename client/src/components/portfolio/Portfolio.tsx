@@ -224,6 +224,7 @@ export default function Portfolio({ ...props }) {
             activeTab,
             groupId,
             hasMemo,
+            isMemoGroup: (id) => resolveGroupHasMemo(sidebarData, route, activeSub, id),
             setNotice,
           });
 

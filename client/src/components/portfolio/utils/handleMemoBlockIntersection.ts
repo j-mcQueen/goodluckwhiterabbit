@@ -5,6 +5,8 @@ import { resolveGroupHasMemo } from "./resolveGroupHasMemo";
 import { appendPlainImages } from "./appendPlainImages";
 import { appendMemoBatch } from "./appendMemoBatch";
 import { execute } from "./execute";
+import { calcNextStart } from "./calcNextStart";
+import { truncateAtMemoGroup } from "./truncateAtMemoGroup";
 import { fetchPortfolioLayoutBatch } from "../../global/memo/fetchPortfolioLayoutBatch";
 import { PortfolioBlock } from "../types/PortfolioBlock";
 import { PortfolioSidebarData } from "../types/PortfolioSidebarData";
@@ -70,9 +72,15 @@ export const handleMemoBlockIntersection = async ({
     const nextImages = await execute(category, nextGroupId, setNotice, size, 0, activeSub);
     setNotice({ status: false, loading: false, message: null });
 
-    if (nextImages.length > 0) {
-      setNextStartIndex(nextImages.length);
-      setBlocks((prev) => appendPlainImages(prev, nextImages));
+    // same spill concerns as the first plain batch (loadPortfolioBlocksForGroup):
+    // stop short of any memo group, and count the cursor within the tail
+    // image's own group rather than across the whole batch
+    const { kept } = truncateAtMemoGroup(nextImages, (groupId) =>
+      resolveGroupHasMemo(sidebarData, route, activeSubIndex, groupId),
+    );
+    if (kept.length > 0) {
+      setNextStartIndex(calcNextStart(nextGroupId, kept, 0));
+      setBlocks((prev) => appendPlainImages(prev, kept));
     }
     return;
   }

@@ -58,6 +58,7 @@ export default function Sidebar({ ...props }) {
         activeTab: browseTab,
         groupId,
         hasMemo,
+        isMemoGroup: (id: string) => resolveGroupHasMemo(sidebarData, route, j, id),
         setNotice,
       });
 
@@ -95,13 +96,16 @@ export default function Sidebar({ ...props }) {
 
     try {
       const hasMemo = resolveGroupHasMemo(sidebarData, route, highlightSub, groupId);
-      const { blocks, nextStartIndex } = await loadPortfolioBlocksForGroup({
+      const { blocks, nextStartIndex, empty } = await loadPortfolioBlocksForGroup({
         activeSub: subcategories[highlightSub],
         activeTab: browseTab,
         groupId,
         hasMemo,
+        isMemoGroup: (id: string) => resolveGroupHasMemo(sidebarData, route, highlightSub, id),
         setNotice,
       });
+
+      if (empty) return; // notice already raised - stay on the current group
 
       if (blocks.length > 0) {
         setBlocks(blocks);
