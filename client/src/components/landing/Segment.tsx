@@ -10,6 +10,7 @@ export default function Segment({ ...props }) {
   const {
     alt,
     available,
+    bleedBottom,
     isFirst,
     isFirstInPage,
     isLast,
@@ -75,7 +76,7 @@ export default function Segment({ ...props }) {
         }
       }}
       transition={{ duration: 0.5 }}
-      className={`relative flex flex-none xl:flex-1 xl:h-full ${selected ? "h-full" : "h-1/2"} items-center justify-center border border-white border-solid overflow-hidden ${segmentBorderClasses}`}
+      className={`relative flex flex-none xl:flex-1 xl:h-full ${selected ? "h-full" : bleedBottom ? "h-[calc(50%+2.5px)] max-xl:z-10" : "h-1/2"} items-center justify-center border border-white border-solid overflow-hidden ${segmentBorderClasses}`}
     >
       {/* primary-level image sits underneath; the subcategory-level image
           crossfades in over it (same 500ms as the rest of the chrome) once a

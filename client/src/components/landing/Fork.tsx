@@ -97,6 +97,17 @@ export default function Fork() {
                 <Segment
                   alt={a.alt}
                   available={available}
+                  // the divider under a full page's last tile is pushed just
+                  // past the page (h-1/2 plus the -0.5px margins leaves it
+                  // ~1.5px short), so at rest the scroll container clips it
+                  // and only the frame's border shows; mid-scroll it is the
+                  // divider between pages
+                  bleedBottom={
+                    selected === null &&
+                    posInPage === tiles.length - 1 &&
+                    tiles.length === TILES_PER_PAGE &&
+                    page !== pages[pages.length - 1].page
+                  }
                   isFirst={pos === 0}
                   isFirstInPage={posInPage === 0}
                   isLast={pos === visible.length - 1}
