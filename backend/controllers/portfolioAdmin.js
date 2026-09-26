@@ -292,6 +292,44 @@ export const adminMovePortfolioGroup = async (req, res, next) => {
   }
 };
 
+// renames a group's display `name` only - like `order`, this is purely a
+// taxonomy-side label and never touches S3: groupId (the physical S3 folder
+// name) is what every image/memo route keys off, so nothing there needs to
+// change. Mirrors adminUpdatePortfolioGroupCount's single-query update shape.
+export const adminRenameGroup = async (req, res, next) => {
+  const verified = await verifyTokens(req, res);
+
+  if (verified) {
+    const { subId, groupId } = req.params;
+
+    const name = String(req.body.name ?? "").trim();
+    if (name.length === 0 || name.length > 100) {
+      return res.status(400).json({ error: "Invalid group name" });
+    }
+
+    let updated;
+    try {
+      updated = await PortfolioSubcategory.findOneAndUpdate(
+        { _id: subId, "groups.groupId": groupId },
+        { $set: { "groups.$.name": name } },
+        { new: true },
+      );
+    } catch (error) {
+      return res.status(500).json({
+        status: true,
+        message:
+          "There was an error renaming the group. Please refresh the page and try again. Let Jack know if the problem persists!",
+        logout: { status: false, path: null },
+      });
+    }
+
+    if (!updated) return res.status(404).json({ error: "Group not found" });
+
+    const group = updated.groups.find((candidate) => candidate.groupId === groupId);
+    return res.status(200).json({ groupId, name: group.name });
+  }
+};
+
 export const adminDeleteGroup = async (req, res, next) => {
   const verified = await verifyTokens(req, res);
 

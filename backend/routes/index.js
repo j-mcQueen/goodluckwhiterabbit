@@ -19,6 +19,7 @@ import {
   adminAddSubcategory,
   adminDeleteSubcategory,
   adminAddGroup,
+  adminRenameGroup,
   adminDeleteGroup,
   adminMovePortfolioGroup,
   adminUploadPortfolioImage,
@@ -81,6 +82,10 @@ router.post("/portfolio/subcategories/:subId/groups", adminAddGroup);
 router.post(
   "/portfolio/subcategories/:subId/groups/:groupId/move/:to",
   adminMovePortfolioGroup,
+);
+router.post(
+  "/portfolio/subcategories/:subId/groups/:groupId/rename",
+  adminRenameGroup,
 );
 router.post(
   "/portfolio/:category/:sub/:groupId/uploadFile",

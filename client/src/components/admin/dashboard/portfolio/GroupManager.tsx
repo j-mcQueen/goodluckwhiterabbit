@@ -1,12 +1,15 @@
 import { useState } from "react";
 import { handleAddGroup } from "../utils/handlers/portfolio/handleAddGroup";
 import { handleMovePortfolioGroup } from "../utils/handlers/portfolio/handleMovePortfolioGroup";
+import { handleRenameGroup } from "../utils/handlers/portfolio/handleRenameGroup";
 import { imageset_select_btns } from "../styles/styles";
 import { portfolio_group } from "../types/portfolioTypes";
 
 import Loading from "../../../global/Loading";
 import Close from "../../../../assets/media/icons/Close";
 import DragHandle from "../../../../assets/media/icons/DragHandle";
+import Memo from "../../../../assets/media/icons/Memo";
+import Check from "../../../../assets/media/icons/Check";
 
 export default function GroupManager({ ...props }) {
   const {
@@ -26,6 +29,36 @@ export default function GroupManager({ ...props }) {
   // which gap (0..sortedGroups.length) the drag is currently over, so the
   // row bordering that gap can be highlighted as the landing position
   const [hoverGap, setHoverGap] = useState<number | null>(null);
+
+  // inline group-rename state - only one row is ever in edit mode at a time,
+  // toggled by the feather/checkmark icon next to that row's delete button
+  const [editingGroupId, setEditingGroupId] = useState<string | null>(null);
+  const [editName, setEditName] = useState("");
+  const [renaming, setRenaming] = useState(false);
+
+  const startEditing = (group: portfolio_group) => {
+    setEditingGroupId(group.groupId);
+    setEditName(group.name);
+  };
+
+  const commitRename = async (groupId: string) => {
+    const trimmed = editName.trim();
+    if (trimmed.length === 0 || renaming) return;
+
+    setRenaming(true);
+    const success = await handleRenameGroup({
+      subId: targetSubcategory._id,
+      groupId,
+      name: trimmed,
+      targetSubcategory,
+      setTargetSubcategory,
+      taxonomy,
+      setTaxonomy,
+      setNotice,
+    });
+    setRenaming(false);
+    if (success) setEditingGroupId(null);
+  };
 
   // `order` is the only field that governs display sequence - never assume
   // targetSubcategory.groups is already sorted (a freshly-added group is
@@ -91,7 +124,7 @@ export default function GroupManager({ ...props }) {
           return (
             <div
               key={group.groupId}
-              draggable
+              draggable={editingGroupId !== group.groupId}
               onDragStart={(e) => {
                 e.dataTransfer.effectAllowed = "move";
                 setDragGroupId(group.groupId);
@@ -109,12 +142,50 @@ export default function GroupManager({ ...props }) {
             >
               <DragHandle className="w-4 h-4 shrink-0 opacity-60 cursor-grab" />
 
+              {editingGroupId === group.groupId ? (
+                <form
+                  className="flex-1 min-w-0"
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    commitRename(group.groupId);
+                  }}
+                >
+                  <input
+                    type="text"
+                    value={editName}
+                    onChange={(e) => setEditName(e.target.value)}
+                    minLength={1}
+                    maxLength={100}
+                    autoFocus
+                    disabled={renaming}
+                    className="w-full bg-black border border-solid border-white text-white p-1 tracking-widest focus:border-rd focus:outline-none transition-colors disabled:opacity-30"
+                  />
+                </form>
+              ) : (
+                <button
+                  type="button"
+                  className="flex-1 text-left tracking-widest opacity-80 truncate xl:hover:text-rd focus:text-rd focus:outline-none transition-colors"
+                  onClick={() => onSelectGroup(group.groupId)}
+                >
+                  {group.name.toUpperCase()} ({group.count})
+                </button>
+              )}
+
               <button
                 type="button"
-                className="flex-1 text-left tracking-widest opacity-80 truncate xl:hover:text-rd focus:text-rd focus:outline-none transition-colors"
-                onClick={() => onSelectGroup(group.groupId)}
+                onClick={() =>
+                  editingGroupId === group.groupId
+                    ? commitRename(group.groupId)
+                    : startEditing(group)
+                }
+                disabled={editingGroupId === group.groupId && renaming}
+                className="shrink-0 border border-solid border-white p-1 xl:hover:border-rd xl:hover:text-rd focus:outline-none transition-colors disabled:opacity-30"
               >
-                {group.name.toUpperCase()} ({group.count})
+                {editingGroupId === group.groupId ? (
+                  <Check className="w-3 h-3" />
+                ) : (
+                  <Memo className="w-3 h-3" />
+                )}
               </button>
 
               <button
