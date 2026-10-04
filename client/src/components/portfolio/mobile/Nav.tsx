@@ -24,14 +24,17 @@ export default function Nav({ ...props }) {
   );
 
   // scoped to the current route (no primary-category switching) - picks
-  // commit through Portfolio's onNavigate, same as the desktop Sidebar
-  const handleSubcategoryClick = async (j: number) => {
+  // close the menu and commit through Portfolio's onNavigate, same as the
+  // desktop Sidebar
+  const handleSubcategoryClick = (j: number) => {
     if (j === activeSubIndex) return; // already active - stay open on its groups
-    if (await onNavigate(j, 0)) setIsOpen({ main: false });
+    setIsOpen({ main: false });
+    void onNavigate(j, 0);
   };
 
-  const handleGroupClick = async (k: number) => {
-    if (await onNavigate(activeSubIndex, k)) setIsOpen({ main: false });
+  const handleGroupClick = (k: number) => {
+    setIsOpen({ main: false });
+    void onNavigate(activeSubIndex, k);
   };
 
   return (

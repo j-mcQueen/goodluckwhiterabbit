@@ -28,16 +28,19 @@ export default function Sidebar({ ...props }) {
     sidebarData[route]?.menu[highlightSub] ?? {},
   );
 
-  // picks commit through Portfolio's onNavigate, which loads the group and
-  // only then moves the URL - the dropdown stays open if nothing was shown
-  // (empty group, failed load), matching the old in-place behaviour
-  const handleSubcategoryClick = async (j: number) => {
+  // picks close the dropdown straight away, before Portfolio's onNavigate
+  // fades the current content out, loads the group and only then moves the
+  // URL - an empty group or failed load leaves the current group in place
+  // with a notice explaining why
+  const handleSubcategoryClick = (j: number) => {
     if (j === highlightSub) return; // already shown - stay open on its groups
-    if (await onNavigate(route, j, 0)) setSidebarOpen(false);
+    setSidebarOpen(false);
+    void onNavigate(route, j, 0);
   };
 
-  const handleGroupClick = async (k: number) => {
-    if (await onNavigate(route, highlightSub, k)) setSidebarOpen(false);
+  const handleGroupClick = (k: number) => {
+    setSidebarOpen(false);
+    void onNavigate(route, highlightSub, k);
   };
 
   return (

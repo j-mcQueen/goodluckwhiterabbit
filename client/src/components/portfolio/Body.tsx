@@ -1,4 +1,4 @@
-import { Fragment, UIEvent, useRef } from "react";
+import { Fragment, UIEvent, useLayoutEffect, useRef } from "react";
 import { handlePortfolioIntersection } from "./utils/handlePortfolioIntersection";
 import { handleMemoBlockIntersection } from "./utils/handleMemoBlockIntersection";
 import { PortfolioBlock } from "./types/PortfolioBlock";
@@ -25,6 +25,10 @@ const TAB_CATEGORY: Record<number, string> = {
 // how far down the scroll area the "current group" line sits - see handleScroll
 const GROUP_LINE_RATIO = 1 / 3;
 
+// a freshly navigated-to view's on-screen images fade in one after another
+const REVEAL_DURATION_MS = 500;
+const REVEAL_STAGGER_MS = 90;
+
 const PLAIN_GRID_CLASSES =
   // row height is viewport-relative (not a flat px) so it tracks column
   // width: with 3 columns, colWidth ≈ 100vw/3, and dividing that by our
@@ -42,6 +46,7 @@ export default function Body({ ...props }) {
     blocks,
     bodyRef,
     breadcrumb,
+    hidden = false,
     nextStartIndex,
     onGroupInView,
     route,
@@ -92,6 +97,39 @@ export default function Body({ ...props }) {
       if (viewKeyRef.current === startKey) setter(...args);
     };
   };
+
+  // every navigation produces a fresh first block (see viewKeyRef), so a
+  // new key here means a new view rather than another page of the same one.
+  // Each image already on screen fades in staggered, in DOM (reading) order -
+  // done on the <img> elements directly so it covers every render path
+  // below without threading a delay through each. Images below the fold are
+  // left alone; they're revealed by scrolling. A Web Animation with
+  // `fill: "backwards"` holds each at opacity 0 through its delay and takes
+  // precedence over Image.tsx's own mount fade while it runs.
+  const viewKey = (blocks as PortfolioBlock[])[0]?.blockKey;
+
+  useLayoutEffect(() => {
+    const section = bodyRef.current as HTMLElement | undefined;
+    if (!viewKey || !section) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    const bounds = section.getBoundingClientRect();
+    const onScreen = Array.from(section.querySelectorAll("img")).filter((img) => {
+      const rect = img.parentElement?.getBoundingClientRect() ?? img.getBoundingClientRect();
+      return rect.bottom > bounds.top && rect.top < bounds.bottom;
+    });
+
+    const animations = onScreen.map((img, i) =>
+      img.animate([{ opacity: 0 }, { opacity: 1 }], {
+        duration: REVEAL_DURATION_MS,
+        delay: i * REVEAL_STAGGER_MS,
+        easing: "ease-out",
+        fill: "backwards",
+      }),
+    );
+
+    return () => animations.forEach((animation) => animation.cancel());
+  }, [viewKey, bodyRef]);
 
   // which group is "current" while scrolling is whichever one sits under a
   // fixed line a third of the way down the scroll area - the same rule in
@@ -246,7 +284,9 @@ export default function Body({ ...props }) {
     <section
       ref={bodyRef}
       onScroll={handleScroll}
-      className="overflow-y-scroll w-full overflow-x-hidden mb-[0.625rem] xl:my-2"
+      // fades the outgoing view out while a navigation loads the next one
+      // (see Portfolio's loadGroup) - the incoming images then stagger in
+      className={`overflow-y-scroll w-full overflow-x-hidden mb-[0.625rem] xl:my-2 transition-opacity duration-[400ms] ease-out ${hidden ? "opacity-0" : "opacity-100"}`}
     >
       {breadcrumb && (
         <div className="sticky top-0 z-10 w-full bg-black backdrop-blur-sm border-b border-white px-3 py-1 text-md leading-tight tracking-widest text-white uppercase truncate text-center">

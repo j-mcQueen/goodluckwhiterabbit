@@ -28,6 +28,10 @@ const EMPTY_SIDEBAR_DATA: PortfolioSidebarData = {
 
 const CATEGORY_ROUTES = ["/photo", "/art", "/design"];
 
+// matches the Sidebar's exit spring - outgoing content fades over the same
+// span, so both are gone before LOADING appears
+const CONTENT_FADE_MS = 400;
+
 export default function Portfolio({ ...props }) {
   const { route, index } = props;
   const headerItems = ["PHOTO", "ART", "DESIGN"];
@@ -48,6 +52,9 @@ export default function Portfolio({ ...props }) {
   const [browseSub, setBrowseSub] = useState<number>(0);
   const [blocks, setBlocks] = useState<PortfolioBlock[]>([]);
   const [nextStartIndex, setNextStartIndex] = useState<number>(10);
+  // true while a navigation has faded the outgoing content out and the
+  // incoming content hasn't been committed yet
+  const [contentHidden, setContentHidden] = useState<boolean>(false);
   // the category/subcategory the rendered `blocks` actually belong to -
   // Body pages and lays out from this rather than from the URL, since the
   // two briefly disagree mid-navigation (the URL only moves once a click's
@@ -82,6 +89,9 @@ export default function Portfolio({ ...props }) {
   // flight, or they'd rewrite the URL the user just navigated to
   const loadingRef = useRef(false);
   const soundPlayedRef = useRef(false);
+  // read inside loadGroup without making it depend on `blocks`
+  const hasContentRef = useRef(false);
+  hasContentRef.current = blocks.length > 0;
 
   // the URL is the source of truth for the subcategory/group shown as
   // active in the sidebar, mobile nav and header - desktop and mobile share
@@ -102,7 +112,16 @@ export default function Portfolio({ ...props }) {
     async (targetRoute: string, subIndex: number, groupId: string) => {
       const seq = ++loadSeqRef.current;
       loadingRef.current = true;
-      bodyRef.current?.scrollTo({ top: 0, behavior: "smooth" });
+
+      // the outgoing content fades out first (alongside the sidebar's own
+      // exit), so LOADING appears over an empty body and the jump back to
+      // the top happens while nothing is visible - rather than as a smooth
+      // scroll up through the old content while the new content swaps in
+      if (hasContentRef.current) {
+        setContentHidden(true);
+        await new Promise((resolve) => setTimeout(resolve, CONTENT_FADE_MS));
+        if (seq !== loadSeqRef.current) return false;
+      }
 
       const tab = CATEGORY_ROUTES.indexOf(targetRoute);
       const isMemoGroup = (id: string) =>
@@ -121,16 +140,24 @@ export default function Portfolio({ ...props }) {
 
         if (seq !== loadSeqRef.current) return false;
         loadingRef.current = false;
-        if (empty) return false; // notice already raised - stay on the current group
+        if (empty) {
+          // notice already raised - stay on the current group, right where
+          // it was left (it was only hidden, never scrolled)
+          setContentHidden(false);
+          return false;
+        }
 
+        bodyRef.current?.scrollTo({ top: 0 });
         setBlocks(nextBlocks);
         setNextStartIndex(resolvedStart);
         setDisplayed({ tab, subIndex });
         loadedTargetRef.current = `${targetRoute}|${subIndex}|${groupId}`;
+        setContentHidden(false);
         return true;
       } catch (error) {
         if (seq !== loadSeqRef.current) return false;
         loadingRef.current = false;
+        setContentHidden(false);
         setNotice({
           status: true,
           loading: false,
@@ -392,6 +419,7 @@ export default function Portfolio({ ...props }) {
           activeTab={displayed.tab}
           blocks={blocks}
           bodyRef={bodyRef}
+          hidden={contentHidden}
           breadcrumb={mobileBreadcrumb}
           nextStartIndex={nextStartIndex}
           route={displayedRoute}
