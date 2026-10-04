@@ -32,6 +32,25 @@
     url("/fonts/impact/Impact%20Label%20Reversed.woff2") format("woff2");
 }
 
+/* ART memo title -> details: with the TNR BI overrides above, the title leaves ~6.9px under its caps and VT323 leaves
+   ~7.8px above its caps, matching the ~15px gap between details lines - so any margin here breaks equidistance.
+   Memo markup is stored as rendered HTML, so memos saved with the old mt-3 still carry it; this neutralises them. */
+[data-memo-category="ART"] [data-field="body"] {
+  margin-top: 0;
+}
+
+/* Inquire CTA: VT323 leaves ~7.2px under the last details line, so 8px puts the button border ~15px below it -
+   the same gap as between details lines. Overrides the mt-4 baked into previously stored memos. */
+[data-memo-category="ART"] [data-field="inquire"] {
+  margin-top: 0.5rem;
+}
+
+/* COLLECTED line directly under the details/title (no Inquire button between): its line-height: 1 box leaves ~2.1px
+   above the caps, so 6px lands it ~15px below the details. Under the button, the stored mt-3 already gives ~14px. */
+[data-memo-category="ART"] p + [data-field="sold"] {
+  margin-top: 0.375rem;
+}
+
 :root {
   font-family: "VT323", serif;
   letter-spacing: 0.1em;

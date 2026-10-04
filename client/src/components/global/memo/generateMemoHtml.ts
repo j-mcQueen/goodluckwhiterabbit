@@ -1,4 +1,9 @@
-import { ArtMemoFields, MemoFields, PhotoDesignMemoFields, PortfolioCategory } from "./types";
+import {
+  ArtMemoFields,
+  MemoFields,
+  PhotoDesignMemoFields,
+  PortfolioCategory,
+} from "./types";
 
 // Memo content is stored as rendered markup after Submit, not separate
 // structured fields (spec confirmed decision). This is the one place that
@@ -27,7 +32,7 @@ const escapeHtml = (value: string): string =>
     .replace(/'/g, "&#39;");
 
 const INQUIRE_BUTTON_CLASSES =
-  "font-tnrBI tracking-widest text-base text-white opacity-80 drop-shadow-glo border border-solid border-white xl:hover:text-rd xl:hover:border-rd xl:hover:drop-shadow-red xl:focus:text-rd xl:focus:border-rd xl:focus:drop-shadow-red transition-colors px-4 py-2 mt-4";
+  "font-tnrBI tracking-widest text-base text-white opacity-80 drop-shadow-glo border border-solid border-white xl:hover:text-rd xl:hover:border-rd xl:hover:drop-shadow-red xl:focus:text-rd xl:focus:border-rd xl:focus:drop-shadow-red transition-colors px-4 py-2 mt-2";
 
 const inquireButtonHtml = () =>
   `<button type="button" data-field="inquire" class="${INQUIRE_BUTTON_CLASSES}">INQUIRE</button>`;
@@ -70,20 +75,28 @@ const generateArtMemoHtml = (fields: ArtMemoFields): string => {
   }
   if (fields.body.trim()) {
     parts.push(
-      `<p data-field="body" class="font-vt tracking-vt text-white uppercase text-base text-center mt-3 whitespace-pre-line">${escapeHtml(fields.body)}</p>`,
+      `<p data-field="body" class="font-vt tracking-vt text-white uppercase text-base text-center whitespace-pre-line">${escapeHtml(fields.body)}</p>`,
     );
   }
   if (fields.inquire) {
     parts.push(inquireButtonHtml());
   }
   if (fields.sold) {
-    parts.push(`<p data-field="sold" class="font-tnrBI text-rd text-center mt-3">* COLLECTED *</p>`);
+    // the sold line inherits line-height: 1 (body reset), leaving only ~2px above its caps - so it needs less margin
+    // under the details text (~7px below VT323 caps) than under the Inquire button's border to keep the ~15px rhythm
+    const soldMargin = fields.inquire ? "mt-3" : "mt-1.5";
+    parts.push(
+      `<p data-field="sold" class="font-tnrBI text-rd text-center ${soldMargin}">* COLLECTED *</p>`,
+    );
   }
 
   return `<div class="memo-content flex flex-col items-center py-2 px-4" data-memo-category="ART">${parts.join("")}</div>`;
 };
 
-export const generateMemoHtml = (category: PortfolioCategory, fields: MemoFields): string =>
+export const generateMemoHtml = (
+  category: PortfolioCategory,
+  fields: MemoFields,
+): string =>
   category === "ART"
     ? generateArtMemoHtml(fields as ArtMemoFields)
     : generatePhotoDesignMemoHtml(fields as PhotoDesignMemoFields);
