@@ -521,6 +521,19 @@ export const adminUploadPortfolioImage = async (req, res, next) => {
         { _id: owner.subcategory._id, "groups.groupId": groupId },
         { $addToSet: { "groups.$.layout": { type: "image", position } } },
       );
+    } else {
+      // a replaced image starts from default display settings - banner is
+      // opt-in per image, not inherited by whatever lands in its slot
+      await PortfolioSubcategory.updateOne(
+        { _id: owner.subcategory._id },
+        { $set: { "groups.$[g].layout.$[item].banner": false } },
+        {
+          arrayFilters: [
+            { "g.groupId": groupId },
+            { "item.type": "image", "item.position": position },
+          ],
+        },
+      );
     }
 
     // JSON (not a raw blob body) so the client can learn the server-derived
@@ -837,14 +850,84 @@ export const adminSwapPortfolioImages = async (req, res, next) => {
           Delete: { Objects: [...staleKeys, ...tempKeys].map((Key) => ({ Key })) },
         }),
       );
-
-      return res.status(200).json({ success: true });
     } catch (error) {
       return res.status(500).json({
         status: 500,
         message: "We could not reorder this image in storage.",
       });
     }
+
+    // the image content just traded positions but each layout entry stayed
+    // keyed to its position, so per-image flags have to trade too - otherwise
+    // a banner would stay with the slot rather than the image it was set on
+    const group = owner.subcategory.groups.find((g) => g.groupId === groupId);
+    const fromEntry = group.layout.find(
+      (entry) => entry.type === "image" && entry.position === Number(from),
+    );
+    const toEntry = group.layout.find(
+      (entry) => entry.type === "image" && entry.position === Number(to),
+    );
+    const fromBanner = Boolean(fromEntry?.banner);
+    const toBanner = Boolean(toEntry?.banner);
+
+    if (fromBanner !== toBanner) {
+      if (fromEntry) fromEntry.banner = toBanner;
+      if (toEntry) toEntry.banner = fromBanner;
+
+      try {
+        await owner.subcategory.save();
+      } catch (error) {
+        return res.status(500).json({
+          status: 500,
+          message: "The image moved, but its banner setting could not be updated.",
+        });
+      }
+    }
+
+    return res.status(200).json({ success: true });
+  }
+};
+
+// sets/clears the banner flag on one image's layout entry - display-only
+// metadata read by the stacked (ART/DESIGN) live render, never touches S3
+// or layout order
+export const adminSetPortfolioBanner = async (req, res, next) => {
+  const verified = await verifyTokens(req, res);
+
+  if (verified) {
+    const { category, sub, groupId, position } = req.params;
+
+    if (!CATEGORIES.includes(category)) {
+      return res.status(400).json({ error: "Invalid category" });
+    }
+    if (!isValidPosition(position)) {
+      return res.status(400).json({ error: "Invalid position" });
+    }
+    if (typeof req.body?.banner !== "boolean") {
+      return res.status(400).json({ error: "Invalid banner value" });
+    }
+
+    const owner = await findGroupOwner(category, sub, groupId);
+    if (owner.error) return res.status(404).json({ error: owner.error });
+
+    const group = owner.subcategory.groups.find((g) => g.groupId === groupId);
+    const entry = group.layout.find(
+      (candidate) =>
+        candidate.type === "image" && candidate.position === Number(position),
+    );
+    if (!entry) {
+      return res.status(404).json({ error: "No image at that position" });
+    }
+
+    entry.banner = req.body.banner;
+
+    try {
+      await owner.subcategory.save();
+    } catch (error) {
+      return res.status(500).json({ error: "Could not update the banner setting." });
+    }
+
+    return res.status(200).json({ success: true, banner: entry.banner });
   }
 };
 
@@ -1301,7 +1384,7 @@ export const adminGetPortfolioGroupLayout = async (req, res, next) => {
           new GetObjectCommand({ Bucket: process.env.AWS_SECONDARY_BUCKET, Key: key }),
           { expiresIn: 600 },
         );
-        return { type: "image", position: entry.position, url };
+        return { type: "image", position: entry.position, url, banner: Boolean(entry.banner) };
       }),
     );
 

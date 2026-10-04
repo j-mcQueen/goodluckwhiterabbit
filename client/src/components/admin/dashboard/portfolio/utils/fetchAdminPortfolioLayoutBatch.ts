@@ -3,7 +3,7 @@ import { measurePortfolioImageRatio } from "../../../../global/memo/measurePortf
 import { PortfolioLayoutEntry } from "../../../../global/utils/splitPortfolioLayoutIntoSegments";
 
 type LayoutApiItem =
-  | { type: "image"; position: number; url: string }
+  | { type: "image"; position: number; url: string; banner?: boolean }
   | { type: "memo"; memoId: string; html: string };
 
 // Admin counterpart to fetchPortfolioLayoutBatch.ts (public site) - same
@@ -50,7 +50,7 @@ export const fetchAdminPortfolioLayoutBatch = async (
     const ratio = await measurePortfolioImageRatio(blob);
 
     blobsByKey.set(key, blob);
-    entries.push({ type: "image", key, ratio });
+    entries.push({ type: "image", key, ratio, banner: Boolean(item.banner) });
   }
 
   return { entries, blobsByKey, stored: data.stored };

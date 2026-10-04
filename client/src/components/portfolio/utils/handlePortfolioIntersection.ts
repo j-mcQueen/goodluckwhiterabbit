@@ -65,7 +65,7 @@ export const handlePortfolioIntersection = async ({
   // the boundary that matters is the first image of a memo group - not
   // merely the first group change: a batch can cross several groups, and a
   // memo group further along must not be swallowed into the plain block
-  const { kept: before, memoGroupId: newGroupId } = truncateAtMemoGroup(result as { blob: Blob; group: string }[], (groupId) =>
+  const { kept: before, memoGroupId: newGroupId } = truncateAtMemoGroup(result as { blob: Blob; group: string; banner?: boolean }[], (groupId) =>
     resolveGroupHasMemo(sidebarData, route, activeSubIndex, groupId),
   );
 

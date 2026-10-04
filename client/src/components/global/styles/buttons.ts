@@ -24,3 +24,11 @@ export const orderItemDelete =
 
 export const loadBatchButton =
   "font-tnrBI text-md tracking-widest opacity-80 drop-shadow-glo p-3 border border-solid border-white transition-colors xl:hover:text-rd xl:hover:border-rd xl:hover:drop-shadow-red xl:focus:text-rd xl:focus:border-rd xl:focus:drop-shadow-red xl:hover:cursor-pointer w-full mt-3 disabled:opacity-30 disabled:cursor-not-allowed";
+
+// sits immediately right of orderItemDelete (same size: m-1 + p-1 + w-4 icon
+// + border = 26px footprint), same at-rest chrome. Active state fills red and
+// inverts the icon (Expand.tsx fills with currentColor).
+export const orderItemBanner =
+  "absolute top-0 left-7 m-1 border border-solid border-rd p-1 transition-colors";
+export const orderItemBannerInactive = "bg-black text-white";
+export const orderItemBannerActive = "bg-red text-black";

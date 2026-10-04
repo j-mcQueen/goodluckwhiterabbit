@@ -4,7 +4,7 @@ import { measurePortfolioImageRatio } from "./measurePortfolioImageRatio";
 import { PortfolioLayoutEntry } from "../utils/splitPortfolioLayoutIntoSegments";
 
 type LayoutApiItem =
-  | { type: "image"; position: number; url: string }
+  | { type: "image"; position: number; url: string; banner?: boolean }
   | { type: "memo"; memoId: string; html: string };
 
 type LayoutApiResponse =
@@ -64,7 +64,13 @@ export const fetchPortfolioLayoutBatch = async (
       const imageResponse = await fetch(item.url);
       const blob = await imageResponse.blob();
       const ratio = await measurePortfolioImageRatio(blob);
-      return { type: "image" as const, key: String(item.position), ratio, blob };
+      return {
+        type: "image" as const,
+        key: String(item.position),
+        ratio,
+        blob,
+        banner: Boolean(item.banner),
+      };
     }),
   );
 
@@ -83,7 +89,7 @@ export const fetchPortfolioLayoutBatch = async (
       entries.push({ type: "memo", key: value.key, memoId: value.memoId, html: value.html });
     } else {
       blobsByKey.set(value.key, value.blob);
-      entries.push({ type: "image", key: value.key, ratio: value.ratio });
+      entries.push({ type: "image", key: value.key, ratio: value.ratio, banner: value.banner });
     }
   });
 

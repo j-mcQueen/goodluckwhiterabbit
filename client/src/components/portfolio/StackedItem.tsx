@@ -7,10 +7,23 @@ import { ReactNode } from "react";
 // a hardcoded vh calc - see Body.tsx's "h-full flex flex-col" wrapper for
 // why that chain is safe (every intermediate container is a flex item, so
 // each has a definite used size post-layout per the flexbox spec).
-const STACKED_ITEM_BASE_CLASSES =
-  "w-full max-w-3xl mx-auto flex flex-col items-center justify-center gap-4 py-1.5 px-2";
+const STACKED_ITEM_LAYOUT_CLASSES =
+  "w-full mx-auto flex flex-col items-center justify-center gap-4 py-1.5 px-2";
+const STACKED_ITEM_BASE_CLASSES = `max-w-3xl ${STACKED_ITEM_LAYOUT_CLASSES}`;
 
 export const STACKED_ITEM_CLASSES = `min-h-full ${STACKED_ITEM_BASE_CLASSES}`;
+
+// admin-flagged banner image (layout `banner`) - identical to
+// STACKED_ITEM_CLASSES minus the max-w-3xl cap, so it spans the body's full
+// width while keeping exactly the same height behavior. Pair with
+// STACKED_BANNER_IMAGE_CLASSES on the <img> itself.
+export const STACKED_BANNER_ITEM_CLASSES = `min-h-full ${STACKED_ITEM_LAYOUT_CLASSES}`;
+
+// width is the primary fit: always the frame's full width, natural height
+// at that width, capped at the frame's height - when the cap binds,
+// object-cover crops top and bottom rather than squashing. Never wider or
+// taller than the frame, never distorted.
+export const STACKED_BANNER_IMAGE_CLASSES = "block w-full h-auto max-h-full object-cover";
 
 // A memo is only a few lines of text, so filling a whole viewport-height
 // item (STACKED_ITEM_CLASSES) leaves it centered in hundreds of px of empty
@@ -49,12 +62,22 @@ export const STACKED_IMAGE_FRAME_CLASSES =
 export default function StackedItem({
   children,
   memo = false,
+  banner = false,
 }: {
   children: ReactNode;
   memo?: boolean;
+  banner?: boolean;
 }) {
   return (
-    <div className={memo ? STACKED_MEMO_ITEM_CLASSES : STACKED_ITEM_CLASSES}>
+    <div
+      className={
+        memo
+          ? STACKED_MEMO_ITEM_CLASSES
+          : banner
+            ? STACKED_BANNER_ITEM_CLASSES
+            : STACKED_ITEM_CLASSES
+      }
+    >
       {children}
     </div>
   );

@@ -7,7 +7,7 @@ import { PortfolioBlock } from "../types/PortfolioBlock";
 // its own key here rather than via a separate parallel staticKeys array.
 export const appendPlainImages = (
   blocks: PortfolioBlock[],
-  newImages: { blob: Blob; group: string }[],
+  newImages: { blob: Blob; group: string; banner?: boolean }[],
 ): PortfolioBlock[] => {
   if (newImages.length === 0) return blocks;
 

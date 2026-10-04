@@ -19,6 +19,7 @@ export type PortfolioLayoutImageEntry = {
   type: "image";
   key: string;
   ratio: number; // defaults to 1 before the image has loaded
+  banner?: boolean; // stacked (ART/DESIGN) render only - full width, cropped to fill
 };
 
 export type PortfolioLayoutMemoEntry = {

@@ -10,8 +10,10 @@ import PortfolioTrigger from "./PortfolioTrigger";
 import GroupSentinel from "./GroupSentinel";
 import StackedItem, {
   STACKED_ITEM_CLASSES,
+  STACKED_BANNER_ITEM_CLASSES,
   STACKED_MEMO_ITEM_CLASSES,
   STACKED_IMAGE_FRAME_CLASSES,
+  STACKED_BANNER_IMAGE_CLASSES,
 } from "./StackedItem";
 import WidowImagesRow from "../global/memo/WidowImagesRow";
 
@@ -152,6 +154,7 @@ export default function Body({ ...props }) {
     block.entries.map((entry, entryIndex) => {
       const key = entry.type === "memo" ? `memo-${entry.memoId}` : `image-${entry.key}`;
       const isLastEntry = isLastBlock && entryIndex === block.entries.length - 1;
+      const banner = entry.type === "image" && Boolean(entry.banner);
 
       const content =
         entry.type === "memo" ? (
@@ -168,7 +171,11 @@ export default function Body({ ...props }) {
                 <img
                   src={url}
                   alt=""
-                  className="block w-full h-full object-contain"
+                  className={
+                    banner
+                      ? STACKED_BANNER_IMAGE_CLASSES
+                      : "block w-full h-full object-contain"
+                  }
                   loading="lazy"
                 />
               ) : null;
@@ -180,14 +187,18 @@ export default function Body({ ...props }) {
         <PortfolioTrigger
           key={key}
           className={
-            entry.type === "memo" ? STACKED_MEMO_ITEM_CLASSES : STACKED_ITEM_CLASSES
+            entry.type === "memo"
+              ? STACKED_MEMO_ITEM_CLASSES
+              : banner
+                ? STACKED_BANNER_ITEM_CLASSES
+                : STACKED_ITEM_CLASSES
           }
           onTrigger={() => triggerMemoBlock(block)}
         >
           {content}
         </PortfolioTrigger>
       ) : (
-        <StackedItem key={key} memo={entry.type === "memo"}>
+        <StackedItem key={key} memo={entry.type === "memo"} banner={banner}>
           {content}
         </StackedItem>
       );

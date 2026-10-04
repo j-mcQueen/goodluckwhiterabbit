@@ -2,6 +2,7 @@
 export const generatePortfolioBatch = async (data: {
   keys: string[];
   urls: string[];
+  banners?: boolean[]; // index-aligned with keys
 }) => {
   const groupRegex = /\/(\d{3})\//;
 
@@ -14,7 +15,7 @@ export const generatePortfolioBatch = async (data: {
       const response = await fetch(url, { method: "GET" });
       const blob = await response.blob();
 
-      return { blob, group };
+      return { blob, group, banner: Boolean(data.banners?.[i]) };
     }),
   );
 

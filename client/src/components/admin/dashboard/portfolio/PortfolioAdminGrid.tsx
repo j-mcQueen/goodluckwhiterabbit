@@ -17,6 +17,7 @@ import { handleMovePortfolioLayoutItem } from "../utils/handlers/portfolioOrderi
 import { handleSwapPortfolioImages } from "../utils/handlers/portfolioOrdering/handleSwapPortfolioImages";
 import { handlePortfolioFileUpload } from "../utils/handlers/portfolioOrdering/handlePortfolioFileUpload";
 import { handlePortfolioDelete } from "../utils/handlers/portfolioOrdering/handlePortfolioDelete";
+import { handleTogglePortfolioBanner } from "../utils/handlers/portfolioOrdering/handleTogglePortfolioBanner";
 import { measurePortfolioImageRatio } from "../../../global/memo/measurePortfolioImageRatio";
 import {
   splitPortfolioLayoutIntoSegments,
@@ -37,7 +38,14 @@ import MemoDialog from "./MemoDialog";
 import Loading from "../../../global/Loading";
 import Memo from "../../../../assets/media/icons/Memo";
 import Close from "../../../../assets/media/icons/Close";
-import { loadBatchButton, orderItemDelete } from "../../../global/styles/buttons";
+import Expand from "../../../../assets/media/icons/Expand";
+import {
+  loadBatchButton,
+  orderItemBanner,
+  orderItemBannerActive,
+  orderItemBannerInactive,
+  orderItemDelete,
+} from "../../../global/styles/buttons";
 
 type DialogState =
   | { mode: "closed" }
@@ -115,6 +123,12 @@ const EMPTY_SLOT_CLASSES =
 const GRID_GAP_PX = 8; // must match the gap-2 on the grid wrapper + each run's grid
 const ROW_HEIGHT_RATIO = 0.85; // matches Body.tsx/MemoAwareBody's portrait-friendly target ratio
 
+// only the stacked live layouts (StackedItem.tsx) have a width cap for a
+// banner to lift - PHOTO's packed grid has no equivalent, so no toggle there.
+// The toggle is state-only in this grid: tiles keep their packed size here
+// regardless of banner, since this grid doesn't mirror the stacked layout.
+const BANNER_CATEGORIES: PortfolioCategory[] = ["ART", "DESIGN"];
+
 // framer-motion reserves onDragStart (and friends) on its own components for
 // its pointer-based drag gesture API, with an incompatible signature from the
 // native DOM DragEvent - matches PortfolioOrderItem.tsx's old workaround of
@@ -124,6 +138,7 @@ function ImageTile({
   dragProps,
   onDragStartNative,
   onDelete,
+  banner,
   className,
   children,
 }: {
@@ -134,6 +149,8 @@ function ImageTile({
   };
   onDragStartNative: (e: DragEvent) => void;
   onDelete: () => void;
+  // null hides the toggle entirely (non-stacked category)
+  banner: { active: boolean; onToggle: () => void } | null;
   className: string;
   children: React.ReactNode;
 }) {
@@ -157,6 +174,19 @@ function ImageTile({
       <button type="button" onClick={onDelete} className={orderItemDelete}>
         <Close className="w-4 h-4" />
       </button>
+      {banner && (
+        <button
+          type="button"
+          onClick={banner.onToggle}
+          aria-pressed={banner.active}
+          title={banner.active ? "Banner: on" : "Banner: off"}
+          className={`${orderItemBanner} ${
+            banner.active ? orderItemBannerActive : orderItemBannerInactive
+          }`}
+        >
+          <Expand className="w-4 h-4" />
+        </button>
+      )}
       {children}
     </motion.div>
   );
@@ -459,7 +489,26 @@ export default function PortfolioAdminGrid({
 
       // content at the two positions traded, but layout's array order
       // (already ascending by position for a memo-free group) is untouched
-      // by design - swap which blob is shown at each key instead
+      // by design - swap which blob is shown at each key instead, and trade
+      // banner flags the same way (mirrors adminSwapPortfolioImages)
+      setEntries((prev) => {
+        if (!prev) return prev;
+        const bannerOf = (key: string) =>
+          prev.some(
+            (entry) => entry.type === "image" && entry.key === key && entry.banner,
+          );
+        const fromBanner = bannerOf(fromKey);
+        const toBanner = bannerOf(toKey);
+        return prev.map((entry) =>
+          entry.type !== "image"
+            ? entry
+            : entry.key === fromKey
+              ? { ...entry, banner: toBanner }
+              : entry.key === toKey
+                ? { ...entry, banner: fromBanner }
+                : entry,
+        );
+      });
       setUrlsByKey((prev) => {
         const next = new Map(prev);
         const a = prev.get(fromKey);
@@ -556,7 +605,43 @@ export default function PortfolioAdminGrid({
         next.set(key, URL.createObjectURL(result.blob));
         return next;
       });
+      // a replacement starts from default display settings (the backend
+      // clears banner on replace too)
+      setEntries((prev) =>
+        prev
+          ? prev.map((entry) =>
+              entry.type === "image" && entry.key === key
+                ? { ...entry, banner: false }
+                : entry,
+            )
+          : prev,
+      );
     }
+  };
+
+  const handleToggleBanner = async (key: string) => {
+    const current = entries.some(
+      (entry) => entry.type === "image" && entry.key === key && entry.banner,
+    );
+    const success = await handleTogglePortfolioBanner({
+      category,
+      sub,
+      groupId,
+      position: key,
+      banner: !current,
+      setNotice,
+    });
+    if (!success) return;
+
+    setEntries((prev) =>
+      prev
+        ? prev.map((entry) =>
+            entry.type === "image" && entry.key === key
+              ? { ...entry, banner: !current }
+              : entry,
+          )
+        : prev,
+    );
   };
 
   const handleImageDelete = async (key: string) => {
@@ -655,6 +740,12 @@ export default function PortfolioAdminGrid({
   };
 
   const segments = splitPortfolioLayoutIntoSegments(entries);
+  const showBannerToggle = BANNER_CATEGORIES.includes(category);
+  const bannerKeys = new Set(
+    entries
+      .filter((entry) => entry.type === "image" && entry.banner)
+      .map((entry) => entry.key),
+  );
 
   const imageDragProps = (key: string) => ({
     draggable: true,
@@ -735,6 +826,11 @@ export default function PortfolioAdminGrid({
       dragProps={imageDragProps(key)}
       onDragStartNative={imageDragStartNative(key)}
       onDelete={() => handleImageDelete(key)}
+      banner={
+        showBannerToggle
+          ? { active: bannerKeys.has(key), onToggle: () => handleToggleBanner(key) }
+          : null
+      }
       className={tileClassName}
     >
       {renderImage(key, imgClassName)}

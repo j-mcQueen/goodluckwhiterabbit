@@ -175,6 +175,10 @@ export const generatePortfolioUrls = async (req, res, next) => {
   if (startGroupIndex === -1) return res.status(200).json({ files: false });
 
   const keys = [];
+  // index-aligned with keys - read from each group's layout, which carries
+  // per-image display flags even for memo-free groups (whose order itself
+  // still comes from S3 position, not layout)
+  const banners = [];
   let cursorStart = Number(req.params.start);
   let stored = 0;
 
@@ -185,6 +189,11 @@ export const generatePortfolioUrls = async (req, res, next) => {
       i++
     ) {
       const groupId = orderedGroups[i].groupId;
+      const bannerPositions = new Set(
+        (orderedGroups[i].layout ?? [])
+          .filter((entry) => entry.type === "image" && entry.banner)
+          .map((entry) => entry.position),
+      );
       const prefix = `${category}/${sub}/${groupId}/`;
 
       const listed = await s3.send(
@@ -210,6 +219,9 @@ export const generatePortfolioUrls = async (req, res, next) => {
       // images near the end of a group as duplicates
       for (const obj of matches.slice(cursorStart)) {
         keys.push(obj.Key);
+        banners.push(
+          bannerPositions.has(Number(obj.Key.match(positionRegex)?.[1])),
+        );
         if (keys.length === 10) break;
       }
 
@@ -254,8 +266,8 @@ export const generatePortfolioUrls = async (req, res, next) => {
   }
 
   return skipped.length > 0
-    ? res.status(200).json({ presigns, keys, skipped, stored })
-    : res.status(200).json({ presigns, keys, stored });
+    ? res.status(200).json({ presigns, keys, banners, skipped, stored })
+    : res.status(200).json({ presigns, keys, banners, stored });
 };
 
 // layout-aware counterpart to generatePortfolioUrls above, used only for
@@ -329,7 +341,7 @@ export const generatePortfolioLayoutUrls = async (req, res, next) => {
         new GetObjectCommand({ Bucket: process.env.AWS_SECONDARY_BUCKET, Key: key }),
         { expiresIn: 600 },
       );
-      return { type: "image", position: entry.position, url };
+      return { type: "image", position: entry.position, url, banner: Boolean(entry.banner) };
     }),
   );
 

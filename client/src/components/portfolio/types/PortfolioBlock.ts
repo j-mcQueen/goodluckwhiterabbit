@@ -14,7 +14,7 @@ import { PortfolioLayoutEntry } from "../../global/utils/splitPortfolioLayoutInt
 export type PortfolioPlainBlock = {
   kind: "plain";
   blockKey: string;
-  images: { blob: Blob; group: string; key: string }[];
+  images: { blob: Blob; group: string; key: string; banner?: boolean }[];
   // keys of the images that make up this (now-closed) block's trailing
   // widow row, if any - only ever computed once, at the moment the block
   // is closed off by a following memo-aware block (see

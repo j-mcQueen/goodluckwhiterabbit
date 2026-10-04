@@ -27,6 +27,7 @@ import {
   adminDeletePortfolioImage,
   adminSwapPortfolioImages,
   adminSwapPortfolioLayout,
+  adminSetPortfolioBanner,
   adminMovePortfolioLayoutItem,
   adminRepairPortfolioLayout,
   adminUpdatePortfolioGroupCount,
@@ -108,6 +109,10 @@ router.post(
 router.post(
   "/portfolio/:category/:sub/:groupId/layout/move/:from/:to",
   adminMovePortfolioLayoutItem,
+);
+router.post(
+  "/portfolio/:category/:sub/:groupId/:position/banner",
+  adminSetPortfolioBanner,
 );
 router.post(
   "/portfolio/:category/:sub/:groupId/layout/repair",

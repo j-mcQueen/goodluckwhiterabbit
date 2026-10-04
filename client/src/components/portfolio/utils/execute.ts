@@ -31,5 +31,6 @@ export const execute = async (
     : await generatePortfolioBatch({
         keys: data.keys,
         urls: data.presigns,
+        banners: data.banners,
       });
 };

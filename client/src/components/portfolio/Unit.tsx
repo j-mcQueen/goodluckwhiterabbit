@@ -1,6 +1,10 @@
 import { InView } from "react-intersection-observer";
 import { useState, useRef } from "react";
-import { STACKED_ITEM_CLASSES, STACKED_IMAGE_FRAME_CLASSES } from "./StackedItem";
+import {
+  STACKED_ITEM_CLASSES,
+  STACKED_BANNER_ITEM_CLASSES,
+  STACKED_IMAGE_FRAME_CLASSES,
+} from "./StackedItem";
 import { widowCellClassName } from "../global/memo/widowCellClassName";
 
 import Image from "./Image";
@@ -25,8 +29,12 @@ export default function Unit({ ...props }) {
   // grid, sized to match the grid's own column width/row height exactly
   // (widowCellClassName) rather than shrinking to WidowMemoPair's smaller
   // paired-with-memo preview size.
+  const banner = stacked && Boolean(image?.banner);
+
   const wrapperClassName = stacked
-    ? STACKED_ITEM_CLASSES
+    ? banner
+      ? STACKED_BANNER_ITEM_CLASSES
+      : STACKED_ITEM_CLASSES
     : layout === "row"
       ? widowCellClassName(ratio >= SPAN_THRESHOLD ? 2 : 1)
       : `flex overflow-hidden ${ratio >= SPAN_THRESHOLD ? "xl:col-span-2" : ""}`;
@@ -38,7 +46,7 @@ export default function Unit({ ...props }) {
         innerRef={imgRef}
         itemKey={itemKey}
         setRatio={setRatio}
-        fit="contain"
+        fit={banner ? "banner" : "contain"}
       />
     </div>
   ) : (

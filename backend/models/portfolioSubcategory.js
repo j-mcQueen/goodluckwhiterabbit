@@ -10,6 +10,7 @@ const LayoutItemSchema = new Schema(
     type: { type: String, enum: ["image", "memo"], required: true },
     position: { type: Number }, // required when type === "image"
     memoId: { type: String }, // required when type === "memo"
+    banner: { type: Boolean, default: false }, // images only - stacked (ART/DESIGN) live render drops its width cap and crops to fill
   },
   { _id: false },
 );

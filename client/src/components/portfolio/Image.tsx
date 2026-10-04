@@ -1,6 +1,13 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { handleLoad } from "./utils/handleLoad";
+import { STACKED_BANNER_IMAGE_CLASSES } from "./StackedItem";
+
+const FIT_CLASSES = {
+  cover: "block w-full h-full object-cover",
+  contain: "block w-full h-full object-contain",
+  banner: STACKED_BANNER_IMAGE_CLASSES,
+};
 
 export default function Image({ ...props }) {
   const { image, innerRef, itemKey, setRatio, fit = "cover" } = props;
@@ -28,7 +35,7 @@ export default function Image({ ...props }) {
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           alt=""
-          className={`block w-full h-full ${fit === "contain" ? "object-contain" : "object-cover"}`}
+          className={FIT_CLASSES[fit as keyof typeof FIT_CLASSES]}
           loading="lazy"
           src={src}
           ref={innerRef}
