@@ -102,16 +102,24 @@ export default function PortfolioMemoSegments({
             </WidowImagesRow>
           );
 
+          // unlike a memo, a widow row is the tail of the run above it, not
+          // a separate section - mt-2 matches the grid's own gap-2 between
+          // rows (same as Body.tsx's plain-block widow row). No bottom
+          // margin: a widow segment is always this block's last, and the
+          // next block's memo already brings its own my-12. Directly after
+          // a memo (no run to continue), that memo's my-12 covers it too.
+          const widowClassName = segments[index - 1]?.kind === "memo" ? "" : "mt-2";
+
           if (!isLast || !onTrigger) {
             return (
-              <div key="widow" className="my-12">
+              <div key="widow" className={widowClassName}>
                 {content}
               </div>
             );
           }
 
           return (
-            <PortfolioTrigger key="widow" className="my-12" onTrigger={onTrigger}>
+            <PortfolioTrigger key="widow" className={widowClassName} onTrigger={onTrigger}>
               {content}
             </PortfolioTrigger>
           );
@@ -130,16 +138,28 @@ export default function PortfolioMemoSegments({
               <MemoDisplay html={segment.html} onInquire={onInquire} />
             );
 
+          // a paired memo's box starts with its widow row, which is the tail
+          // of the run above rather than a separate section - so its top
+          // edge gets the grid's own gap-2 (same as the "widow" segment
+          // above) instead of a memo's my-12. Directly after another memo
+          // (no run to continue), that memo's bottom my-12 covers it.
+          const memoClassName =
+            segment.pairedWidowImages.length === 0
+              ? "my-12"
+              : segments[index - 1]?.kind === "memo"
+                ? "mb-12"
+                : "mt-2 mb-12";
+
           if (!isLast || !onTrigger) {
             return (
-              <div key={`memo-${segment.memoId}`} className="my-12">
+              <div key={`memo-${segment.memoId}`} className={memoClassName}>
                 {content}
               </div>
             );
           }
 
           return (
-            <PortfolioTrigger key={`memo-${segment.memoId}`} className="my-12" onTrigger={onTrigger}>
+            <PortfolioTrigger key={`memo-${segment.memoId}`} className={memoClassName} onTrigger={onTrigger}>
               {content}
             </PortfolioTrigger>
           );
