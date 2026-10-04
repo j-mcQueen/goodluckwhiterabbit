@@ -1,8 +1,4 @@
 import { motion } from "framer-motion";
-import { useNavigate } from "react-router-dom";
-import { resolveGroupId } from "./utils/resolveGroupId";
-import { resolveGroupHasMemo } from "./utils/resolveGroupHasMemo";
-import { loadPortfolioBlocksForGroup } from "./utils/loadPortfolioBlocksForGroup";
 
 import BrowseColumns from "./BrowseColumns";
 
@@ -11,23 +7,14 @@ export default function Sidebar({ ...props }) {
     activeGroup,
     activeSub,
     activeTab,
-    bodyRef,
     browseSub,
     browseTab,
+    onNavigate,
     route,
     sidebarData,
-    setActiveGroup,
-    setActiveGroupId,
-    setActiveSub,
-    setActiveTab,
-    setBlocks,
-    setNextStartIndex,
-    setNotice,
     setSidebarOpen,
     sidebarRect,
   } = props;
-
-  const navigate = useNavigate();
 
   // browsing a category other than the real active one previews it without
   // committing - the group column falls back to its first subcategory and
@@ -41,94 +28,16 @@ export default function Sidebar({ ...props }) {
     sidebarData[route]?.menu[highlightSub] ?? {},
   );
 
+  // picks commit through Portfolio's onNavigate, which loads the group and
+  // only then moves the URL - the dropdown stays open if nothing was shown
+  // (empty group, failed load), matching the old in-place behaviour
   const handleSubcategoryClick = async (j: number) => {
     if (j === highlightSub) return; // already shown - stay open on its groups
-
-    const groupId = resolveGroupId(sidebarData, route, j, 0);
-    if (!groupId) return; // subcategory has no groups yet
-
-    if (bodyRef) {
-      bodyRef.current?.scrollTo({ top: 0, behavior: "smooth" });
-    }
-
-    try {
-      const hasMemo = resolveGroupHasMemo(sidebarData, route, j, groupId);
-      const { blocks, nextStartIndex } = await loadPortfolioBlocksForGroup({
-        activeSub: subcategories[j],
-        activeTab: browseTab,
-        groupId,
-        hasMemo,
-        isMemoGroup: (id: string) => resolveGroupHasMemo(sidebarData, route, j, id),
-        setNotice,
-      });
-
-      if (blocks.length > 0) {
-        setBlocks(blocks);
-        setNextStartIndex(nextStartIndex);
-      }
-
-      setActiveSub(j);
-      setActiveGroup(0);
-      setActiveGroupId(groupId);
-
-      if (!isActiveCategory) {
-        setActiveTab(browseTab);
-        navigate(route);
-      }
-
-      setSidebarOpen(false);
-    } catch (error) {
-      setNotice({
-        status: true,
-        loading: false,
-        message: "Something went wrong. Please try again.",
-      });
-    }
+    if (await onNavigate(route, j, 0)) setSidebarOpen(false);
   };
 
   const handleGroupClick = async (k: number) => {
-    const groupId = resolveGroupId(sidebarData, route, highlightSub, k);
-    if (!groupId) return;
-
-    if (bodyRef) {
-      bodyRef.current?.scrollTo({ top: 0, behavior: "smooth" });
-    }
-
-    try {
-      const hasMemo = resolveGroupHasMemo(sidebarData, route, highlightSub, groupId);
-      const { blocks, nextStartIndex, empty } = await loadPortfolioBlocksForGroup({
-        activeSub: subcategories[highlightSub],
-        activeTab: browseTab,
-        groupId,
-        hasMemo,
-        isMemoGroup: (id: string) => resolveGroupHasMemo(sidebarData, route, highlightSub, id),
-        setNotice,
-      });
-
-      if (empty) return; // notice already raised - stay on the current group
-
-      if (blocks.length > 0) {
-        setBlocks(blocks);
-        setNextStartIndex(nextStartIndex);
-      }
-
-      if (!isActiveCategory) setActiveSub(highlightSub);
-      setActiveGroup(k);
-      setActiveGroupId(groupId);
-
-      if (!isActiveCategory) {
-        setActiveTab(browseTab);
-        navigate(route);
-      }
-
-      setSidebarOpen(false);
-    } catch (error) {
-      setNotice({
-        status: true,
-        loading: false,
-        message: "Something went wrong. Please try again.",
-      });
-    }
+    if (await onNavigate(route, highlightSub, k)) setSidebarOpen(false);
   };
 
   return (

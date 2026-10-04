@@ -4,12 +4,16 @@ import { handleMovePortfolioGroup } from "../utils/handlers/portfolio/handleMove
 import { handleRenameGroup } from "../utils/handlers/portfolio/handleRenameGroup";
 import { imageset_select_btns } from "../styles/styles";
 import { portfolio_group } from "../types/portfolioTypes";
+import { toGroupSlug } from "../../../global/utils/portfolioSlug";
 
 import Loading from "../../../global/Loading";
 import Close from "../../../../assets/media/icons/Close";
 import DragHandle from "../../../../assets/media/icons/DragHandle";
 import Memo from "../../../../assets/media/icons/Memo";
 import Check from "../../../../assets/media/icons/Check";
+
+const NAME_ERROR_TOOLTIP =
+  "absolute left-0 top-full mt-1 z-10 bg-black border border-solid border-rd text-rd text-xs px-2 py-1 tracking-widest whitespace-nowrap pointer-events-none";
 
 export default function GroupManager({ ...props }) {
   const {
@@ -36,6 +40,26 @@ export default function GroupManager({ ...props }) {
   const [editName, setEditName] = useState("");
   const [renaming, setRenaming] = useState(false);
 
+  // a group's name is its public URL slug (/{category}/{sub}/{group}), so
+  // two names that slugify the same ("MILK & ROSES" / "milk roses") collide -
+  // checked live here so confirmation is blocked before the backend's 409
+  const groupNameError = (candidate: string, exceptGroupId?: string) => {
+    const trimmed = candidate.trim();
+    if (trimmed.length === 0) return null;
+
+    const slug = toGroupSlug(trimmed);
+    if (!slug) return "NEEDS A LETTER OR NUMBER";
+
+    const taken = targetSubcategory.groups.some(
+      (group: portfolio_group) =>
+        group.groupId !== exceptGroupId && toGroupSlug(group.name) === slug,
+    );
+    return taken ? "NAME ALREADY TAKEN" : null;
+  };
+
+  const renameError = editingGroupId ? groupNameError(editName, editingGroupId) : null;
+  const addError = groupNameError(name);
+
   const startEditing = (group: portfolio_group) => {
     setEditingGroupId(group.groupId);
     setEditName(group.name);
@@ -43,7 +67,7 @@ export default function GroupManager({ ...props }) {
 
   const commitRename = async (groupId: string) => {
     const trimmed = editName.trim();
-    if (trimmed.length === 0 || renaming) return;
+    if (trimmed.length === 0 || renaming || renameError) return;
 
     setRenaming(true);
     const success = await handleRenameGroup({
@@ -144,7 +168,7 @@ export default function GroupManager({ ...props }) {
 
               {editingGroupId === group.groupId ? (
                 <form
-                  className="flex-1 min-w-0"
+                  className="relative flex-1 min-w-0"
                   onSubmit={(e) => {
                     e.preventDefault();
                     commitRename(group.groupId);
@@ -158,8 +182,14 @@ export default function GroupManager({ ...props }) {
                     maxLength={100}
                     autoFocus
                     disabled={renaming}
+                    aria-invalid={Boolean(renameError)}
                     className="w-full bg-black border border-solid border-white text-white p-1 tracking-widest focus:border-rd focus:outline-none transition-colors disabled:opacity-30"
                   />
+                  {renameError ? (
+                    <span role="tooltip" className={NAME_ERROR_TOOLTIP}>
+                      {renameError}
+                    </span>
+                  ) : null}
                 </form>
               ) : (
                 <button
@@ -178,7 +208,10 @@ export default function GroupManager({ ...props }) {
                     ? commitRename(group.groupId)
                     : startEditing(group)
                 }
-                disabled={editingGroupId === group.groupId && renaming}
+                disabled={
+                  editingGroupId === group.groupId &&
+                  (renaming || Boolean(renameError))
+                }
                 className="shrink-0 border border-solid border-white p-1 xl:hover:border-rd xl:hover:text-rd focus:outline-none transition-colors disabled:opacity-30"
               >
                 {editingGroupId === group.groupId ? (
@@ -228,6 +261,7 @@ export default function GroupManager({ ...props }) {
       <form
         onSubmit={async (e) => {
           e.preventDefault();
+          if (addError) return;
           const success = await handleAddGroup({
             subId: targetSubcategory._id,
             name,
@@ -242,17 +276,29 @@ export default function GroupManager({ ...props }) {
         }}
         className="flex gap-3 items-center shrink-0"
       >
-        <input
-          type="text"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          placeholder="NEW GROUP NAME"
-          minLength={1}
-          maxLength={100}
-          className="bg-black border border-solid border-white text-white xl:hover:border-rd focus:border-rd p-2 focus:outline-none placeholder:text-white transition-colors"
-          required
-        />
-        <button type="submit" className={imageset_select_btns}>
+        <div className="relative">
+          <input
+            type="text"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="NEW GROUP NAME"
+            minLength={1}
+            maxLength={100}
+            aria-invalid={Boolean(addError)}
+            className="bg-black border border-solid border-white text-white xl:hover:border-rd focus:border-rd p-2 focus:outline-none placeholder:text-white transition-colors"
+            required
+          />
+          {addError ? (
+            <span role="tooltip" className={NAME_ERROR_TOOLTIP}>
+              {addError}
+            </span>
+          ) : null}
+        </div>
+        <button
+          type="submit"
+          disabled={Boolean(addError)}
+          className={`${imageset_select_btns} disabled:opacity-30`}
+        >
           {spinner ? <Loading /> : "ADD GROUP"}
         </button>
       </form>

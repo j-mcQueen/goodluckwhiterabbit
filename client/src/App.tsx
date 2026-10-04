@@ -22,8 +22,11 @@ export default function App() {
   }, []);
 
   const portfolioPaths = ["/photo", "/art", "/design"];
+  // /{category}/{sub}/{group} - sub and group are URL slugs (see
+  // portfolio/utils/resolvePortfolioPath.ts); Portfolio canonicalizes
+  // missing/unknown ones to the first subcategory/group
   const portfolioRoutes = portfolioPaths.map((path) => ({
-    path,
+    path: `${path}/:sub?/:group?`,
     element: <Portfolio route={path} index={portfolioPaths.indexOf(path)} />,
     errorElement: <Error />,
   }));

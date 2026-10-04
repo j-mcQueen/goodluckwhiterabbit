@@ -1,8 +1,9 @@
-import { useLocation, useNavigate } from "react-router-dom";
-import { useState, useEffect, useRef } from "react";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { AnimatePresence } from "framer-motion";
 import { resolveGroupId } from "./utils/resolveGroupId";
 import { resolveGroupIndex } from "./utils/resolveGroupIndex";
+import { resolvePortfolioSlugs, buildPortfolioPath } from "./utils/resolvePortfolioPath";
 import { resolveGroupHasMemo } from "./utils/resolveGroupHasMemo";
 import { loadPortfolioBlocksForGroup } from "./utils/loadPortfolioBlocksForGroup";
 import { mobile } from "../global/utils/determineViewport";
@@ -33,9 +34,9 @@ export default function Portfolio({ ...props }) {
 
   const navigate = useNavigate();
   const location = useLocation();
+  const { sub: subParam, group: groupParam } = useParams();
   const bodyRef = useRef<HTMLElement>();
   const mainRef = useRef<HTMLElement>(null);
-  const loadTrackerRef = useRef(false); // tracks when to pull first set of images
 
   const [contactOpen, setContactOpen] = useState<boolean>(false);
   const [sidebarOpen, setSidebarOpen] = useState<boolean>(false);
@@ -43,21 +44,20 @@ export default function Portfolio({ ...props }) {
     left: number;
     width: number;
   } | null>(null);
-  const [activeTab, setActiveTab] = useState<number>(index);
   const [browseTab, setBrowseTab] = useState<number>(index);
   const [browseSub, setBrowseSub] = useState<number>(0);
-  const [activeSub, setActiveSub] = useState<number>(
-    (location.state as { subIndex?: number } | null)?.subIndex ?? 0,
-  );
-  const [activeGroup, setActiveGroup] = useState<number>(0); // a position in the sidebar list - cosmetic only
-  const [activeGroupId, setActiveGroupId] = useState<string | undefined>(
-    undefined,
-  ); // real S3 groupId - authoritative for all data-fetching decisions
   const [blocks, setBlocks] = useState<PortfolioBlock[]>([]);
   const [nextStartIndex, setNextStartIndex] = useState<number>(10);
+  // the category/subcategory the rendered `blocks` actually belong to -
+  // Body pages and lays out from this rather than from the URL, since the
+  // two briefly disagree mid-navigation (the URL only moves once a click's
+  // content has loaded, and back/forward moves the URL before it has)
+  const [displayed, setDisplayed] = useState<{ tab: number; subIndex: number }>({
+    tab: index,
+    subIndex: 0,
+  });
   const [sidebarData, setSidebarData] =
     useState<PortfolioSidebarData>(EMPTY_SIDEBAR_DATA);
-  const [mobileSubIndex, setMobileSubIndex] = useState<number>(0);
   const [notice, setNotice] = useState<{
     status: boolean;
     loading: boolean;
@@ -68,45 +68,128 @@ export default function Portfolio({ ...props }) {
     message: null,
   });
 
-  const activeSubName = sidebarData[route]?.subcategories[activeSub] ?? "";
+  // `${route}|${subIndex}|${groupId}` of what's currently on screen - the
+  // URL effect below skips loading when the URL already points at it,
+  // which is what lets clicks (load, then navigate) and scrolling (replace
+  // the URL, no load) update the URL without a reload. A ref rather than
+  // location.state: history entries keep their state, so a flag stored
+  // there would wrongly suppress a load on back/forward.
+  const loadedTargetRef = useRef<string | null>(null);
+  // only the newest load may commit - a slower earlier one (a click, then
+  // back before it resolved) must not land on top of it
+  const loadSeqRef = useRef(0);
+  // scroll reports from the outgoing content are ignored while a load is in
+  // flight, or they'd rewrite the URL the user just navigated to
+  const loadingRef = useRef(false);
+  const soundPlayedRef = useRef(false);
 
-  // mobile nav is scoped to the current route (no primary-category
-  // switching), so position only needs to track subcategory + group within it
-  const handleMobileGroupSelect = (
+  // the URL is the source of truth for the subcategory/group shown as
+  // active in the sidebar, mobile nav and header - desktop and mobile share
+  // it (there's no separate mobile subcategory index)
+  const urlTarget = resolvePortfolioSlugs(sidebarData, route, subParam, groupParam);
+  const activeSub = urlTarget?.subIndex ?? 0;
+  const activeGroup = urlTarget?.groupIndex ?? 0;
+
+  const displayedRoute = CATEGORY_ROUTES[displayed.tab];
+  const displayedSubName =
+    sidebarData[displayedRoute]?.subcategories[displayed.subIndex] ?? "";
+
+  // loads a group into view - shared by clicks and the URL effect, so the
+  // fetch/empty/error handling lives in exactly one place. Resolves true
+  // once the group is on screen; false when it was empty (a notice has
+  // been raised), failed, or was superseded by a newer load.
+  const loadGroup = useCallback(
+    async (targetRoute: string, subIndex: number, groupId: string) => {
+      const seq = ++loadSeqRef.current;
+      loadingRef.current = true;
+      bodyRef.current?.scrollTo({ top: 0, behavior: "smooth" });
+
+      const tab = CATEGORY_ROUTES.indexOf(targetRoute);
+      const isMemoGroup = (id: string) =>
+        resolveGroupHasMemo(sidebarData, targetRoute, subIndex, id);
+
+      try {
+        const { blocks: nextBlocks, nextStartIndex: resolvedStart, empty } =
+          await loadPortfolioBlocksForGroup({
+            activeSub: sidebarData[targetRoute]?.subcategories[subIndex] ?? "",
+            activeTab: tab,
+            groupId,
+            hasMemo: isMemoGroup(groupId),
+            isMemoGroup,
+            setNotice,
+          });
+
+        if (seq !== loadSeqRef.current) return false;
+        loadingRef.current = false;
+        if (empty) return false; // notice already raised - stay on the current group
+
+        setBlocks(nextBlocks);
+        setNextStartIndex(resolvedStart);
+        setDisplayed({ tab, subIndex });
+        loadedTargetRef.current = `${targetRoute}|${subIndex}|${groupId}`;
+        return true;
+      } catch (error) {
+        if (seq !== loadSeqRef.current) return false;
+        loadingRef.current = false;
+        setNotice({
+          status: true,
+          loading: false,
+          message: "Something went wrong. Please try again.",
+        });
+        return false;
+      }
+    },
+    [sidebarData],
+  );
+
+  // sidebar/mobile-nav picks: load first, then push the URL, so an empty
+  // group never leaves a history entry (or a URL) pointing at it
+  const handleNavigate = async (
+    targetRoute: string,
     subIndex: number,
     groupIndex: number,
-    groupId: string,
   ) => {
-    setMobileSubIndex(subIndex);
-    setActiveGroup(groupIndex);
-    setActiveGroupId(groupId);
+    const groupId = resolveGroupId(sidebarData, targetRoute, subIndex, groupIndex);
+    if (!groupId) return false; // subcategory has no groups yet
+
+    const loaded = await loadGroup(targetRoute, subIndex, groupId);
+    if (!loaded) return false;
+
+    const path = buildPortfolioPath(sidebarData, targetRoute, subIndex, groupIndex);
+    // re-picking the group already in the URL refreshes it in place rather
+    // than stacking a duplicate history entry
+    navigate(path, { replace: path === window.location.pathname });
+    return true;
   };
 
-  // keeps the cosmetic sidebar/nav highlight index in sync when
-  // activeGroupId changes without a known index - the only case is organic
-  // scroll (Unit.tsx knows the real groupId of what just scrolled into view
-  // but not its position in the sidebar list); click-driven changes already
-  // set both directly, so this is a no-op for those
-  useEffect(() => {
-    if (!activeGroupId) return;
+  // organic scroll into another group (Body's scroll line check reports the
+  // real groupId of whatever crossed its line) - replaces the URL without
+  // loading anything, since that content is already on screen
+  const handleGroupScrolledIntoView = (groupId: string) => {
+    if (loadingRef.current) return false;
 
-    const subIndexForLookup = mobile ? mobileSubIndex : activeSub;
-    const derivedIndex = resolveGroupIndex(
+    const groupIndex = resolveGroupIndex(
       sidebarData,
-      route,
-      subIndexForLookup,
-      activeGroupId,
+      displayedRoute,
+      displayed.subIndex,
+      groupId,
     );
+    if (groupIndex === undefined) return false;
 
-    if (derivedIndex !== undefined && derivedIndex !== activeGroup) {
-      setActiveGroup(derivedIndex);
-    }
-  }, [activeGroupId, sidebarData, route, mobileSubIndex, activeSub, activeGroup]);
+    loadedTargetRef.current = `${displayedRoute}|${displayed.subIndex}|${groupId}`;
+    const path = buildPortfolioPath(
+      sidebarData,
+      displayedRoute,
+      displayed.subIndex,
+      groupIndex,
+    );
+    if (path !== window.location.pathname) navigate(path, { replace: true });
+    return true;
+  };
 
   // clicking the tab whose sidebar is currently showing closes it; clicking
   // any other tab (or any tab while closed) opens a *browse* session for that
-  // category without committing (no route/activeTab change) until a pick is
-  // made within it
+  // category without committing (no URL change) until a pick is made within it
   const handleCategoryTabClick = (tabIndex: number) => {
     if (sidebarOpen && tabIndex === browseTab) {
       setSidebarOpen(false);
@@ -136,17 +219,16 @@ export default function Portfolio({ ...props }) {
     setSidebarRect({ left: rect.left - mainRect.left, width: rect.width });
   };
 
-  const mobileSubName = sidebarData[route]?.subcategories[mobileSubIndex] ?? "";
-  const mobileGroupName =
-    Object.keys(sidebarData[route]?.menu[mobileSubIndex] ?? {})[activeGroup] ??
-    "";
+  const activeSubName = sidebarData[route]?.subcategories[activeSub] ?? "";
+  const activeGroupName =
+    Object.keys(sidebarData[route]?.menu[activeSub] ?? {})[activeGroup] ?? "";
 
   const mobileBreadcrumb =
-    mobile && mobileSubName && mobileGroupName
+    mobile && activeSubName && activeGroupName
       ? {
           category: headerItems[index],
-          subcategory: mobileSubName,
-          group: mobileGroupName,
+          subcategory: activeSubName,
+          group: activeGroupName,
         }
       : null;
 
@@ -168,6 +250,14 @@ export default function Portfolio({ ...props }) {
     }
   }, [route, navigate]);
 
+  // a category change that didn't come from a pick in the dropdown
+  // (back/forward) leaves a stale browse session behind - re-anchor it
+  useEffect(() => {
+    setBrowseTab(index);
+    setBrowseSub(0);
+    setSidebarOpen(false);
+  }, [index]);
+
   useEffect(() => {
     const fetchTaxonomy = async () => {
       try {
@@ -187,83 +277,59 @@ export default function Portfolio({ ...props }) {
     fetchTaxonomy();
   }, []);
 
+  // URL -> content: direct links, the landing page's subcategory pick, and
+  // back/forward all arrive here. Clicks and scrolling have already put the
+  // content on screen by the time they change the URL, so loadedTargetRef
+  // matches and this does nothing for them.
   useEffect(() => {
-    // don't fight the disabled-category redirect above - without this guard,
-    // this effect re-navigates to the disabled route on the same tick since
-    // activeTab still holds that category's index, clobbering the redirect
+    // don't fight the disabled-category redirect above
     if (DISABLED_CATEGORY_ROUTES.includes(route)) return;
 
-    const newRoute = {
-      0: "/photo",
-      1: "/art",
-      2: "/design",
-    };
+    // waits for the taxonomy - this re-runs once sidebarData has loaded
+    const target = resolvePortfolioSlugs(sidebarData, route, subParam, groupParam);
+    if (!target) return;
 
-    const target = newRoute[activeTab as keyof typeof newRoute];
-
-    // already here (true on every mount, since activeTab starts out synced
-    // to route) - skip the redundant same-path navigate, which would wipe
-    // any incoming location.state (e.g. the landing page's subIndex/
-    // playSoundOnLoad) before anything downstream gets a chance to read it
-    if (target === route) return;
-
-    navigate(target);
-  }, [activeTab, navigate, route]);
-
-  useEffect(() => {
-    // provide mechanism for initial images to autoload upon primary category change
-    async function fetchData() {
-      const groupId = resolveGroupId(sidebarData, route, activeSub, 0);
-      if (!groupId) return; // subcategory has no groups yet
-
-      try {
-        const hasMemo = resolveGroupHasMemo(sidebarData, route, activeSub, groupId);
-        const { blocks: nextBlocks, nextStartIndex: resolvedStart } =
-          await loadPortfolioBlocksForGroup({
-            activeSub: activeSubName,
-            activeTab,
-            groupId,
-            hasMemo,
-            isMemoGroup: (id) => resolveGroupHasMemo(sidebarData, route, activeSub, id),
-            setNotice,
-          });
-
-        if (nextBlocks.length > 0) {
-          setBlocks(nextBlocks);
-          setNextStartIndex(resolvedStart);
-
-          // only the landing page's subcategory pick asks for this - normal
-          // in-portfolio category/tab switches stay silent
-          if (
-            (location.state as { playSoundOnLoad?: boolean } | null)
-              ?.playSoundOnLoad
-          ) {
-            playSound();
-          }
-        }
-      } catch (error) {
-        setNotice({
-          status: true,
-          loading: false,
-          message: `There was a problem. It's possible there might not be images here. More info: ${error}`,
-        });
-      }
+    // bare category/subcategory URLs, renamed or unknown slugs, and stray
+    // casing all settle on the one canonical URL for what will be shown -
+    // carrying location.state through so playSoundOnLoad survives
+    const canonical = buildPortfolioPath(
+      sidebarData,
+      route,
+      target.subIndex,
+      target.groupIndex,
+    );
+    if (canonical !== location.pathname) {
+      navigate(canonical, { replace: true, state: location.state });
+      return;
     }
 
-    // wait for the taxonomy fetch to resolve a real subcategory name before
-    // fetching images - this re-runs once sidebarData finishes loading
-    if (!activeSubName) return;
-
-    if (!loadTrackerRef.current) {
-      // only triggers when the primary category has changed
-      loadTrackerRef.current = true;
-      bodyRef.current?.scrollTo({ top: 0, behavior: "smooth" });
-      setActiveGroup(0);
-      setActiveGroupId(resolveGroupId(sidebarData, route, activeSub, 0));
-      fetchData();
+    if (!target.groupId) return; // subcategory has no groups yet
+    if (loadedTargetRef.current === `${route}|${target.subIndex}|${target.groupId}`) {
       return;
-    } else return;
-  }, [activeSub, activeTab, activeSubName, location.state, route, sidebarData]);
+    }
+
+    // only the landing page's subcategory pick asks for this - normal
+    // in-portfolio navigation stays silent
+    const wantsSound = Boolean(
+      (location.state as { playSoundOnLoad?: boolean } | null)?.playSoundOnLoad,
+    );
+
+    loadGroup(route, target.subIndex, target.groupId).then((loaded) => {
+      if (loaded && wantsSound && !soundPlayedRef.current) {
+        soundPlayedRef.current = true;
+        playSound();
+      }
+    });
+  }, [
+    groupParam,
+    loadGroup,
+    location.pathname,
+    location.state,
+    navigate,
+    route,
+    sidebarData,
+    subParam,
+  ]);
 
   return (
     <div className="w-[calc(100dvw-var(--frame)-2px)] h-[calc(100dvh-var(--frame))] overflow-hidden relative">
@@ -276,27 +342,24 @@ export default function Portfolio({ ...props }) {
       {mobile ? (
         <Nav
           activeGroupIndex={activeGroup}
-          activeSubIndex={mobileSubIndex}
-          categoryIndex={index}
-          onGroupSelect={handleMobileGroupSelect}
+          activeSubIndex={activeSub}
+          onNavigate={(subIndex: number, groupIndex: number) =>
+            handleNavigate(route, subIndex, groupIndex)
+          }
           route={route}
-          setBlocks={setBlocks}
           setContactOpen={setContactOpen}
-          setNextStartIndex={setNextStartIndex}
-          setNotice={setNotice}
           sidebarData={sidebarData}
         />
       ) : (
         <Header
-          activeTab={activeTab}
+          activeTab={index}
           anchorTab={browseTab}
           data={headerItems}
           dashboard={categoryAvailability}
-          loadTrackerRef={loadTrackerRef}
           logout={false}
           onActiveTabRectChange={handleActiveTabRectChange}
           onCategoryTabClick={handleCategoryTabClick}
-          setActiveTab={setActiveTab}
+          setActiveTab={() => {}} // portfolio tabs only open the browse dropdown (onCategoryTabClick)
           setContactOpen={setContactOpen}
         />
       )}
@@ -311,36 +374,28 @@ export default function Portfolio({ ...props }) {
               key="portfolio-sidebar"
               activeGroup={activeGroup}
               activeSub={activeSub}
-              activeTab={activeTab}
-              bodyRef={bodyRef}
+              activeTab={index}
               browseSub={browseSub}
               browseTab={browseTab}
+              onNavigate={handleNavigate}
               route={CATEGORY_ROUTES[browseTab]}
               sidebarData={sidebarData}
               sidebarRect={sidebarRect}
-              setActiveGroup={setActiveGroup}
-              setActiveGroupId={setActiveGroupId}
-              setActiveSub={setActiveSub}
-              setActiveTab={setActiveTab}
-              setBlocks={setBlocks}
-              setNextStartIndex={setNextStartIndex}
-              setNotice={setNotice}
               setSidebarOpen={setSidebarOpen}
             />
           )}
         </AnimatePresence>
 
         <Body
-          activeGroupId={activeGroupId}
-          activeSub={activeSubName}
-          activeSubIndex={activeSub}
-          activeTab={activeTab}
+          activeSub={displayedSubName}
+          activeSubIndex={displayed.subIndex}
+          activeTab={displayed.tab}
           blocks={blocks}
           bodyRef={bodyRef}
           breadcrumb={mobileBreadcrumb}
           nextStartIndex={nextStartIndex}
-          route={route}
-          setActiveGroupId={setActiveGroupId}
+          route={displayedRoute}
+          onGroupInView={handleGroupScrolledIntoView}
           setBlocks={setBlocks}
           setContactOpen={setContactOpen}
           setNextStartIndex={setNextStartIndex}

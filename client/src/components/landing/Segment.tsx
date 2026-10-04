@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import Rewind from "../../assets/media/icons/Rewind";
+import { toSubSlug } from "../global/utils/portfolioSlug";
 
 const BACK_BUTTON_CLASSES =
   "w-10 h-10 xl:w-8 xl:h-8 border border-solid border-white bg-black/50 xl:hover:bg-black/70 transition-colors flex items-center justify-center xl:hover:cursor-pointer";
@@ -70,8 +71,8 @@ export default function Segment({ ...props }) {
       animate={exitSubIndex === null ? "visible" : "hidden"}
       onAnimationComplete={(definition) => {
         if (definition === "hidden" && exitSubIndex !== null) {
-          navigate(path, {
-            state: { subIndex: exitSubIndex, playSoundOnLoad: true },
+          navigate(`${path}/${toSubSlug(subcategories[exitSubIndex])}`, {
+            state: { playSoundOnLoad: true },
           });
         }
       }}

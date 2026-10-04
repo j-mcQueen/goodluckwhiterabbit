@@ -18,6 +18,7 @@ import {
   formatAdminTaxonomy,
 } from "./utils/loadPortfolioTaxonomy.js";
 import { deleteS3Prefix } from "./utils/deleteS3Prefix.js";
+import { validateGroupSlug } from "./utils/portfolioSlug.js";
 import { updatePortfolioGroupCount } from "./utils/updatePortfolioGroupCount.js";
 import PortfolioSubcategory from "../models/portfolioSubcategory.js";
 import PortfolioMemo from "../models/portfolioMemo.js";
@@ -186,6 +187,25 @@ export const adminAddGroup = async (req, res, next) => {
       return res.status(400).json({ error: "Invalid group name" });
     }
 
+    // the group name is its public URL slug (/{category}/{sub}/{group}), so
+    // it must be unique within the subcategory by slug, not just verbatim
+    let existing;
+    try {
+      existing = await PortfolioSubcategory.findById(req.params.subId, "groups");
+    } catch (error) {
+      return res.status(500).json({
+        status: true,
+        message:
+          "There was an error creating the group. Please refresh the page and try again. Let Jack know if the problem persists!",
+        logout: { status: false, path: null },
+      });
+    }
+
+    if (!existing) return res.status(404).json({ error: "Subcategory not found" });
+
+    const slugError = validateGroupSlug(name, existing.groups);
+    if (slugError) return res.status(409).json({ error: slugError });
+
     let claimed;
     try {
       // atomically claim the next group id - the filter guards against ever
@@ -306,6 +326,24 @@ export const adminRenameGroup = async (req, res, next) => {
     if (name.length === 0 || name.length > 100) {
       return res.status(400).json({ error: "Invalid group name" });
     }
+
+    // see adminAddGroup - the name is the group's public URL slug
+    let existing;
+    try {
+      existing = await PortfolioSubcategory.findById(subId, "groups");
+    } catch (error) {
+      return res.status(500).json({
+        status: true,
+        message:
+          "There was an error renaming the group. Please refresh the page and try again. Let Jack know if the problem persists!",
+        logout: { status: false, path: null },
+      });
+    }
+
+    if (!existing) return res.status(404).json({ error: "Group not found" });
+
+    const slugError = validateGroupSlug(name, existing.groups, groupId);
+    if (slugError) return res.status(409).json({ error: slugError });
 
     let updated;
     try {

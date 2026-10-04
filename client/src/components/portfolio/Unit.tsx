@@ -13,12 +13,10 @@ const SPAN_THRESHOLD = 1.3; // ratio at/above this is "landscape enough" to take
 
 export default function Unit({ ...props }) {
   const {
-    activeGroupId,
     image,
     itemKey,
     layout = "grid",
     onTrigger,
-    setActiveGroupId,
     stacked = false,
   } = props;
   const imgRef = useRef<HTMLImageElement>(null);
@@ -57,13 +55,11 @@ export default function Unit({ ...props }) {
     <InView
       as="div"
       className={wrapperClassName}
+      // read by Body's scroll line check to tell which group this image
+      // belongs to - image.group is parsed straight from its real S3 key
+      data-group={image.group}
       onChange={(inView) => {
         if (!inView) return; // only act on entering view, not leaving it
-
-        // image.group is ground truth for "what group is now in view" -
-        // parsed straight from the just-loaded image's real S3 key, so no
-        // arithmetic reconstruction from a display index is needed
-        if (image.group !== activeGroupId) setActiveGroupId(image.group);
 
         // only the true last unit across the whole blocks sequence
         // (Body.tsx) is given a trigger - pagination fires from there

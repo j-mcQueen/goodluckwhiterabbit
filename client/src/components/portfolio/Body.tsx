@@ -1,4 +1,4 @@
-import { Fragment, useRef } from "react";
+import { Fragment, UIEvent, useRef } from "react";
 import { handlePortfolioIntersection } from "./utils/handlePortfolioIntersection";
 import { handleMemoBlockIntersection } from "./utils/handleMemoBlockIntersection";
 import { PortfolioBlock } from "./types/PortfolioBlock";
@@ -7,7 +7,6 @@ import MemoDisplay from "../global/memo/MemoDisplay";
 import Unit from "./Unit";
 import PortfolioMemoSegments from "./PortfolioMemoSegments";
 import PortfolioTrigger from "./PortfolioTrigger";
-import GroupSentinel from "./GroupSentinel";
 import StackedItem, {
   STACKED_ITEM_CLASSES,
   STACKED_BANNER_ITEM_CLASSES,
@@ -23,6 +22,9 @@ const TAB_CATEGORY: Record<number, string> = {
   2: "DESIGN",
 };
 
+// how far down the scroll area the "current group" line sits - see handleScroll
+const GROUP_LINE_RATIO = 1 / 3;
+
 const PLAIN_GRID_CLASSES =
   // row height is viewport-relative (not a flat px) so it tracks column
   // width: with 3 columns, colWidth ≈ 100vw/3, and dividing that by our
@@ -34,7 +36,6 @@ const PLAIN_GRID_CLASSES =
 
 export default function Body({ ...props }) {
   const {
-    activeGroupId,
     activeSub,
     activeSubIndex,
     activeTab,
@@ -42,8 +43,8 @@ export default function Body({ ...props }) {
     bodyRef,
     breadcrumb,
     nextStartIndex,
+    onGroupInView,
     route,
-    setActiveGroupId,
     setBlocks,
     setContactOpen,
     setNextStartIndex,
@@ -92,6 +93,45 @@ export default function Body({ ...props }) {
     };
   };
 
+  // which group is "current" while scrolling is whichever one sits under a
+  // fixed line a third of the way down the scroll area - the same rule in
+  // both directions, so scrolling back up switches as soon as the previous
+  // group's content crosses the line rather than once its top comes back
+  // into view. Every rendered item carries its group in data-group (Unit
+  // for plain images, a display:contents wrapper per memo-aware block, which
+  // is always exactly one group - see appendMemoBatch). A point that lands
+  // on no item (a grid gap, an overlay) reports nothing, keeping the
+  // current group. Checked at most once per frame.
+  const lineFrameRef = useRef<number | null>(null);
+  // `${viewKey}|${groupId}` - groupIds are only unique within a
+  // subcategory, so the last report is scoped to the view it came from
+  const lastLineGroupRef = useRef<string | null>(null);
+
+  const handleScroll = (event: UIEvent<HTMLElement>) => {
+    const section = event.currentTarget;
+    if (lineFrameRef.current !== null) return;
+
+    lineFrameRef.current = requestAnimationFrame(() => {
+      lineFrameRef.current = null;
+
+      const rect = section.getBoundingClientRect();
+      const hit = document.elementFromPoint(
+        rect.left + rect.width / 2,
+        rect.top + rect.height * GROUP_LINE_RATIO,
+      );
+      const groupId = hit && section.contains(hit)
+        ? hit.closest<HTMLElement>("[data-group]")?.dataset.group
+        : undefined;
+      if (!groupId) return;
+
+      const reportKey = `${viewKeyRef.current}|${groupId}`;
+      if (reportKey === lastLineGroupRef.current) return;
+      // only remembered once accepted - Portfolio ignores reports while a
+      // load is in flight, and this one must be re-sent after that
+      if (onGroupInView(groupId)) lastLineGroupRef.current = reportKey;
+    });
+  };
+
   // fires only from the true last rendered node in the whole blocks
   // sequence, whatever kind of block that happens to be - see the
   // isLast checks in each render branch below
@@ -136,11 +176,9 @@ export default function Body({ ...props }) {
       return (
         <Fragment key={image.key}>
           <Unit
-            activeGroupId={activeGroupId}
             image={image}
             itemKey={image.key}
             onTrigger={isLastImage ? () => triggerPlainPipeline(image.group) : undefined}
-            setActiveGroupId={setActiveGroupId}
             stacked={stacked}
           />
         </Fragment>
@@ -207,6 +245,7 @@ export default function Body({ ...props }) {
   return (
     <section
       ref={bodyRef}
+      onScroll={handleScroll}
       className="overflow-y-scroll w-full overflow-x-hidden mb-[0.625rem] xl:my-2"
     >
       {breadcrumb && (
@@ -222,16 +261,13 @@ export default function Body({ ...props }) {
             const isLastBlock = blockIndex === blocks.length - 1;
             return (
               <Fragment key={block.blockKey}>
-                {block.kind === "memo-aware" && (
-                  <GroupSentinel
-                    groupId={block.groupId}
-                    activeGroupId={activeGroupId}
-                    setActiveGroupId={setActiveGroupId}
-                  />
+                {block.kind === "plain" ? (
+                  renderPlainImages(block, isLastBlock)
+                ) : (
+                  <div className="contents" data-group={block.groupId}>
+                    {renderStackedMemoBlock(block, isLastBlock)}
+                  </div>
                 )}
-                {block.kind === "plain"
-                  ? renderPlainImages(block, isLastBlock)
-                  : renderStackedMemoBlock(block, isLastBlock)}
               </Fragment>
             );
           })}
@@ -274,11 +310,9 @@ export default function Body({ ...props }) {
                     {trailingImages.map((image) => (
                       <Unit
                         key={image.key}
-                        activeGroupId={activeGroupId}
                         image={image}
                         itemKey={image.key}
                         layout="row"
-                        setActiveGroupId={setActiveGroupId}
                       />
                     ))}
                   </WidowImagesRow>
@@ -288,12 +322,7 @@ export default function Body({ ...props }) {
           }
 
           return (
-            <Fragment key={block.blockKey}>
-              <GroupSentinel
-                groupId={block.groupId}
-                activeGroupId={activeGroupId}
-                setActiveGroupId={setActiveGroupId}
-              />
+            <div key={block.blockKey} className="contents" data-group={block.groupId}>
               <PortfolioMemoSegments
                 entries={block.entries}
                 urlsByKey={block.urlsByKey}
@@ -301,7 +330,7 @@ export default function Body({ ...props }) {
                 onTrigger={isLastBlock ? () => triggerMemoBlock(block) : undefined}
                 endsBeforeMemo={nextBlockIsMemo}
               />
-            </Fragment>
+            </div>
           );
         })
       )}

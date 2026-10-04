@@ -1,8 +1,5 @@
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { resolveGroupId } from "../utils/resolveGroupId";
-import { resolveGroupHasMemo } from "../utils/resolveGroupHasMemo";
-import { loadPortfolioBlocksForGroup } from "../utils/loadPortfolioBlocksForGroup";
 
 import TopBar from "../../global/header/mobile/TopBar";
 import Instagram from "../../../assets/media/icons/Instagram";
@@ -13,13 +10,9 @@ export default function Nav({ ...props }) {
   const {
     activeGroupIndex,
     activeSubIndex,
-    categoryIndex,
-    onGroupSelect,
+    onNavigate,
     route,
-    setBlocks,
     setContactOpen,
-    setNextStartIndex,
-    setNotice,
     sidebarData,
   } = props;
 
@@ -30,54 +23,15 @@ export default function Nav({ ...props }) {
     sidebarData[route]?.menu[activeSubIndex] ?? {},
   );
 
+  // scoped to the current route (no primary-category switching) - picks
+  // commit through Portfolio's onNavigate, same as the desktop Sidebar
   const handleSubcategoryClick = async (j: number) => {
     if (j === activeSubIndex) return; // already active - stay open on its groups
-
-    const groupId = resolveGroupId(sidebarData, route, j, 0);
-    if (!groupId) return; // subcategory has no groups yet
-
-    const hasMemo = resolveGroupHasMemo(sidebarData, route, j, groupId);
-    const { blocks, nextStartIndex } = await loadPortfolioBlocksForGroup({
-      activeSub: subcategories[j],
-      activeTab: categoryIndex,
-      groupId,
-      hasMemo,
-      isMemoGroup: (id: string) => resolveGroupHasMemo(sidebarData, route, j, id),
-      setNotice,
-    });
-
-    if (blocks.length > 0) {
-      setBlocks(blocks);
-      setNextStartIndex(nextStartIndex);
-    }
-
-    onGroupSelect?.(j, 0, groupId);
-    setIsOpen({ main: false });
+    if (await onNavigate(j, 0)) setIsOpen({ main: false });
   };
 
   const handleGroupClick = async (k: number) => {
-    const groupId = resolveGroupId(sidebarData, route, activeSubIndex, k);
-    if (!groupId) return;
-
-    const hasMemo = resolveGroupHasMemo(sidebarData, route, activeSubIndex, groupId);
-    const { blocks, nextStartIndex, empty } = await loadPortfolioBlocksForGroup({
-      activeSub: subcategories[activeSubIndex],
-      activeTab: categoryIndex,
-      groupId,
-      hasMemo,
-      isMemoGroup: (id: string) => resolveGroupHasMemo(sidebarData, route, activeSubIndex, id),
-      setNotice,
-    });
-
-    if (empty) return; // notice already raised - stay on the current group
-
-    if (blocks.length > 0) {
-      setBlocks(blocks);
-      setNextStartIndex(nextStartIndex);
-    }
-
-    onGroupSelect?.(activeSubIndex, k, groupId);
-    setIsOpen({ main: false });
+    if (await onNavigate(activeSubIndex, k)) setIsOpen({ main: false });
   };
 
   return (

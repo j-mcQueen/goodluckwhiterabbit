@@ -59,7 +59,10 @@ export const handleRenameGroup = async ({ ...params }) => {
 
     setNotice({
       status: true,
-      message: "Something went wrong renaming this group - please try again.",
+      message:
+        response.status === 409
+          ? data.error
+          : "Something went wrong renaming this group - please try again.",
       logout: { status: false, path: null },
     });
     return false;
