@@ -70,7 +70,7 @@ const generateArtMemoHtml = (fields: ArtMemoFields): string => {
   }
   if (fields.body.trim()) {
     parts.push(
-      `<p data-field="body" class="font-vt tracking-vt text-white uppercase text-base text-center mt-3 whitespace-pre-line">${escapeHtml(fields.body)}</p>`,
+      `<p data-field="body" class="font-vt tracking-vt text-white uppercase text-base text-center whitespace-pre-line">${escapeHtml(fields.body)}</p>`,
     );
   }
   if (fields.inquire) {
