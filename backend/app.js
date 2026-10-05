@@ -73,9 +73,10 @@ passport.use(
   new LocalStrategy(async (username, password, done) => {
     try {
       const admin = await Admin.findOne({ username, role: "admin" }).exec();
-      const match = bcrypt.compare(password, admin.password);
+      if (!admin) return done(null, false);
 
-      if (!admin || !match) return done(null, false);
+      const match = await bcrypt.compare(password, admin.password);
+      if (!match) return done(null, false);
 
       // oooh, a real admin!
       return done(null, admin);
