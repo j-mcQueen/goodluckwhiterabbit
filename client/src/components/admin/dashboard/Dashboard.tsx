@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { SetStateAction, useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { determineHost as host } from "../../global/utils/determineHost";
 import { mobile } from "../../global/utils/determineViewport";
@@ -15,16 +15,30 @@ import RejectedFiles from "./modals/RejectedFiles";
 import Notice from "./modals/Notice";
 
 export default function AdminDashboard() {
-  const navigate = useNavigate();
-  const location = useLocation();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   useEffect(() => {
     document.title = "ADMIN DASHBOARD — GOOD LUCK WHITE RABBIT";
   }, []);
 
-  const [activePane, setActivePane] = useState("ALL");
   const [clients, setClients] = useState([]);
   const [targetClient, setTargetClient] = useState({});
+
+  // the active pane lives in the URL (?pane=) so a refresh keeps the admin
+  // where they were - EDIT depends on an in-memory targetClient, so it falls
+  // back to ALL when there isn't one (i.e. after a refresh)
+  const paneParam = (searchParams.get("pane") ?? "ALL").toUpperCase();
+  const activePane =
+    (paneParam === "EDIT" && Object.keys(targetClient).length === 0) ||
+    !["ALL", "ADD", "EDIT", "PORTFOLIO"].includes(paneParam)
+      ? "ALL"
+      : paneParam;
+
+  const setActivePane = (value: SetStateAction<string>) => {
+    const pane = typeof value === "function" ? value(activePane) : value;
+    // changing pane drops the previous pane's params, e.g. PortfolioManager's
+    setSearchParams(pane === "ALL" ? {} : { pane: pane.toLowerCase() });
+  };
 
   const [clientFilterResult, setClientFilterResult] = useState([]);
   const [rejectedFiles, setRejectedFiles] = useState([]);
@@ -54,8 +68,6 @@ export default function AdminDashboard() {
         const data = await response.json();
 
         if (data) {
-          location.state.login = false; // ensures fn does not rerun after login
-
           switch (response.status) {
             case 200:
             case 304:
@@ -89,8 +101,11 @@ export default function AdminDashboard() {
       }
     };
 
-    if (location.state.login === true) getAllClients(); // if admin has just logged in, fetch clients
-  }, [location, navigate]);
+    // runs once on mount rather than keying off location.state.login - the
+    // pane/breadcrumb URL params change location (and drop its state) on
+    // every navigation within the dashboard
+    getAllClients();
+  }, []);
 
   return (
     <main className="w-[calc(100dvw-var(--frame)-2px)] h-[calc(100dvh-var(--frame)-2px)] overflow-scroll overflow-x-hidden relative flex flex-col">

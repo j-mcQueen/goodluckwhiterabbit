@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { determineHost as host } from "../../global/utils/determineHost";
 import { imageset_select_btns } from "./styles/styles";
@@ -25,12 +26,27 @@ const EMPTY_DELETE_TOGGLE = {
 export default function PortfolioManager({ ...props }) {
   const { setNotice } = props;
 
+  const [searchParams, setSearchParams] = useSearchParams();
   const [taxonomy, setTaxonomy] = useState<portfolio_subcategory[]>([]);
-  const [activeCategory, setActiveCategory] = useState<string | null>(null);
+  const [taxonomyLoaded, setTaxonomyLoaded] = useState(false);
   const [targetSubcategory, setTargetSubcategory] =
     useState<portfolio_subcategory | null>(null);
-  const [targetGroupId, setTargetGroupId] = useState("");
-  const [started, setStarted] = useState(false);
+
+  // the breadcrumb position lives in the URL (?cat=&sub=&group=) so it
+  // survives a refresh and the browser back button steps back through it
+  const catParam = searchParams.get("cat");
+  const activeCategory =
+    catParam && CATEGORIES.includes(catParam) ? catParam : null;
+  const subParam = activeCategory ? searchParams.get("sub") : null;
+  const targetGroupId = subParam ? searchParams.get("group") ?? "" : "";
+  // targetSubcategory is still held in state so children can update it in
+  // place - only trust it once it matches the URL, otherwise it's stale
+  // (e.g. mid back-navigation) or still being restored from the taxonomy
+  const activeSubcategory =
+    targetSubcategory && targetSubcategory._id === subParam
+      ? targetSubcategory
+      : null;
+  const started = Boolean(activeSubcategory && targetGroupId);
   const [dragTarget, setDragTarget] = useState({});
   const [queue, setQueue] = useState<File[]>([]);
   const [submitOpen, setSubmitOpen] = useState(false);
@@ -59,6 +75,7 @@ export default function PortfolioManager({ ...props }) {
 
         if (response.status === 200) {
           setTaxonomy(data);
+          setTaxonomyLoaded(true);
         } else if (response.status === 401) {
           setNotice({
             status: true,
@@ -80,22 +97,71 @@ export default function PortfolioManager({ ...props }) {
     getTaxonomy();
   }, [setNotice]);
 
+  const setPosition = (
+    position: { cat?: string; sub?: string; group?: string },
+    replace = false,
+  ) => {
+    setSearchParams(
+      (prev) => {
+        // keep Dashboard.tsx's ?pane= and anything else outside the breadcrumb
+        const next = new URLSearchParams(prev);
+        for (const key of ["cat", "sub", "group"] as const) {
+          const value = position[key];
+          if (value) next.set(key, value);
+          else next.delete(key);
+        }
+        return next;
+      },
+      { replace },
+    );
+  };
+
+  // restore the subcategory object from the URL once the taxonomy is in (on
+  // refresh, or when back/forward changes the URL), and drop any part of the
+  // URL that no longer resolves, e.g. a since-deleted subcategory or group
+  useEffect(() => {
+    if (!taxonomyLoaded) return;
+
+    if (catParam !== activeCategory) {
+      setPosition({}, true);
+      return;
+    }
+    if (!activeCategory || !subParam) return;
+
+    const sub = taxonomy.find(
+      (entry) => entry._id === subParam && entry.category === activeCategory,
+    );
+    if (!sub) {
+      setPosition({ cat: activeCategory }, true);
+      return;
+    }
+    if (
+      targetGroupId &&
+      !sub.groups.some((group) => group.groupId === targetGroupId)
+    ) {
+      setPosition({ cat: activeCategory, sub: sub._id }, true);
+    }
+
+    setTargetSubcategory((prev) => (prev?._id === sub._id ? prev : sub));
+    // setPosition is recreated every render but only wraps setSearchParams
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [taxonomyLoaded, taxonomy, catParam, activeCategory, subParam, targetGroupId]);
+
   const resetToCategories = () => {
-    setActiveCategory(null);
     setTargetSubcategory(null);
-    setTargetGroupId("");
-    setStarted(false);
+    setPosition({});
   };
 
   const resetToSubcategories = () => {
     setTargetSubcategory(null);
-    setTargetGroupId("");
-    setStarted(false);
+    setPosition({ cat: activeCategory ?? undefined });
   };
 
   const resetToGroups = () => {
-    setTargetGroupId("");
-    setStarted(false);
+    setPosition({
+      cat: activeCategory ?? undefined,
+      sub: activeSubcategory?._id,
+    });
   };
 
   return (
@@ -110,7 +176,7 @@ export default function PortfolioManager({ ...props }) {
             ◄ CATEGORIES
           </button>
 
-          {targetSubcategory ? (
+          {activeSubcategory ? (
             <button
               type="button"
               onClick={resetToSubcategories}
@@ -126,7 +192,7 @@ export default function PortfolioManager({ ...props }) {
               onClick={resetToGroups}
               className="xl:hover:text-rd focus:text-rd focus:outline-none transition-colors"
             >
-              ◄ {targetSubcategory?.name} GROUPS
+              ◄ {activeSubcategory?.name} GROUPS
             </button>
           ) : null}
         </nav>
@@ -138,7 +204,7 @@ export default function PortfolioManager({ ...props }) {
           setDeleteModalToggle={setDeleteModalToggle}
           taxonomy={taxonomy}
           setTaxonomy={setTaxonomy}
-          targetSubcategory={targetSubcategory}
+          targetSubcategory={activeSubcategory}
           setTargetSubcategory={setTargetSubcategory}
           setNotice={setNotice}
         />
@@ -154,26 +220,31 @@ export default function PortfolioManager({ ...props }) {
                 key={category}
                 type="button"
                 className={imageset_select_btns}
-                onClick={() => setActiveCategory(category)}
+                onClick={() => setPosition({ cat: category })}
               >
                 {category}
               </button>
             ))}
           </div>
         </div>
-      ) : !targetSubcategory ? (
+      ) : subParam && !activeSubcategory ? (
+        // restoring the subcategory from the URL - render nothing rather than
+        // flashing the subcategory list first
+        null
+      ) : !activeSubcategory ? (
         <SubcategoryManager
           category={activeCategory}
           taxonomy={taxonomy}
           setTaxonomy={setTaxonomy}
           setDeleteModalToggle={setDeleteModalToggle}
-          onSelectSubcategory={(sub: portfolio_subcategory) =>
-            setTargetSubcategory(sub)
-          }
+          onSelectSubcategory={(sub: portfolio_subcategory) => {
+            setTargetSubcategory(sub);
+            setPosition({ cat: activeCategory, sub: sub._id });
+          }}
         />
       ) : !started ? (
         <GroupManager
-          targetSubcategory={targetSubcategory}
+          targetSubcategory={activeSubcategory}
           setTargetSubcategory={setTargetSubcategory}
           taxonomy={taxonomy}
           setTaxonomy={setTaxonomy}
@@ -182,8 +253,11 @@ export default function PortfolioManager({ ...props }) {
           onSelectGroup={(groupId: string) => {
             // PortfolioAdminGrid.tsx fetches its own data on mount from
             // category/sub/groupId - nothing more to load here
-            setTargetGroupId(groupId);
-            setStarted(true);
+            setPosition({
+              cat: activeCategory,
+              sub: activeSubcategory._id,
+              group: groupId,
+            });
           }}
         />
       ) : (
@@ -196,7 +270,7 @@ export default function PortfolioManager({ ...props }) {
               const data = await portfolioBulkUpload(
                 queue,
                 activeCategory,
-                targetSubcategory.name,
+                activeSubcategory.name,
                 targetGroupId,
                 (percent: number) => setUploadProgress(percent),
               );
@@ -209,13 +283,13 @@ export default function PortfolioManager({ ...props }) {
                 newLayoutLength: data.newLayoutLength,
               });
 
-              const updatedGroups = targetSubcategory.groups.map((group) =>
+              const updatedGroups = activeSubcategory.groups.map((group) =>
                 group.groupId === targetGroupId
                   ? { ...group, count: data.newCount }
                   : group,
               );
               const updatedSubcategory = {
-                ...targetSubcategory,
+                ...activeSubcategory,
                 groups: updatedGroups,
               };
               setTargetSubcategory(updatedSubcategory);
@@ -267,7 +341,7 @@ export default function PortfolioManager({ ...props }) {
                 category={activeCategory}
                 dragTarget={dragTarget}
                 setNotice={setNotice}
-                targetSubcategory={targetSubcategory}
+                targetSubcategory={activeSubcategory}
                 setTargetSubcategory={setTargetSubcategory}
                 targetGroupId={targetGroupId}
                 taxonomy={taxonomy}
