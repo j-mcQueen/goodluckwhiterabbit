@@ -96,9 +96,18 @@ export default function ImageQueue({ ...props }) {
                   draggable={true}
                   onDragStart={(e) => {
                     e.currentTarget.style.opacity = "0.25";
-                    if (fileRef.current?.files) {
-                      const file = fileRef.current.files[index];
+                    // uncompressed queues (PortfolioManager.tsx) hold the
+                    // full-resolution files themselves, so drag the queue
+                    // entry directly - the input's FileList only holds the
+                    // latest ADD selection and doesn't shift on queue
+                    // deletes, so indexing it can pick the wrong file. A
+                    // compressed queue (EditClient.tsx) holds shrunken
+                    // copies, and its single-file upload wants the original
+                    if (!compress) {
                       setDragTarget(file);
+                      handleDragStart(e, "queue", index);
+                    } else if (fileRef.current?.files) {
+                      setDragTarget(fileRef.current.files[index]);
                       handleDragStart(e, "queue", index);
                     }
                   }}
