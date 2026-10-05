@@ -20,7 +20,9 @@ export const fetchAdminPortfolioLayoutBatch = async (
 ): Promise<{
   entries: PortfolioLayoutEntry[];
   blobsByKey: Map<string, Blob>;
-  stored: number;
+  // layout entries (images + memos) the group holds in total - what this
+  // batch pagination runs over, not the group's image-only `count`
+  layoutLength: number;
 } | null> => {
   const response = await fetch(
     `${host}/admin/portfolio/${category}/${sub}/${groupId}/layout/sm/${start}`,
@@ -53,5 +55,5 @@ export const fetchAdminPortfolioLayoutBatch = async (
     entries.push({ type: "image", key, ratio, banner: Boolean(item.banner) });
   }
 
-  return { entries, blobsByKey, stored: data.stored };
+  return { entries, blobsByKey, layoutLength: data.stored };
 };

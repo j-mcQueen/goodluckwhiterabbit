@@ -693,8 +693,16 @@ export const adminBulkUploadPortfolioImages = async (req, res, next) => {
         (candidate) => candidate.groupId === groupId,
       );
 
+      // layout length (images + memos) is what the admin grid paginates
+      // over, distinct from `count` (images only) - returned separately so
+      // the grid can tell whether it needs to fetch the new entries
+      let newLayoutLength = (
+        owner.subcategory.groups.find((candidate) => candidate.groupId === groupId)
+          ?.layout ?? []
+      ).length;
+
       if (succeededPositions.length > 0) {
-        await PortfolioSubcategory.updateOne(
+        const withLayout = await PortfolioSubcategory.findOneAndUpdate(
           { _id: owner.subcategory._id, "groups.groupId": groupId },
           {
             $addToSet: {
@@ -703,13 +711,19 @@ export const adminBulkUploadPortfolioImages = async (req, res, next) => {
               },
             },
           },
+          { new: true },
         );
+        const layoutGroup = withLayout?.groups?.find(
+          (candidate) => candidate.groupId === groupId,
+        );
+        if (layoutGroup) newLayoutLength = layoutGroup.layout.length;
       }
 
       return res.status(200).json({
         succeeded,
         failed,
         newCount: updatedGroup?.count ?? succeeded.length,
+        newLayoutLength,
       });
     } catch (error) {
       return res

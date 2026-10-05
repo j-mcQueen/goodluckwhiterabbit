@@ -3,7 +3,8 @@ import { determineHost as host } from "../../../../../global/utils/determineHost
 type PortfolioBulkUploadResponse = {
   succeeded: string[];
   failed: string[];
-  newCount: number;
+  newCount: number; // images only
+  newLayoutLength: number; // images + memos
 };
 
 export const portfolioBulkUpload = async (

@@ -45,7 +45,7 @@ export default function PortfolioManager({ ...props }) {
   // would make the grid auto-load its entire backlog on those too
   const [bulkUploadSignal, setBulkUploadSignal] = useState<{
     key: number;
-    newCount: number;
+    newLayoutLength: number;
   } | null>(null);
 
   useEffect(() => {
@@ -204,7 +204,10 @@ export default function PortfolioManager({ ...props }) {
               setSubmitStatus(1);
               setUploadProgress(null);
               setBulkFails(data.failed);
-              setBulkUploadSignal({ key: Date.now(), newCount: data.newCount });
+              setBulkUploadSignal({
+                key: Date.now(),
+                newLayoutLength: data.newLayoutLength,
+              });
 
               const updatedGroups = targetSubcategory.groups.map((group) =>
                 group.groupId === targetGroupId

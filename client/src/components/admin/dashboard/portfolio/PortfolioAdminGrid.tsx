@@ -245,7 +245,7 @@ export default function PortfolioAdminGrid({
   // uploading. Deliberately not the group's plain `count` prop: that value
   // can change for other incidental reasons during navigation, and would
   // make the grid auto-load its entire backlog on those too.
-  bulkUploadSignal: { key: number; newCount: number } | null;
+  bulkUploadSignal: { key: number; newLayoutLength: number } | null;
   // reports how many *images* (not memos) are currently loaded into
   // `entries`, so PortfolioFileInfo.tsx's "FILES DISPLAYED" counter can
   // reflect this grid's actual paginated state instead of just echoing the
@@ -254,7 +254,9 @@ export default function PortfolioAdminGrid({
 }) {
   const [entries, setEntries] = useState<PortfolioLayoutEntry[] | null>(null);
   const [urlsByKey, setUrlsByKey] = useState<Map<string, string>>(new Map());
-  const [stored, setStored] = useState(0);
+  // total layout entries (images + memos) the group holds server-side -
+  // what pagination and caughtUp run over. Not the image-only `count`.
+  const [layoutLength, setLayoutLength] = useState(0);
   const [dialog, setDialog] = useState<DialogState>({ mode: "closed" });
   // how many empty drop-target slots are currently visible once caught up -
   // grows by BATCH_SIZE each time the load-more button is pressed while
@@ -318,7 +320,7 @@ export default function PortfolioAdminGrid({
       );
       return next;
     });
-    setStored(result.stored);
+    setLayoutLength(result.layoutLength);
   };
 
   // guarded against React StrictMode's dev-mode double-invoke of effects:
@@ -332,7 +334,7 @@ export default function PortfolioAdminGrid({
       prev.forEach((url) => URL.revokeObjectURL(url));
       return new Map();
     });
-    setStored(0);
+    setLayoutLength(0);
     setEmptySlotCount(BATCH_SIZE);
 
     fetchAdminPortfolioLayoutBatch(category, sub, groupId, 0).then((result) => {
@@ -343,7 +345,7 @@ export default function PortfolioAdminGrid({
         nextUrls.set(key, URL.createObjectURL(blob)),
       );
       setUrlsByKey(nextUrls);
-      setStored(result.stored);
+      setLayoutLength(result.layoutLength);
     });
 
     return () => {
@@ -359,14 +361,14 @@ export default function PortfolioAdminGrid({
     if (!bulkUploadSignal) return;
     if (
       entries === null ||
-      entries.length !== stored ||
-      bulkUploadSignal.newCount <= stored
+      entries.length !== layoutLength ||
+      bulkUploadSignal.newLayoutLength <= layoutLength
     )
       return;
 
     let cancelled = false;
     const catchUp = async () => {
-      let start = stored;
+      let start = layoutLength;
       // eslint-disable-next-line no-constant-condition
       while (true) {
         const result = await fetchAdminPortfolioLayoutBatch(
@@ -385,10 +387,10 @@ export default function PortfolioAdminGrid({
           );
           return next;
         });
-        setStored(result.stored);
+        setLayoutLength(result.layoutLength);
 
         start += result.entries.length;
-        if (start >= result.stored) break;
+        if (start >= result.layoutLength) break;
       }
     };
     catchUp();
@@ -450,7 +452,7 @@ export default function PortfolioAdminGrid({
   // content at entries.length and have that actually be the group's true
   // end - otherwise unloaded backlog would end up displayed after content
   // that's really positioned ahead of it
-  const caughtUp = entries.length === stored;
+  const caughtUp = entries.length === layoutLength;
 
   const handleImageSwap = async (fromKey: string, toKey: string) => {
     if (fromKey === toKey) return;
@@ -580,7 +582,7 @@ export default function PortfolioAdminGrid({
       next.set(key, URL.createObjectURL(result.blob));
       return next;
     });
-    setStored((prev) => prev + 1);
+    setLayoutLength((prev) => prev + 1);
   };
 
   const handleReplace = async (key: string, file: File) => {
@@ -667,7 +669,7 @@ export default function PortfolioAdminGrid({
       next.delete(key);
       return next;
     });
-    setStored((prev) => Math.max(0, prev - 1));
+    setLayoutLength((prev) => Math.max(0, prev - 1));
   };
 
   const handleMemoDelete = async (memoId: string) => {
@@ -683,7 +685,7 @@ export default function PortfolioAdminGrid({
     setEntries((prev) =>
       prev ? prev.filter((entry) => entry.key !== memoId) : prev,
     );
-    setStored((prev) => Math.max(0, prev - 1));
+    setLayoutLength((prev) => Math.max(0, prev - 1));
   };
 
   const handleDialogSubmit = async (fields: MemoFields) => {
@@ -712,7 +714,7 @@ export default function PortfolioAdminGrid({
           });
           return next;
         });
-        setStored((prev) => prev + 1);
+        setLayoutLength((prev) => prev + 1);
       }
       return;
     }
